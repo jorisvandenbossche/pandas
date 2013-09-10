@@ -235,7 +235,7 @@ Conversion / Constructors
 .. autosummary::
    :toctree: generated/
 
-   Series.__init__
+   Series
    Series.astype
    Series.copy
 
@@ -430,7 +430,7 @@ Conversion / Constructors
 .. autosummary::
    :toctree: generated/
 
-   DataFrame.__init__
+   DataFrame
    DataFrame.astype
    DataFrame.convert_objects
    DataFrame.copy
@@ -657,7 +657,7 @@ Conversion / Constructors
 .. autosummary::
    :toctree: generated/
 
-   Panel.__init__
+   Panel
    Panel.astype
    Panel.copy
 
@@ -793,3 +793,183 @@ Serialization / IO / Conversion
    Panel.to_frame
    Panel.to_clipboard
 
+
+    .. HACK -- the point here is that we don't want this to appear in the output, but the autosummary should still generate the pages.
+        .. autosummary::
+            :toctree: generated/
+            
+            DataFrame.all
+            DataFrame.as_blocks
+            DataFrame.at_time
+            DataFrame.between_time
+            DataFrame.bfill
+            DataFrame.consolidate
+            DataFrame.divide
+            DataFrame.dot
+            DataFrame.eq
+            DataFrame.ffill
+            DataFrame.ge
+            DataFrame.get
+            DataFrame.get_ftype_counts
+            DataFrame.get_value
+            DataFrame.get_values
+            DataFrame.gt
+            DataFrame.icol
+            DataFrame.iget_value
+            DataFrame.interpolate
+            DataFrame.irow
+            DataFrame.iterkv
+            DataFrame.keys
+            DataFrame.le
+            DataFrame.load
+            DataFrame.lt
+            DataFrame.mask
+            DataFrame.mod
+            DataFrame.ne
+            DataFrame.pivot_table
+            DataFrame.pow
+            DataFrame.product
+            DataFrame.rename_axis
+            DataFrame.rmod
+            DataFrame.rpow
+            DataFrame.save
+            DataFrame.set_value
+            DataFrame.squeeze
+            DataFrame.swapaxes
+            DataFrame.to_dense
+            DataFrame.to_latex
+            DataFrame.to_sql
+            DataFrame.to_wide
+            DataFrame.tshift
+            DataFrame.where
+            
+            DataFrame.at
+            DataFrame.blocks
+            DataFrame.empty
+            DataFrame.ftypes
+            DataFrame.iat
+            DataFrame.iloc
+            DataFrame.loc
+            
+            Series.add_prefix
+            Series.add_suffix
+            Series.all
+            Series.argmax
+            Series.argmin
+            Series.as_blocks
+            Series.as_matrix
+            Series.at_time
+            Series.between_time
+            Series.bfill
+            Series.consolidate
+            Series.convert_objects
+            Series.dot
+            Series.drop_duplicates
+            Series.duplicated
+            Series.ffill
+            Series.filter
+            Series.from_array
+            Series.get_dtype_counts
+            Series.get_ftype_counts
+            Series.get_value
+            Series.get_values
+            Series.iget
+            Series.iget_value
+            Series.irow
+            Series.item
+            Series.iterkv
+            Series.keys
+            Series.load
+            Series.mask
+            Series.mod
+            Series.nonzero
+            Series.pop
+            Series.ptp
+            Series.put
+            Series.ravel
+            Series.reindex_axis
+            Series.rename_axis
+            Series.repeat
+            Series.reshape
+            Series.save
+            Series.set_value
+            Series.squeeze
+            Series.swapaxes
+            Series.to_dense
+            Series.to_hdf
+            Series.to_json
+            Series.to_period
+            Series.to_timestamp
+            Series.tolist
+            Series.transpose
+            Series.tshift
+            Series.valid
+            Series.view
+            Series.where
+            Series.xs
+            
+            Series.T
+            Series.at
+            Series.axes
+            Series.base
+            Series.blocks
+            Series.data
+            Series.empty
+            Series.flags
+            Series.ftype
+            Series.iat
+            Series.iloc
+            Series.is_time_series
+            Series.loc
+            Series.ndim
+            Series.shape
+            Series.size
+            Series.strides
+
+            Panel.align
+            Panel.as_blocks
+            Panel.as_matrix
+            Panel.at_time
+            Panel.between_time
+            Panel.bfill
+            Panel.compound
+            Panel.consolidate
+            Panel.convert_objects
+            Panel.divide
+            Panel.eq
+            Panel.ffill
+            Panel.fromDict
+            Panel.ge
+            Panel.get
+            Panel.get_dtype_counts
+            Panel.get_ftype_counts
+            Panel.get_values
+            Panel.gt
+            Panel.interpolate
+            Panel.iterkv
+            Panel.keys
+            Panel.le
+            Panel.load
+            Panel.lt
+            Panel.mask
+            Panel.multiply
+            Panel.ne
+            Panel.rename_axis
+            Panel.replace
+            Panel.save
+            Panel.squeeze
+            Panel.subtract
+            Panel.toLong
+            Panel.to_dense
+            Panel.to_hdf
+            Panel.to_json
+            Panel.to_long
+            Panel.tshift
+            Panel.where
+            
+            Panel.at
+            Panel.blocks
+            Panel.empty
+            Panel.iat
+            Panel.iloc
+            Panel.loc

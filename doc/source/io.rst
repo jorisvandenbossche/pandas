@@ -319,12 +319,12 @@ Dealing with Unicode Data
 The ``encoding`` argument should be used for encoded unicode data, which will
 result in byte strings being decoded to unicode in the result:
 
-.. ipython:: python
+..    .. ipython:: python
 
-   data = 'word,length\nTr\xe4umen,7\nGr\xfc\xdfe,5'
-   df = pd.read_csv(StringIO(data), encoding='latin-1')
-   df
-   df['word'][1]
+       data = 'word,length\nTr\xe4umen,7\nGr\xfc\xdfe,5'
+       df = pd.read_csv(StringIO(data), encoding='latin-1')
+       df
+       df['word'][1]
 
 Some formats which encode all characters as multiple bytes, like UTF-16, won't
 parse correctly at all without specifying the encoding.
