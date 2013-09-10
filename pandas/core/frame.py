@@ -363,11 +363,11 @@ class DataFrame(NDFrame):
 
     See also
     --------
-    DataFrame.from_records: constructor from tuples, also record arrays
-    DataFrame.from_dict: from dicts of Series, arrays, or dicts
-    DataFrame.from_csv: from CSV files
-    DataFrame.from_items: from sequence of (key, value) pairs
-    read_csv / read_table / read_clipboard
+    DataFrame.from_records : constructor from tuples, also record arrays
+    DataFrame.from_dict : from dicts of Series, arrays, or dicts
+    DataFrame.from_csv : from CSV files
+    DataFrame.from_items : from sequence of (key, value) pairs
+    pandas.read_csv, pandas.read_table, pandas.read_clipboard
     """
     _auto_consolidate = True
     _verbose_info = True
@@ -943,7 +943,7 @@ class DataFrame(NDFrame):
         index : string, list of fields, array-like
             Field of array to use as the index, alternately a specific set of
             input labels to use
-        exclude: sequence, default None
+        exclude : sequence, default None
             Columns or fields to exclude
         columns : sequence, default None
             Column names to use. If the passed data do not have named
@@ -1378,15 +1378,17 @@ class DataFrame(NDFrame):
             Column label for index column(s) if desired. If None is given, and
             `header` and `index` are True, then the index names are used. A
             sequence should be given if the DataFrame uses MultiIndex.
-        startow : upper left cell row to dump data frame
-        startcol : upper left cell column to dump data frame
-
+        startow : 
+            upper left cell row to dump data frame
+        startcol : 
+            upper left cell column to dump data frame
 
         Notes
         -----
         If passing an existing ExcelWriter object, then the sheet will be added
         to the existing workbook.  This can be used to save different
-        DataFrames to one workbook
+        DataFrames to one workbook::
+        
         >>> writer = ExcelWriter('output.xlsx')
         >>> df1.to_excel(writer,'sheet1')
         >>> df2.to_excel(writer,'sheet2')
@@ -2070,7 +2072,7 @@ class DataFrame(NDFrame):
             which levels are used. Levels can be referred by label or position.
         copy : boolean, default True
             Whether to make a copy of the data
-        drop_level, default True
+        drop_level : boolean, default True
             If False, returns object with same levels as self.
 
         Examples
@@ -3775,9 +3777,9 @@ class DataFrame(NDFrame):
         Parameters
         ----------
         method : {'pearson', 'kendall', 'spearman'}
-            pearson : standard correlation coefficient
-            kendall : Kendall Tau correlation coefficient
-            spearman : Spearman rank correlation
+            * pearson : standard correlation coefficient
+            * kendall : Kendall Tau correlation coefficient
+            * spearman : Spearman rank correlation
         min_periods : int, optional
             Minimum number of observations required per pair of columns
             to have a valid result. Currently only available for pearson

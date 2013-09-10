@@ -1571,7 +1571,7 @@ class Series(generic.NDFrame):
 
         Parameters
         ----------
-        normalize: boolean, default False
+        normalize : boolean, default False
             If True then the Series returned will contain the relative
             frequencies of the unique values.
         sort : boolean, default True
@@ -2033,9 +2033,9 @@ class Series(generic.NDFrame):
         ----------
         other : Series
         method : {'pearson', 'kendall', 'spearman'}
-            pearson : standard correlation coefficient
-            kendall : Kendall Tau correlation coefficient
-            spearman : Spearman rank correlation
+            * pearson : standard correlation coefficient
+            * kendall : Kendall Tau correlation coefficient
+            * spearman : Spearman rank correlation
         min_periods : int, optional
             Minimum number of observations needed to have a valid result
 
@@ -2454,10 +2454,10 @@ class Series(generic.NDFrame):
         Parameters
         ----------
         method : {'average', 'min', 'max', 'first'}
-            average: average rank of group
-            min: lowest rank in group
-            max: highest rank in group
-            first: ranks assigned in order they appear in the array
+            * average: average rank of group
+            * min: lowest rank in group
+            * max: highest rank in group
+            * first: ranks assigned in order they appear in the array
         na_option : {'keep'}
             keep: leave NA values where they are
         ascending : boolean, default True
