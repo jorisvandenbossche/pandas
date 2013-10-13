@@ -1013,6 +1013,29 @@ Conversion
    DatetimeIndex.to_pydatetime
 
 
+.. _api.periodindex:
+
+PeriodIndex
+-----------
+
+.. autosummary::
+   :toctree: generated/
+
+   PeriodIndex
+
+
+.. _api.timestamp:
+
+Timestamp
+---------
+
+.. autosummary::
+   :toctree: generated/
+
+   Timestamp
+
+
+
 ..
     HACK - see github issue #4539. To ensure old links remain valid, include
     here the autosummaries with previous currentmodules as a comment and add 
