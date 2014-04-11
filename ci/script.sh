@@ -24,4 +24,14 @@ RET="$?"
 # wait until subprocesses finish (build_docs.sh)
 wait
 
+# check if doc build failed
+grep "Exception" -a /tmp/doc.log
+
+if [ "$?" = "0" ]; then
+    echo "Doc build has failures"
+    echo $(grep "Exception" -a /tmp/doc.log)
+    # letting the travis build fail
+    exit 1
+fi
+
 exit "$RET"
