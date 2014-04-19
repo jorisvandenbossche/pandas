@@ -74,6 +74,7 @@ fi
 
 time pip install $PIP_ARGS -r ci/requirements-${wheel_box}.txt
 
+pip install coveralls
 
 # Need to enable for locale testing. The location of the locale file(s) is
 # distro specific. For example, on Arch Linux all of the locales are in a
