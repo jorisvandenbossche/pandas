@@ -33,6 +33,7 @@ matrix:
       - CLIPBOARD_GUI=gtk2
       - JOB_NAME: "27_nslow"
       - DOC_BUILD=true # if rst files were changed, build docs in parallel with tests
+      - COVERAGE="true"
     - python: 3.2
       env:
       - NOSE_ARGS="not slow and not disabled"
@@ -100,4 +101,4 @@ after_script:
   - ci/after_script.sh
 
 after_success:
-  - coveralls
+  - if [[ "$COVERAGE" == "true" ]]; then coveralls; fi
