@@ -20,14 +20,15 @@ if [ x"$DOC_BUILD" != x"" ]; then
     mv "$TRAVIS_BUILD_DIR"/doc /tmp
     cd /tmp/doc
 
-    rm /tmp/doc/source/api.rst # no R
+    #rm /tmp/doc/source/api.rst # no R
     rm /tmp/doc/source/r_interface.rst # no R
 
     echo ############################### > /tmp/doc.log
     echo # Log file for the doc build  # > /tmp/doc.log
     echo ############################### > /tmp/doc.log
     echo "" > /tmp/doc.log
-    echo -e "y\n" | ./make.py --no-api 2>&1
+    #echo -e "y\n" | ./make.py --no-api 2>&1
+    echo -e "y\n" | ./make.py 2>&1
 
     cd /tmp/doc/build/html
     git config --global user.email "pandas-docs-bot@localhost.foo"
