@@ -913,7 +913,6 @@ Enhancements
     pd.get_dummies(df)
 
 
-
 - Added experimental compatibility with ``openpyxl`` for versions >= 2.0. The ``DataFrame.to_excel``
   method ``engine`` keyword now recognizes ``openpyxl1`` and ``openpyxl2``
   which will explicitly require openpyxl v1 and v2 respectively, failing if
@@ -924,6 +923,7 @@ Enhancements
 - ``DataFrame.fillna`` can now accept a ``DataFrame`` as a fill value (:issue:`8377`)
 
 - Added ``searchsorted`` method to ``Series`` objects (:issue:`7447`)
+
 
 .. _whatsnew_0150.performance:
 
@@ -943,28 +943,11 @@ Performance
 - Performance improvement for ``MultiIndex.values`` for multi-level indexes containing datetimes (:issue:`8543`)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 .. _whatsnew_0150.bug_fixes:
 
 Bug Fixes
 ~~~~~~~~~
+
 - Bug in pivot_table, when using margins and a dict aggfunc (:issue:`8349`)
 - Bug in ``read_csv`` where ``squeeze=True`` would return a view (:issue:`8217`)
 - Bug in checking of table name in ``read_sql`` in certain cases (:issue:`7826`).
@@ -1002,44 +985,26 @@ Bug Fixes
 - Bug in ``PeriodIndex.unique`` returns int64 ``np.ndarray`` (:issue:`7540`)
 - Bug in ``groupby.apply`` with a non-affecting mutation in the function (:issue:`8467`)
 - Bug in ``DataFrame.reset_index`` which has ``MultiIndex`` contains ``PeriodIndex`` or ``DatetimeIndex`` with tz raises ``ValueError`` (:issue:`7746`, :issue:`7793`)
-
-
 - Bug in ``DataFrame.plot`` with ``subplots=True`` may draw unnecessary minor xticks and yticks (:issue:`7801`)
 - Bug in ``StataReader`` which did not read variable labels in 117 files due to difference between Stata documentation and implementation (:issue:`7816`)
 - Bug in ``StataReader`` where strings were always converted to 244 characters-fixed width irrespective of underlying string size (:issue:`7858`)
-
 - Bug in ``DataFrame.plot`` and ``Series.plot`` may ignore ``rot`` and ``fontsize`` keywords (:issue:`7844`)
-
-
 - Bug in ``DatetimeIndex.value_counts`` doesn't preserve tz  (:issue:`7735`)
 - Bug in ``PeriodIndex.value_counts`` results in ``Int64Index`` (:issue:`7735`)
 - Bug in ``DataFrame.join`` when doing left join on index and there are multiple matches (:issue:`5391`)
-
-
-
 - Bug in ``GroupBy.transform()`` where int groups with a transform that
   didn't preserve the index were incorrectly truncated (:issue:`7972`).
-
 - Bug in ``groupby`` where callable objects without name attributes would take the wrong path,
   and produce a ``DataFrame`` instead of a ``Series`` (:issue:`7929`)
-
 - Bug in ``groupby`` error message when a DataFrame grouping column is duplicated (:issue:`7511`)
-
 - Bug in ``read_html`` where the ``infer_types`` argument forced coercion of
   date-likes incorrectly (:issue:`7762`, :issue:`7032`).
-
-
 - Bug in ``Series.str.cat`` with an index which was filtered as to not include the first item (:issue:`7857`)
-
-
 - Bug in ``Timestamp`` cannot parse ``nanosecond`` from string (:issue:`7878`)
 - Bug in ``Timestamp`` with string offset and ``tz`` results incorrect (:issue:`7833`)
-
 - Bug in ``tslib.tz_convert`` and ``tslib.tz_convert_single`` may return different results (:issue:`7798`)
 - Bug in ``DatetimeIndex.intersection`` of non-overlapping timestamps with tz raises ``IndexError`` (:issue:`7880`)
 - Bug in alignment with TimeOps and non-unique indexes (:issue:`8363`)
-
-
 - Bug in ``GroupBy.filter()`` where fast path vs. slow path made the filter
   return a non scalar value that appeared valid but wasn't (:issue:`7870`).
 - Bug in ``date_range()``/``DatetimeIndex()`` when the timezone was inferred from input dates yet incorrect
@@ -1048,46 +1013,23 @@ Bug Fixes
 - Bug in area plot draws legend with incorrect ``alpha`` when ``stacked=True`` (:issue:`8027`)
 - ``Period`` and ``PeriodIndex`` addition/subtraction with ``np.timedelta64`` results in incorrect internal representations (:issue:`7740`)
 - Bug in ``Holiday`` with no offset or observance (:issue:`7987`)
-
 - Bug in ``DataFrame.to_latex`` formatting when columns or index is a ``MultiIndex`` (:issue:`7982`).
-
 - Bug in ``DateOffset`` around Daylight Savings Time produces unexpected results (:issue:`5175`).
-
-
-
-
-
 - Bug in ``DataFrame.shift`` where empty columns would throw ``ZeroDivisionError`` on numpy 1.7 (:issue:`8019`)
-
-
-
-
-
 - Bug in installation where ``html_encoding/*.html`` wasn't installed and
   therefore some tests were not running correctly (:issue:`7927`).
-
 - Bug in ``read_html`` where ``bytes`` objects were not tested for in
   ``_read`` (:issue:`7927`).
-
 - Bug in ``DataFrame.stack()`` when one of the column levels was a datelike (:issue:`8039`)
 - Bug in broadcasting numpy scalars with ``DataFrame`` (:issue:`8116`)
-
-
 - Bug in ``pivot_table`` performed with nameless ``index`` and ``columns`` raises ``KeyError`` (:issue:`8103`)
-
 - Bug in ``DataFrame.plot(kind='scatter')`` draws points and errorbars with different colors when the color is specified by ``c`` keyword (:issue:`8081`)
-
-
-
-
 - Bug in ``Float64Index`` where ``iat`` and ``at`` were not testing and were
   failing (:issue:`8092`).
 - Bug in ``DataFrame.boxplot()`` where y-limits were not set correctly when
   producing multiple axes (:issue:`7528`, :issue:`5517`).
-
 - Bug in ``read_csv`` where line comments were not handled correctly given
   a custom line terminator or ``delim_whitespace=True`` (:issue:`8122`).
-
 - Bug in ``read_html`` where empty tables caused a ``StopIteration`` (:issue:`7575`)
 - Bug in casting when setting a column in a same-dtype block (:issue:`7704`)
 - Bug in accessing groups from a ``GroupBy`` when the original grouper
@@ -1097,7 +1039,6 @@ Bug Fixes
 - Bug in ``GroupBy.count`` with float32 data type were nan values were not excluded (:issue:`8169`).
 - Bug with stacked barplots and NaNs (:issue:`8175`).
 - Bug in resample with non evenly divisible offsets (e.g. '7s') (:issue:`8371`)
-
 - Bug in interpolation methods with the ``limit`` keyword when no values needed interpolating (:issue:`7173`).
 - Bug where ``col_space`` was ignored in ``DataFrame.to_string()`` when ``header=False`` (:issue:`8230`).
 - Bug with ``DatetimeIndex.asof`` incorrectly matching partial strings and returning the wrong date (:issue:`8245`).
@@ -1121,6 +1062,6 @@ Bug Fixes
 - Bug in ``Series`` that allows it to be indexed by a ``DataFrame`` which has unexpected results.  Such indexing is no longer permitted (:issue:`8444`)
 - Bug in item assignment of a ``DataFrame`` with multi-index columns where right-hand-side columns were not aligned (:issue:`7655`)
 - Suppress FutureWarning generated by NumPy when comparing object arrays containing NaN for equality (:issue:`7065`)
-
 - Bug in ``DataFrame.eval()`` where the dtype of the ``not`` operator (``~``)
   was not correctly inferred as ``bool``.
+
