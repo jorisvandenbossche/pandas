@@ -13,4 +13,8 @@ See the following links:
 - `Some extra tips on using git
   <https://github.com/pydata/pandas/wiki/Using-Git>`_
 
-.. include:: ../README.rst
+.. toctree::
+
+    developers
+    documentation
+    internals
