@@ -455,6 +455,7 @@ These can be accessed like ``Series.dt.<property>``.
 
 .. autosummary::
    :toctree: generated/
+   :template: autosummary/accessor_attribute.rst
 
    Series.dt.date
    Series.dt.time
@@ -483,6 +484,7 @@ These can be accessed like ``Series.dt.<property>``.
 
 .. autosummary::
    :toctree: generated/
+   :template: autosummary/accessor_method.rst
 
    Series.dt.to_period
    Series.dt.to_pydatetime
@@ -493,6 +495,7 @@ These can be accessed like ``Series.dt.<property>``.
 
 .. autosummary::
    :toctree: generated/
+   :template: autosummary/accessor_attribute.rst
 
    Series.dt.days
    Series.dt.seconds
@@ -504,6 +507,7 @@ These can be accessed like ``Series.dt.<property>``.
 
 .. autosummary::
    :toctree: generated/
+   :template: autosummary/accessor_method.rst
 
    Series.dt.to_pytimedelta
 
@@ -515,6 +519,7 @@ strings and apply several methods to it. These can be acccessed like
 
 .. autosummary::
    :toctree: generated/
+   :template: autosummary/accessor_method.rst
 
    Series.str.cat
    Series.str.center
