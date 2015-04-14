@@ -392,15 +392,35 @@ class Index(IndexOpsMixin, PandasObject):
         Invoked by unicode(df) in py2 only. Yields a Unicode String in both
         py2/py3.
         """
-        prepr = com.pprint_thing(self, escape_chars=('\t', '\r', '\n'),
-                                 quote_strings=True)
+        klass = self.__class__.__name__
+        space = ' ' * (len(klass) + 1)
+        data = self._format_data()
+        attrs = self._format_attrs()
+        prepr = (u(",\n%s") % space).join([u("%s=%s") % (k, v)
+                                          for k, v in attrs])
+        res = u("%s(%s,\n%s%s)") % (klass,
+                                    data,
+                                    space,
+                                    prepr)
 
-        name_attr=''
-        if self.name:
-            name_attr = u(" %s=%s,") % ('name', self.name)
+        return res
 
-        return "%s(%s,%s dtype='%s')" % (type(self).__name__,
-                prepr, name_attr, self.dtype)
+    def _format_data(self):
+        """
+        Return the formatted data as a unicode string
+        """
+        return com.pprint_thing(self, escape_chars=('\t', '\r', '\n'),
+                                quote_strings=True)
+
+    def _format_attrs(self):
+        """
+        Return a list of tuples of the (attr,formatted_value)
+        """
+        attrs = []
+        if self.name is not None:
+            attrs.append(('name',default_pprint(self.name)))
+        attrs.append(('dtype',"'%s'" % self.dtype))
+        return attrs
 
     def to_series(self, **kwargs):
         """

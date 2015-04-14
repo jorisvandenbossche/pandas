@@ -684,10 +684,6 @@ class DatetimeIndex(DatetimeIndexOpsMixin, Int64Index):
     def to_datetime(self, dayfirst=False):
         return self.copy()
 
-    def _format_footer(self):
-        tagline = 'Length: %d, Freq: %s, Timezone: %s'
-        return tagline % (len(self), self.freqstr, self.tz)
-
     def astype(self, dtype):
         dtype = np.dtype(dtype)
 
