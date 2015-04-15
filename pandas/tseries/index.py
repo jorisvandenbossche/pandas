@@ -597,7 +597,7 @@ class DatetimeIndex(DatetimeIndexOpsMixin, Int64Index):
     def _formatter_func(self):
         from pandas.core.format import _get_format_datetime64
         formatter = _get_format_datetime64(is_dates_only=self._is_dates_only)
-        return lambda x: formatter(x, tz=self.tz)
+        return lambda x: "'%s'" % formatter(x, tz=self.tz)
 
     def __reduce__(self):
 

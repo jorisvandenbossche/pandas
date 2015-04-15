@@ -265,29 +265,6 @@ class DatetimeIndexOpsMixin(object):
         """
         return str
 
-    def _format_data(self):
-        """
-        Return the formatted data as a unicode string
-        """
-
-        formatter = self._formatter_func
-        n = len(self)
-        if n == 0:
-            summary = '[]'
-        elif n == 1:
-            first = formatter(self[0])
-            summary = '[%s]' % first
-        elif n == 2:
-            first = formatter(self[0])
-            last = formatter(self[-1])
-            summary = '[%s, %s]' % (first, last)
-        else:
-            first = formatter(self[0])
-            last = formatter(self[-1])
-            summary = '[%s, ..., %s]' % (first, last)
-
-        return summary
-
     def _format_attrs(self):
         """
         Return a list of tuples of the (attr,formatted_value)
