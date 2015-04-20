@@ -1704,7 +1704,7 @@ class TestCategoricalIndex(Base, tm.TestCase):
         self.assertRaises(NotImplementedError, lambda : idx2.get_indexer(idx1, method='backfill'))
         self.assertRaises(NotImplementedError, lambda : idx2.get_indexer(idx1, method='nearest'))
 
-    def test_repr(self):
+    def test_repr_roundtrip(self):
 
         ci = CategoricalIndex(['a', 'b'], categories=['a', 'b'], ordered=True)
         str(ci)
@@ -4409,6 +4409,23 @@ class TestMultiIndex(Base, tm.TestCase):
             d = {"a": [u("\u05d0"), 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}
             index = pd.DataFrame(d).set_index(["a", "b"]).index
             self.assertFalse("\\u" in repr(index))  # we don't want unicode-escaped
+
+    def test_repr_roundtrip(self):
+
+        mi = MultiIndex.from_product([list('ab'),range(3)],names=['first','second'])
+        str(mi)
+        tm.assert_index_equal(eval(repr(mi)),mi,exact=True)
+
+        # formatting
+        if compat.PY3:
+            str(mi)
+        else:
+            compat.text_type(mi)
+
+        # long format
+        mi = MultiIndex.from_product([list('abcdefg'),range(10)],names=['first','second'])
+        result = str(mi)
+        tm.assert_index_equal(eval(repr(mi)),mi,exact=True)
 
     def test_str(self):
         # tested elsewhere

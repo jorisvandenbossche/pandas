@@ -26,8 +26,10 @@ from pandas.core.config import get_option
 from pandas.io.common import PerformanceWarning
 
 # simplify
-default_pprint = lambda x: com.pprint_thing(x, escape_chars=('\t', '\r', '\n'),
-                                            quote_strings=True)
+default_pprint = lambda x, max_seq_items=None: com.pprint_thing(x,
+                                                                escape_chars=('\t', '\r', '\n'),
+                                                                quote_strings=True,
+                                                                max_seq_items=max_seq_items)
 
 
 __all__ = ['Index']
@@ -2868,32 +2870,22 @@ class CategoricalIndex(Index, PandasDelegate):
 
         return False
 
-    def __unicode__(self):
+    def _format_attrs(self):
         """
-        Return a string representation for this object.
-
-        Invoked by unicode(df) in py2 only. Yields a Unicode String in both
-        py2/py3.
+        Return a list of tuples of the (attr,formatted_value)
         """
+        attrs = [('categories', default_pprint(self.categories, max_seq_items=False)),
+                 ('ordered',self.ordered)]
+        if self.name is not None:
+            attrs.append(('name',default_pprint(self.name)))
+        attrs.append(('dtype',"'%s'" % self.dtype))
+        return attrs
 
-        # currently doesn't use the display.max_categories, or display.max_seq_len
-        # for head/tail printing
-        values = default_pprint(self.values.get_values())
-        cats = default_pprint(self.categories.get_values())
-        space = ' ' * (len(self.__class__.__name__) + 1)
-        name = self.name
-        if name is not None:
-            name = default_pprint(name)
+    def _format_space(self):
+        return "\n%s" % (' ' * (len(self.__class__.__name__) + 1))
 
-        result = u("{klass}({values},\n{space}categories={categories},\n{space}ordered={ordered},\n{space}name={name})").format(
-            klass=self.__class__.__name__,
-            values=values,
-            categories=cats,
-            ordered=self.ordered,
-            name=name,
-            space=space)
-
-        return result
+    def _format_data(self):
+        return default_pprint(self.values.get_values(), max_seq_items=False)
 
     @property
     def inferred_type(self):
@@ -3949,8 +3941,8 @@ class MultiIndex(Index):
         """
         Return a list of tuples of the (attr,formatted_value)
         """
-        attrs = [('levels', default_pprint(self.levels)),
-                 ('labels', default_pprint(self.labels))]
+        attrs = [('levels', default_pprint(self._levels, max_seq_items=False)),
+                 ('labels', default_pprint(self._labels, max_seq_items=False))]
         if not all(name is None for name in self.names):
             attrs.append(('names', default_pprint(self.names)))
         if self.sortorder is not None:

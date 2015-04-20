@@ -230,7 +230,7 @@ Index Representation
 ~~~~~~~~~~~~~~~~~~~~
 
 The string representation of ``Index`` and its sub-classes have now been unified. These are all uniform in their output
-formats, except for ``MultiIndex``, which has a multi-line repr. The display width responds to the option ``display.max_seq_len``,
+formats to a single line, except for ``MultiIndex/CategoricalIndex``, which have a multi-line repr. The display width responds to the option ``display.max_seq_len``,
 which is now defaulted to 10 (previously was 100). (:issue:`6482`)
 
 Previous Behavior
