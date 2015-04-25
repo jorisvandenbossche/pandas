@@ -1181,15 +1181,14 @@ class Index(IndexOpsMixin, PandasObject):
     def __add__(self, other):
         if isinstance(other, Index):
             warnings.warn("using '+' to provide set union with Indexes is deprecated, "
-                          "use '|' or .union()",FutureWarning)
+                          "use '|' or .union()", FutureWarning)
             return self.union(other)
         return Index(np.array(self) + other)
     __iadd__ = __add__
 
     def __sub__(self, other):
-        if isinstance(other, Index):
-            warnings.warn("using '-' to provide set differences with Indexes is deprecated, "
-                          "use .difference()",FutureWarning)
+        warnings.warn("using '-' to provide set differences with Indexes is deprecated, "
+                      "use .difference()", FutureWarning)
         return self.difference(other)
 
     def __and__(self, other):
