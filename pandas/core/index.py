@@ -406,8 +406,6 @@ class Index(IndexOpsMixin, PandasObject):
         # no data provided, just attributes
         if data is None:
             data = ''
-        #else:
-        #    data = "%s,%s" % (data, space)
 
         res = u("%s(%s%s)") % (klass,
                                data,
