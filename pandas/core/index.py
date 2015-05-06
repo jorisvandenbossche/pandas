@@ -444,10 +444,12 @@ class Index(IndexOpsMixin, PandasObject):
         formatter = self._formatter_func
 
         def best_len(values):
-            return max([len(x) for x in values]) + 1
+            return max([len(x) for x in values]) + 2
 
         def best_rows(values, max_len):
-            n_per_row = (75 - len(self.__class__.__name__) - 2) // max_len
+            from pandas.core.format import get_console_size
+            display_width, _ = get_console_size()
+            n_per_row = (display_width - len(self.__class__.__name__) - 2) // max_len
             n_rows = int(ceil(len(values) / float(n_per_row)))
             return n_per_row, n_rows
 
