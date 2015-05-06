@@ -435,6 +435,37 @@ class Index(IndexOpsMixin, PandasObject):
         """
         Return the formatted data as a unicode string
         """
+        space1 = "\n%s" % (' ' * (len(self.__class__.__name__) + 2))
+        space2 = "\n%s" % (' ' * (len(self.__class__.__name__) + 1))
+        sep = ',%s' % space1
+        max_seq_items = get_option('display.max_seq_items')
+        formatter = self._formatter_func
+        n = len(self)
+        if n == 0:
+            summary = '[]'
+        elif n == 1:
+            first = formatter(self[0])
+            summary = '[%s]' % first
+        elif n == 2:
+            first = formatter(self[0])
+            last = formatter(self[-1])
+            summary = '[%s%s%s]' % (first, sep, last)
+        elif n > max_seq_items:
+            n = min(max_seq_items//2,10)
+
+            head = sep.join([ formatter(x) for x in self[:n] ])
+            tail = sep.join([ formatter(x) for x in self[-n:] ])
+            summary = '[%s%s...%s%s]' % (head, space1, space1, tail)
+        else:
+            values = sep.join([ formatter(x) for x in self ])
+            summary = '[%s]' % (values)
+
+        return summary
+
+    def _format_data2(self):
+        """
+        Return the formatted data as a unicode string
+        """
         max_seq_items = get_option('display.max_seq_items')
         formatter = self._formatter_func
         n = len(self)
@@ -2879,6 +2910,9 @@ class CategoricalIndex(Index, PandasDelegate):
         if self.name is not None:
             attrs.append(('name',default_pprint(self.name)))
         attrs.append(('dtype',"'%s'" % self.dtype))
+        max_seq_items = get_option('display.max_seq_items')
+        if len(self) > max_seq_items:
+            attrs.append(('length',len(self)))
         return attrs
 
     @property
