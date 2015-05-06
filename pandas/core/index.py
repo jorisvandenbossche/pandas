@@ -8,6 +8,7 @@ from pandas.compat import range, zip, lrange, lzip, u, reduce, filter, map
 from pandas import compat
 import numpy as np
 
+from math import ceil
 from sys import getsizeof
 import pandas.tslib as tslib
 import pandas.lib as lib
@@ -441,78 +442,32 @@ class Index(IndexOpsMixin, PandasObject):
         sep = ','
         max_seq_items = get_option('display.max_seq_items')
         formatter = self._formatter_func
-        n = len(self)
-        if n == 0:
-            summary = '[]'
-        elif n == 1:
-            first = formatter(self[0])
-            summary = '[%s]' % first
-        elif n == 2:
-            first = formatter(self[0])
-            last = formatter(self[-1])
-            summary = '[%s%s%s]' % (first, space1, last)
-        elif n > max_seq_items:
-            n = min(max_seq_items//2,10)
 
-            head = sep.join([ formatter(x) for x in self[:n] ])
-            tail = sep.join([ formatter(x) for x in self[-n:] ])
-            summary = '[%s%s...%s%s]' % (head, space1, space1, tail)
-        else:
-            values = [ formatter(x) for x in self ]
-            from math import ceil
-            max_len = max([len(x) for x in values]) + 1
+        def best_len(values):
+            return max([len(x) for x in values]) + 1
+
+        def best_rows(values, max_len):
             n_per_row = (75 - len(self.__class__.__name__) - 2) // max_len
             n_rows = int(ceil(len(values) / float(n_per_row)))
+            return n_per_row, n_rows
+
+        def best_fit(values, max_len):
+
+            # number of rows to generate
+            n_per_row, n_rows = best_rows(values, max_len)
+
             # adjust all values to max length
             values = [x.rjust(max_len) for x in values]
-            summary = '['
+
+            summary = ''
             for i in range(n_rows - 1):
                 summary += sep.join(values[i*n_per_row:(i+1)*n_per_row])
                 summary += sep
                 summary += space1
             summary += sep.join(values[(n_rows - 1)*n_per_row:n_rows*n_per_row])
-            summary += ']'
-            summary += space1
 
-        return summary
+            return summary
 
-    def _format_data2(self):
-        """
-        Return the formatted data as a unicode string
-        """
-        space1 = "\n%s" % (' ' * (len(self.__class__.__name__) + 2))
-        space2 = "\n%s" % (' ' * (len(self.__class__.__name__) + 1))
-        sep = ',%s' % space1
-        max_seq_items = get_option('display.max_seq_items')
-        formatter = self._formatter_func
-        n = len(self)
-        if n == 0:
-            summary = '[]'
-        elif n == 1:
-            first = formatter(self[0])
-            summary = '[%s]' % first
-        elif n == 2:
-            first = formatter(self[0])
-            last = formatter(self[-1])
-            summary = '[%s%s%s]' % (first, sep, last)
-        elif n > max_seq_items:
-            n = min(max_seq_items//2,10)
-
-            head = sep.join([ formatter(x) for x in self[:n] ])
-            tail = sep.join([ formatter(x) for x in self[-n:] ])
-            summary = '[%s%s...%s%s]' % (head, space1, space1, tail)
-        else:
-            values = sep.join([ formatter(x) for x in self ])
-            summary = '[%s]' % (values)
-
-        return summary
-
-    def _format_data3(self):
-        """
-        Return the formatted data as a unicode string
-        """
-        max_seq_items = get_option('display.max_seq_items')
-        formatter = self._formatter_func
         n = len(self)
         if n == 0:
             summary = '[]'
@@ -524,15 +479,32 @@ class Index(IndexOpsMixin, PandasObject):
             last = formatter(self[-1])
             summary = '[%s, %s]' % (first, last)
         elif n > max_seq_items:
-            n = min(max_seq_items//2,5)
-            head = ', '.join([ formatter(x) for x in self[:n] ])
-            tail = ', '.join([ formatter(x) for x in self[-n:] ])
-            summary = '[%s, ..., %s]' % (head, tail)
+            n = min(max_seq_items//2,10)
+
+            head = [ formatter(x) for x in self[:n] ]
+            tail = [ formatter(x) for x in self[-n:] ]
+            max_len = max(best_len(head),best_len(tail))
+
+            summary = '['
+            summary += best_fit(head, max_len)
+            summary += space1 + '...' + space1
+            summary += best_fit(tail, max_len)
+            summary += space2
+            summary += ']'
+
         else:
-            summary = "[%s]" % ', '.join([ formatter(x) for x in self ])
+            values = [ formatter(x) for x in self ]
+
+            max_len = best_len(values)
+            n_per_row, n_rows = best_rows(values, max_len)
+
+            summary = '['
+            summary += best_fit(values, max_len)
+            if n_rows > 1:
+                summary += space2
+            summary += ']'
 
         return summary
-
 
     def _format_attrs(self):
         """
