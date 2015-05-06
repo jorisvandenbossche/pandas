@@ -448,7 +448,7 @@ class Index(IndexOpsMixin, PandasObject):
             last = formatter(self[-1])
             summary = '[%s, %s]' % (first, last)
         elif n > max_seq_items:
-            n = min(max_seq_items//2,2)
+            n = min(max_seq_items//2,5)
             head = ', '.join([ formatter(x) for x in self[:n] ])
             tail = ', '.join([ formatter(x) for x in self[-n:] ])
             summary = '[%s, ..., %s]' % (head, tail)
@@ -2874,18 +2874,12 @@ class CategoricalIndex(Index, PandasDelegate):
         """
         Return a list of tuples of the (attr,formatted_value)
         """
-        attrs = [('categories', default_pprint(self.categories, max_seq_items=False)),
+        attrs = [('categories', default_pprint(self.categories)),
                  ('ordered',self.ordered)]
         if self.name is not None:
             attrs.append(('name',default_pprint(self.name)))
         attrs.append(('dtype',"'%s'" % self.dtype))
         return attrs
-
-    def _format_space(self):
-        return "\n%s" % (' ' * (len(self.__class__.__name__) + 1))
-
-    def _format_data(self):
-        return default_pprint(self.values.get_values(), max_seq_items=False)
 
     @property
     def inferred_type(self):

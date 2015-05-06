@@ -1717,9 +1717,12 @@ class TestCategoricalIndex(Base, tm.TestCase):
             compat.text_type(ci)
 
         # long format
+        # this is not reprable
         ci = CategoricalIndex(np.random.randint(0,5,size=100))
-        result = str(ci)
-        tm.assert_index_equal(eval(repr(ci)),ci,exact=True)
+        if compat.PY3:
+            str(ci)
+        else:
+            compat.text_type(ci)
 
     def test_isin(self):
 
