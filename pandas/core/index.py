@@ -449,7 +449,7 @@ class Index(IndexOpsMixin, PandasObject):
         def best_rows(values, max_len):
             from pandas.core.format import get_console_size
             display_width, _ = get_console_size()
-            n_per_row = (display_width - len(self.__class__.__name__) - 2) // max_len
+            n_per_row = (max((display_width/2),75) - len(self.__class__.__name__) - 2) // max_len
             n_rows = int(ceil(len(values) / float(n_per_row)))
             return n_per_row, n_rows
 
@@ -489,10 +489,10 @@ class Index(IndexOpsMixin, PandasObject):
 
             summary = '['
             summary += best_fit(head, max_len)
-            summary += space1 + '...' + space1
+            summary += space1 + ' ...' + space1
             summary += best_fit(tail, max_len)
-            summary += space2
             summary += ']'
+            summary += space2
 
         else:
             values = [ formatter(x) for x in self ]
@@ -502,9 +502,9 @@ class Index(IndexOpsMixin, PandasObject):
 
             summary = '['
             summary += best_fit(values, max_len)
+            summary += ']'
             if n_rows > 1:
                 summary += space2
-            summary += ']'
 
         return summary
 

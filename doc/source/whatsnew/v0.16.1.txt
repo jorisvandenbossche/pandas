@@ -230,7 +230,7 @@ Index Representation
 ~~~~~~~~~~~~~~~~~~~~
 
 The string representation of ``Index`` and its sub-classes have now been unified. ``Index, Int64Index, Float64Index, CategoricalIndex`` are single-line display. The datetimelikes ``DatetimeIndex, PeriodIndex, TimedeltaIndex`` & ``MultiIndex`` will display in a multi-line format showing much more of the index values. The display width responds to the option ``display.max_seq_items``,
-which is now defaulted to 20 (previously was 100). (:issue:`6482`)
+which is defaulted to 100. (:issue:`6482`)
 
 Previous Behavior
 
