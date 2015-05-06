@@ -434,8 +434,8 @@ class Index(IndexOpsMixin, PandasObject):
         """
         Return the formatted data as a unicode string
         """
-        space1 = "\n%s" % (' ' * (len(self.__class__.__name__) + 2))
-        space2 = "\n%s" % (' ' * (len(self.__class__.__name__) + 1))
+        space1 = "\n%s" % (' ' * (len(self.__class__.__name__) + 1))
+        space2 = "\n%s" % (' ' * (len(self.__class__.__name__) + 2))
 
         sep = ','
         max_seq_items = get_option('display.max_seq_items')
@@ -448,7 +448,7 @@ class Index(IndexOpsMixin, PandasObject):
             from pandas.core.format import get_console_size
             display_width, _ = get_console_size()
             if display_width is None:
-                display_width = 80
+                display_width = get_option('display.width')
             n_per_row = (display_width - len(self.__class__.__name__) - 2) // max_len
             n_rows = int(ceil(len(values) / float(n_per_row)))
             return n_per_row, n_rows
@@ -460,7 +460,7 @@ class Index(IndexOpsMixin, PandasObject):
 
             # adjust all values to max length if we have multi-lines
             if n_rows > 1 or justify:
-                values = [x.rjust(max_len) for x in values]
+                values = [values[0].rjust(max_len-2)] + [x.rjust(max_len-1) for x in values[1:]]
                 sep_elements = sep
             else:
                 sep_elements = sep + ' '
@@ -493,10 +493,10 @@ class Index(IndexOpsMixin, PandasObject):
 
             summary = '['
             summary += best_fit(head, max_len, justify=True)
-            summary += space1 + ' ...' + space1
+            summary += ',' + space1 + ' ...' + space2
             summary += best_fit(tail, max_len, justify=True)
             summary += '],'
-            summary += space2
+            summary += space1
 
         else:
             values = [ formatter(x) for x in self ]
@@ -508,7 +508,7 @@ class Index(IndexOpsMixin, PandasObject):
             summary += best_fit(values, max_len)
             summary += '],'
             if n_rows > 1:
-                summary += space2
+                summary += space1
             else:
                 summary += ' '
 

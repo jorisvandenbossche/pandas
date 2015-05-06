@@ -12,10 +12,9 @@ Highlights include:
 - Support for a ``CategoricalIndex``, a category based index, see :ref:`here <whatsnew_0161.enhancements.categoricalindex>`
 - New section on how-to-contribute to *pandas*, see :ref:`here <contributing>`
 - Revised "Merge, join, and concatenate" documentation including graphical examples to make it easier to understand each operations, see :ref:`here <merging>`
-
+- The default ``Index`` printing has changed to a more uniform format, see :ref:`here <whatsnew_0161.index_repr>`
 - New method ``sample`` for drawing random samples from Series, DataFrames and Panels. See :ref:`here <whatsnew_0161.enchancements.sample>`
-
-- ``BusinessHour`` offset is supported, see :ref:`here <timeseries.businesshour>`
+- ``BusinessHour`` datetime-offset is now supported, see :ref:`here <timeseries.businesshour>`
 
 -  Further enhancement to the ``.str`` accessor to make string operations easier, see :ref:`here <whatsnew_0161.enhancements.string>`
 
@@ -288,8 +287,10 @@ New Behavior
 
    pd.get_option('max_seq_items')
    pd.Index(range(4),name='foo')
+   pd.Index(range(25),name='foo')
    pd.Index(range(104),name='foo')
    pd.date_range('20130101',periods=4,name='foo',tz='US/Eastern')
+   pd.date_range('20130101',periods=25,name='foo',tz='US/Eastern')
    pd.date_range('20130101',periods=104,name='foo',tz='US/Eastern')
 
 .. _whatsnew_0161.performance:
