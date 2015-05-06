@@ -437,7 +437,7 @@ class Index(IndexOpsMixin, PandasObject):
         space1 = "\n%s" % (' ' * (len(self.__class__.__name__) + 2))
         space2 = "\n%s" % (' ' * (len(self.__class__.__name__) + 1))
         #sep = ',%s' % space1
-        sep = ','
+        sep = ', '
         max_seq_items = get_option('display.max_seq_items')
         formatter = self._formatter_func
 
@@ -457,7 +457,7 @@ class Index(IndexOpsMixin, PandasObject):
             n_per_row, n_rows = best_rows(values, max_len)
 
             # adjust all values to max length
-            values = [x.rjust(max_len) for x in values]
+            values = [x.rjust(max_len - 2) for x in values]
 
             summary = ''
             for i in range(n_rows - 1):
