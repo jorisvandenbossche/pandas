@@ -406,8 +406,8 @@ class Index(IndexOpsMixin, PandasObject):
         # no data provided, just attributes
         if data is None:
             data = ''
-        else:
-            data = "%s,%s" % (data, space)
+        #else:
+        #    data = "%s,%s" % (data, space)
 
         res = u("%s(%s%s)") % (klass,
                                data,
@@ -491,7 +491,7 @@ class Index(IndexOpsMixin, PandasObject):
             summary += best_fit(head, max_len)
             summary += space1 + ' ...' + space1
             summary += best_fit(tail, max_len)
-            summary += ']'
+            summary += '],'
             summary += space2
 
         else:
