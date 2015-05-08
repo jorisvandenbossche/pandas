@@ -440,6 +440,7 @@ class Index(IndexOpsMixin, PandasObject):
         sep = ','
         max_seq_items = get_option('display.max_seq_items')
         formatter = self._formatter_func
+        needs_justify = self.inferred_type in ['string','categorical']
 
         def best_len(values):
             return max([len(x) for x in values]) + 2
@@ -453,23 +454,27 @@ class Index(IndexOpsMixin, PandasObject):
             n_rows = int(ceil(len(values) / float(n_per_row)))
             return n_per_row, n_rows
 
-        def best_fit(values, max_len, justify=False):
+        def best_fit(values, max_len, n_rows=None, justify=False):
 
             # number of rows to generate
-            n_per_row, n_rows = best_rows(values, max_len)
+            if n_rows is None:
+                n_per_row, n_rows = best_rows(values, max_len)
+            else:
+                n_per_row = len(values)
 
             # adjust all values to max length if we have multi-lines
-            if n_rows > 1 or justify:
+            if justify:
                 values = [values[0].rjust(max_len-2)] + [x.rjust(max_len-1) for x in values[1:]]
-                sep_elements = sep
+                multi_line_space = space1
             else:
-                sep_elements = sep + ' '
+                multi_line_space = space2
 
+            sep_elements = sep + ' '
             summary = ''
             for i in range(n_rows - 1):
-                summary += sep.join(values[i*n_per_row:(i+1)*n_per_row])
+                summary += sep_elements.join(values[i*n_per_row:(i+1)*n_per_row])
                 summary += sep
-                summary += space1
+                summary += multi_line_space
             summary += sep_elements.join(values[(n_rows - 1)*n_per_row:n_rows*n_per_row])
 
             return summary
@@ -491,10 +496,17 @@ class Index(IndexOpsMixin, PandasObject):
             tail = [ formatter(x) for x in self[-n:] ]
             max_len = max(best_len(head),best_len(tail))
 
+            if needs_justify:
+                n_rows = 1
+                justify = False
+            else:
+                n_rows = None
+                justify = True
+
             summary = '['
-            summary += best_fit(head, max_len, justify=True)
+            summary += best_fit(head, max_len, n_rows=n_rows, justify=justify)
             summary += ',' + space1 + ' ...' + space2
-            summary += best_fit(tail, max_len, justify=True)
+            summary += best_fit(tail, max_len, n_rows=n_rows, justify=justify)
             summary += '],'
             summary += space1
 
@@ -2936,7 +2948,9 @@ class CategoricalIndex(Index, PandasDelegate):
         """
         Return a list of tuples of the (attr,formatted_value)
         """
-        attrs = [('categories', default_pprint(self.categories)),
+        max_categories = (10 if get_option("display.max_categories") == 0
+                    else get_option("display.max_categories"))
+        attrs = [('categories', default_pprint(self.categories, max_seq_items=max_categories)),
                  ('ordered',self.ordered)]
         if self.name is not None:
             attrs.append(('name',default_pprint(self.name)))
