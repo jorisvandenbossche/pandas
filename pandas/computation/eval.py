@@ -133,7 +133,7 @@ def _check_for_locals(expr, stack_level, parser):
     if at_top_of_stack or not_pandas_parser:
         for toknum, tokval in tokenize_string(expr):
             if toknum == tokenize.OP and tokval == '@':
-                raise SyntaxError(msg)
+                raise ValueError(msg)
 
 
 def eval(expr, parser='pandas', engine='numexpr', truediv=True,
