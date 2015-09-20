@@ -361,6 +361,12 @@ class DataFrame(NDFrame):
         Data type to force. Only a single dtype is allowed. If None, infer.
     copy : bool, default False
         Copy data from inputs. Only affects DataFrame / 2d ndarray input.
+    policy : string, default None
+        Provide consolidation policy
+          - None : use default policy
+          - block : consolidate into blocks by dtype
+          - column : don't consolidate, but don't split blocks
+          - split : don't consolidate, force splitting of input
 
     See Also
     --------
@@ -437,6 +443,7 @@ class DataFrame(NDFrame):
         columns: Optional[Axes] = None,
         dtype: Optional[Dtype] = None,
         copy: bool = False,
+        policy=None,
     ):
         if data is None:
             data = {}
@@ -453,11 +460,15 @@ class DataFrame(NDFrame):
                 return
 
             mgr = self._init_mgr(
-                data, axes=dict(index=index, columns=columns), dtype=dtype, copy=copy
+                data,
+                axes=dict(index=index, columns=columns),
+                dtype=dtype,
+                copy=copy,
+                policy=policy,
             )
 
         elif isinstance(data, dict):
-            mgr = init_dict(data, index, columns, dtype=dtype)
+            mgr = init_dict(data, index, columns, dtype=dtype, policy=policy)
         elif isinstance(data, ma.MaskedArray):
             import numpy.ma.mrecords as mrecords
 
@@ -474,7 +485,9 @@ class DataFrame(NDFrame):
                     data[mask] = fill_value
                 else:
                     data = data.copy()
-                mgr = init_ndarray(data, index, columns, dtype=dtype, copy=copy)
+                mgr = init_ndarray(
+                    data, index, columns, dtype=dtype, copy=copy, policy=policy
+                )
 
         elif isinstance(data, (np.ndarray, Series, Index)):
             if data.dtype.names:
@@ -482,11 +495,15 @@ class DataFrame(NDFrame):
                 data = {k: data[k] for k in data_columns}
                 if columns is None:
                     columns = data_columns
-                mgr = init_dict(data, index, columns, dtype=dtype)
+                mgr = init_dict(data, index, columns, dtype=dtype, policy=policy)
             elif getattr(data, "name", None) is not None:
-                mgr = init_dict({data.name: data}, index, columns, dtype=dtype)
+                mgr = init_dict(
+                    {data.name: data}, index, columns, dtype=dtype, policy=policy
+                )
             else:
-                mgr = init_ndarray(data, index, columns, dtype=dtype, copy=copy)
+                mgr = init_ndarray(
+                    data, index, columns, dtype=dtype, copy=copy, policy=policy
+                )
 
         # For data is list-like, or Iterable (will consume into list)
         elif isinstance(data, abc.Iterable) and not isinstance(data, (str, bytes)):
@@ -510,11 +527,15 @@ class DataFrame(NDFrame):
                         else:
                             index = ibase.default_index(len(data))
 
-                    mgr = arrays_to_mgr(arrays, columns, index, columns, dtype=dtype)
+                    mgr = arrays_to_mgr(
+                        arrays, columns, index, columns, dtype=dtype, policy=policy
+                    )
                 else:
-                    mgr = init_ndarray(data, index, columns, dtype=dtype, copy=copy)
+                    mgr = init_ndarray(
+                        data, index, columns, dtype=dtype, copy=copy, policy=policy
+                    )
             else:
-                mgr = init_dict({}, index, columns, dtype=dtype)
+                mgr = init_dict({}, index, columns, dtype=dtype, policy=policy)
         else:
             try:
                 arr = np.array(data, dtype=dtype, copy=copy)
@@ -530,7 +551,12 @@ class DataFrame(NDFrame):
                     (len(index), len(columns)), data, dtype=dtype
                 )
                 mgr = init_ndarray(
-                    values, index, columns, dtype=values.dtype, copy=False
+                    values,
+                    index,
+                    columns,
+                    dtype=values.dtype,
+                    copy=False,
+                    policy=policy,
                 )
             else:
                 raise ValueError("DataFrame constructor not properly called!")
@@ -592,7 +618,7 @@ class DataFrame(NDFrame):
         Index._is_homogeneous_type : Whether the object has a single
             dtype.
         MultiIndex._is_homogeneous_type : Whether all the levels of a
-            MultiIndex have the same dtype.
+             have the same dtype.
 
         Examples
         --------
@@ -1977,6 +2003,7 @@ class DataFrame(NDFrame):
         index,
         dtype: Optional[Dtype] = None,
         verify_integrity: bool = True,
+        policy=None,
     ) -> "DataFrame":
         """
         Create DataFrame from a list of arrays corresponding to the columns.
@@ -2012,6 +2039,7 @@ class DataFrame(NDFrame):
             columns,
             dtype=dtype,
             verify_integrity=verify_integrity,
+            policy=policy,
         )
         return cls(mgr)
 

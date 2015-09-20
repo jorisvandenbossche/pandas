@@ -299,6 +299,10 @@ class Block(PandasObject):
         return self.make_block_same_class(new_values, new_mgr_locs)
 
     @property
+    def base(self):
+        return self.values.base
+
+    @property
     def shape(self):
         return self.values.shape
 

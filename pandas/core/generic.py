@@ -216,7 +216,9 @@ class NDFrame(PandasObject, SelectionMixin, indexing.IndexingMixin):
         object.__setattr__(self, "_attrs", attrs)
 
     @classmethod
-    def _init_mgr(cls, mgr, axes, dtype=None, copy: bool = False) -> BlockManager:
+    def _init_mgr(
+        cls, mgr, axes, dtype=None, copy: bool = False, policy=None
+    ) -> BlockManager:
         """ passed a manager and a axes dict """
         for a, axe in axes.items():
             if axe is not None:
@@ -251,6 +253,19 @@ class NDFrame(PandasObject, SelectionMixin, indexing.IndexingMixin):
     @attrs.setter
     def attrs(self, value: Mapping[Optional[Hashable], Any]) -> None:
         self._attrs = dict(value)
+
+    @property
+    def _policy(self):
+        """ return my policy for internal implementation """
+        return self._mgr.policy
+
+    @_policy.setter
+    def _policy(self, value):
+        """
+        set my policy for internal implementation
+        should only set the property for state purposes
+        """
+        self._mgr.policy = value
 
     @classmethod
     def _validate_dtype(cls, dtype):
@@ -1832,6 +1847,7 @@ class NDFrame(PandasObject, SelectionMixin, indexing.IndexingMixin):
             _typ=self._typ,
             _metadata=self._metadata,
             attrs=self.attrs,
+            _policy=self._policy,
             **meta,
         )
 
@@ -5752,7 +5768,9 @@ class NDFrame(PandasObject, SelectionMixin, indexing.IndexingMixin):
         """
         data = self._mgr.copy(deep=deep)
         self._clear_item_cache()
-        return self._constructor(data).__finalize__(self, method="copy")
+        return self._constructor(data, policy=self._policy).__finalize__(
+            self, method="copy"
+        )
 
     def __copy__(self: FrameOrSeries, deep: bool_t = True) -> FrameOrSeries:
         return self.copy(deep=deep)

@@ -7,6 +7,8 @@ import warnings
 
 import numpy as np
 
+from pandas._config import get_option
+
 from pandas._libs import internals as libinternals, lib
 from pandas._typing import ArrayLike, DtypeObj, Label, Scalar
 from pandas.util._validators import validate_bool_kwarg
@@ -112,6 +114,7 @@ class BlockManager(PandasObject):
         "_is_consolidated",
         "_blknos",
         "_blklocs",
+        "_policy",
     ]
 
     _blknos: np.ndarray
@@ -122,9 +125,14 @@ class BlockManager(PandasObject):
         blocks: Sequence[Block],
         axes: Sequence[Index],
         do_integrity_check: bool = True,
+        policy=None,
     ):
         self.axes = [ensure_index(ax) for ax in axes]
         self.blocks: Tuple[Block, ...] = tuple(blocks)
+
+        if policy is None:
+            policy = get_option("mode.policy")
+        self.blocks, self.policy = _split_blocks(tuple(blocks), policy)
 
         for block in blocks:
             if self.ndim != block.ndim:
@@ -190,6 +198,16 @@ class BlockManager(PandasObject):
         else:
             blocks = []
         return type(self).from_blocks(blocks, axes)
+
+    @property
+    def policy(self):
+        """ get the state """
+        return self._policy
+
+    @policy.setter
+    def policy(self, value):
+        """ just set the state """
+        self._policy = value
 
     def __nonzero__(self) -> bool:
         return True
@@ -663,8 +681,11 @@ class BlockManager(PandasObject):
         return self._is_consolidated
 
     def _consolidate_check(self) -> None:
-        dtypes = [blk.dtype for blk in self.blocks if blk._can_consolidate]
-        self._is_consolidated = len(dtypes) == len(set(dtypes))
+        if self.policy in ["split", "column"]:
+            self._is_consolidated = True
+        else:
+            dtypes = [blk.dtype for blk in self.blocks if blk._can_consolidate]
+            self._is_consolidated = len(dtypes) == len(set(dtypes))
         self._known_consolidated = True
 
     @property
@@ -952,7 +973,7 @@ class BlockManager(PandasObject):
         if self.is_consolidated():
             return self
 
-        bm = type(self)(self.blocks, self.axes)
+        bm = type(self)(self.blocks, self.axes, policy=self.policy)
         bm._is_consolidated = False
         bm._consolidate_inplace()
         return bm
@@ -1494,7 +1515,7 @@ class SingleBlockManager(BlockManager):
     ndim = 1
     _is_consolidated = True
     _known_consolidated = True
-    __slots__ = ()
+    __slots__ = "_policy"
 
     def __init__(
         self,
@@ -1502,6 +1523,7 @@ class SingleBlockManager(BlockManager):
         axis: Index,
         do_integrity_check: bool = False,
         fastpath=lib.no_default,
+        policy=None,
     ):
         assert isinstance(block, Block), type(block)
         assert isinstance(axis, Index), type(axis)
@@ -1516,6 +1538,7 @@ class SingleBlockManager(BlockManager):
 
         self.axes = [axis]
         self.blocks = tuple([block])
+        self.policy = policy
 
     @classmethod
     def from_blocks(
@@ -1615,7 +1638,9 @@ class SingleBlockManager(BlockManager):
 # Constructor Helpers
 
 
-def create_block_manager_from_blocks(blocks, axes: List[Index]) -> BlockManager:
+def create_block_manager_from_blocks(
+    blocks, axes: List[Index], policy, verify_integrity=True
+) -> BlockManager:
     try:
         if len(blocks) == 1 and not isinstance(blocks[0], Block):
             # if blocks[0] is of length 0, return empty blocks
@@ -1629,7 +1654,9 @@ def create_block_manager_from_blocks(blocks, axes: List[Index]) -> BlockManager:
                     make_block(values=blocks[0], placement=slice(0, len(axes[0])))
                 ]
 
-        mgr = BlockManager(blocks, axes)
+        mgr = BlockManager(
+            blocks, axes, policy=policy, do_integrity_check=verify_integrity
+        )
         mgr._consolidate_inplace()
         return mgr
 
@@ -1640,15 +1667,15 @@ def create_block_manager_from_blocks(blocks, axes: List[Index]) -> BlockManager:
 
 
 def create_block_manager_from_arrays(
-    arrays, names: Index, axes: List[Index]
+    arrays, names: Index, axes: List[Index], policy,
 ) -> BlockManager:
     assert isinstance(names, Index)
     assert isinstance(axes, list)
     assert all(isinstance(x, Index) for x in axes)
 
     try:
-        blocks = form_blocks(arrays, names, axes)
-        mgr = BlockManager(blocks, axes)
+        blocks = form_blocks(arrays, names, axes, policy=policy)
+        mgr = BlockManager(blocks, axes, policy=policy)
         mgr._consolidate_inplace()
         return mgr
     except ValueError as e:
@@ -1679,7 +1706,7 @@ def construction_error(tot_items, block_shape, axes, e=None):
 # -----------------------------------------------------------------------
 
 
-def form_blocks(arrays, names: Index, axes) -> List[Block]:
+def form_blocks(arrays, names: Index, axes, policy) -> List[Block]:
     # put "leftover" items in float bucket, where else?
     # generalize?
     items_dict: DefaultDict[str, List] = defaultdict(list)
@@ -1705,23 +1732,25 @@ def form_blocks(arrays, names: Index, axes) -> List[Block]:
 
     blocks: List[Block] = []
     if len(items_dict["FloatBlock"]):
-        float_blocks = _multi_blockify(items_dict["FloatBlock"])
+        float_blocks = _multi_blockify(items_dict["FloatBlock"], policy=policy)
         blocks.extend(float_blocks)
 
     if len(items_dict["ComplexBlock"]):
-        complex_blocks = _multi_blockify(items_dict["ComplexBlock"])
+        complex_blocks = _multi_blockify(items_dict["ComplexBlock"], policy=policy)
         blocks.extend(complex_blocks)
 
     if len(items_dict["TimeDeltaBlock"]):
-        timedelta_blocks = _multi_blockify(items_dict["TimeDeltaBlock"])
+        timedelta_blocks = _multi_blockify(items_dict["TimeDeltaBlock"], policy=policy)
         blocks.extend(timedelta_blocks)
 
     if len(items_dict["IntBlock"]):
-        int_blocks = _multi_blockify(items_dict["IntBlock"])
+        int_blocks = _multi_blockify(items_dict["IntBlock"], policy=policy)
         blocks.extend(int_blocks)
 
     if len(items_dict["DatetimeBlock"]):
-        datetime_blocks = _simple_blockify(items_dict["DatetimeBlock"], DT64NS_DTYPE)
+        datetime_blocks = _simple_blockify(
+            items_dict["DatetimeBlock"], DT64NS_DTYPE, policy=policy
+        )
         blocks.extend(datetime_blocks)
 
     if len(items_dict["DatetimeTZBlock"]):
@@ -1732,11 +1761,13 @@ def form_blocks(arrays, names: Index, axes) -> List[Block]:
         blocks.extend(dttz_blocks)
 
     if len(items_dict["BoolBlock"]):
-        bool_blocks = _simple_blockify(items_dict["BoolBlock"], np.bool_)
+        bool_blocks = _simple_blockify(items_dict["BoolBlock"], np.bool_, policy=policy)
         blocks.extend(bool_blocks)
 
     if len(items_dict["ObjectBlock"]) > 0:
-        object_blocks = _simple_blockify(items_dict["ObjectBlock"], np.object_)
+        object_blocks = _simple_blockify(
+            items_dict["ObjectBlock"], np.object_, policy=policy
+        )
         blocks.extend(object_blocks)
 
     if len(items_dict["CategoricalBlock"]) > 0:
@@ -1776,22 +1807,25 @@ def form_blocks(arrays, names: Index, axes) -> List[Block]:
     return blocks
 
 
-def _simple_blockify(tuples, dtype) -> List[Block]:
+def _simple_blockify(tuples, dtype, policy) -> List[Block]:
     """
     return a single array of a block that has a single dtype; if dtype is
     not None, coerce to this dtype
     """
-    values, placement = _stack_arrays(tuples, dtype)
+    values, placement = _stack_arrays(tuples, dtype, policy)
 
-    # TODO: CHECK DTYPE?
-    if dtype is not None and values.dtype != dtype:  # pragma: no cover
-        values = values.astype(dtype)
+    blocks = []
+    for v, p in zip(values, placement):
+        # TODO: CHECK DTYPE?
+        if dtype is not None and v.dtype != dtype:  # pragma: no cover
+            v = v.astype(dtype)
 
-    block = make_block(values, placement=placement)
-    return [block]
+        block = make_block(v, placement=p)
+        blocks.append(block)
+    return blocks
 
 
-def _multi_blockify(tuples, dtype=None):
+def _multi_blockify(tuples, dtype=None, policy=None):
     """ return an array of blocks that potentially have different dtypes """
     # group by dtype
     grouper = itertools.groupby(tuples, lambda x: x[2].dtype)
@@ -1799,15 +1833,16 @@ def _multi_blockify(tuples, dtype=None):
     new_blocks = []
     for dtype, tup_block in grouper:
 
-        values, placement = _stack_arrays(list(tup_block), dtype)
+        values, placement = _stack_arrays(list(tup_block), dtype, policy)
 
-        block = make_block(values, placement=placement)
-        new_blocks.append(block)
+        for v, p in zip(values, placement):
+            block = make_block(v, placement=p)
+            new_blocks.append(block)
 
     return new_blocks
 
 
-def _stack_arrays(tuples, dtype):
+def _stack_arrays(tuples, dtype, policy):
 
     # fml
     def _asarray_compat(x):
@@ -1827,6 +1862,16 @@ def _stack_arrays(tuples, dtype):
     first = arrays[0]
     shape = (len(arrays),) + _shape_compat(first)
 
+    # individual blocks
+    from .blocks import _block_shape
+
+    if policy in ["split", "column"]:
+        return (
+            [_block_shape(_asarray_compat(arr), 2) for arr in arrays],
+            [(p,) for p in placement],
+        )
+
+    # stack em
     stacked = np.empty(shape, dtype=dtype)
     for i, arr in enumerate(arrays):
         stacked[i] = _asarray_compat(arr)
@@ -1851,6 +1896,38 @@ def _interleaved_dtype(blocks: Sequence[Block]) -> Optional[DtypeObj]:
         return None
 
     return find_common_type([b.dtype for b in blocks])
+
+
+def _split_blocks(blocks, policy):
+    """
+    return split blocks according to the policy
+    # GH 10556, 9216, 5902
+    """
+
+    policies = ["block", "column", "split"]
+    if policy not in policies:
+        raise ValueError("specified policy must be in [{0}]".format(",".join(policies)))
+
+    new_blocks = []
+    for b in blocks:
+
+        if b.shape[0] == 1:
+            new_blocks.append(b)
+
+        elif policy == "split":
+            from .blocks import _block_shape
+
+            # split these & copy to make this a separate base
+            for i, p in enumerate(b.mgr_locs.as_array):
+                new_b = b.make_block(
+                    _block_shape(b.iget(i).copy(), ndim=b.ndim), placement=[p]
+                )
+                new_blocks.append(new_b)
+
+        else:
+            new_blocks.append(b)
+
+    return new_blocks, policy
 
 
 def _consolidate(blocks):

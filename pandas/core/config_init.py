@@ -471,20 +471,14 @@ cf.deprecate_option(
 )
 
 
-# user warnings
+#
+# options from the "mode" namespace
+
 chained_assignment = """
 : string
     Raise an exception, warn, or no action if trying to use chained assignment,
     The default is warn
 """
-
-with cf.config_prefix("mode"):
-    cf.register_option(
-        "chained_assignment",
-        "warn",
-        chained_assignment,
-        validator=is_one_of_factory([None, "warn", "raise"]),
-    )
 
 
 # Set up the io.excel specific reader configuration.
@@ -499,6 +493,25 @@ _xlsm_options = ["xlrd", "openpyxl"]
 _xlsx_options = ["xlrd", "openpyxl"]
 _ods_options = ["odf"]
 _xlsb_options = ["pyxlsb"]
+policy = """
+: string
+    Default policy for construction of objects,
+    The default is 'block'
+"""
+
+with cf.config_prefix("mode"):
+    cf.register_option(
+        "chained_assignment",
+        "warn",
+        chained_assignment,
+        validator=is_one_of_factory([None, "warn", "raise"]),
+    )
+    cf.register_option(
+        "policy",
+        "block",
+        policy,
+        validator=is_one_of_factory(["block", "column", "split"]),
+    )
 
 
 with cf.config_prefix("io.excel.xls"):
