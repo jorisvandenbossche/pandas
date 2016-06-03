@@ -391,6 +391,67 @@ For some windowing functions, additional parameters must be specified:
     such that the weights are normalized with respect to each other. Weights
     of ``[1, 1, 1]`` and ``[2, 2, 2]`` yield the same result.
 
+.. _stats.moments.ts:
+
+Time-aware Rolling
+~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 0.18.2
+
+New in version 0.18.2 are the ability to pass an offset (or convertible) to a ``.rolling()`` method and have it produce
+variable sized windows based on the passed time window. This is useful for a non-regular time frequency index.
+
+.. ipython:: python
+
+   dft = pd.DataFrame({'B': [0, 1, 2, np.nan, 4]},
+                      index=pd.date_range('20130101 09:00:00', periods=5))
+   dft
+
+This is a regular frequency index. Using an integer window parameter works to roll along the window frequency.
+
+.. ipython:: python
+
+   dft.rolling(2).sum()
+   dft.rolling(2, min_periods=1).sum()
+
+Specifying an offset allows a more intuitive specification of the rolling frequency.
+
+.. ipython:: python
+
+   dft.rolling('2s').sum()
+
+Using a non-regular, but still monotonic index, rolling with an integer window does not impart any special calculation.
+
+.. ipython:: python
+
+
+   dft = DataFrame({'B': [0, 1, 2, np.nan, 4]},
+                   index = pd.Index([pd.Timestamp('20130101 09:00:00'),
+                                     pd.Timestamp('20130101 09:00:02'),
+                                     pd.Timestamp('20130101 09:00:03'),
+                                     pd.Timestamp('20130101 09:00:05'),
+                                     pd.Timestamp('20130101 09:00:06')],
+                                    name='foo'))
+
+   dft
+   dft.rolling(2).sum()
+
+
+Using the time-specification generates variable windows for this sparse data.
+
+.. ipython:: python
+
+   dft.rolling('2s').sum()
+
+Furthermore, we now allow an optional ``on`` parameter to specify a column (rather than the
+default of the index) in a DataFrame.
+
+.. ipython:: python
+
+   dft = dft.reset_index()
+   dft
+   dft.rolling('2s', on='foo').sum()
+
 Centering Windows
 ~~~~~~~~~~~~~~~~~
 

@@ -11,7 +11,7 @@ from distutils.version import LooseVersion
 
 import pandas as pd
 from pandas import (Series, DataFrame, Panel, bdate_range, isnull,
-                    notnull, concat)
+                    notnull, concat, Timestamp)
 import pandas.core.datetools as datetools
 import pandas.stats.moments as mom
 import pandas.core.window as rwindow
@@ -319,6 +319,13 @@ class TestRolling(Base):
     def setUp(self):
         self._create_data()
 
+    def test_doc_string(self):
+
+        df = DataFrame({'B': [0, 1, 2, np.nan, 4]})
+        df
+        df.rolling(2).sum()
+        df.rolling(2, min_periods=1).sum()
+
     def test_constructor(self):
         # GH 12669
 
@@ -372,6 +379,12 @@ class TestExpanding(Base):
     def setUp(self):
         self._create_data()
 
+    def test_doc_string(self):
+
+        df = DataFrame({'B': [0, 1, 2, np.nan, 4]})
+        df
+        df.expanding(2).sum()
+
     def test_constructor(self):
         # GH 12669
 
@@ -407,6 +420,12 @@ class TestEWM(Base):
 
     def setUp(self):
         self._create_data()
+
+    def test_doc_string(self):
+
+        df = DataFrame({'B': [0, 1, 2, np.nan, 4]})
+        df
+        df.ewm(com=0.5).mean()
 
     def test_constructor(self):
         for o in [self.series, self.frame]:
@@ -565,6 +584,7 @@ class Dtype(object):
     def test_dtypes(self):
         self._create_data()
         for f_name, d_name in product(self.funcs.keys(), self.data.keys()):
+
             f = self.funcs[f_name]
             d = self.data[d_name]
             exp = self.expects[d_name][f_name]
@@ -958,6 +978,7 @@ class TestMoments(Base):
                                     name='median')
 
     def test_rolling_min(self):
+
         with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
             self._check_moment_func(mom.rolling_min, np.min, name='min')
 
@@ -970,6 +991,7 @@ class TestMoments(Base):
                               window=3, min_periods=5)
 
     def test_rolling_max(self):
+
         with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
             self._check_moment_func(mom.rolling_max, np.max, name='max')
 
@@ -2890,6 +2912,7 @@ class TestMomentsConsistency(Base):
         Series(np.random.randn(n)).rolling(window=2, center=False).median()
 
     def test_rolling_min_max_numeric_types(self):
+
         # GH12373
         types_test = [np.dtype("f{}".format(width)) for width in [4, 8]]
         types_test.extend([np.dtype("{}{}".format(sign, width))
@@ -2961,6 +2984,7 @@ class TestGrouperGrouping(tm.TestCase):
         r = g.rolling(window=4)
 
         for f in ['sum', 'mean', 'min', 'max', 'count', 'kurt', 'skew']:
+
             result = getattr(r, f)()
             expected = g.apply(lambda x: getattr(x.rolling(4), f)())
             tm.assert_frame_equal(result, expected)
@@ -3007,6 +3031,7 @@ class TestGrouperGrouping(tm.TestCase):
         r = g.expanding()
 
         for f in ['sum', 'mean', 'min', 'max', 'count', 'kurt', 'skew']:
+
             result = getattr(r, f)()
             expected = g.apply(lambda x: getattr(x.expanding(), f)())
             tm.assert_frame_equal(result, expected)
@@ -3046,4 +3071,471 @@ class TestGrouperGrouping(tm.TestCase):
         # reduction
         result = r.apply(lambda x: x.sum())
         expected = g.apply(lambda x: x.expanding().apply(lambda y: y.sum()))
+        tm.assert_frame_equal(result, expected)
+
+
+class TestRollingTS(tm.TestCase):
+
+    # rolling time-series friendly
+    # xref GH13327
+
+    def setUp(self):
+
+        self.regular = DataFrame({'A': pd.date_range('20130101',
+                                                     periods=5,
+                                                     freq='s'),
+                                  'B': range(5)}).set_index('A')
+
+        self.ragged = DataFrame({'B': range(5)})
+        self.ragged.index = [Timestamp('20130101 09:00:00'),
+                             Timestamp('20130101 09:00:02'),
+                             Timestamp('20130101 09:00:03'),
+                             Timestamp('20130101 09:00:05'),
+                             Timestamp('20130101 09:00:06')]
+
+    def test_doc_string(self):
+
+        df = DataFrame({'B': [0, 1, 2, np.nan, 4]},
+                       index=[Timestamp('20130101 09:00:00'),
+                              Timestamp('20130101 09:00:02'),
+                              Timestamp('20130101 09:00:03'),
+                              Timestamp('20130101 09:00:05'),
+                              Timestamp('20130101 09:00:06')])
+        df
+        df.rolling('2s').sum()
+
+    def test_valid(self):
+
+        df = self.regular
+
+        # not a valid freq
+        with self.assertRaises(ValueError):
+            df.rolling(window='foobar')
+
+        # not a datetimelike index
+        with self.assertRaises(ValueError):
+            df.reset_index().rolling(window='foobar')
+
+        # non-fixed freqs
+        for freq in ['2MS', pd.offsets.MonthBegin(2)]:
+            with self.assertRaises(ValueError):
+                df.rolling(window=freq)
+
+        for freq in ['1D', pd.offsets.Day(2), '2ms']:
+            df.rolling(window=freq)
+
+    def test_on(self):
+
+        df = self.regular
+
+        # not a valid column
+        with self.assertRaises(ValueError):
+            df.rolling(window='2s', on='foobar')
+
+        # column is valid
+        df = df.copy()
+        df['C'] = pd.date_range('20130101', periods=len(df))
+        df.rolling(window='2d', on='C').sum()
+
+        # invalid columns
+        with self.assertRaises(ValueError):
+            df.rolling(window='2d', on='B')
+
+        # ok even though on non-selected
+        df.rolling(window='2d', on='C').B.sum()
+
+    def test_monotonic_on(self):
+
+        # on/index must be monotonic
+        df = DataFrame({'A': pd.date_range('20130101',
+                                           periods=5,
+                                           freq='s'),
+                        'B': range(5)})
+
+        self.assertTrue(df.A.is_monotonic)
+        df.rolling('2s', on='A').sum()
+
+        df = df.set_index('A')
+        self.assertTrue(df.index.is_monotonic)
+        df.rolling('2s').sum()
+
+        # non-monotonic
+        df.index = reversed(df.index.tolist())
+        self.assertFalse(df.index.is_monotonic)
+
+        with self.assertRaises(ValueError):
+            df.rolling('2s').sum()
+
+        df = df.reset_index()
+        with self.assertRaises(ValueError):
+            df.rolling('2s', on='A').sum()
+
+    def test_frame_on(self):
+
+        df = DataFrame({'B': range(5),
+                        'C': pd.date_range('20130101 09:00:00',
+                                           periods=5,
+                                           freq='3s')})
+
+        df['A'] = [Timestamp('20130101 09:00:00'),
+                   Timestamp('20130101 09:00:02'),
+                   Timestamp('20130101 09:00:03'),
+                   Timestamp('20130101 09:00:05'),
+                   Timestamp('20130101 09:00:06')]
+
+        # we are doing simulating using 'on'
+        expected = (df.assign(B=(df.set_index('A')
+                                 .rolling('2s')
+                                 .B
+                                 .sum()
+                                 .reset_index(drop=True)
+                                 ))
+                    [['B', 'A']]
+                    )
+
+        result = (df.rolling('2s', on='A')
+                    .B
+                    .sum()
+                    .reset_index()
+                  )
+
+        # these may have differening result order
+        tm.assert_frame_equal(result, expected, check_like=True)
+
+    def test_basic_regular(self):
+
+        df = self.regular.copy()
+
+        df.index = pd.date_range('20130101', periods=5, freq='D')
+        expected = df.rolling(window=1, min_periods=1).sum()
+        result = df.rolling(window='1D').sum()
+        tm.assert_frame_equal(result, expected)
+
+        df.index = pd.date_range('20130101', periods=5, freq='2D')
+        expected = df.rolling(window=1, min_periods=1).sum()
+        result = df.rolling(window='2D', min_periods=1).sum()
+        tm.assert_frame_equal(result, expected)
+
+        expected = df.rolling(window=1, min_periods=1).sum()
+        result = df.rolling(window='2D', min_periods=1).sum()
+        tm.assert_frame_equal(result, expected)
+
+        expected = df.rolling(window=1).sum()
+        result = df.rolling(window='2D').sum()
+        tm.assert_frame_equal(result, expected)
+
+    def test_min_periods(self):
+
+        # compare for min_periods
+        df = self.regular
+
+        # these slightly different
+        expected = df.rolling(2, min_periods=1).sum()
+        result = df.rolling('2s').sum()
+        tm.assert_frame_equal(result, expected)
+
+        expected = df.rolling(2, min_periods=1).sum()
+        result = df.rolling('2s', min_periods=1).sum()
+        tm.assert_frame_equal(result, expected)
+
+    def test_ragged_sum(self):
+
+        df = self.ragged
+        result = df.rolling(window='1s', min_periods=1).sum()
+        expected = df.copy()
+        expected['B'] = [0.0, 1, 2, 3, 4]
+        tm.assert_frame_equal(result, expected)
+
+        # minp must be <= window
+        with self.assertRaises(ValueError):
+            df.rolling(window='1s', min_periods=2).sum()
+
+        result = df.rolling(window='2s', min_periods=1).sum()
+        expected = df.copy()
+        expected['B'] = [0.0, 1, 3, 3, 7]
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='2s', min_periods=2).sum()
+        expected = df.copy()
+        expected['B'] = [np.nan, np.nan, 3, np.nan, 7]
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='3s', min_periods=1).sum()
+        expected = df.copy()
+        expected['B'] = [0.0, 1, 3, 5, 7]
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='3s').sum()
+        expected = df.copy()
+        expected['B'] = [0.0, 1, 3, 5, 7]
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='4s', min_periods=1).sum()
+        expected = df.copy()
+        expected['B'] = [0.0, 1, 3, 6, 9]
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='4s', min_periods=3).sum()
+        expected = df.copy()
+        expected['B'] = [np.nan, np.nan, 3, 6, 9]
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='5s', min_periods=1).sum()
+        expected = df.copy()
+        expected['B'] = [0.0, 1, 3, 6, 10]
+        tm.assert_frame_equal(result, expected)
+
+    def test_ragged_mean(self):
+
+        df = self.ragged
+        result = df.rolling(window='1s', min_periods=1).mean()
+        expected = df.copy()
+        expected['B'] = [0.0, 1, 2, 3, 4]
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='2s', min_periods=1).mean()
+        expected = df.copy()
+        expected['B'] = [0.0, 1, 1.5, 3.0, 3.5]
+        tm.assert_frame_equal(result, expected)
+
+    def test_ragged_median(self):
+
+        df = self.ragged
+        result = df.rolling(window='1s', min_periods=1).median()
+        expected = df.copy()
+        expected['B'] = [0.0, 1, 2, 3, 4]
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='2s', min_periods=1).median()
+        expected = df.copy()
+        expected['B'] = [0.0, 1, 1.5, 3.0, 3.5]
+        tm.assert_frame_equal(result, expected)
+
+    def test_ragged_quantile(self):
+
+        df = self.ragged
+        result = df.rolling(window='1s', min_periods=1).quantile(0.5)
+        expected = df.copy()
+        expected['B'] = [0.0, 1, 2, 3, 4]
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='2s', min_periods=1).quantile(0.5)
+        expected = df.copy()
+        expected['B'] = [0.0, 1, 1.0, 3.0, 3.0]
+        tm.assert_frame_equal(result, expected)
+
+    def test_ragged_std(self):
+
+        df = self.ragged
+        result = df.rolling(window='1s', min_periods=1).std(ddof=0)
+        expected = df.copy()
+        expected['B'] = [0.0] * 5
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='1s', min_periods=1).std(ddof=1)
+        expected = df.copy()
+        expected['B'] = [np.nan] * 5
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='3s', min_periods=1).std(ddof=0)
+        expected = df.copy()
+        expected['B'] = [0.0] + [0.5] * 4
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='5s', min_periods=1).std(ddof=1)
+        expected = df.copy()
+        expected['B'] = [np.nan, 0.707107, 1.0, 1.0, 1.290994]
+        tm.assert_frame_equal(result, expected)
+
+    def test_ragged_var(self):
+
+        df = self.ragged
+        result = df.rolling(window='1s', min_periods=1).var(ddof=0)
+        expected = df.copy()
+        expected['B'] = [0.0] * 5
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='1s', min_periods=1).var(ddof=1)
+        expected = df.copy()
+        expected['B'] = [np.nan] * 5
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='3s', min_periods=1).var(ddof=0)
+        expected = df.copy()
+        expected['B'] = [0.0] + [0.25] * 4
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='5s', min_periods=1).var(ddof=1)
+        expected = df.copy()
+        expected['B'] = [np.nan, 0.5, 1.0, 1.0, 1 + 2 / 3.]
+        tm.assert_frame_equal(result, expected)
+
+    def test_ragged_skew(self):
+
+        df = self.ragged
+        result = df.rolling(window='3s', min_periods=1).skew()
+        expected = df.copy()
+        expected['B'] = [np.nan] * 5
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='5s', min_periods=1).skew()
+        expected = df.copy()
+        expected['B'] = [np.nan] * 2 + [0.0, 0.0, 0.0]
+        tm.assert_frame_equal(result, expected)
+
+    def test_ragged_kurt(self):
+
+        df = self.ragged
+        result = df.rolling(window='3s', min_periods=1).kurt()
+        expected = df.copy()
+        expected['B'] = [np.nan] * 5
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='5s', min_periods=1).kurt()
+        expected = df.copy()
+        expected['B'] = [np.nan] * 4 + [-1.2]
+        tm.assert_frame_equal(result, expected)
+
+    def test_ragged_count(self):
+
+        df = self.ragged
+        result = df.rolling(window='1s', min_periods=1).count()
+        expected = df.copy()
+        expected['B'] = [1.0, 1, 1, 1, 1]
+        tm.assert_frame_equal(result, expected)
+
+        df = self.ragged
+        result = df.rolling(window='1s').count()
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='2s', min_periods=1).count()
+        expected = df.copy()
+        expected['B'] = [1.0, 1, 2, 1, 2]
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='2s', min_periods=2).count()
+        expected = df.copy()
+        expected['B'] = [np.nan, np.nan, 2, np.nan, 2]
+        tm.assert_frame_equal(result, expected)
+
+    def test_regular_min(self):
+
+        df = DataFrame({'A': pd.date_range('20130101',
+                                           periods=5,
+                                           freq='s'),
+                        'B': [0.0, 1, 2, 3, 4]}).set_index('A')
+        result = df.rolling('1s').min()
+        expected = df.copy()
+        expected['B'] = [0.0, 1, 2, 3, 4]
+        tm.assert_frame_equal(result, expected)
+
+        df = DataFrame({'A': pd.date_range('20130101',
+                                           periods=5,
+                                           freq='s'),
+                        'B': [5, 4, 3, 4, 5]}).set_index('A')
+
+        tm.assert_frame_equal(result, expected)
+        result = df.rolling('2s').min()
+        expected = df.copy()
+        expected['B'] = [5.0, 4, 3, 3, 4]
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling('5s').min()
+        expected = df.copy()
+        expected['B'] = [5.0, 4, 3, 3, 3]
+        tm.assert_frame_equal(result, expected)
+
+    def test_ragged_min(self):
+
+        df = self.ragged
+
+        result = df.rolling(window='1s', min_periods=1).min()
+        expected = df.copy()
+        expected['B'] = [0.0, 1, 2, 3, 4]
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='2s', min_periods=1).min()
+        expected = df.copy()
+        expected['B'] = [0.0, 1, 1, 3, 3]
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='5s', min_periods=1).min()
+        expected = df.copy()
+        expected['B'] = [0.0, 0, 0, 1, 1]
+        tm.assert_frame_equal(result, expected)
+
+    def test_perf_min(self):
+
+        N = 10000
+
+        dfp = DataFrame({'B': np.random.randn(N)},
+                        index=pd.date_range('20130101',
+                                            periods=N,
+                                            freq='s'))
+        expected = dfp.rolling(2, min_periods=1).min()
+        result = dfp.rolling('2s').min()
+        self.assertTrue(((result - expected) < 0.01).all().bool())
+
+        expected = dfp.rolling(200, min_periods=1).min()
+        result = dfp.rolling('200s').min()
+        self.assertTrue(((result - expected) < 0.01).all().bool())
+
+    def test_ragged_max(self):
+
+        df = self.ragged
+
+        result = df.rolling(window='1s', min_periods=1).max()
+        expected = df.copy()
+        expected['B'] = [0.0, 1, 2, 3, 4]
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='2s', min_periods=1).max()
+        expected = df.copy()
+        expected['B'] = [0.0, 1, 2, 3, 4]
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='5s', min_periods=1).max()
+        expected = df.copy()
+        expected['B'] = [0.0, 1, 2, 3, 4]
+        tm.assert_frame_equal(result, expected)
+
+    def test_ragged_apply(self):
+
+        df = self.ragged
+
+        f = lambda x: 1
+        result = df.rolling(window='1s', min_periods=1).apply(f)
+        expected = df.copy()
+        expected['B'] = 1.
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='2s', min_periods=1).apply(f)
+        expected = df.copy()
+        expected['B'] = 1.
+        tm.assert_frame_equal(result, expected)
+
+        result = df.rolling(window='5s', min_periods=1).apply(f)
+        expected = df.copy()
+        expected['B'] = 1.
+        tm.assert_frame_equal(result, expected)
+
+    def test_basic_all(self):
+
+        df = self.regular * 2
+        er = df.rolling(window=1)
+        r = df.rolling(window='1s')
+
+        for f in ['sum', 'mean', 'count', 'median', 'std',
+                  'var', 'kurt', 'skew', 'min', 'max']:
+
+            result = getattr(r, f)()
+            expected = getattr(er, f)()
+            tm.assert_frame_equal(result, expected)
+
+        result = r.quantile(0.5)
+        expected = er.quantile(0.5)
+        tm.assert_frame_equal(result, expected)
+
+        result = r.apply(lambda x: 1)
+        expected = er.apply(lambda x: 1)
         tm.assert_frame_equal(result, expected)
