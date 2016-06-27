@@ -62,7 +62,6 @@ cdef extern from "src/headers/math.h":
     int signbit(double) nogil
 
 include "skiplist.pyx"
-include "prioritylist.pyx"
 
 # Cython implementations of rolling sum, mean, variance, skewness,
 # other statistical moment functions
@@ -1219,10 +1218,7 @@ cdef _roll_min_max(ndarray[numeric] input, int64_t win, int64_t minp,
         numeric* last
 
     cdef:
-        pl_list* pl
-        pl_node* node
-        int* cendi
-        int curval
+        cdef numeric r
 
     starti, endi, N, win, minp, is_variable = get_window_indexer(
         input, win,
@@ -1233,37 +1229,28 @@ cdef _roll_min_max(ndarray[numeric] input, int64_t win, int64_t minp,
 
     if is_variable:
 
-        # maximum window size
-        win = (endi - starti).max()
-        cendi = <int *>np.PyArray_DATA(endi.astype('i'))
-
-        with nogil:
-
-            pl = pl_new(win, is_max)
+        if True:
+        #with nogil:
 
             for i in range(N):
                 s = starti[i]
                 e = endi[i]
 
-                curval = <int> starti[i]
-                if i:
-                    for j in range(starti[i - 1], s):
-                        removed = pl_remove(pl, cendi, curval)
-                        nobs -= removed
+                r = input[s]
+                nobs = 0
+                for j in range(s, e):
 
-                # adds, death at the i offset
-                ai = init_mm(input[i], &nobs, is_max)
-                pl_insert_init(pl, ai, i)
+                    # adds, death at the i offset
+                    ai = init_mm(input[j], &nobs, is_max)
 
-                # pl_print(pl)
+                    if is_max:
+                        if ai > r:
+                            r = ai
+                    else:
+                        if ai < r:
+                            r = ai
 
-                # iterate thru the nodes, discarding died nodes
-                # when we have a valid node we are done
-                node = pl_get_value(pl)
-                ai = <numeric> node.val
-                output[i] = calc_mm(minp, nobs, ai)
-
-            pl_free(pl)
+                output[i] = calc_mm(minp, nobs, r)
 
     else:
 
