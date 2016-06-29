@@ -1,4 +1,5 @@
 # cython: profile=False
+# cython: boundscheck=False, wraparound=False, cdivision=True
 
 from numpy cimport *
 cimport numpy as np
@@ -125,8 +126,6 @@ def _check_minp(win, minp, N, floor=None):
 # These define start/end indexers to compute offsets
 
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
 cdef class WindowIndexer:
 
     cdef:
@@ -140,8 +139,6 @@ cdef class WindowIndexer:
                 self.is_variable)
 
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
 cdef class MockFixedWindowIndexer(WindowIndexer):
     """
 
@@ -175,8 +172,6 @@ cdef class MockFixedWindowIndexer(WindowIndexer):
         self.win = win
 
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
 cdef class FixedWindowIndexer(WindowIndexer):
     """
     create a fixed length window indexer object
@@ -217,8 +212,6 @@ cdef class FixedWindowIndexer(WindowIndexer):
         self.win = win
 
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
 cdef class VariableWindowIndexer(WindowIndexer):
     """
     create a variable length window indexer object
@@ -333,8 +326,6 @@ def get_window_indexer(input, win, minp, index, floor=None,
 # this is only an impl for index not None, IOW, freq aware
 
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
 def roll_count(ndarray[double_t] input, int64_t win, int64_t minp,
                object index):
     cdef:
@@ -416,8 +407,6 @@ cdef inline void remove_sum(double val, int64_t *nobs, double *sum_x) nogil:
         sum_x[0] = sum_x[0] - val
 
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
 def roll_sum(ndarray[double_t] input, int64_t win, int64_t minp,
              object index):
     cdef:
@@ -491,7 +480,6 @@ def roll_sum(ndarray[double_t] input, int64_t win, int64_t minp,
 # Rolling mean
 
 
-@cython.cdivision(True)
 cdef inline double calc_mean(int64_t minp, Py_ssize_t nobs,
                              Py_ssize_t neg_ct, double sum_x) nogil:
     cdef double result
@@ -511,7 +499,6 @@ cdef inline double calc_mean(int64_t minp, Py_ssize_t nobs,
     return result
 
 
-@cython.cdivision(True)
 cdef inline void add_mean(double val, Py_ssize_t *nobs, double *sum_x,
                           Py_ssize_t *neg_ct) nogil:
     """ add a value from the mean calc """
@@ -524,7 +511,6 @@ cdef inline void add_mean(double val, Py_ssize_t *nobs, double *sum_x,
             neg_ct[0] = neg_ct[0] + 1
 
 
-@cython.cdivision(True)
 cdef inline void remove_mean(double val, Py_ssize_t *nobs, double *sum_x,
                              Py_ssize_t *neg_ct) nogil:
     """ remove a value from the mean calc """
@@ -536,9 +522,6 @@ cdef inline void remove_mean(double val, Py_ssize_t *nobs, double *sum_x,
             neg_ct[0] = neg_ct[0] - 1
 
 
-@cython.cdivision(True)
-@cython.boundscheck(False)
-@cython.wraparound(False)
 def roll_mean(ndarray[double_t] input, int64_t win, int64_t minp,
               object index):
     cdef:
@@ -612,7 +595,6 @@ def roll_mean(ndarray[double_t] input, int64_t win, int64_t minp,
 # Rolling variance
 
 
-@cython.cdivision(True)
 cdef inline double calc_var(int64_t minp, int ddof, double nobs,
                             double ssqdm_x) nogil:
     cdef double result
@@ -633,7 +615,6 @@ cdef inline double calc_var(int64_t minp, int ddof, double nobs,
     return result
 
 
-@cython.cdivision(True)
 cdef inline void add_var(double val, double *nobs, double *mean_x,
                          double *ssqdm_x) nogil:
     """ add a value from the var calc """
@@ -648,7 +629,6 @@ cdef inline void add_var(double val, double *nobs, double *mean_x,
         ssqdm_x[0] = ssqdm_x[0] + delta * (val - mean_x[0])
 
 
-@cython.cdivision(True)
 cdef inline void remove_var(double val, double *nobs, double *mean_x,
                             double *ssqdm_x) nogil:
     """ remove a value from the var calc """
@@ -666,9 +646,6 @@ cdef inline void remove_var(double val, double *nobs, double *mean_x,
             ssqdm_x[0] = 0
 
 
-@cython.cdivision(True)
-@cython.boundscheck(False)
-@cython.wraparound(False)
 def roll_var(ndarray[double_t] input, int64_t win, int64_t minp,
              object index, int ddof=1):
     """
@@ -763,7 +740,6 @@ def roll_var(ndarray[double_t] input, int64_t win, int64_t minp,
 # ----------------------------------------------------------------------
 # Rolling skewness
 
-@cython.cdivision(True)
 cdef inline double calc_skew(int64_t minp, int64_t nobs, double x, double xx,
                              double xxx) nogil:
     cdef double result, dnobs
@@ -812,9 +788,6 @@ cdef inline void remove_skew(double val, int64_t *nobs, double *x, double *xx,
         xxx[0] = xxx[0] - val * val * val
 
 
-@cython.cdivision(True)
-@cython.boundscheck(False)
-@cython.wraparound(False)
 def roll_skew(ndarray[double_t] input, int64_t win, int64_t minp,
               object index):
     cdef:
@@ -888,7 +861,6 @@ def roll_skew(ndarray[double_t] input, int64_t win, int64_t minp,
 # Rolling kurtosis
 
 
-@cython.cdivision(True)
 cdef inline double calc_kurt(int64_t minp, int64_t nobs, double x, double xx,
                              double xxx, double xxxx) nogil:
     cdef double result, dnobs
@@ -943,9 +915,6 @@ cdef inline void remove_kurt(double val, int64_t *nobs, double *x, double *xx,
         xxxx[0] = xxxx[0] - val * val * val * val
 
 
-@cython.cdivision(True)
-@cython.boundscheck(False)
-@cython.wraparound(False)
 def roll_kurt(ndarray[double_t] input, int64_t win, int64_t minp,
               object index):
     cdef:
@@ -1015,8 +984,6 @@ def roll_kurt(ndarray[double_t] input, int64_t win, int64_t minp,
 # Rolling median, min, max
 
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
 def roll_median_c(ndarray[float64_t] input, int64_t win, int64_t minp,
                   object index):
     cdef:
@@ -1143,8 +1110,6 @@ cdef inline numeric calc_mm(int64_t minp, Py_ssize_t nobs,
     return result
 
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
 def roll_max(ndarray[numeric] input, int64_t win, int64_t minp,
              object index):
     """
@@ -1162,8 +1127,6 @@ def roll_max(ndarray[numeric] input, int64_t win, int64_t minp,
     return _roll_min_max(input, win, minp, index, is_max=1)
 
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
 def roll_min(ndarray[numeric] input, int64_t win, int64_t minp,
              object index):
     """
@@ -1181,8 +1144,6 @@ def roll_min(ndarray[numeric] input, int64_t win, int64_t minp,
     return _roll_min_max(input, win, minp, index, is_max=0)
 
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
 cdef _roll_min_max(ndarray[numeric] input, int64_t win, int64_t minp,
                    object index, bint is_max):
     """

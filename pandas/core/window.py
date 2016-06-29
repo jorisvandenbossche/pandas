@@ -1024,8 +1024,9 @@ class Rolling(_Rolling_and_Expanding):
             try:
                 freq = to_offset(self.window)
             except (TypeError, ValueError):
-                raise ValueError("window string type in not "
-                                 "compat with a datetimelike index")
+                raise ValueError("passed window {0} in not "
+                                 "compat with a datetimelike "
+                                 "index".format(self.window))
 
             # this will raise ValueError on non-fixed freqs
             self.window = freq.nanos
