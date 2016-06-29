@@ -135,8 +135,9 @@ cdef class WindowIndexer:
         bint is_variable
 
     def get_data(self):
-        return (self.start, self.end, self.N, self.win,
-                self.minp, self.is_variable)
+        return (self.start, self.end, <int64_t>self.N, 
+                <int64_t>self.win, <int64_t>self.minp, 
+                self.is_variable)
 
 
 @cython.boundscheck(False)
@@ -169,8 +170,8 @@ cdef class MockFixedWindowIndexer(WindowIndexer):
         self.is_variable = 0
         self.N = len(input)
         self.minp = _check_minp(win, minp, self.N, floor=floor)
-        self.start = np.empty(0, dtype=int)
-        self.end = np.empty(0, dtype=int)
+        self.start = np.empty(0, dtype='int64')
+        self.end = np.empty(0, dtype='int64')
         self.win = win
 
 
@@ -206,11 +207,11 @@ cdef class FixedWindowIndexer(WindowIndexer):
         self.N = len(input)
         self.minp = _check_minp(win, minp, self.N, floor=floor)
 
-        start_s = np.zeros(win, dtype=int)
-        start_e = np.arange(win, self.N, dtype=int) - win + 1
+        start_s = np.zeros(win, dtype='int64')
+        start_e = np.arange(win, self.N, dtype='int64') - win + 1
         self.start = np.concatenate([start_s, start_e])
 
-        end_s = np.arange(win, dtype=int) + 1
+        end_s = np.arange(win, dtype='int64') + 1
         end_e = start_e + win
         self.end = np.concatenate([end_s, end_e])
         self.win = win
@@ -244,16 +245,16 @@ cdef class VariableWindowIndexer(WindowIndexer):
         self.N = len(index)
         self.minp = _check_minp(win, minp, self.N)
 
-        self.start = np.empty(self.N, dtype=int)
+        self.start = np.empty(self.N, dtype='int64')
         self.start.fill(-1)
 
-        self.end = np.empty(self.N, dtype=int)
+        self.end = np.empty(self.N, dtype='int64')
         self.end.fill(-1)
 
         self.build(index, win)
 
         # max window size
-        self.win = (self.end-self.start).max()
+        self.win = (self.end - self.start).max()
 
     def build(self, ndarray[int64_t] index, int64_t win):
 
@@ -338,8 +339,8 @@ def roll_count(ndarray[double_t] input, int64_t win, int64_t minp,
                object index):
     cdef:
         double val, count_x = 0.0
-        int64_t s, e
-        int nobs = 0, i, j, N
+        int64_t s, e, nobs, N
+        Py_ssize_t i, j
         ndarray[int64_t] start, end
         ndarray[double_t] output
 
@@ -1023,7 +1024,9 @@ def roll_median_c(ndarray[float64_t] input, int64_t win, int64_t minp,
         bint err=0, is_variable
         int ret=0
         skiplist_t *sl
-        int64_t midpoint, nobs = 0, i, N, j, s, e
+        Py_ssize_t i, j
+        int64_t nobs = 0, N, s, e
+        int midpoint
         ndarray[int64_t] start, end
         ndarray[double_t] output
 
@@ -1074,7 +1077,7 @@ def roll_median_c(ndarray[float64_t] input, int64_t win, int64_t minp,
                             break
 
             if nobs >= minp:
-                midpoint = nobs / 2
+                midpoint = <int>(nobs / 2)
                 if nobs % 2:
                     res = skiplist_get(sl, midpoint, &ret)
                 else:
@@ -1103,9 +1106,16 @@ cdef inline numeric init_mm(numeric ai, Py_ssize_t *nobs, bint is_max) nogil:
         if ai == ai:
             nobs[0] = nobs[0] + 1
         elif is_max:
-            ai = MINfloat64
+            if numeric == cython.float:
+                ai = MINfloat32
+            else:
+                ai = MINfloat64
         else:
-            ai = MAXfloat64
+            if numeric == cython.float:
+                ai = MAXfloat32
+            else:
+                ai = MAXfloat64
+
     else:
         nobs[0] = nobs[0] + 1
 
