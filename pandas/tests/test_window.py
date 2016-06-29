@@ -3124,6 +3124,11 @@ class TestRollingTS(tm.TestCase):
         for freq in ['1D', pd.offsets.Day(2), '2ms']:
             df.rolling(window=freq)
 
+        # non-integer min_periods
+        for minp in [1.0, 'foo', np.array([1, 2, 3])]:
+            with self.assertRaises(ValueError):
+                df.rolling(window='1D', min_periods=minp)
+
     def test_on(self):
 
         df = self.regular
@@ -3245,10 +3250,6 @@ class TestRollingTS(tm.TestCase):
         expected = df.copy()
         expected['B'] = [0.0, 1, 2, 3, 4]
         tm.assert_frame_equal(result, expected)
-
-        # minp must be <= window
-        with self.assertRaises(ValueError):
-            df.rolling(window='1s', min_periods=2).sum()
 
         result = df.rolling(window='2s', min_periods=1).sum()
         expected = df.copy()

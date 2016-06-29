@@ -46,9 +46,8 @@ pandas.DataFrame.%(name)s
 
 class _Window(PandasObject, SelectionMixin):
     _attributes = ['window', 'min_periods', 'freq', 'center', 'win_type',
-                   'win_unit', 'axis']
+                   'axis']
     exclusions = set()
-    win_unit = None
 
     def __init__(self, obj, window=None, min_periods=None, freq=None,
                  center=False, win_type=None, axis=0, **kwargs):
@@ -173,18 +172,18 @@ class _Window(PandasObject, SelectionMixin):
 
     def _get_index(self, index=None):
         """
-        Return index & units as ndarrays
+        Return index as ndarrays
 
         Returns
         -------
-        tuple of (index, unit)
+        tuple of (index, index_as_ndarray)
         """
-        # return the index
+
         if self.is_freq_type:
             if index is None:
                 index = self._on
-            return index, index.asi8, self.win_unit
-        return index, index, self.win_unit
+            return index, index.asi8
+        return index, index
 
     def _prep_values(self, values=None, kill_inf=True, how=None):
 
@@ -567,7 +566,7 @@ class _Rolling(_Window):
             check_minp = _use_window
 
         blocks, obj, index = self._create_blocks(how=how)
-        index, indexi, unit = self._get_index(index=index)
+        index, indexi = self._get_index(index=index)
         results = []
         for b in blocks:
             try:
@@ -593,7 +592,7 @@ class _Rolling(_Window):
                     # ensure we are only rolling on floats
                     arg = com._ensure_float64(arg)
                     return cfunc(arg,
-                                 window, minp, indexi, unit, **kwargs)
+                                 window, minp, indexi, **kwargs)
 
             # calculation function
             if center:
@@ -629,7 +628,7 @@ class _Rolling_and_Expanding(_Rolling):
     def count(self):
 
         blocks, obj, index = self._create_blocks(how=None)
-        index, indexi, unit = self._get_index(index=index)
+        index, indexi = self._get_index(index=index)
 
         window = self._get_window()
         window = min(window, len(obj)) if not self.center else window
@@ -667,11 +666,11 @@ class _Rolling_and_Expanding(_Rolling):
         _level = kwargs.pop('_level', None)  # noqa
         window = self._get_window()
         offset = _offset(window, self.center)
-        index, indexi, unit = self._get_index()
+        index, indexi = self._get_index()
 
         def f(arg, window, min_periods):
             minp = _use_window(min_periods, window)
-            return _window.roll_generic(arg, window, minp, indexi, unit,
+            return _window.roll_generic(arg, window, minp, indexi,
                                         offset, func, args,
                                         kwargs)
 
@@ -739,12 +738,12 @@ class _Rolling_and_Expanding(_Rolling):
     def std(self, ddof=1, *args, **kwargs):
         nv.validate_window_func('std', args, kwargs)
         window = self._get_window()
-        index, indexi, unit = self._get_index()
+        index, indexi = self._get_index()
 
         def f(arg, *args, **kwargs):
             minp = _require_min_periods(1)(self.min_periods, window)
             return _zsqrt(_window.roll_var(arg, window, minp, indexi,
-                                           unit, ddof))
+                                           ddof))
 
         return self._apply(f, 'std', check_minp=_require_min_periods(1),
                            ddof=ddof, **kwargs)
@@ -786,11 +785,11 @@ class _Rolling_and_Expanding(_Rolling):
 
     def quantile(self, quantile, **kwargs):
         window = self._get_window()
-        index, indexi, unit = self._get_index()
+        index, indexi = self._get_index()
 
         def f(arg, *args, **kwargs):
             minp = _use_window(self.min_periods, window)
-            return _window.roll_quantile(arg, window, minp, indexi, unit,
+            return _window.roll_quantile(arg, window, minp, indexi,
                                          quantile)
 
         return self._apply(f, 'quantile', quantile=quantile,
@@ -973,7 +972,7 @@ class Rolling(_Rolling_and_Expanding):
     frequency by resampling the data. This is done with the default parameters
     of :meth:`~pandas.Series.resample` (i.e. using the `mean`).
     """
-    _attributes = _Window._attributes + ['win_unit', '_on']
+    _attributes = _Window._attributes + ['_on']
 
     def __init__(self, obj, window=None, min_periods=None, freq=None,
                  center=False, win_type=None, on=None, axis=0, **kwargs):
@@ -1031,12 +1030,10 @@ class Rolling(_Rolling_and_Expanding):
             # this will raise ValueError on non-fixed freqs
             self.window = freq.nanos
             self.win_type = 'freq'
-            self.win_unit = int(self.window / freq.n)
 
-            # min_periods should also be in the same units
+            # min_periods must be an integer
             if self.min_periods is None:
                 self.min_periods = 1
-            self.min_periods *= self.win_unit
 
         elif not com.is_integer(self.window):
             raise ValueError("window must be an integer")

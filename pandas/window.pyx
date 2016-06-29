@@ -74,37 +74,36 @@ include "skiplist.pyx"
 #
 
 
-def _check_minp(win, minp, N, floor=None, unit=None):
+def _check_minp(win, minp, N, floor=None):
     """
     Parameters
     ----------
-    win: int (window units)
-    minp: int (window units) or None
+    win: int
+    minp: int or None
     N: len of window
     floor: int, optional
         default 1
-    unit: unit of the window, optional, default 1
 
     Returns
     -------
-    minimum period in len units
+    minimum period
     """
 
-    if unit is None:
-        unit = 1
     if minp is None:
-        minp = unit
+        minp = 1
+    if not util.is_integer_object(minp):
+        raise ValueError("min_periods must be an integer")
     if minp > win:
         raise ValueError("min_periods (%d) must be <= "
                          "window (%d)" % (minp, win))
-    elif minp > N * unit:
-        minp = N + 1 * unit
+    elif minp > N:
+        minp = N + 1
     elif minp < 0:
         raise ValueError('min_periods must be >= 0')
     if floor is None:
         floor = 1
 
-    return max(int(minp / unit), floor)
+    return max(minp, floor)
 
 # original C implementation by N. Devillard.
 # This code in public domain.
@@ -159,19 +158,17 @@ cdef class MockFixedWindowIndexer(WindowIndexer):
         min number of obs in a window to consider non-NaN
     index: object
         index of the input
-    unit: object, optional
-        unit of the window
     floor: optional
-        unit for flooring the unit
+        unit for flooring
 
     """
     def __init__(self, ndarray input, int64_t win, int64_t minp,
-                 object index=None, object unit=None, object floor=None):
+                 object index=None, object floor=None):
 
         assert index is None
         self.is_variable = 0
         self.N = len(input)
-        self.minp = _check_minp(win, minp, self.N, unit=unit, floor=floor)
+        self.minp = _check_minp(win, minp, self.N, floor=floor)
         self.start = np.empty(0, dtype=int)
         self.end = np.empty(0, dtype=int)
         self.win = win
@@ -196,20 +193,18 @@ cdef class FixedWindowIndexer(WindowIndexer):
         min number of obs in a window to consider non-NaN
     index: object
         index of the input
-    unit: object, optional
-        unit of the window
     floor: optional
         unit for flooring the unit
 
     """
     def __init__(self, ndarray input, int64_t win, int64_t minp,
-                 object index=None, object unit=None, object floor=None):
+                 object index=None, object floor=None):
         cdef ndarray start_s, start_e, end_s, end_e
 
         assert index is None
         self.is_variable = 0
         self.N = len(input)
-        self.minp = _check_minp(win, minp, self.N, unit=unit, floor=floor)
+        self.minp = _check_minp(win, minp, self.N, floor=floor)
 
         start_s = np.zeros(win, dtype=int)
         start_e = np.arange(win, self.N, dtype=int) - win + 1
@@ -240,16 +235,14 @@ cdef class VariableWindowIndexer(WindowIndexer):
         min number of obs in a window to consider non-NaN
     index: ndarray
         index of the input
-    unit: int64_t
-        unit of the window
 
     """
     def __init__(self, ndarray input, int64_t win, int64_t minp,
-                 ndarray index, int64_t unit):
+                 ndarray index):
 
         self.is_variable = 1
         self.N = len(index)
-        self.minp = _check_minp(win, minp, self.N, unit=unit)
+        self.minp = _check_minp(win, minp, self.N)
 
         self.start = np.empty(self.N, dtype=int)
         self.start.fill(-1)
@@ -258,7 +251,9 @@ cdef class VariableWindowIndexer(WindowIndexer):
         self.end.fill(-1)
 
         self.build(index, win)
-        self.win = int(win / float(unit))
+
+        # max window size
+        self.win = (self.end-self.start).max()
 
     def build(self, ndarray[int64_t] index, int64_t win):
 
@@ -298,7 +293,7 @@ cdef class VariableWindowIndexer(WindowIndexer):
                     end[i] = end[i - 1]
 
 
-def get_window_indexer(input, win, minp, index, unit, floor=None,
+def get_window_indexer(input, win, minp, index, floor=None,
                        use_mock=True):
     """
     return the correct window indexer for the computation
@@ -310,7 +305,6 @@ def get_window_indexer(input, win, minp, index, unit, floor=None,
     minp: integer, minimum periods
     index: 1d ndarray, optional
         index to the input array
-    unit: unit of the index, optional
     floor: optional
         unit for flooring the unit
     use_mock: boolean, default True
@@ -326,11 +320,11 @@ def get_window_indexer(input, win, minp, index, unit, floor=None,
     """
 
     if index is not None:
-        indexer = VariableWindowIndexer(input, win, minp, index, unit)
+        indexer = VariableWindowIndexer(input, win, minp, index)
     elif use_mock:
-        indexer = MockFixedWindowIndexer(input, win, minp, index, unit, floor)
+        indexer = MockFixedWindowIndexer(input, win, minp, index, floor)
     else:
-        indexer = FixedWindowIndexer(input, win, minp, index, unit, floor)
+        indexer = FixedWindowIndexer(input, win, minp, index, floor)
     return indexer.get_data()
 
 # ----------------------------------------------------------------------
@@ -341,7 +335,7 @@ def get_window_indexer(input, win, minp, index, unit, floor=None,
 @cython.boundscheck(False)
 @cython.wraparound(False)
 def roll_count(ndarray[double_t] input, int64_t win, int64_t minp,
-               object index, object unit):
+               object index):
     cdef:
         double val, count_x = 0.0
         int64_t s, e
@@ -350,8 +344,7 @@ def roll_count(ndarray[double_t] input, int64_t win, int64_t minp,
         ndarray[double_t] output
 
     start, end, N, win, minp, _ = get_window_indexer(input, win,
-                                                     minp, index,
-                                                     unit)
+                                                     minp, index)
     output = np.empty(N, dtype=float)
 
     with nogil:
@@ -425,7 +418,7 @@ cdef inline void remove_sum(double val, int64_t *nobs, double *sum_x) nogil:
 @cython.boundscheck(False)
 @cython.wraparound(False)
 def roll_sum(ndarray[double_t] input, int64_t win, int64_t minp,
-             object index, object unit):
+             object index):
     cdef:
         double val, prev_x, sum_x = 0
         int64_t s, e
@@ -435,8 +428,7 @@ def roll_sum(ndarray[double_t] input, int64_t win, int64_t minp,
         ndarray[double_t] output
 
     start, end, N, win, minp, is_variable = get_window_indexer(input, win,
-                                                               minp, index,
-                                                               unit)
+                                                               minp, index)
     output = np.empty(N, dtype=float)
 
     # for performance we are going to iterate
@@ -547,7 +539,7 @@ cdef inline void remove_mean(double val, Py_ssize_t *nobs, double *sum_x,
 @cython.boundscheck(False)
 @cython.wraparound(False)
 def roll_mean(ndarray[double_t] input, int64_t win, int64_t minp,
-              object index, object unit):
+              object index):
     cdef:
         double val, prev_x, result, sum_x = 0
         int64_t s, e
@@ -557,8 +549,7 @@ def roll_mean(ndarray[double_t] input, int64_t win, int64_t minp,
         ndarray[double_t] output
 
     start, end, N, win, minp, is_variable = get_window_indexer(input, win,
-                                                               minp, index,
-                                                               unit)
+                                                               minp, index)
     output = np.empty(N, dtype=float)
 
     # for performance we are going to iterate
@@ -678,7 +669,7 @@ cdef inline void remove_var(double val, double *nobs, double *mean_x,
 @cython.boundscheck(False)
 @cython.wraparound(False)
 def roll_var(ndarray[double_t] input, int64_t win, int64_t minp,
-             object index, object unit, int ddof=1):
+             object index, int ddof=1):
     """
     Numerically stable implementation using Welford's method.
     """
@@ -691,8 +682,7 @@ def roll_var(ndarray[double_t] input, int64_t win, int64_t minp,
         ndarray[double_t] output
 
     start, end, N, win, minp, is_variable = get_window_indexer(input, win,
-                                                               minp, index,
-                                                               unit)
+                                                               minp, index)
     output = np.empty(N, dtype=float)
 
     # Check for windows larger than array, addresses #7297
@@ -825,7 +815,7 @@ cdef inline void remove_skew(double val, int64_t *nobs, double *x, double *xx,
 @cython.boundscheck(False)
 @cython.wraparound(False)
 def roll_skew(ndarray[double_t] input, int64_t win, int64_t minp,
-              object index, object unit):
+              object index):
     cdef:
         double val, prev
         double x = 0, xx = 0, xxx = 0
@@ -836,8 +826,7 @@ def roll_skew(ndarray[double_t] input, int64_t win, int64_t minp,
         ndarray[double_t] output
 
     start, end, N, win, minp, is_variable = get_window_indexer(input, win,
-                                                               minp, index,
-                                                               unit)
+                                                               minp, index)
     output = np.empty(N, dtype=float)
 
     if is_variable:
@@ -957,7 +946,7 @@ cdef inline void remove_kurt(double val, int64_t *nobs, double *x, double *xx,
 @cython.boundscheck(False)
 @cython.wraparound(False)
 def roll_kurt(ndarray[double_t] input, int64_t win, int64_t minp,
-              object index, object unit):
+              object index):
     cdef:
         double val, prev
         double x = 0, xx = 0, xxx = 0, xxxx = 0
@@ -968,8 +957,7 @@ def roll_kurt(ndarray[double_t] input, int64_t win, int64_t minp,
         ndarray[double_t] output
 
     start, end, N, win, minp, is_variable = get_window_indexer(input, win,
-                                                               minp, index,
-                                                               unit)
+                                                               minp, index)
     output = np.empty(N, dtype=float)
 
     if is_variable:
@@ -1029,7 +1017,7 @@ def roll_kurt(ndarray[double_t] input, int64_t win, int64_t minp,
 @cython.boundscheck(False)
 @cython.wraparound(False)
 def roll_median_c(ndarray[float64_t] input, int64_t win, int64_t minp,
-                  object index, object unit):
+                  object index):
     cdef:
         double val, res, prev
         bint err=0, is_variable
@@ -1044,7 +1032,7 @@ def roll_median_c(ndarray[float64_t] input, int64_t win, int64_t minp,
     start, end, N, win, minp, is_variable = get_window_indexer(
         input, win,
         minp, index,
-        unit, use_mock=False)
+        use_mock=False)
     output = np.empty(N, dtype=float)
 
     sl = skiplist_init(<int>win)
@@ -1148,7 +1136,7 @@ cdef inline numeric calc_mm(int64_t minp, Py_ssize_t nobs,
 @cython.boundscheck(False)
 @cython.wraparound(False)
 def roll_max(ndarray[numeric] input, int64_t win, int64_t minp,
-             object index, object unit):
+             object index):
     """
     Moving max of 1d array of any numeric type along axis=0 ignoring NaNs.
 
@@ -1160,16 +1148,14 @@ def roll_max(ndarray[numeric] input, int64_t win, int64_t minp,
           is below this, output a NaN
     index: ndarray, optional
        index for window computation
-    unit: int, optional
-       unit of the index
     """
-    return _roll_min_max(input, win, minp, index, unit, is_max=1)
+    return _roll_min_max(input, win, minp, index, is_max=1)
 
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
 def roll_min(ndarray[numeric] input, int64_t win, int64_t minp,
-             object index, object unit):
+             object index):
     """
     Moving max of 1d array of any numeric type along axis=0 ignoring NaNs.
 
@@ -1181,23 +1167,14 @@ def roll_min(ndarray[numeric] input, int64_t win, int64_t minp,
           is below this, output a NaN
     index: ndarray, optional
        index for window computation
-    unit: int, optional
-       unit of the index
     """
-    return _roll_min_max(input, win, minp, index, unit, is_max=0)
-
-
-cdef str_numeric_arr(numeric *arr, int64_t win):
-    return ', '.join([ str(arr[i]) for i in range(win) ])
-
-cdef str_arr(int64_t *arr, int64_t win):
-    return ', '.join([ str(arr[i]) for i in range(win) ])
+    return _roll_min_max(input, win, minp, index, is_max=0)
 
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cdef _roll_min_max(ndarray[numeric] input, int64_t win, int64_t minp,
-                   object index, object unit, bint is_max):
+                   object index, bint is_max):
     """
     Moving min/max of 1d array of any numeric type along axis=0
     ignoring NaNs.
@@ -1222,15 +1199,13 @@ cdef _roll_min_max(ndarray[numeric] input, int64_t win, int64_t minp,
 
     starti, endi, N, win, minp, is_variable = get_window_indexer(
         input, win,
-        minp, index,
-        unit)
+        minp, index)
 
     output = np.empty(N, dtype=input.dtype)
 
     if is_variable:
 
-        if True:
-        #with nogil:
+        with nogil:
 
             for i in range(N):
                 s = starti[i]
@@ -1326,7 +1301,7 @@ cdef _roll_min_max(ndarray[numeric] input, int64_t win, int64_t minp,
 
 
 def roll_quantile(ndarray[float64_t, cast=True] input, int64_t win,
-                  int64_t minp, object index, object unit, double quantile):
+                  int64_t minp, object index, double quantile):
     """
     O(N log(window)) implementation using skip list
     """
@@ -1344,7 +1319,7 @@ def roll_quantile(ndarray[float64_t, cast=True] input, int64_t win,
     start, end, N, win, minp, is_variable = get_window_indexer(
         input, win,
         minp, index,
-        unit, use_mock=False)
+        use_mock=False)
     output = np.empty(N, dtype=float)
     skiplist = IndexableSkiplist(win)
 
@@ -1387,8 +1362,8 @@ def roll_quantile(ndarray[float64_t, cast=True] input, int64_t win,
 
 def roll_generic(ndarray[float64_t, cast=True] input,
                  int64_t win, int64_t minp, object index,
-                 object unit, int offset,
-                 object func, object args, object kwargs):
+                 int offset, object func,
+                 object args, object kwargs):
     cdef:
         ndarray[double_t] output, counts, bufarr
         float64_t *buf
@@ -1406,12 +1381,12 @@ def roll_generic(ndarray[float64_t, cast=True] input,
 
     start, end, N, win, minp, is_variable = get_window_indexer(input, win,
                                                                minp, index,
-                                                               unit, floor=0)
+                                                               floor=0)
     output = np.empty(N, dtype=float)
 
     counts = roll_sum(np.concatenate([np.isfinite(input).astype(float),
                                       np.array([0.] * offset)]),
-                      win, minp, index, unit)[offset:]
+                      win, minp, index)[offset:]
 
     if is_variable:
 
