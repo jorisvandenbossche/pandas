@@ -1028,6 +1028,12 @@ class Rolling(_Rolling_and_Expanding):
                                  "compat with a datetimelike "
                                  "index".format(self.window))
 
+            # we don't allow center
+            if self.center:
+                raise NotImplementedError("center is not implemented "
+                                          "for datetimelike and offset "
+                                          "based windows")
+
             # this will raise ValueError on non-fixed freqs
             self.window = freq.nanos
             self.win_type = 'freq'

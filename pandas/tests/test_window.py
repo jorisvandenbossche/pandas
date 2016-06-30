@@ -3129,6 +3129,10 @@ class TestRollingTS(tm.TestCase):
             with self.assertRaises(ValueError):
                 df.rolling(window='1D', min_periods=minp)
 
+        # center is not implemented
+        with self.assertRaises(NotImplementedError):
+            df.rolling(window='1D', center=True)
+
     def test_on(self):
 
         df = self.regular
