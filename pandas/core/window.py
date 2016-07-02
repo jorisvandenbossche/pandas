@@ -892,7 +892,7 @@ class Rolling(_Rolling_and_Expanding):
         For a DataFrame, column on which to calculate
         the rolling window, rather than the index
 
-      .. versionadded:: 0.18.2
+        .. versionadded:: 0.18.2
 
     axis: int or string, default 0
 
@@ -903,7 +903,7 @@ class Rolling(_Rolling_and_Expanding):
     Examples
     --------
 
-    >>> df = DataFrame({'B': [0, 1, 2, np.nan, 4]})
+    >>> df = pd.DataFrame({'B': [0, 1, 2, np.nan, 4]})
     >>> df
          B
     0  0.0
@@ -935,12 +935,13 @@ class Rolling(_Rolling_and_Expanding):
     4  4.0
 
     A ragged (meaning not-a-regular frequency), time-indexed DataFrame
-    >>> df = DataFrame({'B': [0, 1, 2, np.nan, 4]},
-    ....:              index = [Timestamp('20130101 09:00:00'),
-    ....:                       Timestamp('20130101 09:00:02'),
-    ....:                       Timestamp('20130101 09:00:03'),
-    ....:                       Timestamp('20130101 09:00:05'),
-    ....:                       Timestamp('20130101 09:00:06')])
+
+    >>> df = pd.DataFrame({'B': [0, 1, 2, np.nan, 4]},
+    ....:                 index = [pd.Timestamp('20130101 09:00:00'),
+    ....:                          pd.Timestamp('20130101 09:00:02'),
+    ....:                          pd.Timestamp('20130101 09:00:03'),
+    ....:                          pd.Timestamp('20130101 09:00:05'),
+    ....:                          pd.Timestamp('20130101 09:00:06')])
 
     >>> df
                            B

@@ -404,7 +404,7 @@ variable sized windows based on the passed time window. This is useful for a non
 .. ipython:: python
 
    dft = pd.DataFrame({'B': [0, 1, 2, np.nan, 4]},
-                      index=pd.date_range('20130101 09:00:00', periods=5))
+                      index=pd.date_range('20130101 09:00:00', periods=5, freq='s'))
    dft
 
 This is a regular frequency index. Using an integer window parameter works to roll along the window frequency.
