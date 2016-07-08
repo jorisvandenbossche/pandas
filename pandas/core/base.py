@@ -286,10 +286,11 @@ class SelectionMixin(object):
 
     @property
     def name(self):
-        if self._selection is None:
-            return None  # 'result'
-        else:
-            return self._selection
+        # if self._selection is None:
+        #     return None  # 'result'
+        # else:
+        #     return self._selection
+        return None
 
     @property
     def _selection_list(self):
