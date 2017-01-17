@@ -526,7 +526,7 @@ class DatetimeIndex(DatelikeOps, TimelikeOps, DatetimeIndexOpsMixin,
 
     @property
     def _box_func(self):
-        return lambda x: Timestamp(x, freq=self.offset, tz=self.tz)
+        return lambda x: Timestamp(x, tz=self.tz)
 
     def _convert_for_op(self, value):
         """ Convert value to be insertable to ndarray """
