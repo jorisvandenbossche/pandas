@@ -22,7 +22,7 @@ if [ x"$DOC_BUILD" != x"" ]; then
     echo "Will build docs"
 
     source activate pandas
-    conda install -n pandas -c r r rpy2 --yes
+    conda install -n pandas -c r r r-base rpy2 --no-deps --yes
 
     time sudo apt-get $APT_ARGS install dvipng texlive-latex-base texlive-latex-extra
 
