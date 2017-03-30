@@ -4,6 +4,8 @@ from __future__ import print_function
 
 from datetime import datetime
 
+import pytest
+
 from numpy import random
 import numpy as np
 
@@ -139,6 +141,38 @@ class TestDataFrameSelectReindex(tm.TestCase, TestData):
             result = not_lexsorted_df.drop('a', axis=1)
 
         tm.assert_frame_equal(result, expected)
+
+    def test_drop_api_equivalence(self):
+        # equivalence of the labels/axis and index/columns API's
+        df = DataFrame([[1, 2, 3], [3, 4, 5], [5, 6, 7]],
+                       index=['a', 'b', 'c'],
+                       columns=['d', 'e', 'f'])
+
+        res1 = df.drop('a')
+        res2 = df.drop(index='a')
+        tm.assert_frame_equal(res1, res2)
+
+        res1 = df.drop('d', 1)
+        res2 = df.drop(columns='d')
+        tm.assert_frame_equal(res1, res2)
+
+        res1 = df.drop(labels='e', axis=1)
+        res2 = df.drop(columns='e')
+        tm.assert_frame_equal(res1, res2)
+
+        res1 = df.drop(['a'], axis=0)
+        res2 = df.drop(index=['a'])
+        tm.assert_frame_equal(res1, res2)
+
+        res1 = df.drop(['a'], axis=0).drop(['d'], axis=1)
+        res2 = df.drop(index=['a'], columns=['d'])
+
+        with pytest.raises(ValueError):
+            df.drop(labels='a', index='b')
+
+        with pytest.raises(ValueError):
+            df.drop(axis=1)
+
 
     def test_merge_join_different_levels(self):
         # GH 9455
@@ -406,6 +440,32 @@ class TestDataFrameSelectReindex(tm.TestCase, TestData):
 
         # reindex fails
         self.assertRaises(ValueError, df.reindex, index=list(range(len(df))))
+
+    def test_reindex_api_equivalence(self):
+        # equivalence of the labels/axis and index/columns API's
+        df = DataFrame([[1, 2, 3], [3, 4, 5], [5, 6, 7]],
+                       index=['a', 'b', 'c'],
+                       columns=['d', 'e', 'f'])
+
+        res1 = df.reindex(['b', 'a'])
+        res2 = df.reindex(index=['b', 'a'])
+        #res3 = df.reindex(labels=['b', 'a'])
+        res4 = df.reindex(labels=['b', 'a'], axis=0)
+        res5 = df.reindex(['b', 'a'], axis=0)
+        for res in [res2, res3, res4, res5]:
+            tm.assert_frame_equal(res1, res)
+
+        res1 = df.reindex(columns=['e', 'd'])
+        res2 = df.reindex(['e', 'd'], axis=1)
+        res3 = df.reindex(labels=['e', 'd'], axis=1)
+        for res in [res2, res3]:
+            tm.assert_frame_equal(res1, res)
+
+        res1 = df.reindex(['b', 'a'], ['e', 'd'])
+        res2 = df.reindex(columns=['e', 'd'], index=['b', 'a'])
+        res3 = df.reindex(labels=['b', 'a'], axis=0).reindex(labels=['e', 'd'], axis=1)
+        for res in [res2, res3]:
+            tm.assert_frame_equal(res1, res)
 
     def test_align(self):
         af, bf = self.frame.align(self.frame)

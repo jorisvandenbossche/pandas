@@ -317,6 +317,15 @@ class NDFrame(PandasObject):
 
         # construct the args
         args = list(args)
+        if 'axis' in kwargs:
+            axis = kwargs.pop('axis')
+            if axis is not None:
+                if 'labels' in kwargs:
+                    labels = kwargs.pop('labels')
+                    kwargs[self._AXIS_ORDERS[axis]] = labels or args.pop(0)
+                else:
+                    kwargs[self._AXIS_ORDERS[axis]] = args.pop(0)
+
         for a in self._AXIS_ORDERS:
 
             # if we have an alias for this axis
@@ -2016,7 +2025,8 @@ class NDFrame(PandasObject):
 
         return self.reindex(**d)
 
-    def drop(self, labels, axis=0, level=None, inplace=False, errors='raise'):
+    def drop(self, labels=None, axis=0, index=None, columns=None, level=None,
+             inplace=False, errors='raise'):
         """
         Return new object with labels in requested axis removed.
 
@@ -2036,8 +2046,49 @@ class NDFrame(PandasObject):
         Returns
         -------
         dropped : type of caller
+
+        Examples
+        --------
+
+        >>> df = pd.DataFrame(np.arange(9).reshape(3,3),
+                              columns=['foo', 'bar', 'baz'],
+                              index=['A', 'B', 'C'])
+        >>> df
+           foo  bar  baz
+        A    0    1    2
+        B    3    4    5
+        C    6    7    8
+
+
+
+
         """
         inplace = validate_bool_kwarg(inplace, 'inplace')
+
+        if labels is not None:
+            if index is not None or columns is not None:
+                raise ValueError("Cannot specify both labels and index/columns")
+            axis_name = self._get_axis_name(axis)
+            axes = {axis_name: labels}
+        elif index is not None or columns is not None:
+            axes, _ = self._construct_axes_from_arguments((index, columns), {})
+        else:
+            raise ValueError("Need to specify at least one of labels, index or columns")
+
+        obj = self
+
+        for axis, labels in axes.items():
+            if labels is not None:
+                obj = obj._drop_axis(labels, axis, level=level, errors=errors)
+
+        if inplace:
+            self._update_inplace(obj)
+        else:
+            return obj
+
+
+    def _drop_axis(self, labels, axis, level=None, errors='raise'):
+
         axis = self._get_axis_number(axis)
         axis_name = self._get_axis_name(axis)
         axis, axis_ = self._get_axis(axis), axis
@@ -2070,10 +2121,7 @@ class NDFrame(PandasObject):
 
             result = self.loc[tuple(slicer)]
 
-        if inplace:
-            self._update_inplace(result)
-        else:
-            return result
+        return result
 
     def _update_inplace(self, result, verify_is_copy=True):
         """
