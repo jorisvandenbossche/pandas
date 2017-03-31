@@ -2833,9 +2833,23 @@ it is assumed to be aliases for the column names.')
                                             broadcast_axis=broadcast_axis)
 
     @Appender(_shared_docs['reindex'] % _shared_doc_kwargs)
-    def reindex(self, index=None, columns=None, **kwargs):
-        return super(DataFrame, self).reindex(index=index, columns=columns,
-                                              **kwargs)
+    def reindex(self, labels=None, index=None, columns=None, axis=0, **kwargs):
+
+        if labels is not None:
+            if index is not None and columns is None and axis == 0:
+                index, columns = labels, index
+            elif columns is not None:
+                raise ValueError("Cannot specify both labels and index/columns")
+            axis_name = self._get_axis_name(axis)
+            axes = {axis_name: labels}
+        elif index is not None or columns is not None:
+            axes, _ = self._construct_axes_from_arguments((index, columns), {})
+        else:
+            raise ValueError("Need to specify at least one of labels, index or columns")
+
+
+        return super(DataFrame, self).reindex(labels=labels, index=index, columns=columns,
+                                              axis=axis, **kwargs)
 
     @Appender(_shared_docs['reindex_axis'] % _shared_doc_kwargs)
     def reindex_axis(self, labels, axis=0, method=None, level=None, copy=True,

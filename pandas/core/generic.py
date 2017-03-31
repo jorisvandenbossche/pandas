@@ -316,15 +316,21 @@ class NDFrame(PandasObject):
         """
 
         # construct the args
-        args = list(args)
+        #args = list(args)
+        #if 'axis' in kwargs:
+        #    axis = kwargs.pop('axis')
+        #    if axis is not None:
+        #        if 'labels' in kwargs:
+        #            labels = kwargs.pop('labels')
+        #            kwargs[self._AXIS_ORDERS[axis]] = labels or args.pop(0)
+        #        else:
+        #            kwargs[self._AXIS_ORDERS[axis]] = args.pop(0)
         if 'axis' in kwargs:
             axis = kwargs.pop('axis')
-            if axis is not None:
-                if 'labels' in kwargs:
-                    labels = kwargs.pop('labels')
-                    kwargs[self._AXIS_ORDERS[axis]] = labels or args.pop(0)
-                else:
-                    kwargs[self._AXIS_ORDERS[axis]] = args.pop(0)
+            if 'labels' in kwargs:
+                labels = kwargs.pop('labels')
+                if labels is not None:
+                    kwargs[self._AXIS_ORDERS[axis]] = labels
 
         for a in self._AXIS_ORDERS:
 
