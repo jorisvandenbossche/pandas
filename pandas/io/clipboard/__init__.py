@@ -69,7 +69,7 @@ def determine_clipboard():
 
         try:
             # Check if PyQt4 is installed
-            import PyQt4  # noqa
+            from PyQt4.QtGui import QApplication # noqa
         except ImportError:
             pass
         else:
