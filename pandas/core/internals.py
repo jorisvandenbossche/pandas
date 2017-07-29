@@ -159,6 +159,12 @@ class Block(PandasObject):
         """
         return self.values
 
+    def formatted_values(self, dtype=None):
+        """ return an internal format, currently just the ndarray
+        this should be the pure internal API format
+        """
+        return self.values
+
     def get_values(self, dtype=None):
         """
         return an internal format, currently just the ndarray
@@ -538,7 +544,6 @@ class Block(PandasObject):
         raise on an except if raise == True
         """
         errors_legal_values = ('raise', 'ignore')
-
         if errors not in errors_legal_values:
             invalid_arg = ("Expected value of kwarg 'errors' to be one of {}. "
                            "Supplied value is '{}'".format(
@@ -568,12 +573,13 @@ class Block(PandasObject):
                               (compat.text_type, compat.string_types)):
 
                     # use native type formatting for datetime/tz/timedelta
-                    if self.is_datelike:
-                        values = self.to_native_types()
-
-                    # astype formatting
-                    else:
-                        values = self.values
+                    # if self.is_datelike:
+                    #     values = self.to_native_types()
+                    #
+                    # # astype formatting
+                    # else:
+                    #     values = self.values
+                    values = self.to_native_types()
 
                 else:
                     values = self.get_values(dtype=dtype)
@@ -1633,6 +1639,7 @@ class NonConsolidatableMixIn(object):
 
     def get_values(self, dtype=None):
         """ need to to_dense myself (and always return a ndim sized object) """
+        print("I am densified (get_values) ({} elements".format(len(self)))
         values = self.values.to_dense()
         if values.ndim == self.ndim - 1:
             values = values.reshape((1,) + values.shape)
