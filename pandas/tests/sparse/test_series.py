@@ -529,6 +529,9 @@ class TestSparseSeries(SharedWithSparse):
         tm.assert_series_equal(sp.take([0, 1, 2, 3, 4]), exp)
 
         with tm.assert_produces_warning(FutureWarning):
+            sp.take([1, 5], convert=True)
+
+        with tm.assert_produces_warning(FutureWarning):
             sp.take([1, 5], convert=False)
 
     def test_numpy_take(self):
