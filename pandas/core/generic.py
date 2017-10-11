@@ -2235,8 +2235,8 @@ class NDFrame(PandasObject, SelectionMixin):
         """
 
     @Appender(_shared_docs['take'])
-    def take(self, indices, axis=0, convert=-1, is_copy=True, **kwargs):
-        if convert is not -1:
+    def take(self, indices, axis=0, convert=None, is_copy=True, **kwargs):
+        if convert is not None:
             msg = ("The 'convert' parameter is deprecated "
                    "and will be removed in a future version.")
             warnings.warn(msg, FutureWarning, stacklevel=2)
