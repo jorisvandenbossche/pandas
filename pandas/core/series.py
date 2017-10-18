@@ -2546,7 +2546,8 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
 
         # be subclass-friendly
         new_values = algorithms.take_1d(self.get_values(), indexer)
-        return self._constructor(new_values, index=new_index)
+        return (self._constructor(new_values, index=new_index)
+                    .__finalize__(self))
 
     def _needs_reindex_multi(self, axes, method, level):
         """ check if we do need a multi reindex; this is for compat with
