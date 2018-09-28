@@ -38,7 +38,7 @@ def dtype():
 @pytest.fixture
 def data():
     """Length-100 PeriodArray for semantics test."""
-    return IntervalArray(make_data())
+    return IntervalArray._complex_new(make_data())
 
 
 @pytest.fixture
@@ -52,7 +52,7 @@ def data_repeated():
     """Return different versions of data for count times"""
     def gen(count):
         for _ in range(count):
-            yield IntervalArray(make_data())
+            yield IntervalArray._complex_new(make_data())
     yield gen
 
 

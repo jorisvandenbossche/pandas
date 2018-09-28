@@ -155,8 +155,7 @@ class IntervalIndex(IntervalMixin, Index):
             name = data.name
 
         with rewrite_exception("IntervalArray", cls.__name__):
-            array = IntervalArray(data, closed=closed, copy=copy, dtype=dtype,
-                                  fastpath=fastpath,
+            array = IntervalArray._complex_new(data, closed=closed, copy=copy, dtype=dtype,
                                   verify_integrity=verify_integrity)
 
         return cls._simple_new(array, name)
@@ -279,7 +278,7 @@ class IntervalIndex(IntervalMixin, Index):
                'removed in a future version; Use IntervalIndex(...) instead')
         warnings.warn(msg, FutureWarning, stacklevel=2)
         with rewrite_exception("IntervalArray", cls.__name__):
-            array = IntervalArray(data, closed=closed, copy=copy, dtype=dtype)
+            array = IntervalArray._complex_new(data, closed=closed, copy=copy, dtype=dtype)
 
         if name is None and isinstance(data, cls):
             name = data.name

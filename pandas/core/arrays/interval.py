@@ -107,13 +107,9 @@ class IntervalArray(IntervalMixin, ExtensionArray):
     can_hold_na = True
     _na_value = _fill_value = np.nan
 
-    def __new__(cls, data, closed=None, dtype=None, copy=False,
-                fastpath=False, verify_integrity=True):
-
-        if fastpath:
-            return cls._simple_new(data.left, data.right, closed,
-                                   copy=copy, dtype=dtype,
-                                   verify_integrity=False)
+    @classmethod
+    def _complex_new(cls, data, closed=None, dtype=None, copy=False,
+                     verify_integrity=True):
 
         if isinstance(data, ABCSeries) and is_interval_dtype(data):
             data = data.values
@@ -136,13 +132,12 @@ class IntervalArray(IntervalMixin, ExtensionArray):
                 data, validate_closed=closed is None)
             closed = closed or infer_closed
 
-        return cls._simple_new(left, right, closed, copy=copy, dtype=dtype,
+        return cls(left, right, closed, copy=copy, dtype=dtype,
                                verify_integrity=verify_integrity)
 
-    @classmethod
-    def _simple_new(cls, left, right, closed=None,
-                    copy=False, dtype=None, verify_integrity=True):
-        result = IntervalMixin.__new__(cls)
+    def __init__(self, left, right, closed=None,
+                 copy=False, dtype=None, verify_integrity=True):
+        IntervalMixin.__init__(self)
 
         closed = closed or 'right'
         left = ensure_index(left, copy=copy)
@@ -183,20 +178,19 @@ class IntervalArray(IntervalMixin, ExtensionArray):
                    "'{left_tz}' and '{right_tz}'")
             raise ValueError(msg.format(left_tz=left.tz, right_tz=right.tz))
 
-        result._left = left
-        result._right = right
-        result._closed = closed
+        self._left = left
+        self._right = right
+        self._closed = closed
         if verify_integrity:
-            result._validate()
-        return result
+            self._validate()
 
     @classmethod
     def _from_sequence(cls, scalars, dtype=None, copy=False):
-        return cls(scalars, dtype=dtype, copy=copy)
+        return cls._complex_new(scalars, dtype=dtype, copy=copy)
 
     @classmethod
     def _from_factorized(cls, values, original):
-        return cls(values, closed=original.closed)
+        return cls._complex_new(values, closed=original.closed)
 
     _interval_shared_docs['from_breaks'] = """
     Construct an %(klass)s from an array of splits.
@@ -298,8 +292,8 @@ class IntervalArray(IntervalMixin, ExtensionArray):
         left = maybe_convert_platform_interval(left)
         right = maybe_convert_platform_interval(right)
 
-        return cls._simple_new(left, right, closed, copy=copy,
-                               dtype=dtype, verify_integrity=True)
+        return cls(left, right, closed, copy=copy,
+                   dtype=dtype, verify_integrity=True)
 
     _interval_shared_docs['from_intervals'] = """
     Construct an %(klass)s from a 1d array of Interval objects
@@ -474,7 +468,7 @@ class IntervalArray(IntervalMixin, ExtensionArray):
         else:
             # list-like of intervals
             try:
-                array = IntervalArray(value)
+                array = IntervalArray._complex_new(value)
                 value_left, value_right = array.left, array.right
             except TypeError:
                 # wrong type: not interval or NA
@@ -607,7 +601,7 @@ class IntervalArray(IntervalMixin, ExtensionArray):
 
         left = np.concatenate([interval.left for interval in to_concat])
         right = np.concatenate([interval.right for interval in to_concat])
-        return cls._simple_new(left, right, closed=closed, copy=False)
+        return cls(left, right, closed=closed, copy=False)
 
     def _shallow_copy(self, left=None, right=None, closed=None):
         """
@@ -638,7 +632,7 @@ class IntervalArray(IntervalMixin, ExtensionArray):
             # only single value passed, could be an IntervalArray
             # or array of Intervals
             if not isinstance(left, (type(self), ABCIntervalIndex)):
-                left = type(self)(left)
+                left = self._complex_new(left)
 
             left, right = left.left, left.right
         else:
@@ -647,7 +641,7 @@ class IntervalArray(IntervalMixin, ExtensionArray):
             pass
 
         closed = closed or self.closed
-        return self._simple_new(
+        return self.__class__(
             left, right, closed=closed, verify_integrity=False)
 
     def copy(self, deep=False):
