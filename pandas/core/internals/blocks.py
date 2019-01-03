@@ -637,13 +637,7 @@ class Block(PandasObject):
 
                     # _astype_nansafe works fine with 1-d only
                     values = astype_nansafe(values.ravel(), dtype, copy=True)
-
-                # TODO(extension)
-                # should we make this attribute?
-                try:
                     values = values.reshape(self.shape)
-                except AttributeError:
-                    pass
 
             newb = make_block(values, placement=self.mgr_locs,
                               klass=klass, ndim=self.ndim)
