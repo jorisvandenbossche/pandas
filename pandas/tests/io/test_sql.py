@@ -1743,10 +1743,14 @@ class _TestSQLAlchemy(SQLAlchemyMixIn, PandasSQLTest):
         tm.assert_frame_equal(df, expected)
 
     def test_read_sql_delegate(self):
-        iris_frame1 = sql.read_sql_query(
-            "SELECT * FROM iris", self.conn)
-        iris_frame2 = sql.read_sql(
-            "SELECT * FROM iris", self.conn)
+        query = "SELECT * FROM iris"
+        iris_frame1 = sql.read_sql_query(query, self.conn)
+        iris_frame2 = sql.read_sql(query, self.conn)
+        tm.assert_frame_equal(iris_frame1, iris_frame2)
+
+        query = sqlalchemy.text("SELECT * FROM iris")
+        iris_frame1 = sql.read_sql_query(query, self.conn)
+        iris_frame2 = sql.read_sql(query, self.conn)
         tm.assert_frame_equal(iris_frame1, iris_frame2)
 
         iris_frame1 = sql.read_sql_table('iris', self.conn)
