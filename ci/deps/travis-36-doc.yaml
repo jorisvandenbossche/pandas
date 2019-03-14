@@ -36,6 +36,7 @@ dependencies:
   - sphinx
   - sqlalchemy
   - statsmodels
+  - tornado=5
   - xarray
   - xlrd
   - xlsxwriter
