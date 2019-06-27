@@ -1,8 +1,8 @@
 """ public toolkit API """
 
 from pandas.core.dtypes.api import *  # noqa
-from pandas.core.dtypes.dtypes import (
-    CategoricalDtype,  # noqa
+from pandas.core.dtypes.dtypes import (  # noqa
+    CategoricalDtype,
     DatetimeTZDtype,
     PeriodDtype,
     IntervalDtype,

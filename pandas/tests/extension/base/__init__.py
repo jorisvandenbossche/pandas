@@ -49,11 +49,11 @@ from .interface import BaseInterfaceTests  # noqa
 from .methods import BaseMethodsTests  # noqa
 from .ops import BaseArithmeticOpsTests, BaseComparisonOpsTests, BaseOpsUtil  # noqa
 from .printing import BasePrintingTests  # noqa
-from .reduce import (
+from .reduce import (  # noqa
     BaseNoReduceTests,
     BaseNumericReduceTests,
     BaseBooleanReduceTests,
-)  # noqa
+)
 from .missing import BaseMissingTests  # noqa
 from .reshaping import BaseReshapingTests  # noqa
 from .setitem import BaseSetitemTests  # noqa
