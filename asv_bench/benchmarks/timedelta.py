@@ -3,7 +3,13 @@ import datetime
 import numpy as np
 
 from pandas import (
-    DataFrame, Series, Timedelta, Timestamp, timedelta_range, to_timedelta)
+    DataFrame,
+    Series,
+    Timedelta,
+    Timestamp,
+    timedelta_range,
+    to_timedelta,
+)
 
 
 class TimedeltaConstructor:
