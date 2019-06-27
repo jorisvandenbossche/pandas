@@ -7,7 +7,6 @@ import pandas.util.testing as tm
 
 
 class TestIntervalIndex:
-
     def setup_method(self, method):
         self.s = Series(np.arange(5), IntervalIndex.from_breaks(np.arange(6)))
 
@@ -50,14 +49,14 @@ class TestIntervalIndex:
         tm.assert_series_equal(expected, s[s >= 2])
 
     # TODO: check this behavior is consistent with test_interval_new.py
-    @pytest.mark.parametrize('direction', ['increasing', 'decreasing'])
+    @pytest.mark.parametrize("direction", ["increasing", "decreasing"])
     def test_nonoverlapping_monotonic(self, direction, closed):
         tpls = [(0, 1), (2, 3), (4, 5)]
-        if direction == 'decreasing':
+        if direction == "decreasing":
             tpls = tpls[::-1]
 
         idx = IntervalIndex.from_tuples(tpls, closed=closed)
-        s = Series(list('abc'), idx)
+        s = Series(list("abc"), idx)
 
         for key, expected in zip(idx.left, s):
             if idx.closed_left:
@@ -127,10 +126,10 @@ class TestIntervalIndex:
 
         # slice of interval
         with pytest.raises(NotImplementedError):
-            s.loc[Interval(3, 6):]
+            s.loc[Interval(3, 6) :]
 
         with pytest.raises(NotImplementedError):
-            s[Interval(3, 6):]
+            s[Interval(3, 6) :]
 
         expected = s.iloc[3:5]
         result = s[[Interval(3, 6)]]
@@ -204,10 +203,10 @@ class TestIntervalIndex:
 
         # non-unique index and slices not allowed
         with pytest.raises(ValueError):
-            s.loc[Interval(1, 3):]
+            s.loc[Interval(1, 3) :]
 
         with pytest.raises(ValueError):
-            s[Interval(1, 3):]
+            s[Interval(1, 3) :]
 
         # non-unique
         with pytest.raises(ValueError):
@@ -226,8 +225,9 @@ class TestIntervalIndex:
             s.loc[[-1, 3]]
 
     def test_large_series(self):
-        s = Series(np.arange(1000000),
-                   index=IntervalIndex.from_breaks(np.arange(1000001)))
+        s = Series(
+            np.arange(1000000), index=IntervalIndex.from_breaks(np.arange(1000001))
+        )
 
         result1 = s.loc[:80000]
         result2 = s.loc[0:80000]
@@ -237,10 +237,10 @@ class TestIntervalIndex:
 
     def test_loc_getitem_frame(self):
 
-        df = DataFrame({'A': range(10)})
+        df = DataFrame({"A": range(10)})
         s = pd.cut(df.A, 5)
-        df['B'] = s
-        df = df.set_index('B')
+        df["B"] = s
+        df = df.set_index("B")
 
         result = df.loc[4]
         expected = df.iloc[4:6]

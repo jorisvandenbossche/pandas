@@ -17,8 +17,7 @@ from pandas.util._decorators import Appender, Substitution
 
 from pandas.core.dtypes.common import is_list_like
 from pandas.core.dtypes.dtypes import ExtensionDtype
-from pandas.core.dtypes.generic import (
-    ABCExtensionArray, ABCIndexClass, ABCSeries)
+from pandas.core.dtypes.generic import ABCExtensionArray, ABCIndexClass, ABCSeries
 from pandas.core.dtypes.missing import isna
 
 from pandas._typing import ArrayLike
@@ -108,9 +107,10 @@ class ExtensionArray:
     with pandas internals. But other names as ``.data``, ``._data``,
     ``._items``, ... can be freely used.
     """
+
     # '_typ' is for pandas.core.dtypes.generic.ABCExtensionArray.
     # Don't override this.
-    _typ = 'extension'
+    _typ = "extension"
 
     # ------------------------------------------------------------------------
     # Constructors
@@ -260,8 +260,8 @@ class ExtensionArray:
         #   __init__ method coerces that value, then so should __setitem__
         # Note, also, that Series/DataFrame.where internally use __setitem__
         # on a copy of the data.
-        raise NotImplementedError(_not_implemented_message.format(
-            type(self), '__setitem__')
+        raise NotImplementedError(
+            _not_implemented_message.format(type(self), "__setitem__")
         )
 
     def __len__(self) -> int:
@@ -381,7 +381,7 @@ class ExtensionArray:
         # Note: this is used in `ExtensionArray.argsort`.
         return np.array(self)
 
-    def argsort(self, ascending=True, kind='quicksort', *args, **kwargs):
+    def argsort(self, ascending=True, kind="quicksort", *args, **kwargs):
         """
         Return the indices that would sort this array.
 
@@ -451,15 +451,16 @@ class ExtensionArray:
 
         if is_array_like(value):
             if len(value) != len(self):
-                raise ValueError("Length of 'value' does not match. Got ({}) "
-                                 " expected {}".format(len(value), len(self)))
+                raise ValueError(
+                    "Length of 'value' does not match. Got ({}) "
+                    " expected {}".format(len(value), len(self))
+                )
             value = value[mask]
 
         if mask.any():
             if method is not None:
-                func = pad_1d if method == 'pad' else backfill_1d
-                new_values = func(self.astype(object), limit=limit,
-                                  mask=mask)
+                func = pad_1d if method == "pad" else backfill_1d
+                new_values = func(self.astype(object), limit=limit, mask=mask)
                 new_values = self._from_sequence(new_values, dtype=self.dtype)
             else:
                 # fill with value
@@ -479,10 +480,7 @@ class ExtensionArray:
         """
         return self[~self.isna()]
 
-    def shift(
-            self,
-            periods: int = 1,
-            fill_value: object = None) -> ABCExtensionArray:
+    def shift(self, periods: int = 1, fill_value: object = None) -> ABCExtensionArray:
         """
         Shift values by desired number.
 
@@ -525,14 +523,13 @@ class ExtensionArray:
             fill_value = self.dtype.na_value
 
         empty = self._from_sequence(
-            [fill_value] * min(abs(periods), len(self)),
-            dtype=self.dtype
+            [fill_value] * min(abs(periods), len(self)), dtype=self.dtype
         )
         if periods > 0:
             a = empty
             b = self[:-periods]
         else:
-            a = self[abs(periods):]
+            a = self[abs(periods) :]
             b = empty
         return self._concat_same_type([a, b])
 
@@ -621,10 +618,7 @@ class ExtensionArray:
         """
         return self.astype(object), np.nan
 
-    def factorize(
-            self,
-            na_sentinel: int = -1,
-    ) -> Tuple[np.ndarray, ABCExtensionArray]:
+    def factorize(self, na_sentinel: int = -1) -> Tuple[np.ndarray, ABCExtensionArray]:
         """
         Encode the extension array as an enumerated type.
 
@@ -667,13 +661,16 @@ class ExtensionArray:
 
         arr, na_value = self._values_for_factorize()
 
-        labels, uniques = _factorize_array(arr, na_sentinel=na_sentinel,
-                                           na_value=na_value)
+        labels, uniques = _factorize_array(
+            arr, na_sentinel=na_sentinel, na_value=na_value
+        )
 
         uniques = self._from_factorized(uniques, self)
         return labels, uniques
 
-    _extension_array_shared_docs['repeat'] = """
+    _extension_array_shared_docs[
+        "repeat"
+    ] = """
         Repeat elements of a %(klass)s.
 
         Returns a new %(klass)s where each element of the current %(klass)s
@@ -715,8 +712,8 @@ class ExtensionArray:
         Categories (3, object): [a, b, c]
         """
 
-    @Substitution(klass='ExtensionArray')
-    @Appender(_extension_array_shared_docs['repeat'])
+    @Substitution(klass="ExtensionArray")
+    @Appender(_extension_array_shared_docs["repeat"])
     def repeat(self, repeats, axis=None):
         nv.validate_repeat(tuple(), dict(axis=axis))
         ind = np.arange(len(self)).repeat(repeats)
@@ -727,10 +724,7 @@ class ExtensionArray:
     # ------------------------------------------------------------------------
 
     def take(
-            self,
-            indices: Sequence[int],
-            allow_fill: bool = False,
-            fill_value: Any = None
+        self, indices: Sequence[int], allow_fill: bool = False, fill_value: Any = None
     ) -> ABCExtensionArray:
         """
         Take elements from an array.
@@ -837,25 +831,19 @@ class ExtensionArray:
     def __repr__(self):
         from pandas.io.formats.printing import format_object_summary
 
-        template = (
-            '{class_name}'
-            '{data}\n'
-            'Length: {length}, dtype: {dtype}'
-        )
+        template = "{class_name}" "{data}\n" "Length: {length}, dtype: {dtype}"
         # the short repr has no trailing newline, while the truncated
         # repr does. So we include a newline in our template, and strip
         # any trailing newlines from format_object_summary
-        data = format_object_summary(self, self._formatter(),
-                                     indent_for_name=False).rstrip(', \n')
-        class_name = '<{}>\n'.format(self.__class__.__name__)
-        return template.format(class_name=class_name, data=data,
-                               length=len(self),
-                               dtype=self.dtype)
+        data = format_object_summary(
+            self, self._formatter(), indent_for_name=False
+        ).rstrip(", \n")
+        class_name = "<{}>\n".format(self.__class__.__name__)
+        return template.format(
+            class_name=class_name, data=data, length=len(self), dtype=self.dtype
+        )
 
-    def _formatter(
-            self,
-            boxed: bool = False,
-    ) -> Callable[[Any], Optional[str]]:
+    def _formatter(self, boxed: bool = False) -> Callable[[Any], Optional[str]]:
         """Formatting function for scalar values.
 
         This is used in the default '__repr__'. The returned formatting
@@ -899,8 +887,7 @@ class ExtensionArray:
 
     @classmethod
     def _concat_same_type(
-            cls,
-            to_concat: Sequence[ABCExtensionArray]
+        cls, to_concat: Sequence[ABCExtensionArray]
     ) -> ABCExtensionArray:
         """
         Concatenate multiple array
@@ -958,8 +945,11 @@ class ExtensionArray:
         ------
         TypeError : subclass does not define reductions
         """
-        raise TypeError("cannot perform {name} with type {dtype}".format(
-            name=name, dtype=self.dtype))
+        raise TypeError(
+            "cannot perform {name} with type {dtype}".format(
+                name=name, dtype=self.dtype
+            )
+        )
 
 
 class ExtensionOpsMixin:
@@ -1100,7 +1090,7 @@ class ExtensionScalarOpsMixin(ExtensionOpsMixin):
                     res = np.asarray(arr)
                 return res
 
-            if op.__name__ in {'divmod', 'rdivmod'}:
+            if op.__name__ in {"divmod", "rdivmod"}:
                 a, b = zip(*res)
                 res = _maybe_convert(a), _maybe_convert(b)
             else:

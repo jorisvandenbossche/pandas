@@ -65,17 +65,28 @@ df_note = """- If `kind` = 'scatter' and the argument `c` is the name of a dataf
       a single number (e.g. `mean`, `max`, `sum`, `std`)."""
 series_note = ""
 
-_shared_doc_df_kwargs = dict(klass='DataFrame', klass_obj='df',
-                             klass_kind=df_kind, klass_coord=df_coord,
-                             klass_ax=df_ax, klass_unique=df_unique,
-                             klass_note=df_note)
-_shared_doc_series_kwargs = dict(klass='Series', klass_obj='s',
-                                 klass_kind=series_kind,
-                                 klass_coord=series_coord, klass_ax=series_ax,
-                                 klass_unique=series_unique,
-                                 klass_note=series_note)
+_shared_doc_df_kwargs = dict(
+    klass="DataFrame",
+    klass_obj="df",
+    klass_kind=df_kind,
+    klass_coord=df_coord,
+    klass_ax=df_ax,
+    klass_unique=df_unique,
+    klass_note=df_note,
+)
+_shared_doc_series_kwargs = dict(
+    klass="Series",
+    klass_obj="s",
+    klass_kind=series_kind,
+    klass_coord=series_coord,
+    klass_ax=series_ax,
+    klass_unique=series_unique,
+    klass_note=series_note,
+)
 
-_shared_docs['plot'] = """
+_shared_docs[
+    "plot"
+] = """
     Make plots of %(klass)s using matplotlib / pylab.
 
     *New in version 0.17.0:* Each plot kind has a corresponding method on the
@@ -171,7 +182,9 @@ _shared_docs['plot'] = """
     %(klass_note)s
     """
 
-_shared_docs['boxplot'] = """
+_shared_docs[
+    "boxplot"
+] = """
     Make a box plot from DataFrame columns.
 
     Make a box-and-whisker plot from DataFrame columns, optionally grouped
@@ -334,7 +347,9 @@ _shared_docs['boxplot'] = """
         <class 'numpy.ndarray'>
     """
 
-_shared_docs['kde'] = """
+_shared_docs[
+    "kde"
+] = """
         Generate Kernel Density Estimate plot using Gaussian kernels.
 
         In statistics, `kernel density estimation`_ (KDE) is a non-parametric
@@ -379,9 +394,19 @@ _shared_docs['kde'] = """
         """
 
 
-def hist_series(self, by=None, ax=None, grid=True, xlabelsize=None,
-                xrot=None, ylabelsize=None, yrot=None, figsize=None,
-                bins=10, **kwds):
+def hist_series(
+    self,
+    by=None,
+    ax=None,
+    grid=True,
+    xlabelsize=None,
+    xrot=None,
+    ylabelsize=None,
+    yrot=None,
+    figsize=None,
+    bins=10,
+    **kwds
+):
     """
     Draw histogram of the input series using matplotlib.
 
@@ -421,15 +446,38 @@ def hist_series(self, by=None, ax=None, grid=True, xlabelsize=None,
     matplotlib.axes.Axes.hist : Plot a histogram using matplotlib.
     """
     plot_backend = _get_plot_backend()
-    return plot_backend.hist_series(self, by=by, ax=ax, grid=grid,
-                                    xlabelsize=xlabelsize, xrot=xrot,
-                                    ylabelsize=ylabelsize, yrot=yrot,
-                                    figsize=figsize, bins=bins, **kwds)
+    return plot_backend.hist_series(
+        self,
+        by=by,
+        ax=ax,
+        grid=grid,
+        xlabelsize=xlabelsize,
+        xrot=xrot,
+        ylabelsize=ylabelsize,
+        yrot=yrot,
+        figsize=figsize,
+        bins=bins,
+        **kwds
+    )
 
 
-def hist_frame(data, column=None, by=None, grid=True, xlabelsize=None,
-               xrot=None, ylabelsize=None, yrot=None, ax=None, sharex=False,
-               sharey=False, figsize=None, layout=None, bins=10, **kwds):
+def hist_frame(
+    data,
+    column=None,
+    by=None,
+    grid=True,
+    xlabelsize=None,
+    xrot=None,
+    ylabelsize=None,
+    yrot=None,
+    ax=None,
+    sharex=False,
+    sharey=False,
+    figsize=None,
+    layout=None,
+    bins=10,
+    **kwds
+):
     """
     Make a histogram of the DataFrame's.
 
@@ -508,39 +556,99 @@ def hist_frame(data, column=None, by=None, grid=True, xlabelsize=None,
         >>> hist = df.hist(bins=3)
     """
     plot_backend = _get_plot_backend()
-    return plot_backend.hist_frame(data, column=column, by=by, grid=grid,
-                                   xlabelsize=xlabelsize, xrot=xrot,
-                                   ylabelsize=ylabelsize, yrot=yrot,
-                                   ax=ax, sharex=sharex, sharey=sharey,
-                                   figsize=figsize, layout=layout, bins=bins,
-                                   **kwds)
+    return plot_backend.hist_frame(
+        data,
+        column=column,
+        by=by,
+        grid=grid,
+        xlabelsize=xlabelsize,
+        xrot=xrot,
+        ylabelsize=ylabelsize,
+        yrot=yrot,
+        ax=ax,
+        sharex=sharex,
+        sharey=sharey,
+        figsize=figsize,
+        layout=layout,
+        bins=bins,
+        **kwds
+    )
 
 
-@Appender(_shared_docs['boxplot'] % _shared_doc_kwargs)
-def boxplot(data, column=None, by=None, ax=None, fontsize=None,
-            rot=0, grid=True, figsize=None, layout=None, return_type=None,
-            **kwds):
+@Appender(_shared_docs["boxplot"] % _shared_doc_kwargs)
+def boxplot(
+    data,
+    column=None,
+    by=None,
+    ax=None,
+    fontsize=None,
+    rot=0,
+    grid=True,
+    figsize=None,
+    layout=None,
+    return_type=None,
+    **kwds
+):
     plot_backend = _get_plot_backend()
-    return plot_backend.boxplot(data, column=column, by=by, ax=ax,
-                                fontsize=fontsize, rot=rot, grid=grid,
-                                figsize=figsize, layout=layout,
-                                return_type=return_type, **kwds)
+    return plot_backend.boxplot(
+        data,
+        column=column,
+        by=by,
+        ax=ax,
+        fontsize=fontsize,
+        rot=rot,
+        grid=grid,
+        figsize=figsize,
+        layout=layout,
+        return_type=return_type,
+        **kwds
+    )
 
 
-@Appender(_shared_docs['boxplot'] % _shared_doc_kwargs)
-def boxplot_frame(self, column=None, by=None, ax=None, fontsize=None, rot=0,
-                  grid=True, figsize=None, layout=None,
-                  return_type=None, **kwds):
+@Appender(_shared_docs["boxplot"] % _shared_doc_kwargs)
+def boxplot_frame(
+    self,
+    column=None,
+    by=None,
+    ax=None,
+    fontsize=None,
+    rot=0,
+    grid=True,
+    figsize=None,
+    layout=None,
+    return_type=None,
+    **kwds
+):
     plot_backend = _get_plot_backend()
-    return plot_backend.boxplot_frame(self, column=column, by=by, ax=ax,
-                                      fontsize=fontsize, rot=rot, grid=grid,
-                                      figsize=figsize, layout=layout,
-                                      return_type=return_type, **kwds)
+    return plot_backend.boxplot_frame(
+        self,
+        column=column,
+        by=by,
+        ax=ax,
+        fontsize=fontsize,
+        rot=rot,
+        grid=grid,
+        figsize=figsize,
+        layout=layout,
+        return_type=return_type,
+        **kwds
+    )
 
 
-def boxplot_frame_groupby(grouped, subplots=True, column=None, fontsize=None,
-                          rot=0, grid=True, ax=None, figsize=None,
-                          layout=None, sharex=False, sharey=True, **kwds):
+def boxplot_frame_groupby(
+    grouped,
+    subplots=True,
+    column=None,
+    fontsize=None,
+    rot=0,
+    grid=True,
+    ax=None,
+    figsize=None,
+    layout=None,
+    sharex=False,
+    sharey=True,
+    **kwds
+):
     """
     Make box plots from DataFrameGroupBy data.
 
@@ -592,23 +700,32 @@ def boxplot_frame_groupby(grouped, subplots=True, column=None, fontsize=None,
     """
     plot_backend = _get_plot_backend()
     return plot_backend.boxplot_frame_groupby(
-        grouped, subplots=subplots, column=column, fontsize=fontsize, rot=rot,
-        grid=grid, ax=ax, figsize=figsize, layout=layout, sharex=sharex,
-        sharey=sharey, **kwds)
+        grouped,
+        subplots=subplots,
+        column=column,
+        fontsize=fontsize,
+        rot=rot,
+        grid=grid,
+        ax=ax,
+        figsize=figsize,
+        layout=layout,
+        sharex=sharex,
+        sharey=sharey,
+        **kwds
+    )
 
 
 # kinds supported by both dataframe and series
-_common_kinds = ['line', 'bar', 'barh',
-                 'kde', 'density', 'area', 'hist', 'box']
+_common_kinds = ["line", "bar", "barh", "kde", "density", "area", "hist", "box"]
 # kinds supported by dataframe
-_dataframe_kinds = ['scatter', 'hexbin']
+_dataframe_kinds = ["scatter", "hexbin"]
 # kinds supported only by series or dataframe single column
-_series_kinds = ['pie']
+_series_kinds = ["pie"]
 _all_kinds = _common_kinds + _dataframe_kinds + _series_kinds
 
 
 def _get_standard_kind(kind):
-    return {'density': 'kde'}.get(kind, kind)
+    return {"density": "kde"}.get(kind, kind)
 
 
 def _get_plot_backend():
@@ -624,9 +741,9 @@ def _get_plot_backend():
     The backend is imported lazily, as matplotlib is a soft dependency, and
     pandas can be used without it being installed.
     """
-    backend_str = pandas.get_option('plotting.backend')
-    if backend_str == 'matplotlib':
-        backend_str = 'pandas.plotting._matplotlib'
+    backend_str = pandas.get_option("plotting.backend")
+    if backend_str == "matplotlib":
+        backend_str = "pandas.plotting._matplotlib"
     return importlib.import_module(backend_str)
 
 
@@ -634,16 +751,22 @@ def _plot_classes():
     plot_backend = _get_plot_backend()
     # TODO restore type annotations if we create a base class for plot classes
     # (a parent of MPLPlot, and classes of other backends)
-    classes = [plot_backend.LinePlot, plot_backend.BarPlot,
-               plot_backend.BarhPlot, plot_backend.AreaPlot,
-               plot_backend.HistPlot, plot_backend.BoxPlot,
-               plot_backend.ScatterPlot, plot_backend.HexBinPlot,
-               plot_backend.KdePlot, plot_backend.PiePlot]
+    classes = [
+        plot_backend.LinePlot,
+        plot_backend.BarPlot,
+        plot_backend.BarhPlot,
+        plot_backend.AreaPlot,
+        plot_backend.HistPlot,
+        plot_backend.BoxPlot,
+        plot_backend.ScatterPlot,
+        plot_backend.HexBinPlot,
+        plot_backend.KdePlot,
+        plot_backend.PiePlot,
+    ]
     return {class_._kind: class_ for class_ in classes}
 
 
-def _plot(data, x=None, y=None, subplots=False,
-          ax=None, kind='line', **kwds):
+def _plot(data, x=None, y=None, subplots=False, ax=None, kind="line", **kwds):
     kind = _get_standard_kind(kind.lower().strip())
     if kind in _all_kinds:
         klass = _plot_classes()[kind]
@@ -652,11 +775,11 @@ def _plot(data, x=None, y=None, subplots=False,
 
     if kind in _dataframe_kinds:
         if isinstance(data, ABCDataFrame):
-            plot_obj = klass(data, x=x, y=y, subplots=subplots, ax=ax,
-                             kind=kind, **kwds)
+            plot_obj = klass(
+                data, x=x, y=y, subplots=subplots, ax=ax, kind=kind, **kwds
+            )
         else:
-            raise ValueError("plot kind %r can only be used for data frames"
-                             % kind)
+            raise ValueError("plot kind %r can only be used for data frames" % kind)
 
     elif kind in _series_kinds:
         if isinstance(data, ABCDataFrame):
@@ -687,11 +810,11 @@ def _plot(data, x=None, y=None, subplots=False,
                 if int_y_arg and not data.columns.holds_integer():
                     y = data_cols[y]
 
-                label_kw = kwds['label'] if 'label' in kwds else False
-                for kw in ['xerr', 'yerr']:
-                    if (kw in kwds) and \
-                        (isinstance(kwds[kw], str) or
-                            is_integer(kwds[kw])):
+                label_kw = kwds["label"] if "label" in kwds else False
+                for kw in ["xerr", "yerr"]:
+                    if (kw in kwds) and (
+                        isinstance(kwds[kw], str) or is_integer(kwds[kw])
+                    ):
                         try:
                             kwds[kw] = data[kwds[kw]]
                         except (IndexError, KeyError, TypeError):
@@ -718,58 +841,142 @@ def _plot(data, x=None, y=None, subplots=False,
     return plot_obj.result
 
 
-@Appender(_shared_docs['plot'] % _shared_doc_df_kwargs)
-def plot_frame(data, x=None, y=None, kind='line', ax=None,
-               subplots=False, sharex=None, sharey=False, layout=None,
-               figsize=None, use_index=True, title=None, grid=None,
-               legend=True, style=None, logx=False, logy=False, loglog=False,
-               xticks=None, yticks=None, xlim=None, ylim=None,
-               rot=None, fontsize=None, colormap=None, table=False,
-               yerr=None, xerr=None,
-               secondary_y=False, sort_columns=False,
-               **kwds):
-    return _plot(data, kind=kind, x=x, y=y, ax=ax,
-                 subplots=subplots, sharex=sharex, sharey=sharey,
-                 layout=layout, figsize=figsize, use_index=use_index,
-                 title=title, grid=grid, legend=legend,
-                 style=style, logx=logx, logy=logy, loglog=loglog,
-                 xticks=xticks, yticks=yticks, xlim=xlim, ylim=ylim,
-                 rot=rot, fontsize=fontsize, colormap=colormap, table=table,
-                 yerr=yerr, xerr=xerr,
-                 secondary_y=secondary_y, sort_columns=sort_columns,
-                 **kwds)
+@Appender(_shared_docs["plot"] % _shared_doc_df_kwargs)
+def plot_frame(
+    data,
+    x=None,
+    y=None,
+    kind="line",
+    ax=None,
+    subplots=False,
+    sharex=None,
+    sharey=False,
+    layout=None,
+    figsize=None,
+    use_index=True,
+    title=None,
+    grid=None,
+    legend=True,
+    style=None,
+    logx=False,
+    logy=False,
+    loglog=False,
+    xticks=None,
+    yticks=None,
+    xlim=None,
+    ylim=None,
+    rot=None,
+    fontsize=None,
+    colormap=None,
+    table=False,
+    yerr=None,
+    xerr=None,
+    secondary_y=False,
+    sort_columns=False,
+    **kwds
+):
+    return _plot(
+        data,
+        kind=kind,
+        x=x,
+        y=y,
+        ax=ax,
+        subplots=subplots,
+        sharex=sharex,
+        sharey=sharey,
+        layout=layout,
+        figsize=figsize,
+        use_index=use_index,
+        title=title,
+        grid=grid,
+        legend=legend,
+        style=style,
+        logx=logx,
+        logy=logy,
+        loglog=loglog,
+        xticks=xticks,
+        yticks=yticks,
+        xlim=xlim,
+        ylim=ylim,
+        rot=rot,
+        fontsize=fontsize,
+        colormap=colormap,
+        table=table,
+        yerr=yerr,
+        xerr=xerr,
+        secondary_y=secondary_y,
+        sort_columns=sort_columns,
+        **kwds
+    )
 
 
-@Appender(_shared_docs['plot'] % _shared_doc_series_kwargs)
-def plot_series(data, kind='line', ax=None,                    # Series unique
-                figsize=None, use_index=True, title=None, grid=None,
-                legend=False, style=None, logx=False, logy=False, loglog=False,
-                xticks=None, yticks=None, xlim=None, ylim=None,
-                rot=None, fontsize=None, colormap=None, table=False,
-                yerr=None, xerr=None,
-                label=None, secondary_y=False,                 # Series unique
-                **kwds):
+@Appender(_shared_docs["plot"] % _shared_doc_series_kwargs)
+def plot_series(
+    data,
+    kind="line",
+    ax=None,  # Series unique
+    figsize=None,
+    use_index=True,
+    title=None,
+    grid=None,
+    legend=False,
+    style=None,
+    logx=False,
+    logy=False,
+    loglog=False,
+    xticks=None,
+    yticks=None,
+    xlim=None,
+    ylim=None,
+    rot=None,
+    fontsize=None,
+    colormap=None,
+    table=False,
+    yerr=None,
+    xerr=None,
+    label=None,
+    secondary_y=False,  # Series unique
+    **kwds
+):
 
     # FIXME move this into _matplotlib
     import matplotlib.pyplot as plt
+
     if ax is None and len(plt.get_fignums()) > 0:
         with plt.rc_context():
             ax = plt.gca()
-        ax = getattr(ax, 'left_ax', ax)
+        ax = getattr(ax, "left_ax", ax)
 
-    return _plot(data, kind=kind, ax=ax,
-                 figsize=figsize, use_index=use_index, title=title,
-                 grid=grid, legend=legend,
-                 style=style, logx=logx, logy=logy, loglog=loglog,
-                 xticks=xticks, yticks=yticks, xlim=xlim, ylim=ylim,
-                 rot=rot, fontsize=fontsize, colormap=colormap, table=table,
-                 yerr=yerr, xerr=xerr,
-                 label=label, secondary_y=secondary_y,
-                 **kwds)
+    return _plot(
+        data,
+        kind=kind,
+        ax=ax,
+        figsize=figsize,
+        use_index=use_index,
+        title=title,
+        grid=grid,
+        legend=legend,
+        style=style,
+        logx=logx,
+        logy=logy,
+        loglog=loglog,
+        xticks=xticks,
+        yticks=yticks,
+        xlim=xlim,
+        ylim=ylim,
+        rot=rot,
+        fontsize=fontsize,
+        colormap=colormap,
+        table=table,
+        yerr=yerr,
+        xerr=xerr,
+        label=label,
+        secondary_y=secondary_y,
+        **kwds
+    )
 
 
 class BasePlotMethods(PandasObject):
-
     def __init__(self, data):
         self._parent = data  # can be Series or DataFrame
 
@@ -792,22 +999,61 @@ class SeriesPlotMethods(BasePlotMethods):
     ``s.plot(kind='line')`` is equivalent to ``s.plot.line()``
     """
 
-    def __call__(self, kind='line', ax=None,
-                 figsize=None, use_index=True, title=None, grid=None,
-                 legend=False, style=None, logx=False, logy=False,
-                 loglog=False, xticks=None, yticks=None,
-                 xlim=None, ylim=None,
-                 rot=None, fontsize=None, colormap=None, table=False,
-                 yerr=None, xerr=None,
-                 label=None, secondary_y=False, **kwds):
-        return plot_series(self._parent, kind=kind, ax=ax, figsize=figsize,
-                           use_index=use_index, title=title, grid=grid,
-                           legend=legend, style=style, logx=logx, logy=logy,
-                           loglog=loglog, xticks=xticks, yticks=yticks,
-                           xlim=xlim, ylim=ylim, rot=rot, fontsize=fontsize,
-                           colormap=colormap, table=table, yerr=yerr,
-                           xerr=xerr, label=label, secondary_y=secondary_y,
-                           **kwds)
+    def __call__(
+        self,
+        kind="line",
+        ax=None,
+        figsize=None,
+        use_index=True,
+        title=None,
+        grid=None,
+        legend=False,
+        style=None,
+        logx=False,
+        logy=False,
+        loglog=False,
+        xticks=None,
+        yticks=None,
+        xlim=None,
+        ylim=None,
+        rot=None,
+        fontsize=None,
+        colormap=None,
+        table=False,
+        yerr=None,
+        xerr=None,
+        label=None,
+        secondary_y=False,
+        **kwds
+    ):
+        return plot_series(
+            self._parent,
+            kind=kind,
+            ax=ax,
+            figsize=figsize,
+            use_index=use_index,
+            title=title,
+            grid=grid,
+            legend=legend,
+            style=style,
+            logx=logx,
+            logy=logy,
+            loglog=loglog,
+            xticks=xticks,
+            yticks=yticks,
+            xlim=xlim,
+            ylim=ylim,
+            rot=rot,
+            fontsize=fontsize,
+            colormap=colormap,
+            table=table,
+            yerr=yerr,
+            xerr=xerr,
+            label=label,
+            secondary_y=secondary_y,
+            **kwds
+        )
+
     __call__.__doc__ = plot_series.__doc__
 
     def line(self, **kwds):
@@ -833,7 +1079,7 @@ class SeriesPlotMethods(BasePlotMethods):
             >>> s = pd.Series([1, 3, 2])
             >>> s.plot.line()
         """
-        return self(kind='line', **kwds)
+        return self(kind="line", **kwds)
 
     def bar(self, **kwds):
         """
@@ -849,7 +1095,7 @@ class SeriesPlotMethods(BasePlotMethods):
         -------
         :class:`matplotlib.axes.Axes` or numpy.ndarray of them
         """
-        return self(kind='bar', **kwds)
+        return self(kind="bar", **kwds)
 
     def barh(self, **kwds):
         """
@@ -865,7 +1111,7 @@ class SeriesPlotMethods(BasePlotMethods):
         -------
         :class:`matplotlib.axes.Axes` or numpy.ndarray of them
         """
-        return self(kind='barh', **kwds)
+        return self(kind="barh", **kwds)
 
     def box(self, **kwds):
         """
@@ -881,7 +1127,7 @@ class SeriesPlotMethods(BasePlotMethods):
         -------
         :class:`matplotlib.axes.Axes` or numpy.ndarray of them
         """
-        return self(kind='box', **kwds)
+        return self(kind="box", **kwds)
 
     def hist(self, bins=10, **kwds):
         """
@@ -899,12 +1145,14 @@ class SeriesPlotMethods(BasePlotMethods):
         -------
         :class:`matplotlib.axes.Axes` or numpy.ndarray of them
         """
-        return self(kind='hist', bins=bins, **kwds)
+        return self(kind="hist", bins=bins, **kwds)
 
-    @Appender(_shared_docs['kde'] % {
-        'this-datatype': 'Series',
-        'sibling-datatype': 'DataFrame',
-        'examples': """
+    @Appender(
+        _shared_docs["kde"]
+        % {
+            "this-datatype": "Series",
+            "sibling-datatype": "DataFrame",
+            "examples": """
         Given a Series of points randomly sampled from an unknown
         distribution, estimate its PDF using KDE with automatic
         bandwidth determination and plot the results, evaluating them at
@@ -937,10 +1185,11 @@ class SeriesPlotMethods(BasePlotMethods):
             :context: close-figs
 
             >>> ax = s.plot.kde(ind=[1, 2, 3, 4, 5])
-        """.strip()
-    })
+        """.strip(),
+        }
+    )
     def kde(self, bw_method=None, ind=None, **kwds):
-        return self(kind='kde', bw_method=bw_method, ind=ind, **kwds)
+        return self(kind="kde", bw_method=bw_method, ind=ind, **kwds)
 
     density = kde
 
@@ -958,7 +1207,7 @@ class SeriesPlotMethods(BasePlotMethods):
         -------
         :class:`matplotlib.axes.Axes` or numpy.ndarray of them
         """
-        return self(kind='area', **kwds)
+        return self(kind="area", **kwds)
 
     def pie(self, **kwds):
         """
@@ -974,7 +1223,7 @@ class SeriesPlotMethods(BasePlotMethods):
         -------
         :class:`matplotlib.axes.Axes` or numpy.ndarray of them
         """
-        return self(kind='pie', **kwds)
+        return self(kind="pie", **kwds)
 
 
 class FramePlotMethods(BasePlotMethods):
@@ -991,23 +1240,73 @@ class FramePlotMethods(BasePlotMethods):
     ``df.plot(kind='line')`` is equivalent to ``df.plot.line()``
     """
 
-    def __call__(self, x=None, y=None, kind='line', ax=None,
-                 subplots=False, sharex=None, sharey=False, layout=None,
-                 figsize=None, use_index=True, title=None, grid=None,
-                 legend=True, style=None, logx=False, logy=False, loglog=False,
-                 xticks=None, yticks=None, xlim=None, ylim=None,
-                 rot=None, fontsize=None, colormap=None, table=False,
-                 yerr=None, xerr=None,
-                 secondary_y=False, sort_columns=False, **kwds):
-        return plot_frame(self._parent, kind=kind, x=x, y=y, ax=ax,
-                          subplots=subplots, sharex=sharex, sharey=sharey,
-                          layout=layout, figsize=figsize, use_index=use_index,
-                          title=title, grid=grid, legend=legend, style=style,
-                          logx=logx, logy=logy, loglog=loglog, xticks=xticks,
-                          yticks=yticks, xlim=xlim, ylim=ylim, rot=rot,
-                          fontsize=fontsize, colormap=colormap, table=table,
-                          yerr=yerr, xerr=xerr, secondary_y=secondary_y,
-                          sort_columns=sort_columns, **kwds)
+    def __call__(
+        self,
+        x=None,
+        y=None,
+        kind="line",
+        ax=None,
+        subplots=False,
+        sharex=None,
+        sharey=False,
+        layout=None,
+        figsize=None,
+        use_index=True,
+        title=None,
+        grid=None,
+        legend=True,
+        style=None,
+        logx=False,
+        logy=False,
+        loglog=False,
+        xticks=None,
+        yticks=None,
+        xlim=None,
+        ylim=None,
+        rot=None,
+        fontsize=None,
+        colormap=None,
+        table=False,
+        yerr=None,
+        xerr=None,
+        secondary_y=False,
+        sort_columns=False,
+        **kwds
+    ):
+        return plot_frame(
+            self._parent,
+            kind=kind,
+            x=x,
+            y=y,
+            ax=ax,
+            subplots=subplots,
+            sharex=sharex,
+            sharey=sharey,
+            layout=layout,
+            figsize=figsize,
+            use_index=use_index,
+            title=title,
+            grid=grid,
+            legend=legend,
+            style=style,
+            logx=logx,
+            logy=logy,
+            loglog=loglog,
+            xticks=xticks,
+            yticks=yticks,
+            xlim=xlim,
+            ylim=ylim,
+            rot=rot,
+            fontsize=fontsize,
+            colormap=colormap,
+            table=table,
+            yerr=yerr,
+            xerr=xerr,
+            secondary_y=secondary_y,
+            sort_columns=sort_columns,
+            **kwds
+        )
+
     __call__.__doc__ = plot_frame.__doc__
 
     def line(self, x=None, y=None, **kwds):
@@ -1071,7 +1370,7 @@ class FramePlotMethods(BasePlotMethods):
 
             >>> lines = df.plot.line(x='pig', y='horse')
         """
-        return self(kind='line', x=x, y=y, **kwds)
+        return self(kind="line", x=x, y=y, **kwds)
 
     def bar(self, x=None, y=None, **kwds):
         """
@@ -1156,7 +1455,7 @@ class FramePlotMethods(BasePlotMethods):
 
             >>> ax = df.plot.bar(x='lifespan', rot=0)
         """
-        return self(kind='bar', x=x, y=y, **kwds)
+        return self(kind="bar", x=x, y=y, **kwds)
 
     def barh(self, x=None, y=None, **kwds):
         """
@@ -1236,7 +1535,7 @@ class FramePlotMethods(BasePlotMethods):
             ...                    'lifespan': lifespan}, index=index)
             >>> ax = df.plot.barh(x='lifespan')
         """
-        return self(kind='barh', x=x, y=y, **kwds)
+        return self(kind="barh", x=x, y=y, **kwds)
 
     def box(self, by=None, **kwds):
         r"""
@@ -1286,7 +1585,7 @@ class FramePlotMethods(BasePlotMethods):
             >>> df = pd.DataFrame(data, columns=list('ABCD'))
             >>> ax = df.plot.box()
         """
-        return self(kind='box', by=by, **kwds)
+        return self(kind="box", by=by, **kwds)
 
     def hist(self, by=None, bins=10, **kwds):
         """
@@ -1333,12 +1632,14 @@ class FramePlotMethods(BasePlotMethods):
             >>> df['two'] = df['one'] + np.random.randint(1, 7, 6000)
             >>> ax = df.plot.hist(bins=12, alpha=0.5)
         """
-        return self(kind='hist', by=by, bins=bins, **kwds)
+        return self(kind="hist", by=by, bins=bins, **kwds)
 
-    @Appender(_shared_docs['kde'] % {
-        'this-datatype': 'DataFrame',
-        'sibling-datatype': 'Series',
-        'examples': """
+    @Appender(
+        _shared_docs["kde"]
+        % {
+            "this-datatype": "DataFrame",
+            "sibling-datatype": "Series",
+            "examples": """
         Given several Series of points randomly sampled from unknown
         distributions, estimate their PDFs using KDE with automatic
         bandwidth determination and plot the results, evaluating them at
@@ -1374,10 +1675,11 @@ class FramePlotMethods(BasePlotMethods):
             :context: close-figs
 
             >>> ax = df.plot.kde(ind=[1, 2, 3, 4, 5, 6])
-        """.strip()
-    })
+        """.strip(),
+        }
+    )
     def kde(self, bw_method=None, ind=None, **kwds):
-        return self(kind='kde', bw_method=bw_method, ind=ind, **kwds)
+        return self(kind="kde", bw_method=bw_method, ind=ind, **kwds)
 
     density = kde
 
@@ -1452,7 +1754,7 @@ class FramePlotMethods(BasePlotMethods):
             ... })
             >>> ax = df.plot.area(x='day')
         """
-        return self(kind='area', x=x, y=y, **kwds)
+        return self(kind="area", x=x, y=y, **kwds)
 
     def pie(self, y=None, **kwds):
         """
@@ -1501,7 +1803,7 @@ class FramePlotMethods(BasePlotMethods):
 
             >>> plot = df.plot.pie(subplots=True, figsize=(6, 3))
         """
-        return self(kind='pie', y=y, **kwds)
+        return self(kind="pie", y=y, **kwds)
 
     def scatter(self, x, y, s=None, c=None, **kwds):
         """
@@ -1582,10 +1884,9 @@ class FramePlotMethods(BasePlotMethods):
             ...                       c='species',
             ...                       colormap='viridis')
         """
-        return self(kind='scatter', x=x, y=y, c=c, s=s, **kwds)
+        return self(kind="scatter", x=x, y=y, c=c, s=s, **kwds)
 
-    def hexbin(self, x, y, C=None, reduce_C_function=None, gridsize=None,
-               **kwds):
+    def hexbin(self, x, y, C=None, reduce_C_function=None, gridsize=None, **kwds):
         """
         Generate a hexagonal binning plot.
 
@@ -1668,7 +1969,7 @@ class FramePlotMethods(BasePlotMethods):
             ...                     cmap="viridis")
         """
         if reduce_C_function is not None:
-            kwds['reduce_C_function'] = reduce_C_function
+            kwds["reduce_C_function"] = reduce_C_function
         if gridsize is not None:
-            kwds['gridsize'] = gridsize
-        return self(kind='hexbin', x=x, y=y, C=C, **kwds)
+            kwds["gridsize"] = gridsize
+        return self(kind="hexbin", x=x, y=y, C=C, **kwds)

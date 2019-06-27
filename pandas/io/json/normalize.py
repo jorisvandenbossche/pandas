@@ -18,7 +18,7 @@ def _convert_to_line_delimits(s):
 
     # Determine we have a JSON list to turn to lines otherwise just return the
     # json object, only lists can
-    if not s[0] == '[' and s[-1] == ']':
+    if not s[0] == "[" and s[-1] == "]":
         return s
     s = s[1:-1]
 
@@ -96,11 +96,15 @@ def nested_to_record(ds, prefix="", sep=".", level=0):
     return new_ds
 
 
-def json_normalize(data, record_path=None, meta=None,
-                   meta_prefix=None,
-                   record_prefix=None,
-                   errors='raise',
-                   sep='.'):
+def json_normalize(
+    data,
+    record_path=None,
+    meta=None,
+    meta_prefix=None,
+    record_prefix=None,
+    errors="raise",
+    sep=".",
+):
     """
     Normalize semi-structured JSON data into a flat table.
 
@@ -180,6 +184,7 @@ def json_normalize(data, record_path=None, meta=None,
     0          1
     1          2
     """
+
     def _pull_field(js, spec):
         result = js
         if isinstance(spec, list):
@@ -236,8 +241,7 @@ def json_normalize(data, record_path=None, meta=None,
                     if level + 1 == len(val):
                         seen_meta[key] = _pull_field(obj, val[-1])
 
-                _recursive_extract(obj[path[0]], path[1:],
-                                   seen_meta, level=level + 1)
+                _recursive_extract(obj[path[0]], path[1:], seen_meta, level=level + 1)
         else:
             for obj in data:
                 recs = _pull_field(obj, path[0])
@@ -252,13 +256,14 @@ def json_normalize(data, record_path=None, meta=None,
                         try:
                             meta_val = _pull_field(obj, val[level:])
                         except KeyError as e:
-                            if errors == 'ignore':
+                            if errors == "ignore":
                                 meta_val = np.nan
                             else:
-                                raise KeyError("Try running with "
-                                               "errors='ignore' as key "
-                                               "{err} is not always present"
-                                               .format(err=e))
+                                raise KeyError(
+                                    "Try running with "
+                                    "errors='ignore' as key "
+                                    "{err} is not always present".format(err=e)
+                                )
                     meta_vals[key].append(meta_val)
 
                 records.extend(recs)
@@ -268,8 +273,7 @@ def json_normalize(data, record_path=None, meta=None,
     result = DataFrame(records)
 
     if record_prefix is not None:
-        result = result.rename(
-            columns=lambda x: "{p}{c}".format(p=record_prefix, c=x))
+        result = result.rename(columns=lambda x: "{p}{c}".format(p=record_prefix, c=x))
 
     # Data types, a problem
     for k, v in meta_vals.items():
@@ -277,8 +281,10 @@ def json_normalize(data, record_path=None, meta=None,
             k = meta_prefix + k
 
         if k in result:
-            raise ValueError('Conflicting metadata name {name}, '
-                             'need distinguishing prefix '.format(name=k))
+            raise ValueError(
+                "Conflicting metadata name {name}, "
+                "need distinguishing prefix ".format(name=k)
+            )
 
         # forcing dtype to object to avoid the metadata being casted to string
         result[k] = np.array(v, dtype=object).repeat(lengths)
