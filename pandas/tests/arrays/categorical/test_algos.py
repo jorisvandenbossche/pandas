@@ -95,7 +95,9 @@ class TestTake:
 
     def test_positional_take(self, ordered_fixture):
         cat = pd.Categorical(
-            ["a", "a", "b", "b"], categories=["b", "a"], ordered=ordered_fixture
+            ["a", "a", "b", "b"],
+            categories=["b", "a"],
+            ordered=ordered_fixture,
         )
         result = cat.take([0, 1, 2], allow_fill=False)
         expected = pd.Categorical(

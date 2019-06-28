@@ -167,7 +167,11 @@ class SelectionMixin:
     _internal_names_set = set(_internal_names)
 
     _builtin_table = OrderedDict(
-        ((builtins.sum, np.sum), (builtins.max, np.max), (builtins.min, np.min))
+        (
+            (builtins.sum, np.sum),
+            (builtins.max, np.max),
+            (builtins.min, np.min),
+        )
     )
 
     _cython_table = OrderedDict(
@@ -215,7 +219,8 @@ class SelectionMixin:
     @property
     def _selection_list(self):
         if not isinstance(
-            self._selection, (list, tuple, ABCSeries, ABCIndexClass, np.ndarray)
+            self._selection,
+            (list, tuple, ABCSeries, ABCIndexClass, np.ndarray),
         ):
             return [self._selection]
         return self._selection
@@ -250,11 +255,15 @@ class SelectionMixin:
                 )
             )
 
-        if isinstance(key, (list, tuple, ABCSeries, ABCIndexClass, np.ndarray)):
+        if isinstance(
+            key, (list, tuple, ABCSeries, ABCIndexClass, np.ndarray)
+        ):
             if len(self.obj.columns.intersection(key)) != len(key):
                 bad_keys = list(set(key).difference(self.obj.columns))
                 raise KeyError(
-                    "Columns not found: {missing}".format(missing=str(bad_keys)[1:-1])
+                    "Columns not found: {missing}".format(
+                        missing=str(bad_keys)[1:-1]
+                    )
                 )
             return self._gotitem(list(key), ndim=2)
 
@@ -308,7 +317,14 @@ class SelectionMixin:
             # but don't let them think they can pass args to it
             assert len(args) == 0
             assert (
-                len([kwarg for kwarg in kwargs if kwarg not in ["axis", "_level"]]) == 0
+                len(
+                    [
+                        kwarg
+                        for kwarg in kwargs
+                        if kwarg not in ["axis", "_level"]
+                    ]
+                )
+                == 0
             )
             return f
 
@@ -346,7 +362,10 @@ class SelectionMixin:
         _level = kwargs.pop("_level", None)
 
         if isinstance(arg, str):
-            return self._try_aggregate_string_function(arg, *args, **kwargs), None
+            return (
+                self._try_aggregate_string_function(arg, *args, **kwargs),
+                None,
+            )
 
         if isinstance(arg, dict):
 
@@ -405,8 +424,12 @@ class SelectionMixin:
 
                     elif isinstance(obj, ABCSeries):
                         nested_renaming_depr()
-                    elif isinstance(obj, ABCDataFrame) and k not in obj.columns:
-                        raise KeyError("Column '{col}' does not exist!".format(col=k))
+                    elif (
+                        isinstance(obj, ABCDataFrame) and k not in obj.columns
+                    ):
+                        raise KeyError(
+                            "Column '{col}' does not exist!".format(col=k)
+                        )
 
                 arg = new_arg
 
@@ -479,7 +502,10 @@ class SelectionMixin:
                 if len(sl) == 1:
 
                     result = _agg(
-                        arg, lambda fname, agg_how: _agg_1dim(self._selection, agg_how)
+                        arg,
+                        lambda fname, agg_how: _agg_1dim(
+                            self._selection, agg_how
+                        ),
                     )
 
                 # we are selecting the same set as we are aggregating
@@ -511,7 +537,9 @@ class SelectionMixin:
 
             def is_any_frame():
                 # return a boolean if we have *any* nested series
-                return any(isinstance(r, ABCDataFrame) for r in result.values())
+                return any(
+                    isinstance(r, ABCDataFrame) for r in result.values()
+                )
 
             if isinstance(result, list):
                 return concat(result, keys=keys, axis=1, sort=True), True
@@ -520,7 +548,10 @@ class SelectionMixin:
                 # we have a dict of DataFrames
                 # return a MI DataFrame
 
-                return concat([result[k] for k in keys], keys=keys, axis=1), True
+                return (
+                    concat([result[k] for k in keys], keys=keys, axis=1),
+                    True,
+                )
 
             elif isinstance(self, ABCSeries) and is_any_series():
 
@@ -554,7 +585,12 @@ class SelectionMixin:
             return result, True
         elif is_list_like(arg):
             # we require a list, but not an 'str'
-            return self._aggregate_multiple_funcs(arg, _level=_level, _axis=_axis), None
+            return (
+                self._aggregate_multiple_funcs(
+                    arg, _level=_level, _axis=_axis
+                ),
+                None,
+            )
         else:
             result = None
 
@@ -598,7 +634,9 @@ class SelectionMixin:
         else:
             for index, col in enumerate(obj):
                 try:
-                    colg = self._gotitem(col, ndim=1, subset=obj.iloc[:, index])
+                    colg = self._gotitem(
+                        col, ndim=1, subset=obj.iloc[:, index]
+                    )
                     results.append(colg.aggregate(arg))
                     keys.append(col)
                 except (TypeError, DataError):
@@ -1196,7 +1234,14 @@ class IndexOpsMixin:
         return bool(isna(self).any())
 
     def _reduce(
-        self, op, name, axis=0, skipna=True, numeric_only=None, filter_type=None, **kwds
+        self,
+        op,
+        name,
+        axis=0,
+        skipna=True,
+        numeric_only=None,
+        filter_type=None,
+        **kwds
     ):
         """ perform the reduction type operation if we can """
         func = getattr(self, name, None)
@@ -1277,7 +1322,9 @@ class IndexOpsMixin:
             if na_action == "ignore":
 
                 def map_f(values, f):
-                    return lib.map_infer_mask(values, f, isna(values).view(np.uint8))
+                    return lib.map_infer_mask(
+                        values, f, isna(values).view(np.uint8)
+                    )
 
             else:
                 map_f = lib.map_infer
@@ -1288,7 +1335,12 @@ class IndexOpsMixin:
         return new_values
 
     def value_counts(
-        self, normalize=False, sort=True, ascending=False, bins=None, dropna=True
+        self,
+        normalize=False,
+        sort=True,
+        ascending=False,
+        bins=None,
+        dropna=True,
     ):
         """
         Return a Series containing counts of unique values.
@@ -1601,7 +1653,9 @@ class IndexOpsMixin:
     @Substitution(klass="Index")
     @Appender(_shared_docs["searchsorted"])
     def searchsorted(self, value, side="left", sorter=None):
-        return algorithms.searchsorted(self._values, value, side=side, sorter=sorter)
+        return algorithms.searchsorted(
+            self._values, value, side=side, sorter=sorter
+        )
 
     def drop_duplicates(self, keep="first", inplace=False):
         inplace = validate_bool_kwarg(inplace, "inplace")

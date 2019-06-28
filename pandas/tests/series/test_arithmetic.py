@@ -20,7 +20,11 @@ class TestSeriesFlexArithmetic:
             (lambda x: x, lambda x: x * 2, False),
             (lambda x: x, lambda x: x[::2], False),
             (lambda x: x, lambda x: 5, True),
-            (lambda x: tm.makeFloatSeries(), lambda x: tm.makeFloatSeries(), True),
+            (
+                lambda x: tm.makeFloatSeries(),
+                lambda x: tm.makeFloatSeries(),
+                True,
+            ),
         ],
     )
     @pytest.mark.parametrize(
@@ -139,14 +143,24 @@ class TestSeriesComparison:
 
     @pytest.mark.parametrize(
         "op",
-        [operator.eq, operator.ne, operator.le, operator.lt, operator.ge, operator.gt],
+        [
+            operator.eq,
+            operator.ne,
+            operator.le,
+            operator.lt,
+            operator.ge,
+            operator.gt,
+        ],
     )
     @pytest.mark.parametrize(
-        "names", [(None, None, None), ("foo", "bar", None), ("baz", "baz", "baz")]
+        "names",
+        [(None, None, None), ("foo", "bar", None), ("baz", "baz", "baz")],
     )
     def test_ser_cmp_result_names(self, names, op):
         # datetime64 dtype
-        dti = pd.date_range("1949-06-07 03:00:00", freq="H", periods=5, name=names[0])
+        dti = pd.date_range(
+            "1949-06-07 03:00:00", freq="H", periods=5, name=names[0]
+        )
         ser = Series(dti).rename(names[1])
         result = op(ser, dti)
         assert result.name == names[2]

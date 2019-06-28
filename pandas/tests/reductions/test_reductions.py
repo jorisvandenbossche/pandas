@@ -136,7 +136,9 @@ class TestReductions:
         assert obj.argmin(skipna=False) == -1
         assert obj.argmax(skipna=False) == -1
 
-        obj = Index([pd.NaT, datetime(2011, 11, 1), datetime(2011, 11, 2), pd.NaT])
+        obj = Index(
+            [pd.NaT, datetime(2011, 11, 1), datetime(2011, 11, 2), pd.NaT]
+        )
         assert obj.argmin() == 1
         assert obj.argmax() == 2
         assert obj.argmin(skipna=False) == -1
@@ -152,7 +154,8 @@ class TestReductions:
     def test_same_tz_min_max_axis_1(self, op, expected_col):
         # GH 10390
         df = DataFrame(
-            pd.date_range("2016-01-01 00:00:00", periods=3, tz="UTC"), columns=["a"]
+            pd.date_range("2016-01-01 00:00:00", periods=3, tz="UTC"),
+            columns=["a"],
         )
         df["b"] = df.a.subtract(pd.Timedelta(seconds=3600))
         result = getattr(df, op)(axis=1)
@@ -251,7 +254,10 @@ class TestIndexReductions:
         # GH#4984
         # make sure ops return Timedelta
         s = Series(
-            [Timestamp("20130101") + timedelta(seconds=i * i) for i in range(10)]
+            [
+                Timestamp("20130101") + timedelta(seconds=i * i)
+                for i in range(10)
+            ]
         )
         td = s.diff()
 
@@ -302,14 +308,20 @@ class TestIndexReductions:
         assert s.diff().median() == timedelta(days=4)
 
         s = Series(
-            [Timestamp("2015-02-03"), Timestamp("2015-02-07"), Timestamp("2015-02-15")]
+            [
+                Timestamp("2015-02-03"),
+                Timestamp("2015-02-07"),
+                Timestamp("2015-02-15"),
+            ]
         )
         assert s.diff().median() == timedelta(days=6)
 
     def test_minmax_tz(self, tz_naive_fixture):
         tz = tz_naive_fixture
         # monotonic
-        idx1 = pd.DatetimeIndex(["2011-01-01", "2011-01-02", "2011-01-03"], tz=tz)
+        idx1 = pd.DatetimeIndex(
+            ["2011-01-01", "2011-01-02", "2011-01-03"], tz=tz
+        )
         assert idx1.is_monotonic
 
         # non-monotonic
@@ -415,7 +427,9 @@ class TestIndexReductions:
     def test_minmax_period(self):
 
         # monotonic
-        idx1 = pd.PeriodIndex([NaT, "2011-01-01", "2011-01-02", "2011-01-03"], freq="D")
+        idx1 = pd.PeriodIndex(
+            [NaT, "2011-01-01", "2011-01-02", "2011-01-03"], freq="D"
+        )
         assert idx1.is_monotonic
 
         # non-monotonic
@@ -469,13 +483,17 @@ class TestIndexReductions:
 
     def test_min_max_categorical(self):
 
-        ci = pd.CategoricalIndex(list("aabbca"), categories=list("cab"), ordered=False)
+        ci = pd.CategoricalIndex(
+            list("aabbca"), categories=list("cab"), ordered=False
+        )
         with pytest.raises(TypeError):
             ci.min()
         with pytest.raises(TypeError):
             ci.max()
 
-        ci = pd.CategoricalIndex(list("aabbca"), categories=list("cab"), ordered=True)
+        ci = pd.CategoricalIndex(
+            list("aabbca"), categories=list("cab"), ordered=True
+        )
         assert ci.min() == "c"
         assert ci.max() == "b"
 
@@ -733,7 +751,10 @@ class TestSeriesReductions:
         # no NaNs
         nona = string_series.dropna()
         assert nona[nona.idxmin()] == nona.min()
-        assert nona.index.values.tolist().index(nona.idxmin()) == nona.values.argmin()
+        assert (
+            nona.index.values.tolist().index(nona.idxmin())
+            == nona.values.argmin()
+        )
 
         # all NaNs
         allna = string_series * np.nan
@@ -763,7 +784,10 @@ class TestSeriesReductions:
         # no NaNs
         nona = string_series.dropna()
         assert nona[nona.idxmax()] == nona.max()
-        assert nona.index.values.tolist().index(nona.idxmax()) == nona.values.argmax()
+        assert (
+            nona.index.values.tolist().index(nona.idxmax())
+            == nona.values.argmax()
+        )
 
         # all NaNs
         allna = string_series * np.nan
@@ -813,7 +837,9 @@ class TestSeriesReductions:
         assert not s2.any(skipna=True)
 
         # Check level.
-        s = pd.Series([False, False, True, True, False, True], index=[0, 0, 1, 1, 2, 2])
+        s = pd.Series(
+            [False, False, True, True, False, True], index=[0, 0, 1, 1, 2, 2]
+        )
         tm.assert_series_equal(s.all(level=0), Series([False, True, False]))
         tm.assert_series_equal(s.any(level=0), Series([False, True, True]))
 
@@ -881,7 +907,10 @@ class TestSeriesReductions:
             (pd.Series(["foo", "bar", "baz"]), TypeError),
             (pd.Series([(1,), (2,)]), TypeError),
             # For mixed data types
-            (pd.Series(["foo", "foo", "bar", "bar", None, np.nan, "baz"]), TypeError),
+            (
+                pd.Series(["foo", "foo", "bar", "bar", None, np.nan, "baz"]),
+                TypeError,
+            ),
         ],
     )
     def test_assert_idxminmax_raises(self, test_input, error_type):
@@ -1002,7 +1031,9 @@ class TestCategoricalSeriesReductions:
 
         cat = Series(
             Categorical(
-                ["a", "b", "c", "d"], categories=["d", "c", "b", "a"], ordered=True
+                ["a", "b", "c", "d"],
+                categories=["d", "c", "b", "a"],
+                ordered=True,
             )
         )
         _min = cat.min()
@@ -1024,7 +1055,9 @@ class TestCategoricalSeriesReductions:
 
         cat = Series(
             Categorical(
-                [np.nan, 1, 2, np.nan], categories=[5, 4, 3, 2, 1], ordered=True
+                [np.nan, 1, 2, np.nan],
+                categories=[5, 4, 3, 2, 1],
+                ordered=True,
             )
         )
         _min = cat.min()
@@ -1036,7 +1069,9 @@ class TestCategoricalSeriesReductions:
         # TODO deprecate numeric_only argument for Categorical and use
         # skipna as well, see GH25303
         cat = Series(
-            Categorical(["a", "b", np.nan, "a"], categories=["b", "a"], ordered=True)
+            Categorical(
+                ["a", "b", np.nan, "a"], categories=["b", "a"], ordered=True
+            )
         )
 
         _min = cat.min()
@@ -1062,7 +1097,10 @@ class TestSeriesMode:
 
     @pytest.mark.parametrize(
         "dropna, expected",
-        [(True, Series([], dtype=np.float64)), (False, Series([], dtype=np.float64))],
+        [
+            (True, Series([], dtype=np.float64)),
+            (False, Series([], dtype=np.float64)),
+        ],
     )
     def test_mode_empty(self, dropna, expected):
         s = Series([], dtype=np.float64)
@@ -1087,7 +1125,9 @@ class TestSeriesMode:
         expected = Series(expected, dtype=dt)
         tm.assert_series_equal(result, expected)
 
-    @pytest.mark.parametrize("dropna, expected", [(True, [1.0]), (False, [1, np.nan])])
+    @pytest.mark.parametrize(
+        "dropna, expected", [(True, [1.0]), (False, [1, np.nan])]
+    )
     def test_mode_numerical_nan(self, dropna, expected):
         s = Series([1, 1, 2, np.nan, np.nan])
         result = s.mode(dropna)
@@ -1149,7 +1189,8 @@ class TestSeriesMode:
     )
     def test_mode_datetime(self, dropna, expected1, expected2):
         s = Series(
-            ["2011-01-03", "2013-01-02", "1900-05-03", "nan", "nan"], dtype="M8[ns]"
+            ["2011-01-03", "2013-01-02", "1900-05-03", "nan", "nan"],
+            dtype="M8[ns]",
         )
         result = s.mode(dropna)
         expected1 = Series(expected1, dtype="M8[ns]")
@@ -1182,7 +1223,8 @@ class TestSeriesMode:
         # gh-5986: Test timedelta types.
 
         s = Series(
-            ["1 days", "-1 days", "0 days", "nan", "nan"], dtype="timedelta64[ns]"
+            ["1 days", "-1 days", "0 days", "nan", "nan"],
+            dtype="timedelta64[ns]",
         )
         result = s.mode(dropna)
         expected1 = Series(expected1, dtype="timedelta64[ns]")
@@ -1218,7 +1260,9 @@ class TestSeriesMode:
                 False,
                 Categorical([np.nan], categories=[1, 2]),
                 Categorical([np.nan, "a"], categories=[1, "a"]),
-                Categorical([np.nan, 3, 1], categories=[3, 2, 1], ordered=True),
+                Categorical(
+                    [np.nan, 3, 1], categories=[3, 2, 1], ordered=True
+                ),
             ),
         ],
     )
@@ -1235,7 +1279,9 @@ class TestSeriesMode:
 
         s = Series(
             Categorical(
-                [1, 1, 2, 3, 3, np.nan, np.nan], categories=[3, 2, 1], ordered=True
+                [1, 1, 2, 3, 3, np.nan, np.nan],
+                categories=[3, 2, 1],
+                ordered=True,
             )
         )
         result = s.mode(dropna)

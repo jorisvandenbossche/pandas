@@ -22,7 +22,9 @@ def kind(request):
 
 class TestSparseArray:
     def setup_method(self, method):
-        self.arr_data = np.array([np.nan, np.nan, 1, 2, 3, np.nan, 4, 5, np.nan, 6])
+        self.arr_data = np.array(
+            [np.nan, np.nan, 1, 2, 3, np.nan, 4, 5, np.nan, 6]
+        )
         self.arr = SparseArray(self.arr_data)
         self.zarr = SparseArray([0, 0, 1, 2, 3, 0, 4, 5, 0, 6], fill_value=0)
 
@@ -79,7 +81,9 @@ class TestSparseArray:
         assert arr.dtype == SparseDtype(np.object)
         assert np.isnan(arr.fill_value)
 
-        arr = SparseArray(["A", "A", np.nan, "B"], dtype=np.object, fill_value="A")
+        arr = SparseArray(
+            ["A", "A", np.nan, "B"], dtype=np.object, fill_value="A"
+        )
         assert arr.dtype == SparseDtype(np.object, "A")
         assert arr.fill_value == "A"
 
@@ -118,7 +122,10 @@ class TestSparseArray:
         assert arr.fill_value == 0
 
         arr = SparseArray(
-            data=[1, 2], sparse_index=IntIndex(4, [1, 2]), fill_value=0, dtype=np.int64
+            data=[1, 2],
+            sparse_index=IntIndex(4, [1, 2]),
+            fill_value=0,
+            dtype=np.int64,
         )
         exp = SparseArray([0, 1, 2, 0], fill_value=0, dtype=np.int64)
         tm.assert_sp_array_equal(arr, exp)
@@ -153,7 +160,10 @@ class TestSparseArray:
 
     def test_constructor_spindex_dtype_scalar_broadcasts(self):
         arr = SparseArray(
-            data=[1, 2], sparse_index=IntIndex(4, [1, 2]), fill_value=0, dtype=None
+            data=[1, 2],
+            sparse_index=IntIndex(4, [1, 2]),
+            fill_value=0,
+            dtype=None,
         )
         exp = SparseArray([0, 1, 2, 0], fill_value=0, dtype=None)
         tm.assert_sp_array_equal(arr, exp)
@@ -180,7 +190,12 @@ class TestSparseArray:
     @pytest.mark.parametrize("format", ["coo", "csc", "csr"])
     @pytest.mark.parametrize(
         "size",
-        [pytest.param(0, marks=td.skip_if_np_lt("1.16", reason="NumPy-11383")), 10],
+        [
+            pytest.param(
+                0, marks=td.skip_if_np_lt("1.16", reason="NumPy-11383")
+            ),
+            10,
+        ],
     )
     @td.skip_if_no_scipy
     def test_from_spmatrix(self, size, format):
@@ -225,7 +240,9 @@ class TestSparseArray:
     @pytest.mark.filterwarnings("ignore:Sparse:FutureWarning")
     def test_sparse_series_round_trip(self, kind, fill):
         # see gh-13999
-        arr = SparseArray([np.nan, 1, np.nan, 2, 3], kind=kind, fill_value=fill)
+        arr = SparseArray(
+            [np.nan, 1, np.nan, 2, 3], kind=kind, fill_value=fill
+        )
         res = SparseArray(SparseSeries(arr))
         tm.assert_sp_array_equal(arr, res)
 
@@ -243,7 +260,10 @@ class TestSparseArray:
     def test_sparse_series_round_trip2(self, kind, fill):
         # see gh-13999
         arr = SparseArray(
-            [True, False, True, True], dtype=np.bool, kind=kind, fill_value=fill
+            [True, False, True, True],
+            dtype=np.bool,
+            kind=kind,
+            fill_value=fill,
         )
         res = SparseArray(SparseSeries(arr))
         tm.assert_sp_array_equal(arr, res)
@@ -327,7 +347,9 @@ class TestSparseArray:
         tm.assert_sp_array_equal(result, expected)
 
         # allow_fill=False
-        result = sparse.take(np.array([1, 0, -1]), allow_fill=False, fill_value=True)
+        result = sparse.take(
+            np.array([1, 0, -1]), allow_fill=False, fill_value=True
+        )
         expected = SparseArray([np.nan, np.nan, 4])
         tm.assert_sp_array_equal(result, expected)
 
@@ -361,7 +383,9 @@ class TestSparseArray:
         tm.assert_sp_array_equal(result, expected)
 
         # allow_fill=False
-        result = sparse.take(np.array([1, 0, -1]), allow_fill=False, fill_value=True)
+        result = sparse.take(
+            np.array([1, 0, -1]), allow_fill=False, fill_value=True
+        )
         expected = SparseArray([0, np.nan, 4], fill_value=0)
         tm.assert_sp_array_equal(result, expected)
 
@@ -436,7 +460,9 @@ class TestSparseArray:
         tm.assert_numpy_array_equal(arr.sp_values, np.array([True, True]))
         # Behavior change: np.asarray densifies.
         # tm.assert_numpy_array_equal(arr.sp_values, np.asarray(arr))
-        tm.assert_numpy_array_equal(arr.sp_index.indices, np.array([2, 3], np.int32))
+        tm.assert_numpy_array_equal(
+            arr.sp_index.indices, np.array([2, 3], np.int32)
+        )
 
         dense = arr.to_dense()
         assert dense.dtype == bool
@@ -461,7 +487,9 @@ class TestSparseArray:
         arr = SparseArray(data, dtype=np.float32)
 
         assert arr.dtype == SparseDtype(np.float32)
-        tm.assert_numpy_array_equal(arr.sp_values, np.array([1, 3], dtype=np.float32))
+        tm.assert_numpy_array_equal(
+            arr.sp_values, np.array([1, 3], dtype=np.float32)
+        )
         # Behavior change: np.asarray densifies.
         # tm.assert_numpy_array_equal(arr.sp_values, np.asarray(arr))
         tm.assert_numpy_array_equal(
@@ -482,7 +510,9 @@ class TestSparseArray:
         dtype = SparseDtype("float64", fill_value=0)
         result = arr.astype(dtype)
         expected = SparseArray._simple_new(
-            np.array([0.0, 2.0], dtype=dtype.subtype), IntIndex(4, [2, 3]), dtype
+            np.array([0.0, 2.0], dtype=dtype.subtype),
+            IntIndex(4, [2, 3]),
+            dtype,
         )
         tm.assert_sp_array_equal(result, expected)
 
@@ -518,7 +548,9 @@ class TestSparseArray:
         assert res.dtype == SparseDtype(typ, 1)
         assert res.sp_values.dtype == typ
 
-        tm.assert_numpy_array_equal(np.asarray(res.to_dense()), vals.astype(typ))
+        tm.assert_numpy_array_equal(
+            np.asarray(res.to_dense()), vals.astype(typ)
+        )
 
     @pytest.mark.parametrize(
         "array, dtype, expected",
@@ -707,7 +739,9 @@ class TestSparseArray:
         res = arr[[False, False, False]]
         assert res.dtype == arr.dtype
 
-    @pytest.mark.parametrize("op", ["add", "sub", "mul", "truediv", "floordiv", "pow"])
+    @pytest.mark.parametrize(
+        "op", ["add", "sub", "mul", "truediv", "floordiv", "pow"]
+    )
     def test_binary_operators(self, op):
         op = getattr(operator, op)
         data1 = np.random.randn(20)
@@ -727,7 +761,8 @@ class TestSparseArray:
         def _check_op(op, first, second):
             res = op(first, second)
             exp = SparseArray(
-                op(first.to_dense(), second.to_dense()), fill_value=first.fill_value
+                op(first.to_dense(), second.to_dense()),
+                fill_value=first.fill_value,
             )
             assert isinstance(res, SparseArray)
             assert_almost_equal(res.to_dense(), exp.to_dense())
@@ -768,8 +803,12 @@ class TestSparseArray:
     def test_generator_warnings(self):
         sp_arr = SparseArray([1, 2, 3])
         with warnings.catch_warnings(record=True) as w:
-            warnings.filterwarnings(action="always", category=DeprecationWarning)
-            warnings.filterwarnings(action="always", category=PendingDeprecationWarning)
+            warnings.filterwarnings(
+                action="always", category=DeprecationWarning
+            )
+            warnings.filterwarnings(
+                action="always", category=PendingDeprecationWarning
+            )
             for _ in sp_arr:
                 pass
             assert len(w) == 0
@@ -849,7 +888,9 @@ class TestSparseArray:
 
     def test_nonzero(self):
         # Tests regression #21172.
-        sa = pd.SparseArray([float("nan"), float("nan"), 1, 0, 0, 2, 0, 0, 0, 3, 0, 0])
+        sa = pd.SparseArray(
+            [float("nan"), float("nan"), 1, 0, 0, 2, 0, 0, 0, 3, 0, 0]
+        )
         expected = np.array([2, 5, 9], dtype=np.int32)
         result, = sa.nonzero()
         tm.assert_numpy_array_equal(expected, result)
@@ -1069,12 +1110,16 @@ class TestSparseArrayAnalytics:
         tm.assert_sp_array_equal(np.abs(sparse), result)
 
         sparse = SparseArray([1, -1, 2, -2], fill_value=1)
-        result = SparseArray([1, 2, 2], sparse_index=sparse.sp_index, fill_value=1)
+        result = SparseArray(
+            [1, 2, 2], sparse_index=sparse.sp_index, fill_value=1
+        )
         tm.assert_sp_array_equal(abs(sparse), result)
         tm.assert_sp_array_equal(np.abs(sparse), result)
 
         sparse = SparseArray([1, -1, 2, -2], fill_value=-1)
-        result = SparseArray([1, 2, 2], sparse_index=sparse.sp_index, fill_value=1)
+        result = SparseArray(
+            [1, 2, 2], sparse_index=sparse.sp_index, fill_value=1
+        )
         tm.assert_sp_array_equal(abs(sparse), result)
         tm.assert_sp_array_equal(np.abs(sparse), result)
 
@@ -1107,7 +1152,9 @@ class TestSparseArrayAnalytics:
     @pytest.mark.parametrize("fill_value", [0.0, np.nan])
     def test_modf(self, fill_value):
         # https://github.com/pandas-dev/pandas/issues/26946
-        sparse = pd.SparseArray([fill_value] * 10 + [1.1, 2.2], fill_value=fill_value)
+        sparse = pd.SparseArray(
+            [fill_value] * 10 + [1.1, 2.2], fill_value=fill_value
+        )
         r1, r2 = np.modf(sparse)
         e1, e2 = np.modf(np.asarray(sparse))
         tm.assert_sp_array_equal(r1, pd.SparseArray(e1, fill_value=fill_value))
@@ -1141,7 +1188,9 @@ class TestSparseArrayAnalytics:
 
 @pytest.mark.filterwarnings("ignore:Sparse:FutureWarning")
 class TestAccessor:
-    @pytest.mark.parametrize("attr", ["npoints", "density", "fill_value", "sp_values"])
+    @pytest.mark.parametrize(
+        "attr", ["npoints", "density", "fill_value", "sp_values"]
+    )
     def test_get_attributes(self, attr):
         arr = SparseArray([0, 1])
         ser = pd.Series(arr)
@@ -1170,7 +1219,9 @@ class TestAccessor:
 
         ser = pd.Series(
             [1, 2, 3],
-            index=pd.MultiIndex.from_product([[0], [1, 2, 3]], names=["a", "b"]),
+            index=pd.MultiIndex.from_product(
+                [[0], [1, 2, 3]], names=["a", "b"]
+            ),
             dtype="Sparse[int]",
         )
         A, _, _ = ser.sparse.to_coo()

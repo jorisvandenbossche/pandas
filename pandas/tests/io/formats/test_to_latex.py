@@ -207,7 +207,9 @@ b &  0 &  1 &  0 &  1 &  0 \\
         assert result == expected
 
         # GH 10660
-        df = pd.DataFrame({"a": [0, 0, 1, 1], "b": list("abab"), "c": [1, 2, 3, 4]})
+        df = pd.DataFrame(
+            {"a": [0, 0, 1, 1], "b": list("abab"), "c": [1, 2, 3, 4]}
+        )
         result = df.set_index(["a", "b"]).to_latex()
         expected = r"""\begin{tabular}{llr}
 \toprule
@@ -248,7 +250,8 @@ a &       &      &           &      &       &      &       &      \\
         # equal too. In this test, 'c' has to be printed both times
         # because the higher order index 'A' != 'B'.
         df = pd.DataFrame(
-            index=pd.MultiIndex.from_tuples([("A", "c"), ("B", "c")]), columns=["col"]
+            index=pd.MultiIndex.from_tuples([("A", "c"), ("B", "c")]),
+            columns=["col"],
         )
         result = df.to_latex()
         expected = r"""\begin{tabular}{lll}
@@ -322,7 +325,9 @@ c3 & 0 &  0 &  1 &  2 &  3 &  4 \\
         assert result == expected
 
         df.index = df.T.index
-        result = df.T.to_latex(multirow=True, multicolumn=True, multicolumn_format="c")
+        result = df.T.to_latex(
+            multirow=True, multicolumn=True, multicolumn_format="c"
+        )
         expected = r"""\begin{tabular}{llrrrrr}
 \toprule
    &   & \multicolumn{2}{c}{c1} & \multicolumn{2}{c}{c2} & c3 \\
@@ -347,7 +352,9 @@ c3 & 0 &  0 &  1 &  2 &  3 &  4 \\
         test_dict = {"co$e^x$": {a: "a", b: "b"}, "co^l1": {a: "a", b: "b"}}
 
         unescaped_result = DataFrame(test_dict).to_latex(escape=False)
-        escaped_result = DataFrame(test_dict).to_latex()  # default: escape=True
+        escaped_result = DataFrame(
+            test_dict
+        ).to_latex()  # default: escape=True
 
         unescaped_expected = r"""\begin{tabular}{lll}
 \toprule
@@ -440,7 +447,18 @@ b &       b &     b \\
         assert r"\multicolumn{3}" in with3columns_result
 
     def test_to_latex_escape_special_chars(self):
-        special_characters = ["&", "%", "$", "#", "_", "{", "}", "~", "^", "\\"]
+        special_characters = [
+            "&",
+            "%",
+            "$",
+            "#",
+            "_",
+            "{",
+            "}",
+            "~",
+            "^",
+            "\\",
+        ]
         df = DataFrame(data=special_characters)
         observed = df.to_latex()
         expected = r"""\begin{tabular}{ll}
@@ -615,7 +633,9 @@ AA &  BB \\
             else ""
         )
         placeholder = "{}" if any(names) and 1 in axes else " "
-        col_names = [n if (bool(n) and 1 in axes) else placeholder for n in names]
+        col_names = [
+            n if (bool(n) and 1 in axes) else placeholder for n in names
+        ]
         observed = df.to_latex()
         expected = r"""\begin{tabular}{llrrrr}
 \toprule

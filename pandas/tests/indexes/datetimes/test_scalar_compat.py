@@ -58,7 +58,9 @@ class TestDatetimeIndexOps:
         idx = tm.makeDateIndex(100)
         expected = getattr(idx, field)[-1]
         if field == "weekday_name":
-            with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
+            with tm.assert_produces_warning(
+                FutureWarning, check_stacklevel=False
+            ):
                 result = getattr(Timestamp(idx[-1]), field)
         else:
             result = getattr(Timestamp(idx[-1]), field)

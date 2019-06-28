@@ -11,7 +11,11 @@ from pandas._libs import missing as libmissing
 from pandas._libs.tslibs import iNaT, is_null_datetimelike
 
 from pandas.core.dtypes.common import is_scalar
-from pandas.core.dtypes.dtypes import DatetimeTZDtype, IntervalDtype, PeriodDtype
+from pandas.core.dtypes.dtypes import (
+    DatetimeTZDtype,
+    IntervalDtype,
+    PeriodDtype,
+)
 from pandas.core.dtypes.missing import (
     array_equivalent,
     isna,
@@ -22,7 +26,14 @@ from pandas.core.dtypes.missing import (
 )
 
 import pandas as pd
-from pandas import DatetimeIndex, Float64Index, NaT, Series, TimedeltaIndex, date_range
+from pandas import (
+    DatetimeIndex,
+    Float64Index,
+    NaT,
+    Series,
+    TimedeltaIndex,
+    date_range,
+)
 from pandas.util import testing as tm
 
 
@@ -183,7 +194,10 @@ class TestIsNA:
         [
             (np.complex128(np.nan), True),
             (np.float64(1), False),
-            (np.array([1, 1 + 0j, np.nan, 3]), np.array([False, False, True, False])),
+            (
+                np.array([1, 1 + 0j, np.nan, 3]),
+                np.array([False, False, True, False]),
+            ),
             (
                 np.array([1, 1 + 0j, np.nan, 3], dtype=object),
                 np.array([False, False, True, False]),
@@ -279,7 +293,9 @@ class TestIsNA:
 
 
 def test_array_equivalent():
-    assert array_equivalent(np.array([np.nan, np.nan]), np.array([np.nan, np.nan]))
+    assert array_equivalent(
+        np.array([np.nan, np.nan]), np.array([np.nan, np.nan])
+    )
     assert array_equivalent(
         np.array([np.nan, 1, np.nan]), np.array([np.nan, 1, np.nan])
     )
@@ -298,12 +314,24 @@ def test_array_equivalent():
     assert not array_equivalent(
         np.array([np.nan, 1, np.nan]), np.array([np.nan, 2, np.nan])
     )
-    assert not array_equivalent(np.array(["a", "b", "c", "d"]), np.array(["e", "e"]))
-    assert array_equivalent(Float64Index([0, np.nan]), Float64Index([0, np.nan]))
-    assert not array_equivalent(Float64Index([0, np.nan]), Float64Index([1, np.nan]))
-    assert array_equivalent(DatetimeIndex([0, np.nan]), DatetimeIndex([0, np.nan]))
-    assert not array_equivalent(DatetimeIndex([0, np.nan]), DatetimeIndex([1, np.nan]))
-    assert array_equivalent(TimedeltaIndex([0, np.nan]), TimedeltaIndex([0, np.nan]))
+    assert not array_equivalent(
+        np.array(["a", "b", "c", "d"]), np.array(["e", "e"])
+    )
+    assert array_equivalent(
+        Float64Index([0, np.nan]), Float64Index([0, np.nan])
+    )
+    assert not array_equivalent(
+        Float64Index([0, np.nan]), Float64Index([1, np.nan])
+    )
+    assert array_equivalent(
+        DatetimeIndex([0, np.nan]), DatetimeIndex([0, np.nan])
+    )
+    assert not array_equivalent(
+        DatetimeIndex([0, np.nan]), DatetimeIndex([1, np.nan])
+    )
+    assert array_equivalent(
+        TimedeltaIndex([0, np.nan]), TimedeltaIndex([0, np.nan])
+    )
     assert not array_equivalent(
         TimedeltaIndex([0, np.nan]), TimedeltaIndex([1, np.nan])
     )
@@ -318,14 +346,17 @@ def test_array_equivalent():
             DatetimeIndex([1, np.nan], tz="US/Eastern"),
         )
         assert not array_equivalent(
-            DatetimeIndex([0, np.nan]), DatetimeIndex([0, np.nan], tz="US/Eastern")
+            DatetimeIndex([0, np.nan]),
+            DatetimeIndex([0, np.nan], tz="US/Eastern"),
         )
         assert not array_equivalent(
             DatetimeIndex([0, np.nan], tz="CET"),
             DatetimeIndex([0, np.nan], tz="US/Eastern"),
         )
 
-    assert not array_equivalent(DatetimeIndex([0, np.nan]), TimedeltaIndex([0, np.nan]))
+    assert not array_equivalent(
+        DatetimeIndex([0, np.nan]), TimedeltaIndex([0, np.nan])
+    )
 
 
 def test_array_equivalent_compat():
@@ -349,10 +380,12 @@ def test_array_equivalent_compat():
 def test_array_equivalent_str():
     for dtype in ["O", "S", "U"]:
         assert array_equivalent(
-            np.array(["A", "B"], dtype=dtype), np.array(["A", "B"], dtype=dtype)
+            np.array(["A", "B"], dtype=dtype),
+            np.array(["A", "B"], dtype=dtype),
         )
         assert not array_equivalent(
-            np.array(["A", "B"], dtype=dtype), np.array(["A", "X"], dtype=dtype)
+            np.array(["A", "B"], dtype=dtype),
+            np.array(["A", "X"], dtype=dtype),
         )
 
 
@@ -362,7 +395,12 @@ def test_array_equivalent_str():
         # Datetime-like
         (np.dtype("M8[ns]"), NaT),
         (np.dtype("m8[ns]"), NaT),
-        (DatetimeTZDtype.construct_from_string("datetime64[ns, US/Eastern]"), NaT),
+        (
+            DatetimeTZDtype.construct_from_string(
+                "datetime64[ns, US/Eastern]"
+            ),
+            NaT,
+        ),
         (PeriodDtype("M"), NaT),
         # Integer
         ("u1", 0),

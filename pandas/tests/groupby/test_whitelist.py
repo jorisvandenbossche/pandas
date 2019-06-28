@@ -85,7 +85,9 @@ def mframe():
         codes=[[0, 0, 0, 1, 1, 2, 2, 3, 3, 3], [0, 1, 2, 0, 1, 1, 2, 0, 1, 2]],
         names=["first", "second"],
     )
-    return DataFrame(np.random.randn(10, 3), index=index, columns=["A", "B", "C"])
+    return DataFrame(
+        np.random.randn(10, 3), index=index, columns=["A", "B", "C"]
+    )
 
 
 @pytest.fixture
@@ -170,7 +172,9 @@ def raw_frame():
         names=["first", "second"],
     )
     raw_frame = DataFrame(
-        np.random.randn(10, 3), index=index, columns=Index(["A", "B", "C"], name="exp")
+        np.random.randn(10, 3),
+        index=index,
+        columns=Index(["A", "B", "C"], name="exp"),
     )
     raw_frame.iloc[1, [1, 2]] = np.nan
     raw_frame.iloc[7, [0, 1]] = np.nan
@@ -182,7 +186,9 @@ def raw_frame():
 @pytest.mark.parametrize("axis", [0, 1])
 @pytest.mark.parametrize("skipna", [True, False])
 @pytest.mark.parametrize("sort", [True, False])
-def test_regression_whitelist_methods(raw_frame, op, level, axis, skipna, sort):
+def test_regression_whitelist_methods(
+    raw_frame, op, level, axis, skipna, sort
+):
     # GH6944
     # GH 17537
     # explicitly test the whitelist methods
@@ -370,7 +376,9 @@ def test_groupby_selection_with_methods(df):
     # methods which aren't just .foo()
     tm.assert_frame_equal(g.fillna(0), g_exp.fillna(0))
     tm.assert_frame_equal(g.dtypes, g_exp.dtypes)
-    tm.assert_frame_equal(g.apply(lambda x: x.sum()), g_exp.apply(lambda x: x.sum()))
+    tm.assert_frame_equal(
+        g.apply(lambda x: x.sum()), g_exp.apply(lambda x: x.sum())
+    )
 
     tm.assert_frame_equal(g.resample("D").mean(), g_exp.resample("D").mean())
     tm.assert_frame_equal(g.resample("D").ohlc(), g_exp.resample("D").ohlc())

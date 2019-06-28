@@ -86,7 +86,9 @@ class BaseDecimal:
             right_na = right.isna()
 
         tm.assert_series_equal(left_na, right_na)
-        return tm.assert_series_equal(left[~left_na], right[~right_na], *args, **kwargs)
+        return tm.assert_series_equal(
+            left[~left_na], right[~right_na], *args, **kwargs
+        )
 
     def assert_frame_equal(self, left, right, *args, **kwargs):
         # TODO(EA): select_dtypes
@@ -133,8 +135,12 @@ class TestReshaping(BaseDecimal, base.BaseReshapingTests):
 class TestGetitem(BaseDecimal, base.BaseGetitemTests):
     def test_take_na_value_other_decimal(self):
         arr = DecimalArray([decimal.Decimal("1.0"), decimal.Decimal("2.0")])
-        result = arr.take([0, -1], allow_fill=True, fill_value=decimal.Decimal("-1.0"))
-        expected = DecimalArray([decimal.Decimal("1.0"), decimal.Decimal("-1.0")])
+        result = arr.take(
+            [0, -1], allow_fill=True, fill_value=decimal.Decimal("-1.0")
+        )
+        expected = DecimalArray(
+            [decimal.Decimal("1.0"), decimal.Decimal("-1.0")]
+        )
         self.assert_extension_array_equal(result, expected)
 
 
@@ -203,7 +209,8 @@ class TestPrinting(BaseDecimal, base.BasePrintingTests):
 # TODO(extension)
 @pytest.mark.xfail(
     reason=(
-        "raising AssertionError as this is not implemented, " "though easy enough to do"
+        "raising AssertionError as this is not implemented, "
+        "though easy enough to do"
     )
 )
 def test_series_constructor_coerce_data_to_extension_dtype_raises():
@@ -387,5 +394,7 @@ def test_formatting_values_deprecated():
 
     ser = pd.Series(DecimalArray2([decimal.Decimal("1.0")]))
 
-    with tm.assert_produces_warning(DeprecationWarning, check_stacklevel=False):
+    with tm.assert_produces_warning(
+        DeprecationWarning, check_stacklevel=False
+    ):
         repr(ser)

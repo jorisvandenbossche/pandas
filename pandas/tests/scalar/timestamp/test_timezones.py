@@ -64,11 +64,16 @@ class TestTimestampTZOperations:
             ts.tz_localize("US/Eastern", ambiguous="infer")
 
         # GH#8025
-        msg = "Cannot localize tz-aware Timestamp, " "use tz_convert for conversions"
+        msg = (
+            "Cannot localize tz-aware Timestamp, "
+            "use tz_convert for conversions"
+        )
         with pytest.raises(TypeError, match=msg):
             Timestamp("2011-01-01", tz="US/Eastern").tz_localize("Asia/Tokyo")
 
-        msg = "Cannot convert tz-naive Timestamp, " "use tz_localize to localize"
+        msg = (
+            "Cannot convert tz-naive Timestamp, " "use tz_localize to localize"
+        )
         with pytest.raises(TypeError, match=msg):
             Timestamp("2011-01-01").tz_convert("Asia/Tokyo")
 
@@ -204,7 +209,12 @@ class TestTimestampTZOperations:
     @pytest.mark.parametrize(
         "start_ts, tz, end_ts, shift",
         [
-            ["2015-03-29 02:20:00", "Europe/Warsaw", "2015-03-29 03:00:00", "forward"],
+            [
+                "2015-03-29 02:20:00",
+                "Europe/Warsaw",
+                "2015-03-29 03:00:00",
+                "forward",
+            ],
             [
                 "2015-03-29 02:20:00",
                 "Europe/Warsaw",
@@ -223,7 +233,12 @@ class TestTimestampTZOperations:
                 "2015-03-29 01:20:00",
                 timedelta(hours=-1),
             ],
-            ["2018-03-11 02:33:00", "US/Pacific", "2018-03-11 03:00:00", "forward"],
+            [
+                "2018-03-11 02:33:00",
+                "US/Pacific",
+                "2018-03-11 03:00:00",
+                "forward",
+            ],
             [
                 "2018-03-11 02:33:00",
                 "US/Pacific",
@@ -259,7 +274,9 @@ class TestTimestampTZOperations:
 
     @pytest.mark.parametrize("offset", [-1, 1])
     @pytest.mark.parametrize("tz_type", ["", "dateutil/"])
-    def test_timestamp_tz_localize_nonexistent_shift_invalid(self, offset, tz_type):
+    def test_timestamp_tz_localize_nonexistent_shift_invalid(
+        self, offset, tz_type
+    ):
         # GH 8917, 24466
         tz = tz_type + "Europe/Warsaw"
         ts = Timestamp("2015-03-29 02:20:00")
@@ -435,12 +452,16 @@ class TestTimestampTZOperations:
 
         assert result == expected
 
-    def test_timestamp_timetz_equivalent_with_datetime_tz(self, tz_naive_fixture):
+    def test_timestamp_timetz_equivalent_with_datetime_tz(
+        self, tz_naive_fixture
+    ):
         # GH21358
         tz = timezones.maybe_get_tz(tz_naive_fixture)
 
         stamp = Timestamp("2018-06-04 10:20:30", tz=tz)
-        _datetime = datetime(2018, 6, 4, hour=10, minute=20, second=30, tzinfo=tz)
+        _datetime = datetime(
+            2018, 6, 4, hour=10, minute=20, second=30, tzinfo=tz
+        )
 
         result = stamp.timetz()
         expected = _datetime.timetz()

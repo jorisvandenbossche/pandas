@@ -50,7 +50,9 @@ def data_repeated(request):
 
     def gen(count):
         for _ in range(count):
-            yield SparseArray(make_data(request.param), fill_value=request.param)
+            yield SparseArray(
+                make_data(request.param), fill_value=request.param
+            )
 
     yield gen
 
@@ -77,7 +79,9 @@ def na_cmp():
 
 @pytest.fixture(params=[0, np.nan])
 def data_for_grouping(request):
-    return SparseArray([1, 1, np.nan, np.nan, 2, 2, 1, 3], fill_value=request.param)
+    return SparseArray(
+        [1, 1, np.nan, np.nan, 2, 2, 1, 3], fill_value=request.param
+    )
 
 
 class BaseSparseTests:
@@ -160,7 +164,9 @@ class TestGetitem(BaseSparseTests, base.BaseGetitemTests):
 
 class TestMissing(BaseSparseTests, base.BaseMissingTests):
     def test_isna(self, data_missing):
-        expected_dtype = SparseDtype(bool, pd.isna(data_missing.dtype.fill_value))
+        expected_dtype = SparseDtype(
+            bool, pd.isna(data_missing.dtype.fill_value)
+        )
         expected = SparseArray([True, False], dtype=expected_dtype)
 
         result = pd.isna(data_missing)
@@ -196,7 +202,9 @@ class TestMissing(BaseSparseTests, base.BaseMissingTests):
         # Have to override to specify that fill_value will change.
         fill_value = data_missing[1]
 
-        result = pd.DataFrame({"A": data_missing, "B": [1, 2]}).fillna(fill_value)
+        result = pd.DataFrame({"A": data_missing, "B": [1, 2]}).fillna(
+            fill_value
+        )
 
         if pd.isna(data_missing.fill_value):
             dtype = SparseDtype(data_missing.dtype, fill_value)
@@ -205,7 +213,9 @@ class TestMissing(BaseSparseTests, base.BaseMissingTests):
 
         expected = pd.DataFrame(
             {
-                "A": data_missing._from_sequence([fill_value, fill_value], dtype=dtype),
+                "A": data_missing._from_sequence(
+                    [fill_value, fill_value], dtype=dtype
+                ),
                 "B": [1, 2],
             }
         )
@@ -233,7 +243,9 @@ class TestMethods(BaseSparseTests, base.BaseMethodsTests):
         val = s1.iloc[0]
         result = s1.combine(val, lambda x1, x2: x1 <= x2)
         expected = pd.Series(
-            pd.SparseArray([a <= val for a in list(orig_data1)], fill_value=False)
+            pd.SparseArray(
+                [a <= val for a in list(orig_data1)], fill_value=False
+            )
         )
         self.assert_series_equal(result, expected)
 
@@ -280,7 +292,9 @@ class TestMethods(BaseSparseTests, base.BaseMethodsTests):
         other = cls._from_sequence([a, b, a, b], dtype=data.dtype)
         cond = np.array([True, False, True, True])
         result = ser.where(cond, other)
-        expected = pd.Series(cls._from_sequence([a, b, b, b], dtype=data.dtype))
+        expected = pd.Series(
+            cls._from_sequence([a, b, b, b], dtype=data.dtype)
+        )
         self.assert_series_equal(result, expected)
 
     def test_combine_first(self, data):

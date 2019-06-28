@@ -126,7 +126,9 @@ class _Unstacker:
         # If the data frame is too big, the number of unique index combination
         # will cause int32 overflow on windows environments.
         # We want to check and raise an error before this happens
-        num_rows = np.max([index_level.size for index_level in self.new_index_levels])
+        num_rows = np.max(
+            [index_level.size for index_level in self.new_index_levels]
+        )
         num_columns = self.removed_level.size
 
         # GH20601: This forces an overflow if the number of cells is too high.
@@ -176,7 +178,9 @@ class _Unstacker:
         mask.put(selector, True)
 
         if mask.sum() < len(self.index):
-            raise ValueError("Index contains duplicate entries, " "cannot reshape")
+            raise ValueError(
+                "Index contains duplicate entries, " "cannot reshape"
+            )
 
         self.group_index = comp_index
         self.mask = mask
@@ -272,7 +276,9 @@ class _Unstacker:
             new_levels = self.value_columns.levels + (self.removed_level_full,)
             new_names = self.value_columns.names + (self.removed_name,)
 
-            new_codes = [lab.take(propagator) for lab in self.value_columns.codes]
+            new_codes = [
+                lab.take(propagator) for lab in self.value_columns.codes
+            ]
         else:
             new_levels = [self.value_columns, self.removed_level_full]
             new_names = [self.value_columns.name, self.removed_name]
@@ -291,11 +297,16 @@ class _Unstacker:
         # The entire level is then just a repetition of the single chunk:
         new_codes.append(np.tile(repeater, width))
         return MultiIndex(
-            levels=new_levels, codes=new_codes, names=new_names, verify_integrity=False
+            levels=new_levels,
+            codes=new_codes,
+            names=new_names,
+            verify_integrity=False,
         )
 
     def get_new_index(self):
-        result_codes = [lab.take(self.compressor) for lab in self.sorted_labels[:-1]]
+        result_codes = [
+            lab.take(self.compressor) for lab in self.sorted_labels[:-1]
+        ]
 
         # construct the new index
         if len(self.new_index_levels) == 1:
@@ -335,7 +346,9 @@ def _unstack_multiple(data, clocs, fill_value=None):
     group_index = get_group_index(ccodes, shape, sort=False, xnull=False)
 
     comp_ids, obs_ids = compress_group_index(group_index, sort=False)
-    recons_codes = decons_obs_group_ids(comp_ids, obs_ids, shape, ccodes, xnull=False)
+    recons_codes = decons_obs_group_ids(
+        comp_ids, obs_ids, shape, ccodes, xnull=False
+    )
 
     if rlocs == []:
         # Everything is in clocs, so the dummy df has a regular index
@@ -382,7 +395,10 @@ def _unstack_multiple(data, clocs, fill_value=None):
             new_codes.append(rec.take(unstcols.codes[-1]))
 
     new_columns = MultiIndex(
-        levels=new_levels, codes=new_codes, names=new_names, verify_integrity=False
+        levels=new_levels,
+        codes=new_codes,
+        names=new_names,
+        verify_integrity=False,
     )
 
     if isinstance(unstacked, Series):
@@ -481,7 +497,9 @@ def _unstack_extension_series(series, level, fill_value):
     for col, indices in result.iteritems():
         out.append(
             Series(
-                values.take(indices.values, allow_fill=True, fill_value=fill_value),
+                values.take(
+                    indices.values, allow_fill=True, fill_value=fill_value
+                ),
                 name=col,
                 index=result.index,
             )
@@ -523,10 +541,15 @@ def stack(frame, level=-1, dropna=True):
         new_names = list(frame.index.names)
         new_names.append(frame.columns.name)
         new_index = MultiIndex(
-            levels=new_levels, codes=new_codes, names=new_names, verify_integrity=False
+            levels=new_levels,
+            codes=new_codes,
+            names=new_names,
+            verify_integrity=False,
         )
     else:
-        levels, (ilab, clab) = zip(*map(factorize, (frame.index, frame.columns)))
+        levels, (ilab, clab) = zip(
+            *map(factorize, (frame.index, frame.columns))
+        )
         codes = ilab.repeat(K), np.tile(clab, N).ravel()
         new_index = MultiIndex(
             levels=levels,
@@ -731,7 +754,10 @@ def _stack_multi_columns(frame, level_num=-1, dropna=True):
     new_names.append(frame.columns.names[level_num])
 
     new_index = MultiIndex(
-        levels=new_levels, codes=new_codes, names=new_names, verify_integrity=False
+        levels=new_levels,
+        codes=new_codes,
+        names=new_names,
+        verify_integrity=False,
     )
 
     result = frame._constructor(new_data, index=new_index, columns=new_columns)
@@ -876,7 +902,9 @@ def get_dummies(
             if is_list_like(item):
                 if not len(item) == data_to_encode.shape[1]:
                     len_msg = len_msg.format(
-                        name=name, len_item=len(item), len_enc=data_to_encode.shape[1]
+                        name=name,
+                        len_item=len(item),
+                        len_enc=data_to_encode.shape[1],
                     )
                     raise ValueError(len_msg)
 
@@ -909,7 +937,9 @@ def get_dummies(
             # columns to prepend to result.
             with_dummies = [data.select_dtypes(exclude=dtypes_to_encode)]
 
-        for (col, pre, sep) in zip(data_to_encode.iteritems(), prefix, prefix_sep):
+        for (col, pre, sep) in zip(
+            data_to_encode.iteritems(), prefix, prefix_sep
+        ):
             # col is (column_name, column), use just column data here
             dummy = _get_dummies_1d(
                 col[1],
@@ -985,9 +1015,13 @@ def _get_dummies_1d(
         # PY2 embedded unicode, gh-22084
         def _make_col_name(prefix, prefix_sep, level):
             fstr = "{prefix}{prefix_sep}{level}"
-            return fstr.format(prefix=prefix, prefix_sep=prefix_sep, level=level)
+            return fstr.format(
+                prefix=prefix, prefix_sep=prefix_sep, level=level
+            )
 
-        dummy_cols = [_make_col_name(prefix, prefix_sep, level) for level in levels]
+        dummy_cols = [
+            _make_col_name(prefix, prefix_sep, level) for level in levels
+        ]
 
     if isinstance(data, Series):
         index = data.index

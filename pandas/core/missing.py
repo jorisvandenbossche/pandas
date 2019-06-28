@@ -122,7 +122,9 @@ def clean_interp_method(method, **kwargs):
         "from_derivatives",
     ]
     if method in ("spline", "polynomial") and order is None:
-        raise ValueError("You must specify the order of the spline or " "polynomial.")
+        raise ValueError(
+            "You must specify the order of the spline or " "polynomial."
+        )
     if method not in valid:
         raise ValueError(
             "method must be one of {valid}. Got '{method}' "
@@ -179,7 +181,10 @@ def interpolate_1d(
     valid_limit_directions = ["forward", "backward", "both"]
     limit_direction = limit_direction.lower()
     if limit_direction not in valid_limit_directions:
-        msg = "Invalid limit_direction: expecting one of {valid!r}, " "got {invalid!r}."
+        msg = (
+            "Invalid limit_direction: expecting one of {valid!r}, "
+            "got {invalid!r}."
+        )
         raise ValueError(
             msg.format(valid=valid_limit_directions, invalid=limit_direction)
         )
@@ -295,7 +300,14 @@ def interpolate_1d(
 
 
 def _interpolate_scipy_wrapper(
-    x, y, new_x, method, fill_value=None, bounds_error=False, order=None, **kwargs
+    x,
+    y,
+    new_x,
+    method,
+    fill_value=None,
+    bounds_error=False,
+    order=None,
+    **kwargs
 ):
     """
     Passed off to scipy.interpolate.interp1d. method is scipy's kind.
@@ -325,7 +337,8 @@ def _interpolate_scipy_wrapper(
             alt_methods["pchip"] = interpolate.pchip_interpolate
         except AttributeError:
             raise ImportError(
-                "Your version of Scipy does not support " "PCHIP interpolation."
+                "Your version of Scipy does not support "
+                "PCHIP interpolation."
             )
     elif method == "akima":
         alt_methods["akima"] = _akima_interpolate
@@ -473,7 +486,9 @@ def interpolate_2d(
     ndim = values.ndim
     if values.ndim == 1:
         if axis != 0:  # pragma: no cover
-            raise AssertionError("cannot interpolate on a ndim == 1 with " "axis != 0")
+            raise AssertionError(
+                "cannot interpolate on a ndim == 1 with " "axis != 0"
+            )
         values = values.reshape(tuple((1,) + values.shape))
 
     if fill_value is None:
@@ -483,7 +498,9 @@ def interpolate_2d(
 
     method = clean_fill_method(method)
     if method == "pad":
-        values = transf(pad_2d(transf(values), limit=limit, mask=mask, dtype=dtype))
+        values = transf(
+            pad_2d(transf(values), limit=limit, mask=mask, dtype=dtype)
+        )
     else:
         values = transf(
             backfill_2d(transf(values), limit=limit, mask=mask, dtype=dtype)
@@ -702,7 +719,11 @@ def dispatch_missing(op, left, right, result):
     result : ndarray
     """
     opstr = "__{opname}__".format(opname=op.__name__).replace("____", "__")
-    if op in [operator.truediv, operator.floordiv, getattr(operator, "div", None)]:
+    if op in [
+        operator.truediv,
+        operator.floordiv,
+        getattr(operator, "div", None),
+    ]:
         result = mask_zero_div_zero(left, right, result)
     elif op is operator.mod:
         result = fill_zeros(result, left, right, opstr, np.nan)

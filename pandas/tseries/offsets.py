@@ -248,7 +248,9 @@ class DateOffset(BaseOffset):
     _params = cache_readonly(BaseOffset._params.fget)
     _use_relativedelta = False
     _adjust_dst = False
-    _attributes = frozenset(["n", "normalize"] + list(liboffsets.relativedelta_kwds))
+    _attributes = frozenset(
+        ["n", "normalize"] + list(liboffsets.relativedelta_kwds)
+    )
 
     # default for prior pickles
     normalize = False
@@ -325,7 +327,9 @@ class DateOffset(BaseOffset):
         # relativedelta/_offset path only valid for base DateOffset
         if self._use_relativedelta and set(kwds).issubset(relativedelta_fast):
 
-            months = (kwds.get("years", 0) * 12 + kwds.get("months", 0)) * self.n
+            months = (
+                kwds.get("years", 0) * 12 + kwds.get("months", 0)
+            ) * self.n
             if months:
                 shifted = liboffsets.shift_months(i.asi8, months)
                 i = type(i)(shifted, dtype=i.dtype)
@@ -599,10 +603,13 @@ class BusinessDay(BusinessMixin, SingleConstructorOffset):
             return result
 
         elif isinstance(other, (timedelta, Tick)):
-            return BDay(self.n, offset=self.offset + other, normalize=self.normalize)
+            return BDay(
+                self.n, offset=self.offset + other, normalize=self.normalize
+            )
         else:
             raise ApplyTypeError(
-                "Only know how to combine business day with " "datetime or timedelta."
+                "Only know how to combine business day with "
+                "datetime or timedelta."
             )
 
     @apply_index_wraps
@@ -690,7 +697,11 @@ class BusinessHourMixin(BusinessMixin):
             elif self.n < 0 and other.time() < self.start:
                 other = other + self.next_bday
         return datetime(
-            other.year, other.month, other.day, self.start.hour, self.start.minute
+            other.year,
+            other.month,
+            other.day,
+            self.start.hour,
+            self.start.minute,
         )
 
     def _prev_opening_time(self, other):
@@ -706,7 +717,11 @@ class BusinessHourMixin(BusinessMixin):
             elif self.n < 0 and other.time() > self.start:
                 other = other - self.next_bday
         return datetime(
-            other.year, other.month, other.day, self.start.hour, self.start.minute
+            other.year,
+            other.month,
+            other.day,
+            self.start.hour,
+            self.start.minute,
         )
 
     @cache_readonly
@@ -732,9 +747,13 @@ class BusinessHourMixin(BusinessMixin):
         if not self.onOffset(dt):
             businesshours = self._get_business_hours_by_sec
             if self.n >= 0:
-                dt = self._prev_opening_time(dt) + timedelta(seconds=businesshours)
+                dt = self._prev_opening_time(dt) + timedelta(
+                    seconds=businesshours
+                )
             else:
-                dt = self._next_opening_time(dt) + timedelta(seconds=businesshours)
+                dt = self._next_opening_time(dt) + timedelta(
+                    seconds=businesshours
+                )
         return dt
 
     @apply_wraps
@@ -770,7 +789,9 @@ class BusinessHourMixin(BusinessMixin):
             )
             n = self.n
             if n >= 0:
-                if other.time() == self.end or not self._onOffset(other, businesshours):
+                if other.time() == self.end or not self._onOffset(
+                    other, businesshours
+                ):
                     other = self._next_opening_time(other)
             else:
                 if other.time() == self.start:
@@ -818,13 +839,16 @@ class BusinessHourMixin(BusinessMixin):
                 if result.time() == self.start and nanosecond == 0:
                     # adjustment to move to previous business day
                     result = (
-                        self._next_opening_time(result - timedelta(seconds=1)) + bhdelta
+                        self._next_opening_time(result - timedelta(seconds=1))
+                        + bhdelta
                     )
 
             return result
         else:
             # TODO: Figure out the end of this sente
-            raise ApplyTypeError("Only know how to combine business hour with ")
+            raise ApplyTypeError(
+                "Only know how to combine business hour with "
+            )
 
     def onOffset(self, dt):
         if self.normalize and not _is_normalized(dt):
@@ -832,7 +856,13 @@ class BusinessHourMixin(BusinessMixin):
 
         if dt.tzinfo is not None:
             dt = datetime(
-                dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.microsecond
+                dt.year,
+                dt.month,
+                dt.day,
+                dt.hour,
+                dt.minute,
+                dt.second,
+                dt.microsecond,
             )
         # Valid BH can be on the different BusinessDay during midnight
         # Distinguish by the time spent from previous opening time
@@ -862,7 +892,9 @@ class BusinessHourMixin(BusinessMixin):
         start = self.start.strftime("%H:%M")
         end = self.end.strftime("%H:%M")
         attrs = [
-            "{prefix}={start}-{end}".format(prefix=self._prefix, start=start, end=end)
+            "{prefix}={start}-{end}".format(
+                prefix=self._prefix, start=start, end=end
+            )
         ]
         out += ": " + ", ".join(attrs)
         return out
@@ -880,7 +912,12 @@ class BusinessHour(BusinessHourMixin, SingleConstructorOffset):
     _attributes = frozenset(["n", "normalize", "start", "end", "offset"])
 
     def __init__(
-        self, n=1, normalize=False, start="09:00", end="17:00", offset=timedelta(0)
+        self,
+        n=1,
+        normalize=False,
+        start="09:00",
+        end="17:00",
+        offset=timedelta(0),
     ):
         BaseOffset.__init__(self, n, normalize)
         super().__init__(start=start, end=end, offset=offset)
@@ -947,7 +984,9 @@ class CustomBusinessDay(_CustomMixin, BusinessDay):
             return result
 
         elif isinstance(other, (timedelta, Tick)):
-            return BDay(self.n, offset=self.offset + other, normalize=self.normalize)
+            return BDay(
+                self.n, offset=self.offset + other, normalize=self.normalize
+            )
         else:
             raise ApplyTypeError(
                 "Only know how to combine trading day with "
@@ -964,7 +1003,9 @@ class CustomBusinessDay(_CustomMixin, BusinessDay):
         return np.is_busday(day64, busdaycal=self.calendar)
 
 
-class CustomBusinessHour(_CustomMixin, BusinessHourMixin, SingleConstructorOffset):
+class CustomBusinessHour(
+    _CustomMixin, BusinessHourMixin, SingleConstructorOffset
+):
     """
     DateOffset subclass representing possibly n custom business days.
 
@@ -974,7 +1015,16 @@ class CustomBusinessHour(_CustomMixin, BusinessHourMixin, SingleConstructorOffse
     _prefix = "CBH"
     _anchor = 0
     _attributes = frozenset(
-        ["n", "normalize", "weekmask", "holidays", "calendar", "start", "end", "offset"]
+        [
+            "n",
+            "normalize",
+            "weekmask",
+            "holidays",
+            "calendar",
+            "start",
+            "end",
+            "offset",
+        ]
     )
 
     def __init__(
@@ -1190,7 +1240,9 @@ class SemiMonthOffset(DateOffset):
         BaseOffset.__init__(self, n, normalize)
 
         if day_of_month is None:
-            object.__setattr__(self, "day_of_month", self._default_day_of_month)
+            object.__setattr__(
+                self, "day_of_month", self._default_day_of_month
+            )
         else:
             object.__setattr__(self, "day_of_month", int(day_of_month))
         if not self._min_day_of_month <= self.day_of_month <= 27:
@@ -1222,7 +1274,9 @@ class SemiMonthOffset(DateOffset):
         # initially positive.
         if type(self) is SemiMonthBegin and (self.n <= 0 and other.day == 1):
             n -= 1
-        elif type(self) is SemiMonthEnd and (self.n > 0 and other.day == days_in_month):
+        elif type(self) is SemiMonthEnd and (
+            self.n > 0 and other.day == days_in_month
+        ):
             n += 1
 
         return self._apply(n, other)
@@ -1490,7 +1544,9 @@ class Week(DateOffset):
             # when adding, dates on end roll to next
             normed = dtindex - off + Timedelta(1, "D") - Timedelta(1, "ns")
             roll = np.where(
-                base_period.to_timestamp(how="end") == normed, self.n, self.n - 1
+                base_period.to_timestamp(how="end") == normed,
+                self.n,
+                self.n - 1,
             )
             # integer-array addition on PeriodIndex is deprecated,
             #  so we use _addsub_int_array directly
@@ -1619,7 +1675,9 @@ class WeekOfMonth(_WeekOfMonthMixin, DateOffset):
     def _from_name(cls, suffix=None):
         if not suffix:
             raise ValueError(
-                "Prefix {prefix!r} requires a suffix.".format(prefix=cls._prefix)
+                "Prefix {prefix!r} requires a suffix.".format(
+                    prefix=cls._prefix
+                )
             )
         # TODO: handle n here...
         # only one digit weeks (1 --> week 0, 2 --> week 1, etc.)
@@ -1684,13 +1742,17 @@ class LastWeekOfMonth(_WeekOfMonthMixin, DateOffset):
     @property
     def rule_code(self):
         weekday = ccalendar.int_to_weekday.get(self.weekday, "")
-        return "{prefix}-{weekday}".format(prefix=self._prefix, weekday=weekday)
+        return "{prefix}-{weekday}".format(
+            prefix=self._prefix, weekday=weekday
+        )
 
     @classmethod
     def _from_name(cls, suffix=None):
         if not suffix:
             raise ValueError(
-                "Prefix {prefix!r} requires a suffix.".format(prefix=cls._prefix)
+                "Prefix {prefix!r} requires a suffix.".format(
+                    prefix=cls._prefix
+                )
             )
         # TODO: handle n here...
         weekday = ccalendar.weekday_to_int[suffix]
@@ -1971,7 +2033,12 @@ class FY5253(DateOffset):
     _attributes = frozenset(["weekday", "startingMonth", "variation"])
 
     def __init__(
-        self, n=1, normalize=False, weekday=0, startingMonth=1, variation="nearest"
+        self,
+        n=1,
+        normalize=False,
+        weekday=0,
+        startingMonth=1,
+        variation="nearest",
     ):
         BaseOffset.__init__(self, n, normalize)
         object.__setattr__(self, "startingMonth", startingMonth)
@@ -1984,12 +2051,16 @@ class FY5253(DateOffset):
 
         if self.variation not in ["nearest", "last"]:
             raise ValueError(
-                "{variation} is not a valid variation".format(variation=self.variation)
+                "{variation} is not a valid variation".format(
+                    variation=self.variation
+                )
             )
 
     def isAnchored(self):
         return (
-            self.n == 1 and self.startingMonth is not None and self.weekday is not None
+            self.n == 1
+            and self.startingMonth is not None
+            and self.weekday is not None
         )
 
     def onOffset(self, dt):
@@ -2000,7 +2071,10 @@ class FY5253(DateOffset):
 
         if self.variation == "nearest":
             # We have to check the year end of "this" cal year AND the previous
-            return year_end == dt or self.get_year_end(shift_month(dt, -1, None)) == dt
+            return (
+                year_end == dt
+                or self.get_year_end(shift_month(dt, -1, None)) == dt
+            )
         else:
             return year_end == dt
 
@@ -2009,9 +2083,15 @@ class FY5253(DateOffset):
         norm = Timestamp(other).normalize()
 
         n = self.n
-        prev_year = self.get_year_end(datetime(other.year - 1, self.startingMonth, 1))
-        cur_year = self.get_year_end(datetime(other.year, self.startingMonth, 1))
-        next_year = self.get_year_end(datetime(other.year + 1, self.startingMonth, 1))
+        prev_year = self.get_year_end(
+            datetime(other.year - 1, self.startingMonth, 1)
+        )
+        cur_year = self.get_year_end(
+            datetime(other.year, self.startingMonth, 1)
+        )
+        next_year = self.get_year_end(
+            datetime(other.year + 1, self.startingMonth, 1)
+        )
 
         prev_year = conversion.localize_pydatetime(prev_year, other.tzinfo)
         cur_year = conversion.localize_pydatetime(cur_year, other.tzinfo)
@@ -2114,7 +2194,8 @@ class FY5253(DateOffset):
             variation = "last"
         else:
             raise ValueError(
-                "Unable to parse varion_code: " "{code}".format(code=varion_code)
+                "Unable to parse varion_code: "
+                "{code}".format(code=varion_code)
             )
 
         startingMonth = ccalendar.MONTH_TO_CAL_NUM[startingMonth_code]
@@ -2335,7 +2416,10 @@ class FY5253Quarter(DateOffset):
     @classmethod
     def _from_name(cls, *args):
         return cls(
-            **dict(FY5253._parse_suffix(*args[:-1]), qtr_with_extra_week=int(args[-1]))
+            **dict(
+                FY5253._parse_suffix(*args[:-1]),
+                qtr_with_extra_week=int(args[-1]),
+            )
         )
 
 
@@ -2357,7 +2441,9 @@ class Easter(DateOffset):
         current_easter = datetime(
             current_easter.year, current_easter.month, current_easter.day
         )
-        current_easter = conversion.localize_pydatetime(current_easter, other.tzinfo)
+        current_easter = conversion.localize_pydatetime(
+            current_easter, other.tzinfo
+        )
 
         n = self.n
         if n >= 0 and other < current_easter:
@@ -2649,7 +2735,9 @@ def generate_range(start=None, end=None, periods=None, offset=BDay()):
             next_date = offset.apply(cur)
             if next_date <= cur:
                 raise ValueError(
-                    "Offset {offset} did not increment date".format(offset=offset)
+                    "Offset {offset} did not increment date".format(
+                        offset=offset
+                    )
                 )
             cur = next_date
     else:
@@ -2665,7 +2753,9 @@ def generate_range(start=None, end=None, periods=None, offset=BDay()):
             next_date = offset.apply(cur)
             if next_date >= cur:
                 raise ValueError(
-                    "Offset {offset} did not decrement date".format(offset=offset)
+                    "Offset {offset} did not decrement date".format(
+                        offset=offset
+                    )
                 )
             cur = next_date
 

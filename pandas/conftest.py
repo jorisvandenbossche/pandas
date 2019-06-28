@@ -30,13 +30,19 @@ hypothesis.settings.load_profile("ci")
 
 
 def pytest_addoption(parser):
-    parser.addoption("--skip-slow", action="store_true", help="skip slow tests")
-    parser.addoption("--skip-network", action="store_true", help="skip network tests")
+    parser.addoption(
+        "--skip-slow", action="store_true", help="skip slow tests"
+    )
+    parser.addoption(
+        "--skip-network", action="store_true", help="skip network tests"
+    )
     parser.addoption("--skip-db", action="store_true", help="skip db tests")
     parser.addoption(
         "--run-high-memory", action="store_true", help="run high memory tests"
     )
-    parser.addoption("--only-slow", action="store_true", help="run only slow tests")
+    parser.addoption(
+        "--only-slow", action="store_true", help="run only slow tests"
+    )
     parser.addoption(
         "--strict-data-files",
         action="store_true",
@@ -60,7 +66,9 @@ def pytest_runtest_setup(item):
     if "high_memory" in item.keywords and not item.config.getoption(
         "--run-high-memory"
     ):
-        pytest.skip("skipping high memory test since --run-high-memory was not set")
+        pytest.skip(
+            "skipping high memory test since --run-high-memory was not set"
+        )
 
 
 # Configurations for all tests and all test modules
@@ -87,7 +95,9 @@ def spmatrix(request):
     return getattr(sparse, request.param + "_matrix")
 
 
-@pytest.fixture(params=[0, 1, "index", "columns"], ids=lambda x: "axis {!r}".format(x))
+@pytest.fixture(
+    params=[0, 1, "index", "columns"], ids=lambda x: "axis {!r}".format(x)
+)
 def axis(request):
     """
      Fixture for returning the axis numbers of a DataFrame.
@@ -231,7 +241,9 @@ def _get_cython_table_params(ndframe, func_names_and_expected):
     return results
 
 
-@pytest.fixture(params=["__eq__", "__ne__", "__le__", "__lt__", "__ge__", "__gt__"])
+@pytest.fixture(
+    params=["__eq__", "__ne__", "__le__", "__lt__", "__ge__", "__gt__"]
+)
 def all_compare_operators(request):
     """
     Fixture for dunder names for common compare operations
@@ -671,7 +683,10 @@ _any_skipna_inferred_dtype = [
     ("mixed-integer-float", [1, np.nan, 2.0]),
     ("decimal", [Decimal(1), np.nan, Decimal(2)]),
     ("boolean", [True, np.nan, False]),
-    ("datetime64", [np.datetime64("2013-01-01"), np.nan, np.datetime64("2018-01-01")]),
+    (
+        "datetime64",
+        [np.datetime64("2013-01-01"), np.nan, np.datetime64("2018-01-01")],
+    ),
     ("datetime", [pd.Timestamp("20130101"), np.nan, pd.Timestamp("20180101")]),
     ("date", [date(2013, 1, 1), np.nan, date(2018, 1, 1)]),
     # The following two dtypes are commented out due to GH 23554

@@ -38,8 +38,9 @@ def test_parse_time_quarter_with_dash(dashed, normal):
 
 @pytest.mark.parametrize("dashed", ["-2Q1992", "2-Q1992", "4-4Q1992"])
 def test_parse_time_quarter_with_dash_error(dashed):
-    msg = "Unknown datetime string format, " "unable to parse: {dashed}".format(
-        dashed=dashed
+    msg = (
+        "Unknown datetime string format, "
+        "unable to parse: {dashed}".format(dashed=dashed)
     )
 
     with pytest.raises(parsing.DateParseError, match=msg):
@@ -116,8 +117,9 @@ def test_parsers_quarter_invalid(date_str):
             "must be between 1 and 4: {date_str}".format(date_str=date_str)
         )
     else:
-        msg = "Unknown datetime string format, unable " "to parse: {date_str}".format(
-            date_str=date_str
+        msg = (
+            "Unknown datetime string format, unable "
+            "to parse: {date_str}".format(date_str=date_str)
         )
 
     with pytest.raises(ValueError, match=msg):
@@ -126,7 +128,10 @@ def test_parsers_quarter_invalid(date_str):
 
 @pytest.mark.parametrize(
     "date_str,expected",
-    [("201101", datetime(2011, 1, 1, 0, 0)), ("200005", datetime(2000, 5, 1, 0, 0))],
+    [
+        ("201101", datetime(2011, 1, 1, 0, 0)),
+        ("200005", datetime(2000, 5, 1, 0, 0)),
+    ],
 )
 def test_parsers_month_freq(date_str, expected):
     result, _, _ = parsing.parse_time_string(date_str, freq="M")
@@ -150,10 +155,14 @@ def test_guess_datetime_format_with_parseable_formats(string, fmt):
     assert result == fmt
 
 
-@pytest.mark.parametrize("dayfirst,expected", [(True, "%d/%m/%Y"), (False, "%m/%d/%Y")])
+@pytest.mark.parametrize(
+    "dayfirst,expected", [(True, "%d/%m/%Y"), (False, "%m/%d/%Y")]
+)
 def test_guess_datetime_format_with_dayfirst(dayfirst, expected):
     ambiguous_string = "01/01/2011"
-    result = parsing._guess_datetime_format(ambiguous_string, dayfirst=dayfirst)
+    result = parsing._guess_datetime_format(
+        ambiguous_string, dayfirst=dayfirst
+    )
     assert result == expected
 
 

@@ -7,7 +7,8 @@ import pandas.util.testing as tm
 
 
 @pytest.mark.parametrize(
-    "other", [Index(["three", "one", "two"]), Index(["one"]), Index(["one", "three"])]
+    "other",
+    [Index(["three", "one", "two"]), Index(["one"]), Index(["one", "three"])],
 )
 def test_join_level(idx, other, join_type):
     join_index, lidx, ridx = other.join(
@@ -51,12 +52,16 @@ def test_join_self(idx, join_type):
 
 def test_join_multi():
     # GH 10665
-    midx = pd.MultiIndex.from_product([np.arange(4), np.arange(4)], names=["a", "b"])
+    midx = pd.MultiIndex.from_product(
+        [np.arange(4), np.arange(4)], names=["a", "b"]
+    )
     idx = pd.Index([1, 2, 5], name="b")
 
     # inner
     jidx, lidx, ridx = midx.join(idx, how="inner", return_indexers=True)
-    exp_idx = pd.MultiIndex.from_product([np.arange(4), [1, 2]], names=["a", "b"])
+    exp_idx = pd.MultiIndex.from_product(
+        [np.arange(4), [1, 2]], names=["a", "b"]
+    )
     exp_lidx = np.array([1, 2, 5, 6, 9, 10, 13, 14], dtype=np.intp)
     exp_ridx = np.array([0, 1, 0, 1, 0, 1, 0, 1], dtype=np.intp)
     tm.assert_index_equal(jidx, exp_idx)

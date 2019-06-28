@@ -107,7 +107,9 @@ R_l0_g2,R_l1_g2,R2C0,R2C1,R2C2
 R_l0_g3,R_l1_g3,R3C0,R3C1,R3C2
 R_l0_g4,R_l1_g4,R4C0,R4C1,R4C2
 """
-    result = parser.read_csv(StringIO(data), header=[0, 1, 2, 3], index_col=[0, 1])
+    result = parser.read_csv(
+        StringIO(data), header=[0, 1, 2, 3], index_col=[0, 1]
+    )
     tm.assert_frame_equal(result, expected)
 
 
@@ -124,11 +126,20 @@ R_l0_g4,R_l1_g4,R4C0,R4C1,R4C2
         ),
         (
             dict(index_col=[0, 1], names=["foo", "bar"]),
-            ("cannot specify names " "when specifying a " "multi-index header"),
+            (
+                "cannot specify names "
+                "when specifying a "
+                "multi-index header"
+            ),
         ),
         (
             dict(index_col=[0, 1], usecols=["foo", "bar"]),
-            ("cannot specify " "usecols when " "specifying a " "multi-index header"),
+            (
+                "cannot specify "
+                "usecols when "
+                "specifying a "
+                "multi-index header"
+            ),
         ),
     ],
 )
@@ -189,7 +200,14 @@ def test_header_multi_index_common_format1(all_parsers, kwargs):
         [[1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12]],
         index=["one", "two"],
         columns=MultiIndex.from_tuples(
-            [("a", "q"), ("a", "r"), ("a", "s"), ("b", "t"), ("c", "u"), ("c", "v")]
+            [
+                ("a", "q"),
+                ("a", "r"),
+                ("a", "s"),
+                ("b", "t"),
+                ("c", "u"),
+                ("c", "v"),
+            ]
         ),
     )
     data = """,a,a,a,b,c,c
@@ -236,7 +254,14 @@ def test_header_multi_index_common_format2(all_parsers, kwargs):
         [[1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12]],
         index=["one", "two"],
         columns=MultiIndex.from_tuples(
-            [("a", "q"), ("a", "r"), ("a", "s"), ("b", "t"), ("c", "u"), ("c", "v")]
+            [
+                ("a", "q"),
+                ("a", "r"),
+                ("a", "s"),
+                ("b", "t"),
+                ("c", "u"),
+                ("c", "v"),
+            ]
         ),
     )
     data = """,a,a,a,b,c,c
@@ -282,7 +307,14 @@ def test_header_multi_index_common_format3(all_parsers, kwargs):
         [[1, 2, 3, 4, 5, 6], [7, 8, 9, 10, 11, 12]],
         index=["one", "two"],
         columns=MultiIndex.from_tuples(
-            [("a", "q"), ("a", "r"), ("a", "s"), ("b", "t"), ("c", "u"), ("c", "v")]
+            [
+                ("a", "q"),
+                ("a", "r"),
+                ("a", "s"),
+                ("b", "t"),
+                ("c", "u"),
+                ("c", "v"),
+            ]
         ),
     )
     expected = expected.reset_index(drop=True)
@@ -364,7 +396,9 @@ def test_header_names_backward_compat(all_parsers, data, header):
     parser = all_parsers
     expected = parser.read_csv(StringIO("1,2,3\n4,5,6"), names=["a", "b", "c"])
 
-    result = parser.read_csv(StringIO(data), names=["a", "b", "c"], header=header)
+    result = parser.read_csv(
+        StringIO(data), names=["a", "b", "c"], header=header
+    )
     tm.assert_frame_equal(result, expected)
 
 
@@ -396,7 +430,8 @@ def test_no_header(all_parsers, kwargs, names):
 11,12,13,14,15
 """
     expected = DataFrame(
-        [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15]], columns=names
+        [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15]],
+        columns=names,
     )
     result = parser.read_csv(StringIO(data), header=None, **kwargs)
     tm.assert_frame_equal(result, expected)
@@ -431,7 +466,12 @@ def test_singleton_header(all_parsers):
             DataFrame(
                 [[0, 40, 34, 0.1]],
                 columns=MultiIndex.from_tuples(
-                    [("A", "one"), ("A", "one.1"), ("A", "one.2"), ("B", "two")]
+                    [
+                        ("A", "one"),
+                        ("A", "one.1"),
+                        ("A", "one.2"),
+                        ("B", "two"),
+                    ]
                 ),
             ),
         ),
@@ -440,7 +480,12 @@ def test_singleton_header(all_parsers):
             DataFrame(
                 [[0, 40, 34, 0.1]],
                 columns=MultiIndex.from_tuples(
-                    [("A", "one"), ("A", "one.1"), ("A", "one.1.1"), ("B", "two")]
+                    [
+                        ("A", "one"),
+                        ("A", "one.1"),
+                        ("A", "one.1.1"),
+                        ("B", "two"),
+                    ]
                 ),
             ),
         ),
@@ -471,7 +516,8 @@ def test_mangles_multi_index(all_parsers, data, expected):
 
 @pytest.mark.parametrize("index_col", [None, [0]])
 @pytest.mark.parametrize(
-    "columns", [None, (["", "Unnamed"]), (["Unnamed", ""]), (["Unnamed", "NotUnnamed"])]
+    "columns",
+    [None, (["", "Unnamed"]), (["Unnamed", ""]), (["Unnamed", "NotUnnamed"])],
 )
 def test_multi_index_unnamed(all_parsers, index_col, columns):
     # see gh-23687
@@ -488,7 +534,9 @@ def test_multi_index_unnamed(all_parsers, index_col, columns):
     if index_col is None:
         data = ",".join(columns or ["", ""]) + "\n0,1\n2,3\n4,5\n"
     else:
-        data = ",".join([""] + (columns or ["", ""])) + "\n,0,1\n0,2,3\n1,4,5\n"
+        data = (
+            ",".join([""] + (columns or ["", ""])) + "\n,0,1\n0,2,3\n1,4,5\n"
+        )
 
     if columns is None:
         msg = (
@@ -498,7 +546,9 @@ def test_multi_index_unnamed(all_parsers, index_col, columns):
         with pytest.raises(ParserError, match=msg):
             parser.read_csv(StringIO(data), header=header, index_col=index_col)
     else:
-        result = parser.read_csv(StringIO(data), header=header, index_col=index_col)
+        result = parser.read_csv(
+            StringIO(data), header=header, index_col=index_col
+        )
         template = "Unnamed: {i}_level_0"
         exp_columns = []
 

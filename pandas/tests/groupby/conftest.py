@@ -12,7 +12,9 @@ def mframe():
         codes=[[0, 0, 0, 1, 1, 2, 2, 3, 3, 3], [0, 1, 2, 0, 1, 1, 2, 0, 1, 2]],
         names=["first", "second"],
     )
-    return DataFrame(np.random.randn(10, 3), index=index, columns=["A", "B", "C"])
+    return DataFrame(
+        np.random.randn(10, 3), index=index, columns=["A", "B", "C"]
+    )
 
 
 @pytest.fixture

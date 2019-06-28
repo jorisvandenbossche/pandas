@@ -27,21 +27,29 @@ class TestCategoricalMissing:
         # Nans are represented as -1 in codes
         c = Categorical(["a", "b", np.nan, "a"])
         tm.assert_index_equal(c.categories, Index(["a", "b"]))
-        tm.assert_numpy_array_equal(c._codes, np.array([0, 1, -1, 0], dtype=np.int8))
+        tm.assert_numpy_array_equal(
+            c._codes, np.array([0, 1, -1, 0], dtype=np.int8)
+        )
         c[1] = np.nan
         tm.assert_index_equal(c.categories, Index(["a", "b"]))
-        tm.assert_numpy_array_equal(c._codes, np.array([0, -1, -1, 0], dtype=np.int8))
+        tm.assert_numpy_array_equal(
+            c._codes, np.array([0, -1, -1, 0], dtype=np.int8)
+        )
 
         # Adding nan to categories should make assigned nan point to the
         # category!
         c = Categorical(["a", "b", np.nan, "a"])
         tm.assert_index_equal(c.categories, Index(["a", "b"]))
-        tm.assert_numpy_array_equal(c._codes, np.array([0, 1, -1, 0], dtype=np.int8))
+        tm.assert_numpy_array_equal(
+            c._codes, np.array([0, 1, -1, 0], dtype=np.int8)
+        )
 
     def test_set_dtype_nans(self):
         c = Categorical(["a", "b", np.nan])
         result = c._set_dtype(CategoricalDtype(["a", "c"]))
-        tm.assert_numpy_array_equal(result.codes, np.array([0, -1, -1], dtype="int8"))
+        tm.assert_numpy_array_equal(
+            result.codes, np.array([0, -1, -1], dtype="int8")
+        )
 
     def test_set_item_nan(self):
         cat = Categorical([1, 2, 3])

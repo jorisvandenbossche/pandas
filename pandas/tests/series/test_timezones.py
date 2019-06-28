@@ -130,7 +130,9 @@ class TestSeriesTimezones:
             ts.tz_convert("US/Eastern")
 
     def test_series_tz_convert_to_utc(self):
-        base = DatetimeIndex(["2011-01-01", "2011-01-02", "2011-01-03"], tz="UTC")
+        base = DatetimeIndex(
+            ["2011-01-01", "2011-01-02", "2011-01-03"], tz="UTC"
+        )
         idx1 = base.tz_convert("Asia/Tokyo")[:2]
         idx2 = base.tz_convert("US/Eastern")[1:]
 
@@ -141,8 +143,12 @@ class TestSeriesTimezones:
     # Series.append
 
     def test_series_append_aware(self):
-        rng1 = date_range("1/1/2011 01:00", periods=1, freq="H", tz="US/Eastern")
-        rng2 = date_range("1/1/2011 02:00", periods=1, freq="H", tz="US/Eastern")
+        rng1 = date_range(
+            "1/1/2011 01:00", periods=1, freq="H", tz="US/Eastern"
+        )
+        rng2 = date_range(
+            "1/1/2011 02:00", periods=1, freq="H", tz="US/Eastern"
+        )
         ser1 = Series([1], index=rng1)
         ser2 = Series([2], index=rng2)
         ts_result = ser1.append(ser2)
@@ -160,7 +166,9 @@ class TestSeriesTimezones:
         ser2 = Series([2], index=rng2)
         ts_result = ser1.append(ser2)
 
-        exp_index = DatetimeIndex(["2011-01-01 01:00", "2011-01-01 02:00"], tz="UTC")
+        exp_index = DatetimeIndex(
+            ["2011-01-01 01:00", "2011-01-01 02:00"], tz="UTC"
+        )
         exp = Series([1, 2], index=exp_index)
         tm.assert_series_equal(ts_result, exp)
         utc = rng1.tz
@@ -168,8 +176,12 @@ class TestSeriesTimezones:
 
         # GH#7795
         # different tz coerces to object dtype, not UTC
-        rng1 = date_range("1/1/2011 01:00", periods=1, freq="H", tz="US/Eastern")
-        rng2 = date_range("1/1/2011 02:00", periods=1, freq="H", tz="US/Central")
+        rng1 = date_range(
+            "1/1/2011 01:00", periods=1, freq="H", tz="US/Eastern"
+        )
+        rng2 = date_range(
+            "1/1/2011 02:00", periods=1, freq="H", tz="US/Central"
+        )
         ser1 = Series([1], index=rng1)
         ser2 = Series([2], index=rng2)
         ts_result = ser1.append(ser2)
@@ -184,7 +196,9 @@ class TestSeriesTimezones:
 
     def test_series_append_aware_naive(self):
         rng1 = date_range("1/1/2011 01:00", periods=1, freq="H")
-        rng2 = date_range("1/1/2011 02:00", periods=1, freq="H", tz="US/Eastern")
+        rng2 = date_range(
+            "1/1/2011 02:00", periods=1, freq="H", tz="US/Eastern"
+        )
         ser1 = Series(np.random.randn(len(rng1)), index=rng1)
         ser2 = Series(np.random.randn(len(rng2)), index=rng2)
         ts_result = ser1.append(ser2)
@@ -203,8 +217,12 @@ class TestSeriesTimezones:
         assert ts_result.index.equals(expected)
 
     def test_series_append_dst(self):
-        rng1 = date_range("1/1/2016 01:00", periods=3, freq="H", tz="US/Eastern")
-        rng2 = date_range("8/1/2016 01:00", periods=3, freq="H", tz="US/Eastern")
+        rng1 = date_range(
+            "1/1/2016 01:00", periods=3, freq="H", tz="US/Eastern"
+        )
+        rng2 = date_range(
+            "8/1/2016 01:00", periods=3, freq="H", tz="US/Eastern"
+        )
         ser1 = Series([1, 2, 3], index=rng1)
         ser2 = Series([10, 11, 12], index=rng2)
         ts_result = ser1.append(ser2)
@@ -280,7 +298,8 @@ class TestSeriesTimezones:
 
         perm = np.random.permutation(100)[:90]
         ser2 = Series(
-            np.random.randn(90), index=rng.take(perm).tz_convert("Europe/Berlin")
+            np.random.randn(90),
+            index=rng.take(perm).tz_convert("Europe/Berlin"),
         )
 
         result = ser1 + ser2
@@ -336,12 +355,17 @@ class TestSeriesTimezones:
         tm.assert_series_equal(result, expected)
         assert timezones.tz_compare(result.index.tz, tz)
 
-    @pytest.mark.parametrize("tzstr", ["Europe/Berlin", "dateutil/Europe/Berlin"])
+    @pytest.mark.parametrize(
+        "tzstr", ["Europe/Berlin", "dateutil/Europe/Berlin"]
+    )
     def test_getitem_pydatetime_tz(self, tzstr):
         tz = timezones.maybe_get_tz(tzstr)
 
         index = date_range(
-            start="2012-12-24 16:00", end="2012-12-24 18:00", freq="H", tz=tzstr
+            start="2012-12-24 16:00",
+            end="2012-12-24 18:00",
+            freq="H",
+            tz=tzstr,
         )
         ts = Series(index=index, data=index.hour)
         time_pandas = Timestamp("2012-12-24 17:00", tz=tzstr)
@@ -365,11 +389,13 @@ class TestSeriesTimezones:
     def test_tz_localize_convert_copy_inplace_mutate(self, copy, method, tz):
         # GH 6326
         result = Series(
-            np.arange(0, 5), index=date_range("20131027", periods=5, freq="1H", tz=tz)
+            np.arange(0, 5),
+            index=date_range("20131027", periods=5, freq="1H", tz=tz),
         )
         getattr(result, method)("UTC", copy=copy)
         expected = Series(
-            np.arange(0, 5), index=date_range("20131027", periods=5, freq="1H", tz=tz)
+            np.arange(0, 5),
+            index=date_range("20131027", periods=5, freq="1H", tz=tz),
         )
         tm.assert_series_equal(result, expected)
 

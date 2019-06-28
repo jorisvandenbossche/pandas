@@ -13,7 +13,9 @@ from pandas.util import testing as tm
 def single_level_multiindex():
     """single level MultiIndex"""
     return MultiIndex(
-        levels=[["foo", "bar", "baz", "qux"]], codes=[[0, 1, 2, 3]], names=["first"]
+        levels=[["foo", "bar", "baz", "qux"]],
+        codes=[[0, 1, 2, 3]],
+        names=["first"],
     )
 
 
@@ -50,7 +52,10 @@ class TestMultiIndexLoc:
 
         empty = Series(data=[], dtype=np.float64)
         expected = Series(
-            [], index=MultiIndex(levels=index.levels, codes=[[], []], dtype=np.float64)
+            [],
+            index=MultiIndex(
+                levels=index.levels, codes=[[], []], dtype=np.float64
+            ),
         )
         result = x.loc[empty]
         tm.assert_series_equal(result, expected)
@@ -72,14 +77,19 @@ class TestMultiIndexLoc:
         # empty array:
         empty = np.array([])
         expected = Series(
-            [], index=MultiIndex(levels=index.levels, codes=[[], []], dtype=np.float64)
+            [],
+            index=MultiIndex(
+                levels=index.levels, codes=[[], []], dtype=np.float64
+            ),
         )
         result = x.loc[empty]
         tm.assert_series_equal(result, expected)
 
         # 0-dim array (scalar):
         scalar = np.int64(1)
-        expected = Series(data=[0, 1, 2], index=["A", "B", "C"], dtype=np.float64)
+        expected = Series(
+            data=[0, 1, 2], index=["A", "B", "C"], dtype=np.float64
+        )
         result = x.loc[scalar]
         tm.assert_series_equal(result, expected)
 
@@ -134,7 +144,9 @@ class TestMultiIndexLoc:
         # GH 14885
         s = Series(
             range(8),
-            index=MultiIndex.from_product([["a", "b"], ["c", "d"], ["e", "f"]]),
+            index=MultiIndex.from_product(
+                [["a", "b"], ["c", "d"], ["e", "f"]]
+            ),
         )
 
         with pytest.raises(KeyError, match=r"^\('a', 'b'\)$"):
@@ -313,7 +325,9 @@ def test_loc_getitem_duplicates_multiindex_missing_indexers(
         exp_idx = MultiIndex.from_product(
             [["A"], ["foo", "bar", "baz"]], names=["one", "two"]
         )
-        expected = Series(np.arange(3, dtype="int64"), index=exp_idx).sort_index()
+        expected = Series(
+            np.arange(3, dtype="int64"), index=exp_idx
+        ).sort_index()
 
     if expected_error is not None:
         with pytest.raises(KeyError, match=expected_error):
@@ -323,7 +337,9 @@ def test_loc_getitem_duplicates_multiindex_missing_indexers(
         tm.assert_series_equal(result, expected)
 
 
-def test_series_loc_getitem_fancy(multiindex_year_month_day_dataframe_random_data):
+def test_series_loc_getitem_fancy(
+    multiindex_year_month_day_dataframe_random_data
+):
     s = multiindex_year_month_day_dataframe_random_data["A"]
     expected = s.reindex(s.index[49:51])
     result = s.loc[[(2000, 3, 10), (2000, 3, 13)]]
@@ -334,7 +350,9 @@ def test_series_loc_getitem_fancy(multiindex_year_month_day_dataframe_random_dat
 def test_loc_getitem_duplicates_multiindex_empty_indexer(columns_indexer):
     # GH 8737
     # empty indexer
-    multi_index = MultiIndex.from_product((["foo", "bar", "baz"], ["alpha", "beta"]))
+    multi_index = MultiIndex.from_product(
+        (["foo", "bar", "baz"], ["alpha", "beta"])
+    )
     df = DataFrame(np.random.randn(5, 6), index=range(5), columns=multi_index)
     df = df.sort_index(level=0, axis=1)
 
@@ -348,7 +366,9 @@ def test_loc_getitem_duplicates_multiindex_non_scalar_type_object():
     # GH 7914
     df = DataFrame(
         [[np.mean, np.median], ["mean", "median"]],
-        columns=MultiIndex.from_tuples([("functs", "mean"), ("functs", "median")]),
+        columns=MultiIndex.from_tuples(
+            [("functs", "mean"), ("functs", "median")]
+        ),
         index=["function", "name"],
     )
     result = df.loc["function", ("functs", "mean")]
@@ -379,7 +399,9 @@ def test_loc_getitem_int(frame_random_data_integer_multi_index):
     tm.assert_frame_equal(result, expected)
 
 
-def test_loc_getitem_int_raises_exception(frame_random_data_integer_multi_index):
+def test_loc_getitem_int_raises_exception(
+    frame_random_data_integer_multi_index
+):
     df = frame_random_data_integer_multi_index
     with pytest.raises(KeyError, match=r"^3$"):
         df.loc[3]

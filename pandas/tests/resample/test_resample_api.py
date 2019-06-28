@@ -10,10 +10,14 @@ from pandas.core.indexes.datetimes import date_range
 import pandas.util.testing as tm
 from pandas.util.testing import assert_frame_equal, assert_series_equal
 
-dti = date_range(start=datetime(2005, 1, 1), end=datetime(2005, 1, 10), freq="Min")
+dti = date_range(
+    start=datetime(2005, 1, 1), end=datetime(2005, 1, 10), freq="Min"
+)
 
 test_series = Series(np.random.rand(len(dti)), dti)
-_test_frame = DataFrame({"A": test_series, "B": test_series, "C": np.arange(len(dti))})
+_test_frame = DataFrame(
+    {"A": test_series, "B": test_series, "C": np.arange(len(dti))}
+)
 
 
 @pytest.fixture
@@ -61,9 +65,13 @@ def test_groupby_resample_api():
         pd.date_range("2016-01-03", periods=8).tolist()
         + pd.date_range("2016-01-17", periods=8).tolist()
     )
-    index = pd.MultiIndex.from_arrays([[1] * 8 + [2] * 8, i], names=["group", "date"])
+    index = pd.MultiIndex.from_arrays(
+        [[1] * 8 + [2] * 8, i], names=["group", "date"]
+    )
     expected = DataFrame({"val": [5] * 7 + [6] + [7] * 7 + [8]}, index=index)
-    result = df.groupby("group").apply(lambda x: x.resample("1D").ffill())[["val"]]
+    result = df.groupby("group").apply(lambda x: x.resample("1D").ffill())[
+        ["val"]
+    ]
     assert_frame_equal(result, expected)
 
 
@@ -286,7 +294,9 @@ def test_agg():
     b_sum = r["B"].sum()
 
     expected = pd.concat([a_mean, a_std, b_mean, b_std], axis=1)
-    expected.columns = pd.MultiIndex.from_product([["A", "B"], ["mean", "std"]])
+    expected.columns = pd.MultiIndex.from_product(
+        [["A", "B"], ["mean", "std"]]
+    )
     for t in cases:
         result = t.aggregate([np.mean, np.std])
         assert_frame_equal(result, expected)
@@ -381,7 +391,12 @@ def test_agg_misc():
         [t["A"].sum(), t["B"].sum(), t["A"].mean(), t["B"].mean()], axis=1
     )
     expected.columns = pd.MultiIndex.from_tuples(
-        [("result1", "A"), ("result1", "B"), ("result2", "A"), ("result2", "B")]
+        [
+            ("result1", "A"),
+            ("result1", "B"),
+            ("result2", "A"),
+            ("result2", "B"),
+        ]
     )
 
     for t in cases:
@@ -399,7 +414,9 @@ def test_agg_misc():
         [("A", "sum"), ("A", "std"), ("B", "mean"), ("B", "std")]
     )
     for t in cases:
-        result = t.agg(OrderedDict([("A", ["sum", "std"]), ("B", ["mean", "std"])]))
+        result = t.agg(
+            OrderedDict([("A", ["sum", "std"]), ("B", ["mean", "std"])])
+        )
         assert_frame_equal(result, expected, check_like=True)
 
     # equivalent of using a selection list / or not
@@ -412,7 +429,9 @@ def test_agg_misc():
         with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
             result = t["A"].agg({"A": ["sum", "std"]})
         expected = pd.concat([t["A"].sum(), t["A"].std()], axis=1)
-        expected.columns = pd.MultiIndex.from_tuples([("A", "sum"), ("A", "std")])
+        expected.columns = pd.MultiIndex.from_tuples(
+            [("A", "sum"), ("A", "std")]
+        )
         assert_frame_equal(result, expected, check_like=True)
 
         expected = pd.concat(
@@ -455,7 +474,9 @@ def test_agg_nested_dicts():
     msg = r"cannot perform renaming for r(1|2) with a nested dictionary"
     for t in cases:
         with pytest.raises(pd.core.base.SpecificationError, match=msg):
-            t.aggregate({"r1": {"A": ["mean", "sum"]}, "r2": {"B": ["mean", "sum"]}})
+            t.aggregate(
+                {"r1": {"A": ["mean", "sum"]}, "r2": {"B": ["mean", "sum"]}}
+            )
 
     for t in cases:
         expected = pd.concat(
@@ -472,7 +493,9 @@ def test_agg_nested_dicts():
         assert_frame_equal(result, expected, check_like=True)
 
         with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
-            result = t.agg({"A": {"ra": ["mean", "std"]}, "B": {"rb": ["mean", "std"]}})
+            result = t.agg(
+                {"A": {"ra": ["mean", "std"]}, "B": {"rb": ["mean", "std"]}}
+            )
         assert_frame_equal(result, expected, check_like=True)
 
 

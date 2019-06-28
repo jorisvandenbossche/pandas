@@ -76,14 +76,20 @@ class DatetimeIndexOpsMixin(ExtensionOpsMixin):
         DatetimeLikeArrayMixin.inferred_freq.fget
     )  # type: ignore
     _isnan = cache_readonly(DatetimeLikeArrayMixin._isnan.fget)  # type: ignore
-    hasnans = cache_readonly(DatetimeLikeArrayMixin._hasnans.fget)  # type: ignore
+    hasnans = cache_readonly(
+        DatetimeLikeArrayMixin._hasnans.fget
+    )  # type: ignore
     _hasnans = hasnans  # for index / array -agnostic code
     _resolution = cache_readonly(
         DatetimeLikeArrayMixin._resolution.fget
     )  # type: ignore
-    resolution = cache_readonly(DatetimeLikeArrayMixin.resolution.fget)  # type: ignore
+    resolution = cache_readonly(
+        DatetimeLikeArrayMixin.resolution.fget
+    )  # type: ignore
 
-    _maybe_mask_results = ea_passthrough(DatetimeLikeArrayMixin._maybe_mask_results)
+    _maybe_mask_results = ea_passthrough(
+        DatetimeLikeArrayMixin._maybe_mask_results
+    )
     __iter__ = ea_passthrough(DatetimeLikeArrayMixin.__iter__)
     mean = ea_passthrough(DatetimeLikeArrayMixin.mean)
 
@@ -196,7 +202,8 @@ class DatetimeIndexOpsMixin(ExtensionOpsMixin):
             ):
                 left = left.view("i8")
             if isinstance(
-                right, (np.ndarray, ABCIndex, ABCSeries, DatetimeLikeArrayMixin)
+                right,
+                (np.ndarray, ABCIndex, ABCSeries, DatetimeLikeArrayMixin),
             ):
                 right = right.view("i8")
             results = joinf(left, right)
@@ -215,7 +222,10 @@ class DatetimeIndexOpsMixin(ExtensionOpsMixin):
         if getattr(self, "tz", None):
             # ensure_localized is only relevant for tz-aware DTI
             result = self._data._ensure_localized(
-                arg, ambiguous=ambiguous, nonexistent=nonexistent, from_utc=from_utc
+                arg,
+                ambiguous=ambiguous,
+                nonexistent=nonexistent,
+                from_utc=from_utc,
             )
             return type(self)._simple_new(result, name=self.name)
         return arg
@@ -281,7 +291,9 @@ class DatetimeIndexOpsMixin(ExtensionOpsMixin):
             return self._simple_new(sorted_values, **attribs)
 
     @Appender(_index_shared_docs["take"] % _index_doc_kwargs)
-    def take(self, indices, axis=0, allow_fill=True, fill_value=None, **kwargs):
+    def take(
+        self, indices, axis=0, allow_fill=True, fill_value=None, **kwargs
+    ):
         nv.validate_take(tuple(), kwargs)
         indices = ensure_int64(indices)
 
@@ -327,7 +339,9 @@ class DatetimeIndexOpsMixin(ExtensionOpsMixin):
         tolerance = np.asarray(to_timedelta(tolerance).to_numpy())
 
         if target.size != tolerance.size and tolerance.size > 1:
-            raise ValueError("list-like tolerance size must match " "target index size")
+            raise ValueError(
+                "list-like tolerance size must match " "target index size"
+            )
         return tolerance
 
     def tolist(self):
@@ -593,7 +607,9 @@ class DatetimeIndexOpsMixin(ExtensionOpsMixin):
                     result._values, name=result.name, tz=result.tz, freq=None
                 )
             else:
-                result = self._shallow_copy(result._values, name=result.name, freq=None)
+                result = self._shallow_copy(
+                    result._values, name=result.name, freq=None
+                )
             if result.freq is None:
                 result.freq = to_offset(result.inferred_freq)
             return result
@@ -646,7 +662,10 @@ class DatetimeIndexOpsMixin(ExtensionOpsMixin):
         """
         formatter = self._formatter_func
         if len(self) > 0:
-            index_summary = ", %s to %s" % (formatter(self[0]), formatter(self[-1]))
+            index_summary = ", %s to %s" % (
+                formatter(self[0]),
+                formatter(self[-1]),
+            )
         else:
             index_summary = ""
 
@@ -695,7 +714,9 @@ class DatetimeIndexOpsMixin(ExtensionOpsMixin):
 
         # pass copy=False because any copying will be done in the
         #  _data.astype call above
-        return Index(new_values, dtype=new_values.dtype, name=self.name, copy=False)
+        return Index(
+            new_values, dtype=new_values.dtype, name=self.name, copy=False
+        )
 
     @deprecate_kwarg(old_arg_name="n", new_arg_name="periods")
     def shift(self, periods, freq=None):

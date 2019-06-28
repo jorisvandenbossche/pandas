@@ -14,7 +14,10 @@ from pandas.core.dtypes.api import is_list_like
 
 from pandas import DataFrame, Series
 import pandas.util.testing as tm
-from pandas.util.testing import assert_is_valid_plot_return_object, ensure_clean
+from pandas.util.testing import (
+    assert_is_valid_plot_return_object,
+    ensure_clean,
+)
 
 
 """
@@ -137,7 +140,9 @@ class TestPlotBase:
         """
         from matplotlib.collections import Collection
 
-        if not isinstance(collections, Collection) and not is_list_like(collections):
+        if not isinstance(collections, Collection) and not is_list_like(
+            collections
+        ):
             collections = [collections]
 
         for patch in collections:
@@ -170,7 +175,11 @@ class TestPlotBase:
         """
 
         from matplotlib.lines import Line2D
-        from matplotlib.collections import Collection, PolyCollection, LineCollection
+        from matplotlib.collections import (
+            Collection,
+            PolyCollection,
+            LineCollection,
+        )
 
         conv = self.colorconverter
         if linecolors is not None:
@@ -260,11 +269,15 @@ class TestPlotBase:
                     # retained
                     labels = ax.get_xticklabels()
                 else:
-                    labels = ax.get_xticklabels() + ax.get_xticklabels(minor=True)
+                    labels = ax.get_xticklabels() + ax.get_xticklabels(
+                        minor=True
+                    )
 
                 for label in labels:
                     if xlabelsize is not None:
-                        tm.assert_almost_equal(label.get_fontsize(), xlabelsize)
+                        tm.assert_almost_equal(
+                            label.get_fontsize(), xlabelsize
+                        )
                     if xrot is not None:
                         tm.assert_almost_equal(label.get_rotation(), xrot)
 
@@ -272,11 +285,15 @@ class TestPlotBase:
                 if isinstance(ax.yaxis.get_minor_formatter(), NullFormatter):
                     labels = ax.get_yticklabels()
                 else:
-                    labels = ax.get_yticklabels() + ax.get_yticklabels(minor=True)
+                    labels = ax.get_yticklabels() + ax.get_yticklabels(
+                        minor=True
+                    )
 
                 for label in labels:
                     if ylabelsize is not None:
-                        tm.assert_almost_equal(label.get_fontsize(), ylabelsize)
+                        tm.assert_almost_equal(
+                            label.get_fontsize(), ylabelsize
+                        )
                     if yrot is not None:
                         tm.assert_almost_equal(label.get_rotation(), yrot)
 
@@ -297,7 +314,9 @@ class TestPlotBase:
             assert ax.xaxis.get_scale() == xaxis
             assert ax.yaxis.get_scale() == yaxis
 
-    def _check_axes_shape(self, axes, axes_num=None, layout=None, figsize=None):
+    def _check_axes_shape(
+        self, axes, axes_num=None, layout=None, figsize=None
+    ):
         """
         Check expected number of axes is drawn in expected layout
 

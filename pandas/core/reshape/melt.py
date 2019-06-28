@@ -37,9 +37,12 @@ def melt(
     if id_vars is not None:
         if not is_list_like(id_vars):
             id_vars = [id_vars]
-        elif isinstance(frame.columns, ABCMultiIndex) and not isinstance(id_vars, list):
+        elif isinstance(frame.columns, ABCMultiIndex) and not isinstance(
+            id_vars, list
+        ):
             raise ValueError(
-                "id_vars must be a list of tuples when columns" " are a MultiIndex"
+                "id_vars must be a list of tuples when columns"
+                " are a MultiIndex"
             )
         else:
             # Check that `id_vars` are in frame
@@ -61,7 +64,8 @@ def melt(
             value_vars, list
         ):
             raise ValueError(
-                "value_vars must be a list of tuples when" " columns are a MultiIndex"
+                "value_vars must be a list of tuples when"
+                " columns are a MultiIndex"
             )
         else:
             value_vars = list(value_vars)
@@ -87,11 +91,14 @@ def melt(
                 var_name = frame.columns.names
             else:
                 var_name = [
-                    "variable_{i}".format(i=i) for i in range(len(frame.columns.names))
+                    "variable_{i}".format(i=i)
+                    for i in range(len(frame.columns.names))
                 ]
         else:
             var_name = [
-                frame.columns.name if frame.columns.name is not None else "variable"
+                frame.columns.name
+                if frame.columns.name is not None
+                else "variable"
             ]
     if isinstance(var_name, str):
         var_name = [var_name]
@@ -113,7 +120,9 @@ def melt(
     mdata[value_name] = frame.values.ravel("F")
     for i, col in enumerate(var_name):
         # asanyarray will keep the columns as an Index
-        mdata[col] = np.asanyarray(frame.columns._get_level_values(i)).repeat(N)
+        mdata[col] = np.asanyarray(frame.columns._get_level_values(i)).repeat(
+            N
+        )
 
     return frame._constructor(mdata, columns=mcolumns)
 
@@ -462,7 +471,9 @@ def wide_to_long(df, stubnames, i, j, sep="", suffix=r"\d+"):
     value_vars_flattened = [e for sublist in value_vars for e in sublist]
     id_vars = list(set(df.columns.tolist()).difference(value_vars_flattened))
 
-    melted = [melt_stub(df, s, i, j, v, sep) for s, v in zip(stubnames, value_vars)]
+    melted = [
+        melt_stub(df, s, i, j, v, sep) for s, v in zip(stubnames, value_vars)
+    ]
     melted = melted[0].join(melted[1:], how="outer")
 
     if len(i) == 1:

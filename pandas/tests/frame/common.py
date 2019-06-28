@@ -30,7 +30,9 @@ class TestData:
     @cache_readonly
     def intframe(self):
         # force these all to int64 to avoid platform testing issues
-        return pd.DataFrame({c: s for c, s in _intframe.items()}, dtype=np.int64)
+        return pd.DataFrame(
+            {c: s for c, s in _intframe.items()}, dtype=np.int64
+        )
 
     @cache_readonly
     def tsframe(self):
@@ -115,7 +117,9 @@ class TestData:
     def simple(self):
         arr = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]])
 
-        return pd.DataFrame(arr, columns=["one", "two", "three"], index=["a", "b", "c"])
+        return pd.DataFrame(
+            arr, columns=["one", "two", "three"], index=["a", "b", "c"]
+        )
 
 
 # self.ts3 = tm.makeTimeSeries()[-5:]

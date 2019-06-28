@@ -71,7 +71,9 @@ def test_numpy_ufuncs_basic(indices, func):
 
 
 @pytest.mark.parametrize(
-    "func", [np.isfinite, np.isinf, np.isnan, np.signbit], ids=lambda x: x.__name__
+    "func",
+    [np.isfinite, np.isinf, np.isnan, np.signbit],
+    ids=lambda x: x.__name__,
 )
 def test_numpy_ufuncs_other(indices, func):
     # test ufuncs of numpy, see:

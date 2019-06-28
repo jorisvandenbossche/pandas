@@ -12,7 +12,10 @@ from pandas import DataFrame
 import pandas.util.testing as tm
 
 jinja2 = pytest.importorskip("jinja2")
-from pandas.io.formats.style import Styler, _get_level_lengths  # noqa  # isort:skip
+from pandas.io.formats.style import (
+    Styler,
+    _get_level_lengths,
+)  # noqa  # isort:skip
 
 
 class TestStyler:
@@ -24,7 +27,9 @@ class TestStyler:
         self.g = lambda x: x
 
         def h(x, foo="bar"):
-            return pd.Series("color: {foo}".format(foo=foo), index=x.index, name=x.name)
+            return pd.Series(
+                "color: {foo}".format(foo=foo), index=x.index, name=x.name
+            )
 
         self.h = h
         self.styler = Styler(self.df)
@@ -32,7 +37,11 @@ class TestStyler:
         self.dataframes = [
             self.df,
             pd.DataFrame(
-                {"f": [1.0, 2.0], "o": ["a", "b"], "c": pd.Categorical(["a", "b"])}
+                {
+                    "f": [1.0, 2.0],
+                    "o": ["a", "b"],
+                    "c": pd.Categorical(["a", "b"]),
+                }
             ),
         ]
 
@@ -60,7 +69,9 @@ class TestStyler:
         assert self.styler.ctx == expected
 
     def test_update_ctx_flatten_multi(self):
-        attrs = DataFrame({"A": ["color: red; foo: bar", "color: blue; foo: baz"]})
+        attrs = DataFrame(
+            {"A": ["color: red; foo: bar", "color: blue; foo: baz"]}
+        )
         self.styler._update_ctx(attrs)
         expected = {
             (0, 0): ["color: red", " foo: bar"],
@@ -69,7 +80,9 @@ class TestStyler:
         assert self.styler.ctx == expected
 
     def test_update_ctx_flatten_multi_traliing_semi(self):
-        attrs = DataFrame({"A": ["color: red; foo: bar;", "color: blue; foo: baz;"]})
+        attrs = DataFrame(
+            {"A": ["color: red; foo: bar;", "color: blue; foo: baz;"]}
+        )
         self.styler._update_ctx(attrs)
         expected = {
             (0, 0): ["color: red", " foo: bar"],
@@ -128,7 +141,8 @@ class TestStyler:
     def test_render_double(self):
         df = pd.DataFrame({"A": [0, 1]})
         style = lambda x: pd.Series(
-            ["color: red; border: 1px", "color: blue; border: 2px"], name=x.name
+            ["color: red; border: 1px", "color: blue; border: 2px"],
+            name=x.name,
         )
         s = Styler(df, uuid="AB").apply(style)
         s.render()
@@ -136,7 +150,9 @@ class TestStyler:
 
     def test_set_properties(self):
         df = pd.DataFrame({"A": [0, 1]})
-        result = df.style.set_properties(color="white", size="10px")._compute().ctx
+        result = (
+            df.style.set_properties(color="white", size="10px")._compute().ctx
+        )
         # order is deterministic
         v = ["color: white", "size: 10px"]
         expected = {(0, 0): v, (1, 0): v}
@@ -147,7 +163,9 @@ class TestStyler:
     def test_set_properties_subset(self):
         df = pd.DataFrame({"A": [0, 1]})
         result = (
-            df.style.set_properties(subset=pd.IndexSlice[0, "A"], color="white")
+            df.style.set_properties(
+                subset=pd.IndexSlice[0, "A"], color="white"
+            )
             ._compute()
             .ctx
         )
@@ -316,7 +334,9 @@ class TestStyler:
         for ax in axes:
             for slice_ in slices:
                 result = (
-                    self.df.style.apply(self.h, axis=ax, subset=slice_, foo="baz")
+                    self.df.style.apply(
+                        self.h, axis=ax, subset=slice_, foo="baz"
+                    )
                     ._compute()
                     .ctx
                 )
@@ -374,7 +394,11 @@ class TestStyler:
         idx = pd.IndexSlice
         df = pd.DataFrame(dic, index=[0, 1])
 
-        (df.style.applymap(color_negative_red, subset=idx[:, idx["b", "d"]]).render())
+        (
+            df.style.applymap(
+                color_negative_red, subset=idx[:, idx["b", "d"]]
+            ).render()
+        )
 
     def test_where_with_one_style(self):
         # GH 17474
@@ -409,7 +433,9 @@ class TestStyler:
 
         for slice_ in slices:
             result = (
-                self.df.style.where(f, style1, style2, subset=slice_)._compute().ctx
+                self.df.style.where(f, style1, style2, subset=slice_)
+                ._compute()
+                .ctx
             )
             expected = {
                 (r, c): [style1 if f(self.df.loc[row, col]) else style2]
@@ -441,7 +467,9 @@ class TestStyler:
 
         for slice_ in slices:
             result = (
-                self.df.style.where(f, style1, style2, subset=slice_)._compute().ctx
+                self.df.style.where(f, style1, style2, subset=slice_)
+                ._compute()
+                .ctx
             )
             expected = self.df.style.applymap(g, subset=slice_)._compute().ctx
             assert result == expected
@@ -484,12 +512,14 @@ class TestStyler:
             (1, 0): [
                 "width: 10em",
                 " height: 80%",
-                "background: linear-gradient(" "90deg,red 25.0%, transparent 25.0%)",
+                "background: linear-gradient("
+                "90deg,red 25.0%, transparent 25.0%)",
             ],
             (2, 0): [
                 "width: 10em",
                 " height: 80%",
-                "background: linear-gradient(" "90deg,red 50.0%, transparent 50.0%)",
+                "background: linear-gradient("
+                "90deg,red 50.0%, transparent 50.0%)",
             ],
         }
         assert result == expected
@@ -594,7 +624,11 @@ class TestStyler:
     def test_bar_align_mid_pos_and_neg(self):
         df = pd.DataFrame({"A": [-10, 0, 20, 90]})
 
-        result = df.style.bar(align="mid", color=["#d65f5f", "#5fba7d"])._compute().ctx
+        result = (
+            df.style.bar(align="mid", color=["#d65f5f", "#5fba7d"])
+            ._compute()
+            .ctx
+        )
 
         expected = {
             (0, 0): [
@@ -626,7 +660,11 @@ class TestStyler:
     def test_bar_align_mid_all_pos(self):
         df = pd.DataFrame({"A": [10, 20, 50, 100]})
 
-        result = df.style.bar(align="mid", color=["#d65f5f", "#5fba7d"])._compute().ctx
+        result = (
+            df.style.bar(align="mid", color=["#d65f5f", "#5fba7d"])
+            ._compute()
+            .ctx
+        )
 
         expected = {
             (0, 0): [
@@ -660,7 +698,11 @@ class TestStyler:
     def test_bar_align_mid_all_neg(self):
         df = pd.DataFrame({"A": [-100, -60, -30, -20]})
 
-        result = df.style.bar(align="mid", color=["#d65f5f", "#5fba7d"])._compute().ctx
+        result = (
+            df.style.bar(align="mid", color=["#d65f5f", "#5fba7d"])
+            ._compute()
+            .ctx
+        )
 
         expected = {
             (0, 0): [
@@ -873,7 +915,11 @@ class TestStyler:
 
     def test_bar_align_mid_vmin_vmax_wide(self):
         df = pd.DataFrame({"A": [0, 1], "B": [-2, 4]})
-        result = df.style.bar(align="mid", axis=None, vmin=-3, vmax=7)._compute().ctx
+        result = (
+            df.style.bar(align="mid", axis=None, vmin=-3, vmax=7)
+            ._compute()
+            .ctx
+        )
         expected = {
             (0, 0): ["width: 10em", " height: 80%"],
             (1, 0): [
@@ -902,7 +948,11 @@ class TestStyler:
 
     def test_bar_align_mid_vmin_vmax_clipping(self):
         df = pd.DataFrame({"A": [0, 1], "B": [-2, 4]})
-        result = df.style.bar(align="mid", axis=None, vmin=-1, vmax=3)._compute().ctx
+        result = (
+            df.style.bar(align="mid", axis=None, vmin=-1, vmax=3)
+            ._compute()
+            .ctx
+        )
         expected = {
             (0, 0): ["width: 10em", " height: 80%"],
             (1, 0): [
@@ -1071,7 +1121,12 @@ class TestStyler:
                 columns=x.columns,
             )
 
-        result = pd.DataFrame([[1, 2], [3, 4]]).style.apply(f, axis=None)._compute().ctx
+        result = (
+            pd.DataFrame([[1, 2], [3, 4]])
+            .style.apply(f, axis=None)
+            ._compute()
+            .ctx
+        )
         assert result[(1, 1)] == ["color: red"]
 
     def test_trim(self):
@@ -1146,7 +1201,8 @@ class TestStyler:
 
         assert all(["display_value" in c for c in row] for row in ctx["body"])
         assert all(
-            [len(c["display_value"]) <= 3 for c in row[1:]] for row in ctx["body"]
+            [len(c["display_value"]) <= 3 for c in row[1:]]
+            for row in ctx["body"]
         )
         assert len(ctx["body"][0][1]["display_value"].lstrip("-")) <= 3
 
@@ -1158,7 +1214,9 @@ class TestStyler:
             df.style.format(True)
 
     def test_display_subset(self):
-        df = pd.DataFrame([[0.1234, 0.1234], [1.1234, 1.1234]], columns=["a", "b"])
+        df = pd.DataFrame(
+            [[0.1234, 0.1234], [1.1234, 1.1234]], columns=["a", "b"]
+        )
         ctx = df.style.format(
             {"a": "{:0.1f}", "b": "{0:.2%}"}, subset=pd.IndexSlice[0, :]
         )._translate()
@@ -1168,19 +1226,27 @@ class TestStyler:
         assert ctx["body"][0][2]["display_value"] == "12.34%"
 
         raw_11 = "1.1234"
-        ctx = df.style.format("{:0.1f}", subset=pd.IndexSlice[0, :])._translate()
+        ctx = df.style.format(
+            "{:0.1f}", subset=pd.IndexSlice[0, :]
+        )._translate()
         assert ctx["body"][0][1]["display_value"] == expected
         assert ctx["body"][1][1]["display_value"] == raw_11
 
-        ctx = df.style.format("{:0.1f}", subset=pd.IndexSlice[0, :])._translate()
+        ctx = df.style.format(
+            "{:0.1f}", subset=pd.IndexSlice[0, :]
+        )._translate()
         assert ctx["body"][0][1]["display_value"] == expected
         assert ctx["body"][1][1]["display_value"] == raw_11
 
-        ctx = df.style.format("{:0.1f}", subset=pd.IndexSlice["a"])._translate()
+        ctx = df.style.format(
+            "{:0.1f}", subset=pd.IndexSlice["a"]
+        )._translate()
         assert ctx["body"][0][1]["display_value"] == expected
         assert ctx["body"][0][2]["display_value"] == "0.1234"
 
-        ctx = df.style.format("{:0.1f}", subset=pd.IndexSlice[0, "a"])._translate()
+        ctx = df.style.format(
+            "{:0.1f}", subset=pd.IndexSlice[0, "a"]
+        )._translate()
         assert ctx["body"][0][1]["display_value"] == expected
         assert ctx["body"][1][1]["display_value"] == raw_11
 
@@ -1193,7 +1259,9 @@ class TestStyler:
         assert ctx["body"][1][2]["display_value"] == "1.1234"
 
     def test_display_dict(self):
-        df = pd.DataFrame([[0.1234, 0.1234], [1.1234, 1.1234]], columns=["a", "b"])
+        df = pd.DataFrame(
+            [[0.1234, 0.1234], [1.1234, 1.1234]], columns=["a", "b"]
+        )
         ctx = df.style.format({"a": "{:0.1f}", "b": "{0:.2%}"})._translate()
         assert ctx["body"][0][1]["display_value"] == "0.1"
         assert ctx["body"][0][2]["display_value"] == "12.34%"
@@ -1266,7 +1334,8 @@ class TestStyler:
 
     def test_mi_sparse(self):
         df = pd.DataFrame(
-            {"A": [1, 2]}, index=pd.MultiIndex.from_arrays([["a", "a"], [0, 1]])
+            {"A": [1, 2]},
+            index=pd.MultiIndex.from_arrays([["a", "a"], [0, 1]]),
         )
 
         result = df.style._translate()
@@ -1333,7 +1402,8 @@ class TestStyler:
     def test_mi_sparse_disabled(self):
         with pd.option_context("display.multi_sparse", False):
             df = pd.DataFrame(
-                {"A": [1, 2]}, index=pd.MultiIndex.from_arrays([["a", "a"], [0, 1]])
+                {"A": [1, 2]},
+                index=pd.MultiIndex.from_arrays([["a", "a"], [0, 1]]),
             )
             result = df.style._translate()
         body = result["body"]
@@ -1350,8 +1420,16 @@ class TestStyler:
         result = df.style._translate()
         head = result["head"][1]
         expected = [
-            {"class": "index_name level0", "value": "idx_level_0", "type": "th"},
-            {"class": "index_name level1", "value": "idx_level_1", "type": "th"},
+            {
+                "class": "index_name level0",
+                "value": "idx_level_0",
+                "type": "th",
+            },
+            {
+                "class": "index_name level1",
+                "value": "idx_level_1",
+                "type": "th",
+            },
             {"class": "blank", "value": "", "type": "th"},
         ]
 
@@ -1365,7 +1443,8 @@ class TestStyler:
                 names=["idx_level_0", "idx_level_1"],
             ),
             columns=pd.MultiIndex.from_arrays(
-                [["C1", "C1", "C2", "C2"], [1, 0, 1, 0]], names=["col_0", "col_1"]
+                [["C1", "C1", "C2", "C2"], [1, 0, 1, 0]],
+                names=["col_0", "col_1"],
             ),
         )
         result = df.style._translate()
@@ -1562,10 +1641,15 @@ class TestStylerMatplotlibDep:
             assert result[(1, 0)] == result[(1, 1)]
 
         result = (
-            df.style.background_gradient(subset=pd.IndexSlice[1, "A"])._compute().ctx
+            df.style.background_gradient(subset=pd.IndexSlice[1, "A"])
+            ._compute()
+            .ctx
         )
 
-        assert result[(1, 0)] == ["background-color: #fff7fb", "color: #000000"]
+        assert result[(1, 0)] == [
+            "background-color: #fff7fb",
+            "color: #000000",
+        ]
 
     @pytest.mark.parametrize(
         "c_map,expected",
@@ -1607,19 +1691,27 @@ class TestStylerMatplotlibDep:
         low = ["background-color: #f7fbff", "color: #000000"]
         high = ["background-color: #08306b", "color: #f1f1f1"]
         mid = ["background-color: #abd0e6", "color: #000000"]
-        result = df.style.background_gradient(cmap="Blues", axis=0)._compute().ctx
+        result = (
+            df.style.background_gradient(cmap="Blues", axis=0)._compute().ctx
+        )
         assert result[(0, 0)] == low
         assert result[(0, 1)] == low
         assert result[(1, 0)] == high
         assert result[(1, 1)] == high
 
-        result = df.style.background_gradient(cmap="Blues", axis=1)._compute().ctx
+        result = (
+            df.style.background_gradient(cmap="Blues", axis=1)._compute().ctx
+        )
         assert result[(0, 0)] == low
         assert result[(0, 1)] == high
         assert result[(1, 0)] == low
         assert result[(1, 1)] == high
 
-        result = df.style.background_gradient(cmap="Blues", axis=None)._compute().ctx
+        result = (
+            df.style.background_gradient(cmap="Blues", axis=None)
+            ._compute()
+            .ctx
+        )
         assert result[(0, 0)] == low
         assert result[(0, 1)] == mid
         assert result[(1, 0)] == mid
@@ -1663,7 +1755,9 @@ def test_from_custom_template(tmpdir):
         {% endblock table %}"""
         )
     )
-    result = Styler.from_custom_template(str(tmpdir.join("templates")), "myhtml.tpl")
+    result = Styler.from_custom_template(
+        str(tmpdir.join("templates")), "myhtml.tpl"
+    )
     assert issubclass(result, Styler)
     assert result.env is not Styler.env
     assert result.template is not Styler.template

@@ -103,7 +103,9 @@ def versions_from_parentdir(parentdir_prefix, root, verbose):
             print(
                 "guessing rootdir is '{root}', but '{dirname}' "
                 "doesn't start with prefix '{parentdir_prefix}'".format(
-                    root=root, dirname=dirname, parentdir_prefix=parentdir_prefix
+                    root=root,
+                    dirname=dirname,
+                    parentdir_prefix=parentdir_prefix,
                 )
             )
         raise NotThisMethod("rootdir doesn't start with parentdir_prefix")
@@ -249,7 +251,9 @@ def git_pieces_from_vcs(tag_prefix, root, verbose, run_command=run_command):
         # tag
         full_tag = mo.group(1)
         if not full_tag.startswith(tag_prefix):
-            fmt = "tag '{full_tag}' doesn't start with prefix " "'{tag_prefix}'"
+            fmt = (
+                "tag '{full_tag}' doesn't start with prefix " "'{tag_prefix}'"
+            )
             msg = fmt.format(full_tag=full_tag, tag_prefix=tag_prefix)
             if verbose:
                 print(msg)
@@ -267,7 +271,9 @@ def git_pieces_from_vcs(tag_prefix, root, verbose, run_command=run_command):
     else:
         # HEX: no tags
         pieces["closest-tag"] = None
-        count_out = run_command(GITS, ["rev-list", "HEAD", "--count"], cwd=root)
+        count_out = run_command(
+            GITS, ["rev-list", "HEAD", "--count"], cwd=root
+        )
         pieces["distance"] = int(count_out)  # total number of commits
 
     return pieces
@@ -296,7 +302,9 @@ def render_pep440(pieces):
                 rendered += ".dirty"
     else:
         # exception #1
-        rendered = "0+untagged.{:d}.g{}".format(pieces["distance"], pieces["short"])
+        rendered = "0+untagged.{:d}.g{}".format(
+            pieces["distance"], pieces["short"]
+        )
         if pieces["dirty"]:
             rendered += ".dirty"
     return rendered
@@ -446,7 +454,9 @@ def get_versions():
     verbose = cfg.verbose
 
     try:
-        return git_versions_from_keywords(get_keywords(), cfg.tag_prefix, verbose)
+        return git_versions_from_keywords(
+            get_keywords(), cfg.tag_prefix, verbose
+        )
     except NotThisMethod:
         pass
 

@@ -40,7 +40,8 @@ def _assert_not_almost_equal(a, b, **kwargs):
     try:
         assert_almost_equal(a, b, **kwargs)
         msg = (
-            "{a} and {b} were approximately equal " "when they shouldn't have been"
+            "{a} and {b} were approximately equal "
+            "when they shouldn't have been"
         ).format(a=a, b=b)
         pytest.fail(msg=msg)
     except AssertionError:
@@ -80,12 +81,16 @@ def test_assert_almost_equal_numbers(a, b):
     _assert_almost_equal_both(a, b)
 
 
-@pytest.mark.parametrize("a,b", [(1.1, 1), (1.1, True), (1, 2), (1.0001, np.int16(1))])
+@pytest.mark.parametrize(
+    "a,b", [(1.1, 1), (1.1, True), (1, 2), (1.0001, np.int16(1))]
+)
 def test_assert_not_almost_equal_numbers(a, b):
     _assert_not_almost_equal_both(a, b)
 
 
-@pytest.mark.parametrize("a,b", [(0, 0), (0, 0.0), (0, np.float64(0)), (0.000001, 0)])
+@pytest.mark.parametrize(
+    "a,b", [(0, 0), (0, 0.0), (0, np.float64(0)), (0.000001, 0)]
+)
 def test_assert_almost_equal_numbers_with_zeros(a, b):
     _assert_almost_equal_both(a, b)
 
@@ -147,7 +152,9 @@ def test_assert_almost_equal_dict_like_object(val):
                 return dict_val
 
     func = (
-        _assert_almost_equal_both if val == dict_val else _assert_not_almost_equal_both
+        _assert_almost_equal_both
+        if val == dict_val
+        else _assert_not_almost_equal_both
     )
     func(real_dict, DictLikeObj(), check_dtype=False)
 
@@ -202,7 +209,10 @@ def test_assert_not_almost_equal_null(a, b):
     [
         (np.inf, np.inf),
         (np.inf, float("inf")),
-        (np.array([np.inf, np.nan, -np.inf]), np.array([np.inf, np.nan, -np.inf])),
+        (
+            np.array([np.inf, np.nan, -np.inf]),
+            np.array([np.inf, np.nan, -np.inf]),
+        ),
         (
             np.array([np.inf, None, -np.inf], dtype=np.object_),
             np.array([np.inf, np.nan, -np.inf], dtype=np.object_),
@@ -245,7 +255,10 @@ def test_assert_almost_equal_value_mismatch():
 
 @pytest.mark.parametrize(
     "a,b,klass1,klass2",
-    [(np.array([1]), 1, "ndarray", "int"), (1, np.array([1]), "int", "ndarray")],
+    [
+        (np.array([1]), 1, "ndarray", "int"),
+        (1, np.array([1]), "int", "ndarray"),
+    ],
 )
 def test_assert_almost_equal_class_mismatch(a, b, klass1, klass2):
     msg = """numpy array are different
@@ -291,7 +304,8 @@ numpy array values are different \\(16\\.66667 %\\)
 
     with pytest.raises(AssertionError, match=msg):
         assert_almost_equal(
-            np.array([[1, 2], [3, 4], [5, 6]]), np.array([[1, 3], [3, 4], [5, 6]])
+            np.array([[1, 2], [3, 4], [5, 6]]),
+            np.array([[1, 3], [3, 4], [5, 6]]),
         )
 
 
@@ -303,7 +317,9 @@ numpy array values are different \\(25\\.0 %\\)
 \\[right\\]: \\[\\[1, 3\\], \\[3, 4\\]\\]"""
 
     with pytest.raises(AssertionError, match=msg):
-        assert_almost_equal(np.array([[1, 2], [3, 4]]), np.array([[1, 3], [3, 4]]))
+        assert_almost_equal(
+            np.array([[1, 2], [3, 4]]), np.array([[1, 3], [3, 4]])
+        )
 
 
 def test_assert_almost_equal_shape_mismatch_override():
@@ -325,7 +341,9 @@ numpy array values are different \\(33\\.33333 %\\)
 \\[right\\]: \\[á, à, å\\]"""
 
     with pytest.raises(AssertionError, match=msg):
-        assert_almost_equal(np.array(["á", "à", "ä"]), np.array(["á", "à", "å"]))
+        assert_almost_equal(
+            np.array(["á", "à", "ä"]), np.array(["á", "à", "å"])
+        )
 
 
 def test_assert_almost_equal_timestamp():

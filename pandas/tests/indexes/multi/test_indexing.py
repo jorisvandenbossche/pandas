@@ -45,7 +45,8 @@ def test_slice_locs():
 
     slob = slice(
         *idx.slice_locs(
-            df.index[5] + timedelta(seconds=30), df.index[15] - timedelta(seconds=30)
+            df.index[5] + timedelta(seconds=30),
+            df.index[15] - timedelta(seconds=30),
         )
     )
     sliced = stacked[slob]
@@ -188,7 +189,8 @@ def test_get_indexer():
 def test_get_indexer_nearest():
     midx = MultiIndex.from_tuples([("a", 1), ("b", 2)])
     msg = (
-        "method='nearest' not implemented yet for MultiIndex; see GitHub" " issue 9365"
+        "method='nearest' not implemented yet for MultiIndex; see GitHub"
+        " issue 9365"
     )
     with pytest.raises(NotImplementedError, match=msg):
         midx.get_indexer(["a"], method="nearest")
@@ -242,7 +244,10 @@ def test_get_indexer_consistency(idx):
 @pytest.mark.parametrize("ind1", [[True] * 5, pd.Index([True] * 5)])
 @pytest.mark.parametrize(
     "ind2",
-    [[True, False, True, False, False], pd.Index([True, False, True, False, False])],
+    [
+        [True, False, True, False, False],
+        pd.Index([True, False, True, False, False]),
+    ],
 )
 def test_getitem_bool_index_all(ind1, ind2):
     # GH#22533
@@ -275,7 +280,10 @@ def test_get_loc(idx):
     with pytest.raises(KeyError, match=r"^'quux'$"):
         idx.get_loc("quux")
 
-    msg = "only the default get_loc method is currently supported for" " MultiIndex"
+    msg = (
+        "only the default get_loc method is currently supported for"
+        " MultiIndex"
+    )
     with pytest.raises(NotImplementedError, match=msg):
         idx.get_loc("foo", method="nearest")
 

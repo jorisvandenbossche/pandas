@@ -137,7 +137,8 @@ def pivot_table(
 
         if table.columns.nlevels > 1:
             m = MultiIndex.from_arrays(
-                cartesian_product(table.columns.levels), names=table.columns.names
+                cartesian_product(table.columns.levels),
+                names=table.columns.names,
             )
             table = table.reindex(m, axis=1)
 
@@ -291,7 +292,15 @@ def _compute_grand_margin(data, values, aggfunc, margins_name="All"):
 
 
 def _generate_marginal_results(
-    table, data, values, rows, cols, aggfunc, observed, grand_margin, margins_name="All"
+    table,
+    data,
+    values,
+    rows,
+    cols,
+    aggfunc,
+    observed,
+    grand_margin,
+    margins_name="All",
 ):
     if len(cols) > 0:
         # need to "interleave" the margins
@@ -302,10 +311,16 @@ def _generate_marginal_results(
             return (key, margins_name) + ("",) * (len(cols) - 1)
 
         if len(rows) > 0:
-            margin = data[rows + values].groupby(rows, observed=observed).agg(aggfunc)
+            margin = (
+                data[rows + values]
+                .groupby(rows, observed=observed)
+                .agg(aggfunc)
+            )
             cat_axis = 1
 
-            for key, piece in table.groupby(level=0, axis=cat_axis, observed=observed):
+            for key, piece in table.groupby(
+                level=0, axis=cat_axis, observed=observed
+            ):
                 all_key = _all_key(key)
 
                 # we are going to mutate this, so need to copy!
@@ -327,7 +342,9 @@ def _generate_marginal_results(
         else:
             margin = grand_margin
             cat_axis = 0
-            for key, piece in table.groupby(level=0, axis=cat_axis, observed=observed):
+            for key, piece in table.groupby(
+                level=0, axis=cat_axis, observed=observed
+            ):
                 all_key = _all_key(key)
                 table_pieces.append(piece)
                 table_pieces.append(Series(margin[key], index=[all_key]))
@@ -342,7 +359,9 @@ def _generate_marginal_results(
         margin_keys = table.columns
 
     if len(cols) > 0:
-        row_margin = data[cols + values].groupby(cols, observed=observed).agg(aggfunc)
+        row_margin = (
+            data[cols + values].groupby(cols, observed=observed).agg(aggfunc)
+        )
         row_margin = row_margin.stack()
 
         # slight hack
@@ -374,7 +393,9 @@ def _generate_marginal_results_without_values(
             margin_keys.append(all_key)
 
         else:
-            margin = data.groupby(level=0, axis=0, observed=observed).apply(aggfunc)
+            margin = data.groupby(level=0, axis=0, observed=observed).apply(
+                aggfunc
+            )
             all_key = _all_key()
             table[all_key] = margin
             result = table
@@ -426,7 +447,9 @@ def pivot(data, index=None, columns=None, values=None):
                 data[values].values, index=index, columns=values
             )
         else:
-            indexed = data._constructor_sliced(data[values].values, index=index)
+            indexed = data._constructor_sliced(
+                data[values].values, index=index
+            )
     return indexed.unstack(columns)
 
 
@@ -545,7 +568,9 @@ def crosstab(
     rownames = _get_names(index, rownames, prefix="row")
     colnames = _get_names(columns, colnames, prefix="col")
 
-    common_idx = _get_objs_combined_axis(index + columns, intersect=True, sort=False)
+    common_idx = _get_objs_combined_axis(
+        index + columns, intersect=True, sort=False
+    )
 
     data = {}
     data.update(zip(rownames, index))
@@ -580,7 +605,10 @@ def crosstab(
     # Post-process
     if normalize is not False:
         table = _normalize(
-            table, normalize=normalize, margins=margins, margins_name=margins_name
+            table,
+            normalize=normalize,
+            margins=margins,
+            margins_name=margins_name,
         )
 
     return table

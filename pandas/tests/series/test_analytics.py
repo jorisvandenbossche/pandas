@@ -43,14 +43,18 @@ class TestSeriesAnalytics:
         s = Series([True, True, False, False, False], name="bool_data")
         result = s.describe()
         expected = Series(
-            [5, 2, False, 3], name="bool_data", index=["count", "unique", "top", "freq"]
+            [5, 2, False, 3],
+            name="bool_data",
+            index=["count", "unique", "top", "freq"],
         )
         tm.assert_series_equal(result, expected)
 
         s = Series(["a", "a", "b", "c", "d"], name="str_data")
         result = s.describe()
         expected = Series(
-            [5, 4, "a", 2], name="str_data", index=["count", "unique", "top", "freq"]
+            [5, 4, "a", 2],
+            name="str_data",
+            index=["count", "unique", "top", "freq"],
         )
         tm.assert_series_equal(result, expected)
 
@@ -145,18 +149,29 @@ class TestSeriesAnalytics:
 
     def test_cummin_datetime64(self):
         s = pd.Series(
-            pd.to_datetime(["NaT", "2000-1-2", "NaT", "2000-1-1", "NaT", "2000-1-3"])
+            pd.to_datetime(
+                ["NaT", "2000-1-2", "NaT", "2000-1-1", "NaT", "2000-1-3"]
+            )
         )
 
         expected = pd.Series(
-            pd.to_datetime(["NaT", "2000-1-2", "NaT", "2000-1-1", "NaT", "2000-1-1"])
+            pd.to_datetime(
+                ["NaT", "2000-1-2", "NaT", "2000-1-1", "NaT", "2000-1-1"]
+            )
         )
         result = s.cummin(skipna=True)
         tm.assert_series_equal(expected, result)
 
         expected = pd.Series(
             pd.to_datetime(
-                ["NaT", "2000-1-2", "2000-1-2", "2000-1-1", "2000-1-1", "2000-1-1"]
+                [
+                    "NaT",
+                    "2000-1-2",
+                    "2000-1-2",
+                    "2000-1-1",
+                    "2000-1-1",
+                    "2000-1-1",
+                ]
             )
         )
         result = s.cummin(skipna=False)
@@ -164,25 +179,38 @@ class TestSeriesAnalytics:
 
     def test_cummax_datetime64(self):
         s = pd.Series(
-            pd.to_datetime(["NaT", "2000-1-2", "NaT", "2000-1-1", "NaT", "2000-1-3"])
+            pd.to_datetime(
+                ["NaT", "2000-1-2", "NaT", "2000-1-1", "NaT", "2000-1-3"]
+            )
         )
 
         expected = pd.Series(
-            pd.to_datetime(["NaT", "2000-1-2", "NaT", "2000-1-2", "NaT", "2000-1-3"])
+            pd.to_datetime(
+                ["NaT", "2000-1-2", "NaT", "2000-1-2", "NaT", "2000-1-3"]
+            )
         )
         result = s.cummax(skipna=True)
         tm.assert_series_equal(expected, result)
 
         expected = pd.Series(
             pd.to_datetime(
-                ["NaT", "2000-1-2", "2000-1-2", "2000-1-2", "2000-1-2", "2000-1-3"]
+                [
+                    "NaT",
+                    "2000-1-2",
+                    "2000-1-2",
+                    "2000-1-2",
+                    "2000-1-2",
+                    "2000-1-3",
+                ]
             )
         )
         result = s.cummax(skipna=False)
         tm.assert_series_equal(expected, result)
 
     def test_cummin_timedelta64(self):
-        s = pd.Series(pd.to_timedelta(["NaT", "2 min", "NaT", "1 min", "NaT", "3 min"]))
+        s = pd.Series(
+            pd.to_timedelta(["NaT", "2 min", "NaT", "1 min", "NaT", "3 min"])
+        )
 
         expected = pd.Series(
             pd.to_timedelta(["NaT", "2 min", "NaT", "1 min", "NaT", "1 min"])
@@ -191,13 +219,17 @@ class TestSeriesAnalytics:
         tm.assert_series_equal(expected, result)
 
         expected = pd.Series(
-            pd.to_timedelta(["NaT", "2 min", "2 min", "1 min", "1 min", "1 min"])
+            pd.to_timedelta(
+                ["NaT", "2 min", "2 min", "1 min", "1 min", "1 min"]
+            )
         )
         result = s.cummin(skipna=False)
         tm.assert_series_equal(expected, result)
 
     def test_cummax_timedelta64(self):
-        s = pd.Series(pd.to_timedelta(["NaT", "2 min", "NaT", "1 min", "NaT", "3 min"]))
+        s = pd.Series(
+            pd.to_timedelta(["NaT", "2 min", "NaT", "1 min", "NaT", "3 min"])
+        )
 
         expected = pd.Series(
             pd.to_timedelta(["NaT", "2 min", "NaT", "2 min", "NaT", "3 min"])
@@ -206,7 +238,9 @@ class TestSeriesAnalytics:
         tm.assert_series_equal(expected, result)
 
         expected = pd.Series(
-            pd.to_timedelta(["NaT", "2 min", "2 min", "2 min", "2 min", "3 min"])
+            pd.to_timedelta(
+                ["NaT", "2 min", "2 min", "2 min", "2 min", "3 min"]
+            )
         )
         result = s.cummax(skipna=False)
         tm.assert_series_equal(expected, result)
@@ -240,7 +274,9 @@ class TestSeriesAnalytics:
     def test_compress(self):
         cond = [True, False, True, False, False]
         s = Series([1, -1, 5, 8, 7], index=list("abcde"), name="foo")
-        expected = Series(s.values.compress(cond), index=list("ac"), name="foo")
+        expected = Series(
+            s.values.compress(cond), index=list("ac"), name="foo"
+        )
         with tm.assert_produces_warning(FutureWarning):
             result = s.compress(cond)
         tm.assert_series_equal(result, expected)
@@ -248,7 +284,9 @@ class TestSeriesAnalytics:
     def test_numpy_compress(self):
         cond = [True, False, True, False, False]
         s = Series([1, -1, 5, 8, 7], index=list("abcde"), name="foo")
-        expected = Series(s.values.compress(cond), index=list("ac"), name="foo")
+        expected = Series(
+            s.values.compress(cond), index=list("ac"), name="foo"
+        )
         with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
             tm.assert_series_equal(np.compress(cond, s), expected)
 
@@ -265,7 +303,9 @@ class TestSeriesAnalytics:
         datetime_series.index.name = "index_name"
         result = datetime_series.round(2)
         expected = Series(
-            np.round(datetime_series.values, 2), index=datetime_series.index, name="ts"
+            np.round(datetime_series.values, 2),
+            index=datetime_series.index,
+            name="ts",
         )
         assert_series_equal(result, expected)
         assert result.name == datetime_series.name
@@ -314,9 +354,13 @@ class TestSeriesAnalytics:
         tm.assert_almost_equal(datetime_series.corr(datetime_series), 1)
 
         # partial overlap
-        tm.assert_almost_equal(datetime_series[:15].corr(datetime_series[5:]), 1)
+        tm.assert_almost_equal(
+            datetime_series[:15].corr(datetime_series[5:]), 1
+        )
 
-        assert isna(datetime_series[:15].corr(datetime_series[5:], min_periods=12))
+        assert isna(
+            datetime_series[:15].corr(datetime_series[5:], min_periods=12)
+        )
 
         ts1 = datetime_series[:15].reindex(datetime_series.index)
         ts2 = datetime_series[5:].reindex(datetime_series.index)
@@ -391,7 +435,8 @@ class TestSeriesAnalytics:
         s1 = pd.Series(np.random.randn(10))
         s2 = pd.Series(np.random.randn(10))
         msg = (
-            "method must be either 'pearson', " "'spearman', 'kendall', or a callable, "
+            "method must be either 'pearson', "
+            "'spearman', 'kendall', or a callable, "
         )
         with pytest.raises(ValueError, match=msg):
             s1.corr(s2, method="____")
@@ -448,7 +493,9 @@ class TestSeriesAnalytics:
         assert isna(cp.cov(cp))
 
         # min_periods
-        assert isna(datetime_series[:15].cov(datetime_series[5:], min_periods=12))
+        assert isna(
+            datetime_series[:15].cov(datetime_series[5:], min_periods=12)
+        )
 
         ts1 = datetime_series[:15].reindex(datetime_series.index)
         ts2 = datetime_series[5:].reindex(datetime_series.index)
@@ -474,7 +521,9 @@ class TestSeriesAnalytics:
     def test_dot(self):
         a = Series(np.random.randn(4), index=["p", "q", "r", "s"])
         b = DataFrame(
-            np.random.randn(3, 4), index=["1", "2", "3"], columns=["p", "q", "r", "s"]
+            np.random.randn(3, 4),
+            index=["1", "2", "3"],
+            columns=["p", "q", "r", "s"],
         ).T
 
         result = a.dot(b)
@@ -507,7 +556,9 @@ class TestSeriesAnalytics:
         # matmul test is for GH #10259
         a = Series(np.random.randn(4), index=["p", "q", "r", "s"])
         b = DataFrame(
-            np.random.randn(3, 4), index=["1", "2", "3"], columns=["p", "q", "r", "s"]
+            np.random.randn(3, 4),
+            index=["1", "2", "3"],
+            columns=["p", "q", "r", "s"],
         ).T
 
         # Series @ DataFrame
@@ -517,7 +568,9 @@ class TestSeriesAnalytics:
 
         # DataFrame @ Series
         result = operator.matmul(b.T, a)
-        expected = Series(np.dot(b.T.values, a.T.values), index=["1", "2", "3"])
+        expected = Series(
+            np.dot(b.T.values, a.T.values), index=["1", "2", "3"]
+        )
         assert_series_equal(result, expected)
 
         # Series @ Series
@@ -552,13 +605,17 @@ class TestSeriesAnalytics:
         # mixed dtype DataFrame @ Series
         a["p"] = int(a.p)
         result = operator.matmul(b.T, a)
-        expected = Series(np.dot(b.T.values, a.T.values), index=["1", "2", "3"])
+        expected = Series(
+            np.dot(b.T.values, a.T.values), index=["1", "2", "3"]
+        )
         assert_series_equal(result, expected)
 
         # different dtypes DataFrame @ Series
         a = a.astype(int)
         result = operator.matmul(b.T, a)
-        expected = Series(np.dot(b.T.values, a.T.values), index=["1", "2", "3"])
+        expected = Series(
+            np.dot(b.T.values, a.T.values), index=["1", "2", "3"]
+        )
         assert_series_equal(result, expected)
 
         msg = r"Dot product shape mismatch, \(4,\) vs \(3,\)"
@@ -610,11 +667,17 @@ class TestSeriesAnalytics:
         s = Series([1, 2, 3])
 
         assert_series_equal(s.clip(np.nan), Series([1, 2, 3]))
-        assert_series_equal(s.clip(upper=np.nan, lower=np.nan), Series([1, 2, 3]))
+        assert_series_equal(
+            s.clip(upper=np.nan, lower=np.nan), Series([1, 2, 3])
+        )
 
         # GH #19992
-        assert_series_equal(s.clip(lower=[0, 4, np.nan]), Series([1, 4, np.nan]))
-        assert_series_equal(s.clip(upper=[1, np.nan, 1]), Series([1, np.nan, 1]))
+        assert_series_equal(
+            s.clip(lower=[0, 4, np.nan]), Series([1, 4, np.nan])
+        )
+        assert_series_equal(
+            s.clip(upper=[1, np.nan, 1]), Series([1, np.nan, 1])
+        )
 
     def test_clip_against_series(self):
         # GH #6966
@@ -623,9 +686,13 @@ class TestSeriesAnalytics:
         threshold = Series([1.0, 2.0, 3.0])
 
         with tm.assert_produces_warning(FutureWarning):
-            assert_series_equal(s.clip_lower(threshold), Series([1.0, 2.0, 4.0]))
+            assert_series_equal(
+                s.clip_lower(threshold), Series([1.0, 2.0, 4.0])
+            )
         with tm.assert_produces_warning(FutureWarning):
-            assert_series_equal(s.clip_upper(threshold), Series([1.0, 1.0, 3.0]))
+            assert_series_equal(
+                s.clip_upper(threshold), Series([1.0, 1.0, 3.0])
+            )
 
         lower = Series([1.0, 2.0, 3.0])
         upper = Series([1.5, 2.5, 3.5])
@@ -651,10 +718,18 @@ class TestSeriesAnalytics:
         # naive and tz-aware datetimes
 
         t = Timestamp("2015-12-01 09:30:30")
-        s = Series([Timestamp("2015-12-01 09:30:00"), Timestamp("2015-12-01 09:31:00")])
+        s = Series(
+            [
+                Timestamp("2015-12-01 09:30:00"),
+                Timestamp("2015-12-01 09:31:00"),
+            ]
+        )
         result = s.clip(upper=t)
         expected = Series(
-            [Timestamp("2015-12-01 09:30:00"), Timestamp("2015-12-01 09:30:30")]
+            [
+                Timestamp("2015-12-01 09:30:00"),
+                Timestamp("2015-12-01 09:30:30"),
+            ]
         )
         assert_series_equal(result, expected)
 
@@ -698,7 +773,12 @@ class TestSeriesAnalytics:
         cpe = pd.Series([False, 0, nan, 0])
         cmin = pd.Series([False, False, nan, False])
         cmax = pd.Series([False, True, nan, True])
-        expecteds = {"cumsum": cse, "cumprod": cpe, "cummin": cmin, "cummax": cmax}
+        expecteds = {
+            "cumsum": cse,
+            "cumprod": cpe,
+            "cummin": cmin,
+            "cummax": cmax,
+        }
 
         for method in methods:
             res = getattr(e, method)()
@@ -718,7 +798,21 @@ class TestSeriesAnalytics:
         s = Series(list("abcdefghijk" * 10 ** 5))
         # If numpy doesn't do the manual comparison/mask, these
         # unorderable mixed types are what cause the exception in numpy
-        in_list = [-1, "a", "b", "G", "Y", "Z", "E", "K", "E", "S", "I", "R", "R"] * 6
+        in_list = [
+            -1,
+            "a",
+            "b",
+            "G",
+            "Y",
+            "Z",
+            "E",
+            "K",
+            "E",
+            "S",
+            "I",
+            "R",
+            "R",
+        ] * 6
 
         assert s.isin(in_list).sum() == 200000
 
@@ -803,20 +897,29 @@ class TestSeriesAnalytics:
         with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
             tm.assert_series_equal(s.ptp(level=0, skipna=False), expected)
 
-        msg = "No axis named 1 for object type" " <class 'pandas.core.series.Series'>"
+        msg = (
+            "No axis named 1 for object type"
+            " <class 'pandas.core.series.Series'>"
+        )
         with pytest.raises(ValueError, match=msg):
-            with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
+            with tm.assert_produces_warning(
+                FutureWarning, check_stacklevel=False
+            ):
                 s.ptp(axis=1)
 
         s = pd.Series(["a", "b", "c", "d", "e"])
         msg = r"unsupported operand type\(s\) for -: 'str' and 'str'"
         with pytest.raises(TypeError, match=msg):
-            with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
+            with tm.assert_produces_warning(
+                FutureWarning, check_stacklevel=False
+            ):
                 s.ptp()
 
         msg = r"Series\.ptp does not implement numeric_only\."
         with pytest.raises(NotImplementedError, match=msg):
-            with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
+            with tm.assert_produces_warning(
+                FutureWarning, check_stacklevel=False
+            ):
                 s.ptp(numeric_only=True)
 
     def test_repeat(self):
@@ -828,12 +931,16 @@ class TestSeriesAnalytics:
 
         to_rep = [2, 3, 4]
         reps = s.repeat(to_rep)
-        exp = Series(s.values.repeat(to_rep), index=s.index.values.repeat(to_rep))
+        exp = Series(
+            s.values.repeat(to_rep), index=s.index.values.repeat(to_rep)
+        )
         assert_series_equal(reps, exp)
 
     def test_numpy_repeat(self):
         s = Series(np.arange(3), name="x")
-        expected = Series(s.values.repeat(2), name="x", index=s.index.values.repeat(2))
+        expected = Series(
+            s.values.repeat(2), name="x", index=s.index.values.repeat(2)
+        )
         assert_series_equal(np.repeat(s, 2), expected)
 
         msg = "the 'axis' parameter is not supported"
@@ -923,13 +1030,17 @@ class TestSeriesAnalytics:
         assert_series_equal(s, res)
 
     def test_apply_categorical(self):
-        values = pd.Categorical(list("ABBABCD"), categories=list("DCBA"), ordered=True)
+        values = pd.Categorical(
+            list("ABBABCD"), categories=list("DCBA"), ordered=True
+        )
         s = pd.Series(values, name="XX", index=list("abcdefg"))
         result = s.apply(lambda x: x.lower())
 
         # should be categorical dtype when the number of categories are
         # the same
-        values = pd.Categorical(list("abbabcd"), categories=list("dcba"), ordered=True)
+        values = pd.Categorical(
+            list("abbabcd"), categories=list("dcba"), ordered=True
+        )
         exp = pd.Series(values, name="XX", index=list("abcdefg"))
         tm.assert_series_equal(result, exp)
         tm.assert_categorical_equal(result.values, exp.values)
@@ -995,7 +1106,9 @@ class TestSeriesAnalytics:
             levels=[["one", "two", "three"], [0, 1]],
             codes=[[0, 1, 2, 0, 1, 2], [0, 1, 0, 1, 0, 1]],
         )
-        expected = DataFrame({"bar": s.values}, index=exp_index).sort_index(level=0)
+        expected = DataFrame({"bar": s.values}, index=exp_index).sort_index(
+            level=0
+        )
         unstacked = s.unstack(0).sort_index()
         assert_frame_equal(unstacked, expected)
 
@@ -1003,7 +1116,9 @@ class TestSeriesAnalytics:
         idx = pd.MultiIndex.from_arrays([[101, 102], [3.5, np.nan]])
         ts = pd.Series([1, 2], index=idx)
         left = ts.unstack()
-        right = DataFrame([[nan, 1], [2, nan]], index=[101, 102], columns=[nan, 3.5])
+        right = DataFrame(
+            [[nan, 1], [2, nan]], index=[101, 102], columns=[nan, 3.5]
+        )
         assert_frame_equal(left, right)
 
         idx = pd.MultiIndex.from_arrays(
@@ -1015,7 +1130,8 @@ class TestSeriesAnalytics:
         )
         ts = pd.Series([1.0, 1.1, 1.2, 1.3, 1.4], index=idx)
         right = DataFrame(
-            [[1.0, 1.3], [1.1, nan], [nan, 1.4], [1.2, nan]], columns=["cat", "dog"]
+            [[1.0, 1.3], [1.1, nan], [nan, 1.4], [1.2, nan]],
+            columns=["cat", "dog"],
         )
         tpls = [("a", 1), ("a", 2), ("b", nan), ("b", 1)]
         right.index = pd.MultiIndex.from_tuples(tpls)
@@ -1044,7 +1160,9 @@ class TestSeriesAnalytics:
         tm.assert_series_equal(idx.value_counts(), exp)
 
         # normalize
-        exp = pd.Series(np.array([3.0, 2.0, 1]) / 6.0, index=exp_idx, name="xxx")
+        exp = pd.Series(
+            np.array([3.0, 2.0, 1]) / 6.0, index=exp_idx, name="xxx"
+        )
         tm.assert_series_equal(s.value_counts(normalize=True), exp)
         tm.assert_series_equal(idx.value_counts(normalize=True), exp)
 
@@ -1069,7 +1187,9 @@ class TestSeriesAnalytics:
         idx = pd.DatetimeIndex(values, name="xxx")
         tm.assert_series_equal(idx.value_counts(), exp)
 
-        exp = pd.Series(np.array([3.0, 2.0, 1]) / 6.0, index=exp_idx, name="xxx")
+        exp = pd.Series(
+            np.array([3.0, 2.0, 1]) / 6.0, index=exp_idx, name="xxx"
+        )
         tm.assert_series_equal(s.value_counts(normalize=True), exp)
         tm.assert_series_equal(idx.value_counts(normalize=True), exp)
 
@@ -1093,7 +1213,9 @@ class TestSeriesAnalytics:
         tm.assert_series_equal(idx.value_counts(), exp)
 
         # normalize
-        exp = pd.Series(np.array([3.0, 2.0, 1]) / 6.0, index=exp_idx, name="xxx")
+        exp = pd.Series(
+            np.array([3.0, 2.0, 1]) / 6.0, index=exp_idx, name="xxx"
+        )
         tm.assert_series_equal(s.value_counts(normalize=True), exp)
         tm.assert_series_equal(idx.value_counts(normalize=True), exp)
 
@@ -1101,7 +1223,9 @@ class TestSeriesAnalytics:
         # most dtypes are tested in test_base.py
         values = pd.Categorical([1, 2, 3, 1, 1, 3], ordered=True)
 
-        exp_idx = pd.CategoricalIndex([1, 3, 2], categories=[1, 2, 3], ordered=True)
+        exp_idx = pd.CategoricalIndex(
+            [1, 3, 2], categories=[1, 2, 3], ordered=True
+        )
         exp = pd.Series([3, 2, 1], index=exp_idx, name="xxx")
 
         s = pd.Series(values, name="xxx")
@@ -1111,14 +1235,18 @@ class TestSeriesAnalytics:
         tm.assert_series_equal(idx.value_counts(), exp)
 
         # normalize
-        exp = pd.Series(np.array([3.0, 2.0, 1]) / 6.0, index=exp_idx, name="xxx")
+        exp = pd.Series(
+            np.array([3.0, 2.0, 1]) / 6.0, index=exp_idx, name="xxx"
+        )
         tm.assert_series_equal(s.value_counts(normalize=True), exp)
         tm.assert_series_equal(idx.value_counts(normalize=True), exp)
 
     def test_value_counts_categorical_not_ordered(self):
         values = pd.Categorical([1, 2, 3, 1, 1, 3], ordered=False)
 
-        exp_idx = pd.CategoricalIndex([1, 3, 2], categories=[1, 2, 3], ordered=False)
+        exp_idx = pd.CategoricalIndex(
+            [1, 3, 2], categories=[1, 2, 3], ordered=False
+        )
         exp = pd.Series([3, 2, 1], index=exp_idx, name="xxx")
 
         s = pd.Series(values, name="xxx")
@@ -1128,12 +1256,16 @@ class TestSeriesAnalytics:
         tm.assert_series_equal(idx.value_counts(), exp)
 
         # normalize
-        exp = pd.Series(np.array([3.0, 2.0, 1]) / 6.0, index=exp_idx, name="xxx")
+        exp = pd.Series(
+            np.array([3.0, 2.0, 1]) / 6.0, index=exp_idx, name="xxx"
+        )
         tm.assert_series_equal(s.value_counts(normalize=True), exp)
         tm.assert_series_equal(idx.value_counts(normalize=True), exp)
 
     @pytest.mark.parametrize("func", [np.any, np.all])
-    @pytest.mark.parametrize("kwargs", [dict(keepdims=True), dict(out=object())])
+    @pytest.mark.parametrize(
+        "kwargs", [dict(keepdims=True), dict(out=object())]
+    )
     @td.skip_if_np_lt("1.15")
     def test_validate_any_all_out_keepdims_raises(self, kwargs, func):
         s = pd.Series([1, 2])
@@ -1223,7 +1355,9 @@ def s_main_dtypes():
     """
     df = pd.DataFrame(
         {
-            "datetime": pd.to_datetime(["2003", "2002", "2001", "2002", "2005"]),
+            "datetime": pd.to_datetime(
+                ["2003", "2002", "2001", "2002", "2005"]
+            ),
             "datetimetz": pd.to_datetime(
                 ["2003", "2002", "2001", "2002", "2005"]
             ).tz_localize("US/Eastern"),
@@ -1278,7 +1412,9 @@ class TestNLargestNSmallest:
     )
     def test_error(self, r):
         dt = r.dtype
-        msg = "Cannot use method 'n(larg|small)est' with " "dtype {dt}".format(dt=dt)
+        msg = "Cannot use method 'n(larg|small)est' with " "dtype {dt}".format(
+            dt=dt
+        )
         args = 2, len(r), 0, -1
         methods = r.nlargest, r.nsmallest
         for method, arg in product(methods, args):
@@ -1357,7 +1493,9 @@ class TestNLargestNSmallest:
         # GH 21426
         dtype_info = np.finfo(float_dtype)
         min_val, max_val = dtype_info.min, dtype_info.max
-        min_2nd, max_2nd = np.nextafter([min_val, max_val], 0, dtype=float_dtype)
+        min_2nd, max_2nd = np.nextafter(
+            [min_val, max_val], 0, dtype=float_dtype
+        )
         vals = [min_val, min_2nd, max_2nd, max_val]
         assert_check_nselect_boundary(vals, float_dtype, nselect_method)
 
@@ -1383,7 +1521,8 @@ class TestNLargestNSmallest:
         assert_series_equal(result, expected)
 
     @pytest.mark.parametrize(
-        "data,expected", [([True, False], [True]), ([True, False, True, True], [True])]
+        "data,expected",
+        [([True, False], [True]), ([True, False, True, True], [True])],
     )
     def test_boolean(self, data, expected):
         # GH 26154 : ensure True > False
@@ -1398,7 +1537,9 @@ class TestCategoricalSeriesAnalytics:
 
         s = Series(
             Categorical(
-                [np.nan, 1, 2, np.nan], categories=[5, 4, 3, 2, 1], ordered=True
+                [np.nan, 1, 2, np.nan],
+                categories=[5, 4, 3, 2, 1],
+                ordered=True,
             )
         )
         result = s.count()
@@ -1444,7 +1585,9 @@ class TestCategoricalSeriesAnalytics:
         series = [
             Series(["a", "b", None, "a", None, None], dtype="category"),
             Series(
-                Categorical(["a", "b", None, "a", None, None], categories=["a", "b"])
+                Categorical(
+                    ["a", "b", None, "a", None, None], categories=["a", "b"]
+                )
             ),
         ]
 
@@ -1474,16 +1617,21 @@ class TestCategoricalSeriesAnalytics:
             "unicode_",
             "timedelta64[h]",
             pytest.param(
-                "datetime64[D]", marks=pytest.mark.xfail(reason="GH#7996", strict=False)
+                "datetime64[D]",
+                marks=pytest.mark.xfail(reason="GH#7996", strict=False),
             ),
         ],
     )
-    def test_drop_duplicates_categorical_non_bool(self, dtype, ordered_fixture):
+    def test_drop_duplicates_categorical_non_bool(
+        self, dtype, ordered_fixture
+    ):
         cat_array = np.array([1, 2, 3, 4, 5], dtype=np.dtype(dtype))
 
         # Test case 1
         input1 = np.array([1, 2, 3, 3], dtype=np.dtype(dtype))
-        tc1 = Series(Categorical(input1, categories=cat_array, ordered=ordered_fixture))
+        tc1 = Series(
+            Categorical(input1, categories=cat_array, ordered=ordered_fixture)
+        )
 
         expected = Series([False, False, False, True])
         tm.assert_series_equal(tc1.duplicated(), expected)
@@ -1494,7 +1642,9 @@ class TestCategoricalSeriesAnalytics:
 
         expected = Series([False, False, True, False])
         tm.assert_series_equal(tc1.duplicated(keep="last"), expected)
-        tm.assert_series_equal(tc1.drop_duplicates(keep="last"), tc1[~expected])
+        tm.assert_series_equal(
+            tc1.drop_duplicates(keep="last"), tc1[~expected]
+        )
         sc = tc1.copy()
         sc.drop_duplicates(keep="last", inplace=True)
         tm.assert_series_equal(sc, tc1[~expected])
@@ -1508,7 +1658,9 @@ class TestCategoricalSeriesAnalytics:
 
         # Test case 2
         input2 = np.array([1, 2, 3, 5, 3, 2, 4], dtype=np.dtype(dtype))
-        tc2 = Series(Categorical(input2, categories=cat_array, ordered=ordered_fixture))
+        tc2 = Series(
+            Categorical(input2, categories=cat_array, ordered=ordered_fixture)
+        )
 
         expected = Series([False, False, False, False, True, True, False])
         tm.assert_series_equal(tc2.duplicated(), expected)
@@ -1519,7 +1671,9 @@ class TestCategoricalSeriesAnalytics:
 
         expected = Series([False, True, True, False, False, False, False])
         tm.assert_series_equal(tc2.duplicated(keep="last"), expected)
-        tm.assert_series_equal(tc2.drop_duplicates(keep="last"), tc2[~expected])
+        tm.assert_series_equal(
+            tc2.drop_duplicates(keep="last"), tc2[~expected]
+        )
         sc = tc2.copy()
         sc.drop_duplicates(keep="last", inplace=True)
         tm.assert_series_equal(sc, tc2[~expected])

@@ -109,7 +109,9 @@ def test_get_str_from_freq(freqstr, expected):
     assert _reso.get_str_from_freq(freqstr) == expected
 
 
-@pytest.mark.parametrize("freq", ["A", "Q", "M", "D", "H", "T", "S", "L", "U", "N"])
+@pytest.mark.parametrize(
+    "freq", ["A", "Q", "M", "D", "H", "T", "S", "L", "U", "N"]
+)
 def test_get_freq_roundtrip(freq):
     result = _reso.get_freq(_reso.get_str_from_freq(freq))
     assert freq == result

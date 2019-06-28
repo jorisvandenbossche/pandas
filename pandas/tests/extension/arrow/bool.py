@@ -33,7 +33,9 @@ class ArrowBoolDtype(ExtensionDtype):
         if string == cls.name:
             return cls()
         else:
-            raise TypeError("Cannot construct a '{}' from " "'{}'".format(cls, string))
+            raise TypeError(
+                "Cannot construct a '{}' from " "'{}'".format(cls, string)
+            )
 
     @classmethod
     def construct_array_type(cls):
@@ -110,7 +112,9 @@ class ArrowBoolArray(ExtensionArray):
         if allow_fill and fill_value is None:
             fill_value = self.dtype.na_value
 
-        result = take(data, indices, fill_value=fill_value, allow_fill=allow_fill)
+        result = take(
+            data, indices, fill_value=fill_value, allow_fill=allow_fill
+        )
         return self._from_sequence(result, dtype=self.dtype)
 
     def copy(self):
@@ -118,7 +122,9 @@ class ArrowBoolArray(ExtensionArray):
 
     @classmethod
     def _concat_same_type(cls, to_concat):
-        chunks = list(itertools.chain.from_iterable(x._data.chunks for x in to_concat))
+        chunks = list(
+            itertools.chain.from_iterable(x._data.chunks for x in to_concat)
+        )
         arr = pa.chunked_array(chunks)
         return cls(arr)
 

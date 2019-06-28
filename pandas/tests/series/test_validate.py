@@ -6,7 +6,14 @@ class TestSeriesValidate:
 
     @pytest.mark.parametrize(
         "func",
-        ["reset_index", "_set_name", "sort_values", "sort_index", "rename", "dropna"],
+        [
+            "reset_index",
+            "_set_name",
+            "sort_values",
+            "sort_index",
+            "rename",
+            "dropna",
+        ],
     )
     @pytest.mark.parametrize("inplace", [1, "True", [1, 2, 3], 5.0])
     def test_validate_bool_args(self, string_series, func, inplace):

@@ -20,14 +20,18 @@ def test_format(idx):
 
 def test_format_integer_names():
     index = MultiIndex(
-        levels=[[0, 1], [0, 1]], codes=[[0, 0, 1, 1], [0, 1, 0, 1]], names=[0, 1]
+        levels=[[0, 1], [0, 1]],
+        codes=[[0, 0, 1, 1], [0, 1, 0, 1]],
+        names=[0, 1],
     )
     index.format(names=True)
 
 
 def test_format_sparse_config(idx):
     warn_filters = warnings.filters
-    warnings.filterwarnings("ignore", category=FutureWarning, module=".*format")
+    warnings.filterwarnings(
+        "ignore", category=FutureWarning, module=".*format"
+    )
     # GH1538
     pd.set_option("display.multi_sparse", False)
 
@@ -62,7 +66,9 @@ def test_repr_with_unicode_data():
 
 
 def test_repr_roundtrip_raises():
-    mi = MultiIndex.from_product([list("ab"), range(3)], names=["first", "second"])
+    mi = MultiIndex.from_product(
+        [list("ab"), range(3)], names=["first", "second"]
+    )
     with pytest.raises(TypeError):
         eval(repr(mi))
 

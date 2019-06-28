@@ -15,9 +15,17 @@ def test_to_excel_styleconverter(ext):
 
     hstyle = {
         "font": {"color": "00FF0000", "bold": True},
-        "borders": {"top": "thin", "right": "thin", "bottom": "thin", "left": "thin"},
+        "borders": {
+            "top": "thin",
+            "right": "thin",
+            "bottom": "thin",
+            "left": "thin",
+        },
         "alignment": {"horizontal": "center", "vertical": "top"},
-        "fill": {"patternType": "solid", "fgColor": {"rgb": "006666FF", "tint": 0.3}},
+        "fill": {
+            "patternType": "solid",
+            "fgColor": {"rgb": "006666FF", "tint": 0.3},
+        },
         "number_format": {"format_code": "0.00"},
         "protection": {"locked": True, "hidden": False},
     }
@@ -61,7 +69,12 @@ def test_write_cells_merge_styled(ext):
     openpyxl_sty_merged = sty_kwargs["font"]
     merge_cells = [
         ExcelCell(
-            col=0, row=0, val="pandas", mergestart=1, mergeend=1, style=sty_merged
+            col=0,
+            row=0,
+            val="pandas",
+            mergestart=1,
+            mergeend=1,
+            style=sty_merged,
         )
     ]
 

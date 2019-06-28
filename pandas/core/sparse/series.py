@@ -24,7 +24,10 @@ from pandas.core.index import Index
 from pandas.core.internals import SingleBlockManager
 import pandas.core.ops as ops
 from pandas.core.series import Series
-from pandas.core.sparse.scipy_sparse import _coo_to_sparse_series, _sparse_series_to_coo
+from pandas.core.sparse.scipy_sparse import (
+    _coo_to_sparse_series,
+    _sparse_series_to_coo,
+)
 
 _shared_doc_kwargs = dict(
     axes="index",
@@ -131,7 +134,9 @@ class SparseSeries(Series):
 
     def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
         # avoid infinite recursion for other SparseSeries inputs
-        inputs = tuple(x.values if isinstance(x, type(self)) else x for x in inputs)
+        inputs = tuple(
+            x.values if isinstance(x, type(self)) else x for x in inputs
+        )
         result = self.values.__array_ufunc__(ufunc, method, *inputs, **kwargs)
         return self._constructor(
             result,
@@ -175,7 +180,9 @@ class SparseSeries(Series):
 
     @property
     def block(self):
-        warnings.warn("SparseSeries.block is deprecated.", FutureWarning, stacklevel=2)
+        warnings.warn(
+            "SparseSeries.block is deprecated.", FutureWarning, stacklevel=2
+        )
         return self._data._block
 
     @property
@@ -200,7 +207,13 @@ class SparseSeries(Series):
 
     @classmethod
     def from_array(
-        cls, arr, index=None, name=None, copy=False, fill_value=None, fastpath=False
+        cls,
+        arr,
+        index=None,
+        name=None,
+        copy=False,
+        fill_value=None,
+        fastpath=False,
     ):
         """Construct SparseSeries from array.
 
@@ -259,11 +272,20 @@ class SparseSeries(Series):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", "Sparse")
             series_rep = Series.__repr__(self)
-            rep = "{series}\n{index!r}".format(series=series_rep, index=self.sp_index)
+            rep = "{series}\n{index!r}".format(
+                series=series_rep, index=self.sp_index
+            )
             return rep
 
     def _reduce(
-        self, op, name, axis=0, skipna=True, numeric_only=None, filter_type=None, **kwds
+        self,
+        op,
+        name,
+        axis=0,
+        skipna=True,
+        numeric_only=None,
+        filter_type=None,
+        **kwds
     ):
         """ perform a reduction operation """
         return op(self.get_values(), skipna=skipna, **kwds)
@@ -360,9 +382,9 @@ class SparseSeries(Series):
         -------
         abs: same type as caller
         """
-        return self._constructor(np.abs(self.values), index=self.index).__finalize__(
-            self
-        )
+        return self._constructor(
+            np.abs(self.values), index=self.index
+        ).__finalize__(self)
 
     def get(self, label, default=None):
         """
@@ -464,7 +486,9 @@ class SparseSeries(Series):
         if new_values is not None:
             values = new_values
         new_index = values.index
-        values = SparseArray(values, fill_value=self.fill_value, kind=self.kind)
+        values = SparseArray(
+            values, fill_value=self.fill_value, kind=self.kind
+        )
         self._data = SingleBlockManager(values, new_index)
         self._index = new_index
 
@@ -481,7 +505,9 @@ class SparseSeries(Series):
 
         values = self.values.to_dense()
         values[key] = libindex.convert_scalar(values, value)
-        values = SparseArray(values, fill_value=self.fill_value, kind=self.kind)
+        values = SparseArray(
+            values, fill_value=self.fill_value, kind=self.kind
+        )
         self._data = SingleBlockManager(values, self.index)
 
     def to_dense(self):
@@ -518,7 +544,9 @@ class SparseSeries(Series):
 
     @Substitution(**_shared_doc_kwargs)
     @Appender(generic.NDFrame.reindex.__doc__)
-    def reindex(self, index=None, method=None, copy=True, limit=None, **kwargs):
+    def reindex(
+        self, index=None, method=None, copy=True, limit=None, **kwargs
+    ):
         # TODO: remove?
         return super().reindex(
             index=index, method=method, copy=copy, limit=limit, **kwargs

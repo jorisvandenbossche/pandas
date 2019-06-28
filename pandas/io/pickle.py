@@ -10,7 +10,9 @@ from pandas.compat import pickle_compat as pc
 from pandas.io.common import _get_handle, _stringify_path
 
 
-def to_pickle(obj, path, compression="infer", protocol=pickle.HIGHEST_PROTOCOL):
+def to_pickle(
+    obj, path, compression="infer", protocol=pickle.HIGHEST_PROTOCOL
+):
     """
     Pickle (serialize) object to file.
 

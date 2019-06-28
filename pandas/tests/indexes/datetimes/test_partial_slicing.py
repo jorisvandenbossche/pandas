@@ -44,7 +44,9 @@ class TestSlicing:
         assert dr[1:].name == dr.name
 
     def test_slice_with_negative_step(self):
-        ts = Series(np.arange(20), date_range("2014-01-01", periods=20, freq="MS"))
+        ts = Series(
+            np.arange(20), date_range("2014-01-01", periods=20, freq="MS")
+        )
         SLC = pd.IndexSlice
 
         def assert_slices_equivalent(l_slc, i_slc):
@@ -52,15 +54,22 @@ class TestSlicing:
             tm.assert_series_equal(ts.loc[l_slc], ts.iloc[i_slc])
             tm.assert_series_equal(ts.loc[l_slc], ts.iloc[i_slc])
 
-        assert_slices_equivalent(SLC[Timestamp("2014-10-01") :: -1], SLC[9::-1])
+        assert_slices_equivalent(
+            SLC[Timestamp("2014-10-01") :: -1], SLC[9::-1]
+        )
         assert_slices_equivalent(SLC["2014-10-01"::-1], SLC[9::-1])
 
-        assert_slices_equivalent(SLC[: Timestamp("2014-10-01") : -1], SLC[:8:-1])
+        assert_slices_equivalent(
+            SLC[: Timestamp("2014-10-01") : -1], SLC[:8:-1]
+        )
         assert_slices_equivalent(SLC[:"2014-10-01":-1], SLC[:8:-1])
 
-        assert_slices_equivalent(SLC["2015-02-01":"2014-10-01":-1], SLC[13:8:-1])
         assert_slices_equivalent(
-            SLC[Timestamp("2015-02-01") : Timestamp("2014-10-01") : -1], SLC[13:8:-1]
+            SLC["2015-02-01":"2014-10-01":-1], SLC[13:8:-1]
+        )
+        assert_slices_equivalent(
+            SLC[Timestamp("2015-02-01") : Timestamp("2014-10-01") : -1],
+            SLC[13:8:-1],
         )
         assert_slices_equivalent(
             SLC["2015-02-01" : Timestamp("2014-10-01") : -1], SLC[13:8:-1]
@@ -72,7 +81,9 @@ class TestSlicing:
         assert_slices_equivalent(SLC["2014-10-01":"2015-02-01":-1], SLC[:0])
 
     def test_slice_with_zero_step_raises(self):
-        ts = Series(np.arange(20), date_range("2014-01-01", periods=20, freq="MS"))
+        ts = Series(
+            np.arange(20), date_range("2014-01-01", periods=20, freq="MS")
+        )
         with pytest.raises(ValueError, match="slice step cannot be zero"):
             ts[::0]
         with pytest.raises(ValueError, match="slice step cannot be zero"):
@@ -120,7 +131,9 @@ class TestSlicing:
         df = pd.DataFrame(
             {"A": [1, 2, 3]}, index=pd.date_range("20170101", periods=3)[::-1]
         )
-        expected = pd.DataFrame({"A": 1}, index=pd.date_range("20170103", periods=1))
+        expected = pd.DataFrame(
+            {"A": 1}, index=pd.date_range("20170103", periods=1)
+        )
         tm.assert_frame_equal(df.loc["2017-01-03"], expected)
 
     def test_slice_year(self):
@@ -194,7 +207,9 @@ class TestSlicing:
             s["2004-12-31 00"]
 
     def test_partial_slice_hourly(self):
-        rng = date_range(freq="T", start=datetime(2005, 1, 1, 20, 0, 0), periods=500)
+        rng = date_range(
+            freq="T", start=datetime(2005, 1, 1, 20, 0, 0), periods=500
+        )
         s = Series(np.arange(len(rng)), index=rng)
 
         result = s["2005-1-1"]
@@ -208,7 +223,9 @@ class TestSlicing:
             s["2004-12-31 00:15"]
 
     def test_partial_slice_minutely(self):
-        rng = date_range(freq="S", start=datetime(2005, 1, 1, 23, 59, 0), periods=500)
+        rng = date_range(
+            freq="S", start=datetime(2005, 1, 1, 23, 59, 0), periods=500
+        )
         s = Series(np.arange(len(rng)), index=rng)
 
         result = s["2005-1-1 23:59"]
@@ -280,7 +297,10 @@ class TestSlicing:
 
             # Timestamp with resolution less precise than index
             for fmt in formats[:rnum]:
-                for element, theslice in [[0, slice(None, 1)], [1, slice(1, None)]]:
+                for element, theslice in [
+                    [0, slice(None, 1)],
+                    [1, slice(1, None)],
+                ]:
                     ts_string = index[element].strftime(fmt)
 
                     # Series should return slice
@@ -352,7 +372,8 @@ class TestSlicing:
         # GH 4294
         # partial slice on a series mi
         s = pd.DataFrame(
-            np.random.rand(1000, 1000), index=pd.date_range("2000-1-1", periods=1000)
+            np.random.rand(1000, 1000),
+            index=pd.date_range("2000-1-1", periods=1000),
         ).stack()
 
         s2 = s[:-1].copy()
@@ -378,11 +399,15 @@ class TestSlicing:
         timestamp = pd.Timestamp("2014-01-10")
 
         tm.assert_series_equal(nonmonotonic["2014-01-10":], expected)
-        with pytest.raises(KeyError, match=r"Timestamp\('2014-01-10 00:00:00'\)"):
+        with pytest.raises(
+            KeyError, match=r"Timestamp\('2014-01-10 00:00:00'\)"
+        ):
             nonmonotonic[timestamp:]
 
         tm.assert_series_equal(nonmonotonic.loc["2014-01-10":], expected)
-        with pytest.raises(KeyError, match=r"Timestamp\('2014-01-10 00:00:00'\)"):
+        with pytest.raises(
+            KeyError, match=r"Timestamp\('2014-01-10 00:00:00'\)"
+        ):
             nonmonotonic.loc[timestamp:]
 
     def test_loc_datetime_length_one(self):

@@ -26,7 +26,9 @@ import pandas.core.common as com
 from pandas.core.generic import _shared_docs
 from pandas.core.indexing import _maybe_numeric_slice, _non_reducing_slice
 
-jinja2 = import_optional_dependency("jinja2", extra="DataFrame.style requires jinja2.")
+jinja2 = import_optional_dependency(
+    "jinja2", extra="DataFrame.style requires jinja2."
+)
 
 
 try:
@@ -297,7 +299,9 @@ class Styler:
                         "col{col}".format(col=c),
                     ]
                     cs.extend(
-                        cell_context.get("col_headings", {}).get(r, {}).get(c, [])
+                        cell_context.get("col_headings", {})
+                        .get(r, {})
+                        .get(c, [])
                     )
                     es = {
                         "type": "th",
@@ -329,7 +333,13 @@ class Styler:
                 )
 
             index_header_row.extend(
-                [{"type": "th", "value": BLANK_VALUE, "class": " ".join([BLANK_CLASS])}]
+                [
+                    {
+                        "type": "th",
+                        "value": BLANK_VALUE,
+                        "class": " ".join([BLANK_CLASS]),
+                    }
+                ]
                 * (len(clabels[0]) - len(hidden_columns))
             )
 
@@ -346,7 +356,9 @@ class Styler:
                 ]
                 es = {
                     "type": "th",
-                    "is_visible": (_is_visible(r, c, idx_lengths) and not hidden_index),
+                    "is_visible": (
+                        _is_visible(r, c, idx_lengths) and not hidden_index
+                    ),
                     "value": value,
                     "display_value": value,
                     "id": "_".join(rid[1:]),
@@ -360,7 +372,11 @@ class Styler:
                 row_es.append(es)
 
             for c, col in enumerate(self.data.columns):
-                cs = [DATA_CLASS, "row{row}".format(row=r), "col{col}".format(col=c)]
+                cs = [
+                    DATA_CLASS,
+                    "row{row}".format(row=r),
+                    "col{col}".format(col=c),
+                ]
                 cs.extend(cell_context.get("data", {}).get(r, {}).get(c, []))
                 formatter = self._display_funcs[(r, c)]
                 value = self.data.iloc[r, c]
@@ -372,7 +388,9 @@ class Styler:
                     "is_visible": (c not in hidden_columns),
                 }
                 # only add an id if the cell has a style
-                if self.cell_ids or not (len(ctx[r, c]) == 1 and ctx[r, c][0] == ""):
+                if self.cell_ids or not (
+                    len(ctx[r, c]) == 1 and ctx[r, c][0] == ""
+                ):
                     row_dict["id"] = "_".join(cs[1:])
                 row_es.append(row_dict)
                 props = []
@@ -395,7 +413,9 @@ class Styler:
         if not use_mathjax:
             table_attr = table_attr or ""
             if 'class="' in table_attr:
-                table_attr = table_attr.replace('class="', 'class="tex2jax_ignore ')
+                table_attr = table_attr.replace(
+                    'class="', 'class="tex2jax_ignore '
+                )
             else:
                 table_attr += ' class="tex2jax_ignore"'
 
@@ -521,7 +541,9 @@ class Styler:
         # filter out empty styles, every cell will have a class
         # but the list of props may just be [['', '']].
         # so we have the neested anys below
-        trimmed = [x for x in d["cellstyle"] if any(any(y) for y in x["props"])]
+        trimmed = [
+            x for x in d["cellstyle"] if any(any(y) for y in x["props"])
+        ]
         d["cellstyle"] = trimmed
         d.update(kwargs)
         return self.template.render(**d)
@@ -596,7 +618,9 @@ class Styler:
         subset = _non_reducing_slice(subset)
         data = self.data.loc[subset]
         if axis is not None:
-            result = data.apply(func, axis=axis, result_type="expand", **kwargs)
+            result = data.apply(
+                func, axis=axis, result_type="expand", **kwargs
+            )
             result.columns = data.columns
         else:
             result = func(data, **kwargs)
@@ -606,7 +630,8 @@ class Styler:
                     "passed to `Styler.apply` with axis=None".format(func=func)
                 )
             if not (
-                result.index.equals(data.index) and result.columns.equals(data.columns)
+                result.index.equals(data.index)
+                and result.columns.equals(data.columns)
             ):
                 msg = (
                     "Result of {func!r} must have identical index and "
@@ -674,7 +699,11 @@ class Styler:
         >>> df.style.apply(highlight_max)
         """
         self._todo.append(
-            (lambda instance: getattr(instance, "_apply"), (func, axis, subset), kwargs)
+            (
+                lambda instance: getattr(instance, "_apply"),
+                (func, axis, subset),
+                kwargs,
+            )
         )
         return self
 
@@ -711,7 +740,11 @@ class Styler:
         Styler.where
         """
         self._todo.append(
-            (lambda instance: getattr(instance, "_applymap"), (func, subset), kwargs)
+            (
+                lambda instance: getattr(instance, "_applymap"),
+                (func, subset),
+                kwargs,
+            )
         )
         return self
 
@@ -930,7 +963,9 @@ class Styler:
     @staticmethod
     def _highlight_null(v, null_color):
         return (
-            "background-color: {color}".format(color=null_color) if pd.isna(v) else ""
+            "background-color: {color}".format(color=null_color)
+            if pd.isna(v)
+            else ""
         )
 
     def highlight_null(self, null_color="red"):
@@ -1012,7 +1047,9 @@ class Styler:
         return self
 
     @staticmethod
-    def _background_gradient(s, cmap="PuBu", low=0, high=0, text_color_threshold=0.408):
+    def _background_gradient(
+        s, cmap="PuBu", low=0, high=0, text_color_threshold=0.408
+    ):
         """
         Color background in a range according to the data.
         """
@@ -1093,7 +1130,9 @@ class Styler:
         >>> df.style.set_properties(color="white", align="right")
         >>> df.style.set_properties(**{'background-color': 'yellow'})
         """
-        values = ";".join("{p}: {v}".format(p=p, v=v) for p, v in kwargs.items())
+        values = ";".join(
+            "{p}: {v}".format(p=p, v=v) for p, v in kwargs.items()
+        )
         f = lambda x: values
         return self.applymap(f, subset=subset)
 
@@ -1262,7 +1301,9 @@ class Styler:
         -------
         self : Styler
         """
-        return self._highlight_handler(subset=subset, color=color, axis=axis, max_=True)
+        return self._highlight_handler(
+            subset=subset, color=color, axis=axis, max_=True
+        )
 
     def highlight_min(self, subset=None, color="yellow", axis=0):
         """
@@ -1286,10 +1327,16 @@ class Styler:
             subset=subset, color=color, axis=axis, max_=False
         )
 
-    def _highlight_handler(self, subset=None, color="yellow", axis=None, max_=True):
+    def _highlight_handler(
+        self, subset=None, color="yellow", axis=None, max_=True
+    ):
         subset = _non_reducing_slice(_maybe_numeric_slice(self.data, subset))
         self.apply(
-            self._highlight_extrema, color=color, axis=axis, subset=subset, max_=max_
+            self._highlight_extrema,
+            color=color,
+            axis=axis,
+            subset=subset,
+            max_=max_,
         )
         return self
 
@@ -1311,7 +1358,9 @@ class Styler:
             else:
                 extrema = data == data.min().min()
             return pd.DataFrame(
-                np.where(extrema, attr, ""), index=data.index, columns=data.columns
+                np.where(extrema, attr, ""),
+                index=data.index,
+                columns=data.columns,
             )
 
     @classmethod
@@ -1332,7 +1381,9 @@ class Styler:
         MyStyler : subclass of Styler
             Has the correct ``env`` and ``template`` class attributes set.
         """
-        loader = jinja2.ChoiceLoader([jinja2.FileSystemLoader(searchpath), cls.loader])
+        loader = jinja2.ChoiceLoader(
+            [jinja2.FileSystemLoader(searchpath), cls.loader]
+        )
 
         class MyStyler(cls):
             env = jinja2.Environment(loader=loader)

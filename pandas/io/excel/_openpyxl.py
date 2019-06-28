@@ -89,7 +89,9 @@ class _OpenpyxlWriter(ExcelWriter):
         for k, v in style_dict.items():
             if k in _style_key_map:
                 k = _style_key_map[k]
-            _conv_to_x = getattr(cls, "_convert_to_{k}".format(k=k), lambda x: None)
+            _conv_to_x = getattr(
+                cls, "_convert_to_{k}".format(k=k), lambda x: None
+            )
             new_v = _conv_to_x(v)
             if new_v:
                 style_kwargs[k] = new_v
@@ -310,7 +312,10 @@ class _OpenpyxlWriter(ExcelWriter):
 
         from openpyxl.styles import Border
 
-        _border_key_map = {"diagonalup": "diagonalUp", "diagonaldown": "diagonalDown"}
+        _border_key_map = {
+            "diagonalup": "diagonalUp",
+            "diagonaldown": "diagonalDown",
+        }
 
         border_kwargs = {}
         for k, v in border_dict.items():

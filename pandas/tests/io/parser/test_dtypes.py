@@ -13,7 +13,15 @@ from pandas.errors import ParserWarning
 from pandas.core.dtypes.dtypes import CategoricalDtype
 
 import pandas as pd
-from pandas import Categorical, DataFrame, Index, MultiIndex, Series, Timestamp, concat
+from pandas import (
+    Categorical,
+    DataFrame,
+    Index,
+    MultiIndex,
+    Series,
+    Timestamp,
+    concat,
+)
 import pandas.util.testing as tm
 
 
@@ -61,7 +69,8 @@ one,two
 3,4.5
 4,5.5"""
     expected = DataFrame(
-        [[1, "2.5"], [2, "3.5"], [3, "4.5"], [4, "5.5"]], columns=["one", "two"]
+        [[1, "2.5"], [2, "3.5"], [3, "4.5"], [4, "5.5"]],
+        columns=["one", "two"],
     )
     expected["one"] = expected["one"].astype(np.float64)
     expected["two"] = expected["two"].astype(object)
@@ -118,7 +127,11 @@ def test_categorical_dtype_single(all_parsers, dtype):
 1,a,3.4
 2,b,4.5"""
     expected = DataFrame(
-        {"a": [1, 1, 2], "b": Categorical(["a", "a", "b"]), "c": [3.4, 3.4, 4.5]}
+        {
+            "a": [1, 1, 2],
+            "b": Categorical(["a", "a", "b"]),
+            "c": [3.4, 3.4, 4.5],
+        }
     )
     actual = parser.read_csv(StringIO(data), dtype=dtype)
     tm.assert_frame_equal(actual, expected)
@@ -167,7 +180,9 @@ def test_categorical_dtype_high_cardinality_numeric(all_parsers):
     data = np.sort([str(i) for i in range(524289)])
     expected = DataFrame({"a": Categorical(data, ordered=True)})
 
-    actual = parser.read_csv(StringIO("a\n" + "\n".join(data)), dtype="category")
+    actual = parser.read_csv(
+        StringIO("a\n" + "\n".join(data)), dtype="category"
+    )
     actual["a"] = actual["a"].cat.reorder_categories(
         np.sort(actual.a.cat.categories), ordered=True
     )
@@ -183,7 +198,9 @@ def test_categorical_dtype_latin1(all_parsers, csv_dir_path):
     expected = parser.read_csv(pth, header=None, encoding=encoding)
     expected[1] = Categorical(expected[1])
 
-    actual = parser.read_csv(pth, header=None, encoding=encoding, dtype={1: "category"})
+    actual = parser.read_csv(
+        pth, header=None, encoding=encoding, dtype={1: "category"}
+    )
     tm.assert_frame_equal(actual, expected)
 
 
@@ -213,7 +230,9 @@ def test_categorical_dtype_chunksize_infer_categories(all_parsers):
         DataFrame({"a": [1, 1], "b": Categorical(["a", "b"])}),
         DataFrame({"a": [1, 2], "b": Categorical(["b", "c"])}, index=[2, 3]),
     ]
-    actuals = parser.read_csv(StringIO(data), dtype={"b": "category"}, chunksize=2)
+    actuals = parser.read_csv(
+        StringIO(data), dtype={"b": "category"}, chunksize=2
+    )
 
     for actual, expected in zip(actuals, expecteds):
         tm.assert_frame_equal(actual, expected)
@@ -229,9 +248,12 @@ def test_categorical_dtype_chunksize_explicit_categories(all_parsers):
 2,c"""
     cats = ["a", "b", "c"]
     expecteds = [
-        DataFrame({"a": [1, 1], "b": Categorical(["a", "b"], categories=cats)}),
         DataFrame(
-            {"a": [1, 2], "b": Categorical(["b", "c"], categories=cats)}, index=[2, 3]
+            {"a": [1, 1], "b": Categorical(["a", "b"], categories=cats)}
+        ),
+        DataFrame(
+            {"a": [1, 2], "b": Categorical(["b", "c"], categories=cats)},
+            index=[2, 3],
         ),
     ]
     dtype = CategoricalDtype(cats)
@@ -382,7 +404,8 @@ def test_empty_with_index_pass_dtype(all_parsers):
     )
 
     expected = DataFrame(
-        {"two": np.empty(0, dtype="f")}, index=Index([], dtype="u1", name="one")
+        {"two": np.empty(0, dtype="f")},
+        index=Index([], dtype="u1", name="one"),
     )
     tm.assert_frame_equal(result, expected)
 
@@ -396,9 +419,12 @@ def test_empty_with_multi_index_pass_dtype(all_parsers):
     )
 
     exp_idx = MultiIndex.from_arrays(
-        [np.empty(0, dtype="u1"), np.empty(0, dtype=np.float64)], names=["one", "two"]
+        [np.empty(0, dtype="u1"), np.empty(0, dtype=np.float64)],
+        names=["one", "two"],
     )
-    expected = DataFrame({"three": np.empty(0, dtype=np.object)}, index=exp_idx)
+    expected = DataFrame(
+        {"three": np.empty(0, dtype=np.object)}, index=exp_idx
+    )
     tm.assert_frame_equal(result, expected)
 
 
@@ -432,7 +458,10 @@ def test_empty_with_dup_column_pass_dtype_by_indexes(all_parsers):
     # see gh-9424
     parser = all_parsers
     expected = concat(
-        [Series([], name="one", dtype="u1"), Series([], name="one.1", dtype="f")],
+        [
+            Series([], name="one", dtype="u1"),
+            Series([], name="one.1", dtype="f"),
+        ],
         axis=1,
     )
     expected.index = expected.index.astype(object)
@@ -446,7 +475,10 @@ def test_empty_with_dup_column_pass_dtype_by_indexes_warn(all_parsers):
     # see gh-9424
     parser = all_parsers
     expected = concat(
-        [Series([], name="one", dtype="u1"), Series([], name="one.1", dtype="f")],
+        [
+            Series([], name="one", dtype="u1"),
+            Series([], name="one.1", dtype="f"),
+        ],
         axis=1,
     )
     expected.index = expected.index.astype(object)
@@ -473,7 +505,9 @@ def test_raise_on_passed_int_dtype_with_nas(all_parsers):
         else "Unable to convert column DOY"
     )
     with pytest.raises(ValueError, match=msg):
-        parser.read_csv(StringIO(data), dtype={"DOY": np.int64}, skipinitialspace=True)
+        parser.read_csv(
+            StringIO(data), dtype={"DOY": np.int64}, skipinitialspace=True
+        )
 
 
 def test_dtype_with_converters(all_parsers):
@@ -485,7 +519,9 @@ def test_dtype_with_converters(all_parsers):
     # Dtype spec ignored if converted specified.
     with tm.assert_produces_warning(ParserWarning):
         result = parser.read_csv(
-            StringIO(data), dtype={"a": "i8"}, converters={"a": lambda x: str(x)}
+            StringIO(data),
+            dtype={"a": "i8"},
+            converters={"a": lambda x: str(x)},
         )
     expected = DataFrame({"a": ["1.1", "1.2"], "b": [2.2, 2.3]})
     tm.assert_frame_equal(result, expected)
@@ -495,12 +531,18 @@ def test_dtype_with_converters(all_parsers):
     "dtype,expected",
     [
         (np.float64, DataFrame(columns=["a", "b"], dtype=np.float64)),
-        ("category", DataFrame({"a": Categorical([]), "b": Categorical([])}, index=[])),
+        (
+            "category",
+            DataFrame({"a": Categorical([]), "b": Categorical([])}, index=[]),
+        ),
         (
             dict(a="category", b="category"),
             DataFrame({"a": Categorical([]), "b": Categorical([])}, index=[]),
         ),
-        ("datetime64[ns]", DataFrame(columns=["a", "b"], dtype="datetime64[ns]")),
+        (
+            "datetime64[ns]",
+            DataFrame(columns=["a", "b"], dtype="datetime64[ns]"),
+        ),
         (
             "timedelta64[ns]",
             DataFrame(
@@ -514,21 +556,30 @@ def test_dtype_with_converters(all_parsers):
         (
             dict(a=np.int64, b=np.int32),
             DataFrame(
-                {"a": Series([], dtype=np.int64), "b": Series([], dtype=np.int32)},
+                {
+                    "a": Series([], dtype=np.int64),
+                    "b": Series([], dtype=np.int32),
+                },
                 index=[],
             ),
         ),
         (
             {0: np.int64, 1: np.int32},
             DataFrame(
-                {"a": Series([], dtype=np.int64), "b": Series([], dtype=np.int32)},
+                {
+                    "a": Series([], dtype=np.int64),
+                    "b": Series([], dtype=np.int32),
+                },
                 index=[],
             ),
         ),
         (
             {"a": np.int64, 1: np.int32},
             DataFrame(
-                {"a": Series([], dtype=np.int64), "b": Series([], dtype=np.int32)},
+                {
+                    "a": Series([], dtype=np.int64),
+                    "b": Series([], dtype=np.int32),
+                },
                 index=[],
             ),
         ),

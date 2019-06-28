@@ -35,7 +35,10 @@ def fill_frame(frame):
     values[np.isnan(values)] = 2
 
     return SparseDataFrame(
-        values, columns=["A", "B", "C", "D"], default_fill_value=2, index=frame.index
+        values,
+        columns=["A", "B", "C", "D"],
+        default_fill_value=2,
+        index=frame.index,
     )
 
 
@@ -57,7 +60,9 @@ def test_apply(frame):
     tm.assert_frame_equal(broadcasted.to_dense(), exp)
 
     applied = frame.apply(np.sum)
-    tm.assert_series_equal(applied, frame.to_dense().apply(nanops.nansum).to_sparse())
+    tm.assert_series_equal(
+        applied, frame.to_dense().apply(nanops.nansum).to_sparse()
+    )
 
 
 @pytest.mark.filterwarnings("ignore:Sparse:FutureWarning")

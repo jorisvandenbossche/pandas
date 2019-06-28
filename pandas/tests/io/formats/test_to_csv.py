@@ -12,7 +12,10 @@ from pandas.util import testing as tm
 class TestToCSV:
     @pytest.mark.xfail(
         (3, 6, 5) > sys.version_info >= (3, 5),
-        reason=("Python csv library bug " "(see https://bugs.python.org/issue32255)"),
+        reason=(
+            "Python csv library bug "
+            "(see https://bugs.python.org/issue32255)"
+        ),
     )
     def test_to_csv_with_single_column(self):
         # see gh-18676, https://bugs.python.org/issue32255
@@ -138,11 +141,15 @@ $1$,$2$
         assert df.to_csv() == expected_default
 
         expected_rows = [";col1;col2;col3", "0;1;a;10,1"]
-        expected_european_excel = tm.convert_rows_list_to_csv_str(expected_rows)
+        expected_european_excel = tm.convert_rows_list_to_csv_str(
+            expected_rows
+        )
         assert df.to_csv(decimal=",", sep=";") == expected_european_excel
 
         expected_rows = [",col1,col2,col3", "0,1,a,10.10"]
-        expected_float_format_default = tm.convert_rows_list_to_csv_str(expected_rows)
+        expected_float_format_default = tm.convert_rows_list_to_csv_str(
+            expected_rows
+        )
         assert df.to_csv(float_format="%.2f") == expected_float_format_default
 
         expected_rows = [";col1;col2;col3", "0;1;a;10,10"]
@@ -206,8 +213,12 @@ $1$,$2$
 
     def test_to_csv_date_format(self):
         # GH 10209
-        df_sec = DataFrame({"A": pd.date_range("20130101", periods=5, freq="s")})
-        df_day = DataFrame({"A": pd.date_range("20130101", periods=5, freq="d")})
+        df_sec = DataFrame(
+            {"A": pd.date_range("20130101", periods=5, freq="s")}
+        )
+        df_day = DataFrame(
+            {"A": pd.date_range("20130101", periods=5, freq="d")}
+        )
 
         expected_rows = [
             ",A",
@@ -229,7 +240,10 @@ $1$,$2$
             "4,2013-01-05 00:00:00",
         ]
         expected_ymdhms_day = tm.convert_rows_list_to_csv_str(expected_rows)
-        assert df_day.to_csv(date_format="%Y-%m-%d %H:%M:%S") == expected_ymdhms_day
+        assert (
+            df_day.to_csv(date_format="%Y-%m-%d %H:%M:%S")
+            == expected_ymdhms_day
+        )
 
         expected_rows = [
             ",A",
@@ -265,7 +279,10 @@ $1$,$2$
         expected_ymd_sec = tm.convert_rows_list_to_csv_str(expected_rows)
 
         df_sec_grouped = df_sec.groupby([pd.Grouper(key="A", freq="1h"), "B"])
-        assert df_sec_grouped.mean().to_csv(date_format="%Y-%m-%d") == expected_ymd_sec
+        assert (
+            df_sec_grouped.mean().to_csv(date_format="%Y-%m-%d")
+            == expected_ymd_sec
+        )
 
     def test_to_csv_multi_index(self):
         # see gh-6618
@@ -293,7 +310,9 @@ $1$,$2$
         exp = tm.convert_rows_list_to_csv_str(exp_rows)
         assert df.to_csv(index=False) == exp
 
-        df = DataFrame([1], columns=pd.MultiIndex.from_arrays([["foo"], ["bar"]]))
+        df = DataFrame(
+            [1], columns=pd.MultiIndex.from_arrays([["foo"], ["bar"]])
+        )
 
         exp_rows = [",foo", ",bar", "0,1"]
         exp = tm.convert_rows_list_to_csv_str(exp_rows)
@@ -377,7 +396,9 @@ $1$,$2$
                 assert f.read() == expected_noarg
         with tm.ensure_clean("lf_test.csv") as path:
             # case 2: LF as line terminator
-            expected_lf = b"int,str_lf\n" b"1,abc\n" b'2,"d\nef"\n' b'3,"g\nh\n\ni"\n'
+            expected_lf = (
+                b"int,str_lf\n" b"1,abc\n" b'2,"d\nef"\n' b'3,"g\nh\n\ni"\n'
+            )
             df.to_csv(path, line_terminator="\n", index=False)
             with open(path, "rb") as f:
                 assert f.read() == expected_lf
@@ -385,7 +406,10 @@ $1$,$2$
             # case 3: CRLF as line terminator
             # 'line_terminator' should not change inner element
             expected_crlf = (
-                b"int,str_lf\r\n" b"1,abc\r\n" b'2,"d\nef"\r\n' b'3,"g\nh\n\ni"\r\n'
+                b"int,str_lf\r\n"
+                b"1,abc\r\n"
+                b'2,"d\nef"\r\n'
+                b'3,"g\nh\n\ni"\r\n'
             )
             df.to_csv(path, line_terminator="\r\n", index=False)
             with open(path, "rb") as f:
@@ -393,7 +417,10 @@ $1$,$2$
 
     def test_to_csv_string_with_crlf(self):
         # GH 20353
-        data = {"int": [1, 2, 3], "str_crlf": ["abc", "d\r\nef", "g\r\nh\r\n\r\ni"]}
+        data = {
+            "int": [1, 2, 3],
+            "str_crlf": ["abc", "d\r\nef", "g\r\nh\r\n\r\ni"],
+        }
         df = pd.DataFrame(data)
         with tm.ensure_clean("crlf_test.csv") as path:
             # case 1: The default line terminator(=os.linesep)(PR 21406)
@@ -414,7 +441,10 @@ $1$,$2$
         with tm.ensure_clean("crlf_test.csv") as path:
             # case 2: LF as line terminator
             expected_lf = (
-                b"int,str_crlf\n" b"1,abc\n" b'2,"d\r\nef"\n' b'3,"g\r\nh\r\n\r\ni"\n'
+                b"int,str_crlf\n"
+                b"1,abc\n"
+                b'2,"d\r\nef"\n'
+                b'3,"g\r\nh\r\n\r\ni"\n'
             )
             df.to_csv(path, line_terminator="\n", index=False)
             with open(path, "rb") as f:
@@ -475,7 +505,9 @@ z
         # see gh-20353
         df = pd.DataFrame({"a": ["x", "y", "z"]})
         expected_rows = ["x", "y", "z"]
-        expected = "manual header\n" + tm.convert_rows_list_to_csv_str(expected_rows)
+        expected = "manual header\n" + tm.convert_rows_list_to_csv_str(
+            expected_rows
+        )
         with tm.ensure_clean("test.txt") as path:
             with open(path, "w", newline="") as f:
                 f.write("manual header\n")
@@ -513,5 +545,7 @@ z
 
         with tm.ensure_clean(filename) as path:
             df.to_csv(path, compression=to_compression)
-            result = pd.read_csv(path, index_col=0, compression=read_compression)
+            result = pd.read_csv(
+                path, index_col=0, compression=read_compression
+            )
             tm.assert_frame_equal(result, df)

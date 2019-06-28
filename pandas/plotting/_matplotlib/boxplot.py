@@ -27,7 +27,9 @@ class BoxPlot(LinePlot):
     def __init__(self, data, return_type="axes", **kwargs):
         # Do not call LinePlot.__init__ which may fill nan
         if return_type not in self._valid_return_types:
-            raise ValueError("return_type must be {None, 'axes', 'dict', 'both'}")
+            raise ValueError(
+                "return_type must be {None, 'axes', 'dict', 'both'}"
+            )
 
         self.return_type = return_type
         MPLPlot.__init__(self, data, **kwargs)
@@ -76,13 +78,17 @@ class BoxPlot(LinePlot):
                         raise ValueError(
                             "color dict contains invalid "
                             "key '{0}' "
-                            "The key must be either {1}".format(key, valid_keys)
+                            "The key must be either {1}".format(
+                                key, valid_keys
+                            )
                         )
         else:
             self.color = None
 
         # get standard colors for default
-        colors = _get_standard_colors(num_colors=3, colormap=self.colormap, color=None)
+        colors = _get_standard_colors(
+            num_colors=3, colormap=self.colormap, color=None
+        )
         # use 2 colors by default, for box/whisker and median
         # flier colors isn't needed here
         # because it can be specified by ``sym`` kw
@@ -193,7 +199,12 @@ def _grouped_plot_by_column(
         columns = data._get_numeric_data().columns.difference(by)
     naxes = len(columns)
     fig, axes = _subplots(
-        naxes=naxes, sharex=True, sharey=True, figsize=figsize, ax=ax, layout=layout
+        naxes=naxes,
+        sharex=True,
+        sharey=True,
+        figsize=figsize,
+        ax=ax,
+        layout=layout,
     )
 
     _axes = _flatten(axes)
@@ -389,11 +400,18 @@ def boxplot_frame_groupby(
         ret = pd.Series()
         for (key, group), ax in zip(grouped, axes):
             d = group.boxplot(
-                ax=ax, column=column, fontsize=fontsize, rot=rot, grid=grid, **kwds
+                ax=ax,
+                column=column,
+                fontsize=fontsize,
+                rot=rot,
+                grid=grid,
+                **kwds
             )
             ax.set_title(pprint_thing(key))
             ret.loc[key] = d
-        fig.subplots_adjust(bottom=0.15, top=0.9, left=0.1, right=0.9, wspace=0.2)
+        fig.subplots_adjust(
+            bottom=0.15, top=0.9, left=0.1, right=0.9, wspace=0.2
+        )
     else:
         keys, frames = zip(*grouped)
         if grouped.axis == 0:

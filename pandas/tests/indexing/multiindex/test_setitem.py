@@ -5,7 +5,15 @@ from numpy.random import randn
 import pytest
 
 import pandas as pd
-from pandas import DataFrame, MultiIndex, Series, Timestamp, date_range, isna, notna
+from pandas import (
+    DataFrame,
+    MultiIndex,
+    Series,
+    Timestamp,
+    date_range,
+    isna,
+    notna,
+)
 import pandas.core.common as com
 from pandas.util import testing as tm
 
@@ -30,7 +38,8 @@ class TestMultiIndexSetItem:
 
                 # GH7190
                 index = MultiIndex.from_product(
-                    [np.arange(0, 100), np.arange(0, 80)], names=["time", "firm"]
+                    [np.arange(0, 100), np.arange(0, 80)],
+                    names=["time", "firm"],
                 )
                 t, n = 0, 2
                 df = DataFrame(
@@ -39,7 +48,10 @@ class TestMultiIndexSetItem:
                     index=index,
                 )
                 check(
-                    target=df, indexers=((t, n), "X"), value=0, compare_fn=assert_equal
+                    target=df,
+                    indexers=((t, n), "X"),
+                    value=0,
+                    compare_fn=assert_equal,
                 )
 
                 df = DataFrame(
@@ -48,14 +60,21 @@ class TestMultiIndexSetItem:
                     index=index,
                 )
                 check(
-                    target=df, indexers=((t, n), "X"), value=1, compare_fn=assert_equal
+                    target=df,
+                    indexers=((t, n), "X"),
+                    value=1,
+                    compare_fn=assert_equal,
                 )
 
                 df = DataFrame(
-                    columns=["A", "w", "l", "a", "x", "X", "d", "profit"], index=index
+                    columns=["A", "w", "l", "a", "x", "X", "d", "profit"],
+                    index=index,
                 )
                 check(
-                    target=df, indexers=((t, n), "X"), value=2, compare_fn=assert_equal
+                    target=df,
+                    indexers=((t, n), "X"),
+                    value=2,
+                    compare_fn=assert_equal,
                 )
 
                 # gh-7218: assigning with 0-dim arrays
@@ -85,7 +104,9 @@ class TestMultiIndexSetItem:
                     df.ix[row_selection, col_selection] = df["F"]
                 output = DataFrame(99.0, index=[0, 2, 4], columns=["B", "C"])
                 with catch_warnings(record=True):
-                    tm.assert_frame_equal(df.ix[row_selection, col_selection], output)
+                    tm.assert_frame_equal(
+                        df.ix[row_selection, col_selection], output
+                    )
                 check(
                     target=df,
                     indexers=(row_selection, col_selection),
@@ -96,19 +117,33 @@ class TestMultiIndexSetItem:
 
                 # GH11372
                 idx = MultiIndex.from_product(
-                    [["A", "B", "C"], date_range("2015-01-01", "2015-04-01", freq="MS")]
+                    [
+                        ["A", "B", "C"],
+                        date_range("2015-01-01", "2015-04-01", freq="MS"),
+                    ]
                 )
                 cols = MultiIndex.from_product(
-                    [["foo", "bar"], date_range("2016-01-01", "2016-02-01", freq="MS")]
+                    [
+                        ["foo", "bar"],
+                        date_range("2016-01-01", "2016-02-01", freq="MS"),
+                    ]
                 )
 
-                df = DataFrame(np.random.random((12, 4)), index=idx, columns=cols)
+                df = DataFrame(
+                    np.random.random((12, 4)), index=idx, columns=cols
+                )
 
                 subidx = MultiIndex.from_tuples(
-                    [("A", Timestamp("2015-01-01")), ("A", Timestamp("2015-02-01"))]
+                    [
+                        ("A", Timestamp("2015-01-01")),
+                        ("A", Timestamp("2015-02-01")),
+                    ]
                 )
                 subcols = MultiIndex.from_tuples(
-                    [("foo", Timestamp("2016-01-01")), ("foo", Timestamp("2016-02-01"))]
+                    [
+                        ("foo", Timestamp("2016-01-01")),
+                        ("foo", Timestamp("2016-02-01")),
+                    ]
                 )
 
                 vals = DataFrame(
@@ -121,7 +156,9 @@ class TestMultiIndexSetItem:
                     compare_fn=tm.assert_frame_equal,
                 )
                 # set all columns
-                vals = DataFrame(np.random.random((2, 4)), index=subidx, columns=cols)
+                vals = DataFrame(
+                    np.random.random((2, 4)), index=subidx, columns=cols
+                )
                 check(
                     target=df,
                     indexers=(subidx, slice(None, None, None)),
@@ -206,7 +243,9 @@ class TestMultiIndexSetItem:
 
         with catch_warnings(record=True):
             df.ix[4, "d"] = arr
-            tm.assert_series_equal(df.ix[4, "d"], Series(arr, index=[8, 10], name="d"))
+            tm.assert_series_equal(
+                df.ix[4, "d"], Series(arr, index=[8, 10], name="d")
+            )
 
         # single dtype
         df = DataFrame(
@@ -238,7 +277,9 @@ class TestMultiIndexSetItem:
         # groupby example
         NUM_ROWS = 100
         NUM_COLS = 10
-        col_names = ["A" + num for num in map(str, np.arange(NUM_COLS).tolist())]
+        col_names = [
+            "A" + num for num in map(str, np.arange(NUM_COLS).tolist())
+        ]
         index_cols = col_names[:5]
 
         df = DataFrame(
@@ -253,9 +294,9 @@ class TestMultiIndexSetItem:
         f_index = np.arange(5)
 
         def f(name, df2):
-            return Series(np.arange(df2.shape[0]), name=df2.index.values[0]).reindex(
-                f_index
-            )
+            return Series(
+                np.arange(df2.shape[0]), name=df2.index.values[0]
+            ).reindex(f_index)
 
         # TODO(wesm): unused?
         # new_df = pd.concat([f(name, df2) for name, df2 in grp], axis=1).T
@@ -267,7 +308,9 @@ class TestMultiIndexSetItem:
             with catch_warnings(record=True):
                 df.ix[name, "new_col"] = new_vals
 
-    def test_series_setitem(self, multiindex_year_month_day_dataframe_random_data):
+    def test_series_setitem(
+        self, multiindex_year_month_day_dataframe_random_data
+    ):
         ymd = multiindex_year_month_day_dataframe_random_data
         s = ymd["A"]
 
@@ -279,7 +322,9 @@ class TestMultiIndexSetItem:
         s[2000, 3, 10] = np.nan
         assert isna(s[49])
 
-    def test_frame_getitem_setitem_boolean(self, multiindex_dataframe_random_data):
+    def test_frame_getitem_setitem_boolean(
+        self, multiindex_dataframe_random_data
+    ):
         frame = multiindex_dataframe_random_data
         df = frame.T.copy()
         values = df.values
@@ -333,7 +378,9 @@ class TestMultiIndexSetItem:
         tm.assert_frame_equal(df, result)
 
     def test_frame_setitem_multi_column(self):
-        df = DataFrame(randn(10, 4), columns=[["a", "a", "b", "b"], [0, 1, 0, 1]])
+        df = DataFrame(
+            randn(10, 4), columns=[["a", "a", "b", "b"], [0, 1, 0, 1]]
+        )
 
         cp = df.copy()
         cp["a"] = cp["b"]
@@ -379,11 +426,14 @@ class TestMultiIndexSetItem:
 
     def test_getitem_setitem_slice_integers(self):
         index = MultiIndex(
-            levels=[[0, 1, 2], [0, 2]], codes=[[0, 0, 1, 1, 2, 2], [0, 1, 0, 1, 0, 1]]
+            levels=[[0, 1, 2], [0, 2]],
+            codes=[[0, 0, 1, 1, 2, 2], [0, 1, 0, 1, 0, 1]],
         )
 
         frame = DataFrame(
-            np.random.randn(len(index), 4), index=index, columns=["a", "b", "c", "d"]
+            np.random.randn(len(index), 4),
+            index=index,
+            columns=["a", "b", "c", "d"],
         )
         res = frame.loc[1:2]
         exp = frame.reindex(frame.index[2:])
@@ -425,7 +475,8 @@ class TestMultiIndexSetItem:
 
     def test_nonunique_assignment_1750(self):
         df = DataFrame(
-            [[1, 1, "x", "X"], [1, 1, "y", "Y"], [1, 2, "z", "Z"]], columns=list("ABCD")
+            [[1, 1, "x", "X"], [1, 1, "y", "Y"], [1, 2, "z", "Z"]],
+            columns=list("ABCD"),
         )
 
         df = df.set_index(["A", "B"])
@@ -440,7 +491,9 @@ class TestMultiIndexSetItem:
         # GH 4686
         # assignment with dups that has a dtype change
         cols = MultiIndex.from_tuples([("A", "1"), ("B", "1"), ("A", "2")])
-        df = DataFrame(np.arange(3).reshape((1, 3)), columns=cols, dtype=object)
+        df = DataFrame(
+            np.arange(3).reshape((1, 3)), columns=cols, dtype=object
+        )
         index = df.index.copy()
 
         df["A"] = df["A"].astype(np.float64)

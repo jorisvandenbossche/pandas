@@ -66,12 +66,17 @@ class TestPeriodIndex(DatetimeLike):
 
     def test_fillna_period(self):
         # GH 11343
-        idx = pd.PeriodIndex(["2011-01-01 09:00", pd.NaT, "2011-01-01 11:00"], freq="H")
+        idx = pd.PeriodIndex(
+            ["2011-01-01 09:00", pd.NaT, "2011-01-01 11:00"], freq="H"
+        )
 
         exp = pd.PeriodIndex(
-            ["2011-01-01 09:00", "2011-01-01 10:00", "2011-01-01 11:00"], freq="H"
+            ["2011-01-01 09:00", "2011-01-01 10:00", "2011-01-01 11:00"],
+            freq="H",
         )
-        tm.assert_index_equal(idx.fillna(pd.Period("2011-01-01 10:00", freq="H")), exp)
+        tm.assert_index_equal(
+            idx.fillna(pd.Period("2011-01-01 10:00", freq="H")), exp
+        )
 
         exp = pd.Index(
             [
@@ -91,7 +96,9 @@ class TestPeriodIndex(DatetimeLike):
             ],
             dtype=object,
         )
-        tm.assert_index_equal(idx.fillna(pd.Period("2011-01-01", freq="D")), exp)
+        tm.assert_index_equal(
+            idx.fillna(pd.Period("2011-01-01", freq="D")), exp
+        )
 
     def test_no_millisecond_field(self):
         msg = "type object 'DatetimeIndex' has no attribute 'millisecond'"
@@ -199,7 +206,9 @@ class TestPeriodIndex(DatetimeLike):
 
         idx = pd.PeriodIndex(["2011-01-01", pd.NaT], freq="D")
 
-        exp = np.array([pd.Period("2011-01-01", freq="D"), pd.NaT], dtype=object)
+        exp = np.array(
+            [pd.Period("2011-01-01", freq="D"), pd.NaT], dtype=object
+        )
         tm.assert_numpy_array_equal(idx.values, exp)
         tm.assert_numpy_array_equal(idx.get_values(), exp)
         exp = np.array([14975, -9223372036854775808], dtype=np.int64)
@@ -352,7 +361,8 @@ class TestPeriodIndex(DatetimeLike):
 
     def test_factorize(self):
         idx1 = PeriodIndex(
-            ["2014-01", "2014-01", "2014-02", "2014-02", "2014-03", "2014-03"], freq="M"
+            ["2014-01", "2014-01", "2014-02", "2014-02", "2014-03", "2014-03"],
+            freq="M",
         )
 
         exp_arr = np.array([0, 0, 1, 1, 2, 2], dtype=np.intp)
@@ -367,7 +377,8 @@ class TestPeriodIndex(DatetimeLike):
         tm.assert_index_equal(idx, exp_idx)
 
         idx2 = pd.PeriodIndex(
-            ["2014-03", "2014-03", "2014-02", "2014-01", "2014-03", "2014-01"], freq="M"
+            ["2014-03", "2014-03", "2014-02", "2014-01", "2014-03", "2014-01"],
+            freq="M",
         )
 
         exp_arr = np.array([2, 2, 1, 0, 2, 0], dtype=np.intp)
@@ -382,7 +393,9 @@ class TestPeriodIndex(DatetimeLike):
         tm.assert_index_equal(idx, exp_idx)
 
     def test_is_(self):
-        create_index = lambda: period_range(freq="A", start="1/1/2001", end="12/1/2009")
+        create_index = lambda: period_range(
+            freq="A", start="1/1/2001", end="12/1/2009"
+        )
         index = create_index()
         assert index.is_(index)
         assert not index.is_(create_index())
@@ -466,8 +479,12 @@ class TestPeriodIndex(DatetimeLike):
         tm.assert_index_equal(idx.unique(), expected)
         assert idx.nunique() == 3
 
-        idx = PeriodIndex([2000, 2007, 2007, 2009, 2007], freq="A-JUN", tz="US/Eastern")
-        expected = PeriodIndex([2000, 2007, 2009], freq="A-JUN", tz="US/Eastern")
+        idx = PeriodIndex(
+            [2000, 2007, 2007, 2009, 2007], freq="A-JUN", tz="US/Eastern"
+        )
+        expected = PeriodIndex(
+            [2000, 2007, 2009], freq="A-JUN", tz="US/Eastern"
+        )
         tm.assert_index_equal(idx.unique(), expected)
         assert idx.nunique() == 3
 
@@ -489,7 +506,9 @@ class TestPeriodIndex(DatetimeLike):
 
     def test_pindex_fieldaccessor_nat(self):
         idx = PeriodIndex(
-            ["2011-01", "2011-02", "NaT", "2012-03", "2012-04"], freq="D", name="name"
+            ["2011-01", "2011-02", "NaT", "2012-03", "2012-04"],
+            freq="D",
+            name="name",
         )
 
         exp = Index([2011, 2011, -1, 2012, 2012], dtype=np.int64, name="name")

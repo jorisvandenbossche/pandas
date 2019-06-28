@@ -80,7 +80,9 @@ def _get_next_label(label):
         return np.nextafter(label, np.infty)
     else:
         raise TypeError(
-            "cannot determine next label for type {typ!r}".format(typ=type(label))
+            "cannot determine next label for type {typ!r}".format(
+                typ=type(label)
+            )
         )
 
 
@@ -96,7 +98,9 @@ def _get_prev_label(label):
         return np.nextafter(label, -np.infty)
     else:
         raise TypeError(
-            "cannot determine next label for type {typ!r}".format(typ=type(label))
+            "cannot determine next label for type {typ!r}".format(
+                typ=type(label)
+            )
         )
 
 
@@ -136,7 +140,9 @@ class SetopCheck:
             other = ensure_index(other)
 
             if not isinstance(other, IntervalIndex):
-                result = getattr(intvidx_self.astype(object), self.op_name)(other)
+                result = getattr(intvidx_self.astype(object), self.op_name)(
+                    other
+                )
                 if self.op_name in ("difference",):
                     result = result.astype(intvidx_self.dtype)
                 return result
@@ -208,7 +214,13 @@ class IntervalIndex(IntervalMixin, Index):
     # Constructors
 
     def __new__(
-        cls, data, closed=None, dtype=None, copy=False, name=None, verify_integrity=True
+        cls,
+        data,
+        closed=None,
+        dtype=None,
+        copy=False,
+        name=None,
+        verify_integrity=True,
     ):
 
         if name is None and hasattr(data, "name"):
@@ -246,7 +258,9 @@ class IntervalIndex(IntervalMixin, Index):
 
     @classmethod
     @Appender(_interval_shared_docs["from_breaks"] % _index_doc_kwargs)
-    def from_breaks(cls, breaks, closed="right", name=None, copy=False, dtype=None):
+    def from_breaks(
+        cls, breaks, closed="right", name=None, copy=False, dtype=None
+    ):
         with rewrite_exception("IntervalArray", cls.__name__):
             array = IntervalArray.from_breaks(
                 breaks, closed=closed, copy=copy, dtype=dtype
@@ -266,7 +280,9 @@ class IntervalIndex(IntervalMixin, Index):
 
     @classmethod
     @Appender(_interval_shared_docs["from_intervals"] % _index_doc_kwargs)
-    def from_intervals(cls, data, closed=None, name=None, copy=False, dtype=None):
+    def from_intervals(
+        cls, data, closed=None, name=None, copy=False, dtype=None
+    ):
         msg = (
             "IntervalIndex.from_intervals is deprecated and will be "
             "removed in a future version; Use IntervalIndex(...) instead"
@@ -282,9 +298,13 @@ class IntervalIndex(IntervalMixin, Index):
 
     @classmethod
     @Appender(_interval_shared_docs["from_tuples"] % _index_doc_kwargs)
-    def from_tuples(cls, data, closed="right", name=None, copy=False, dtype=None):
+    def from_tuples(
+        cls, data, closed="right", name=None, copy=False, dtype=None
+    ):
         with rewrite_exception("IntervalArray", cls.__name__):
-            arr = IntervalArray.from_tuples(data, closed=closed, copy=copy, dtype=dtype)
+            arr = IntervalArray.from_tuples(
+                data, closed=closed, copy=copy, dtype=dtype
+            )
         return cls._simple_new(arr, name=name)
 
     # --------------------------------------------------------------------
@@ -372,7 +392,9 @@ class IntervalIndex(IntervalMixin, Index):
 
     @cache_readonly
     def _multiindex(self):
-        return MultiIndex.from_arrays([self.left, self.right], names=["left", "right"])
+        return MultiIndex.from_arrays(
+            [self.left, self.right], names=["left", "right"]
+        )
 
     @property
     def left(self):
@@ -503,7 +525,9 @@ class IntervalIndex(IntervalMixin, Index):
     def memory_usage(self, deep=False):
         # we don't use an explicit engine
         # so return the bytes here
-        return self.left.memory_usage(deep=deep) + self.right.memory_usage(deep=deep)
+        return self.left.memory_usage(deep=deep) + self.right.memory_usage(
+            deep=deep
+        )
 
     @cache_readonly
     def mid(self):
@@ -561,7 +585,10 @@ class IntervalIndex(IntervalMixin, Index):
         return True
 
     @cache_readonly
-    @Appender(_interval_shared_docs["is_non_overlapping_monotonic"] % _index_doc_kwargs)
+    @Appender(
+        _interval_shared_docs["is_non_overlapping_monotonic"]
+        % _index_doc_kwargs
+    )
     def is_non_overlapping_monotonic(self):
         return self._data.is_non_overlapping_monotonic
 
@@ -783,7 +810,8 @@ class IntervalIndex(IntervalMixin, Index):
 
             if not self.is_unique:
                 raise ValueError(
-                    "cannot index with a slice Interval" " and a non-unique index"
+                    "cannot index with a slice Interval"
+                    " and a non-unique index"
                 )
 
             # TODO: this expands to a tuple index, see if we can
@@ -1075,7 +1103,8 @@ class IntervalIndex(IntervalMixin, Index):
         if isinstance(item, Interval):
             if item.closed != self.closed:
                 raise ValueError(
-                    "inserted item must be closed on the same " "side as the index"
+                    "inserted item must be closed on the same "
+                    "side as the index"
                 )
             left_insert = item.left
             right_insert = item.right
@@ -1084,7 +1113,8 @@ class IntervalIndex(IntervalMixin, Index):
             left_insert = right_insert = item
         else:
             raise ValueError(
-                "can only insert Interval objects and NA into " "an IntervalIndex"
+                "can only insert Interval objects and NA into "
+                "an IntervalIndex"
             )
 
         new_left = self.left.insert(loc, left_insert)
@@ -1105,9 +1135,15 @@ class IntervalIndex(IntervalMixin, Index):
         return super()._concat_same_dtype(to_concat, name)
 
     @Appender(_index_shared_docs["take"] % _index_doc_kwargs)
-    def take(self, indices, axis=0, allow_fill=True, fill_value=None, **kwargs):
+    def take(
+        self, indices, axis=0, allow_fill=True, fill_value=None, **kwargs
+    ):
         result = self._data.take(
-            indices, axis=axis, allow_fill=allow_fill, fill_value=fill_value, **kwargs
+            indices,
+            axis=axis,
+            allow_fill=allow_fill,
+            fill_value=fill_value,
+            **kwargs
         )
         attributes = self._get_attributes_dict()
         return self._simple_new(result, **attributes)
@@ -1140,7 +1176,9 @@ class IntervalIndex(IntervalMixin, Index):
         # TODO: integrate with categorical and make generic
         # name argument is unused here; just for compat with base / categorical
         n = len(self)
-        max_seq_items = min((get_option("display.max_seq_items") or n) // 10, 10)
+        max_seq_items = min(
+            (get_option("display.max_seq_items") or n) // 10, 10
+        )
 
         formatter = str
 
@@ -1215,7 +1253,11 @@ class IntervalIndex(IntervalMixin, Index):
     ) -> "IntervalIndex":
         if self.left.is_unique and self.right.is_unique:
             taken = self._intersection_unique(other)
-        elif other.left.is_unique and other.right.is_unique and self.isna().sum() <= 1:
+        elif (
+            other.left.is_unique
+            and other.right.is_unique
+            and self.isna().sum() <= 1
+        ):
             # Swap other/self if other is unique and self does not have
             # multiple NaNs
             taken = other._intersection_unique(self)
@@ -1250,7 +1292,9 @@ class IntervalIndex(IntervalMixin, Index):
 
         return self.take(indexer)
 
-    def _intersection_non_unique(self, other: "IntervalIndex") -> "IntervalIndex":
+    def _intersection_non_unique(
+        self, other: "IntervalIndex"
+    ) -> "IntervalIndex":
         """
         Used when the IntervalIndex does have some common endpoints,
         on either sides.
@@ -1286,7 +1330,9 @@ class IntervalIndex(IntervalMixin, Index):
     def _setop(op_name, sort=None):
         @SetopCheck(op_name=op_name)
         def func(self, other, sort=sort):
-            result = getattr(self._multiindex, op_name)(other._multiindex, sort=sort)
+            result = getattr(self._multiindex, op_name)(
+                other._multiindex, sort=sort
+            )
             result_name = get_op_result_name(self, other)
 
             # GH 19101: ensure empty results have correct dtype
@@ -1295,7 +1341,9 @@ class IntervalIndex(IntervalMixin, Index):
             else:
                 result = result.values
 
-            return type(self).from_tuples(result, closed=self.closed, name=result_name)
+            return type(self).from_tuples(
+                result, closed=self.closed, name=result_name
+            )
 
         return func
 

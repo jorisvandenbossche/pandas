@@ -80,7 +80,11 @@ def deregister():
 
     # restore the old keys
     for unit, formatter in _mpl_units.items():
-        if type(formatter) not in {DatetimeConverter, PeriodConverter, TimeConverter}:
+        if type(formatter) not in {
+            DatetimeConverter,
+            PeriodConverter,
+            TimeConverter,
+        }:
             # make it idempotent by excluding ours.
             units.registry[unit] = formatter
 
@@ -104,7 +108,12 @@ def _check_implicitly_registered():
 
 
 def _to_ordinalf(tm):
-    tot_sec = tm.hour * 3600 + tm.minute * 60 + tm.second + float(tm.microsecond / 1e6)
+    tot_sec = (
+        tm.hour * 3600
+        + tm.minute * 60
+        + tm.second
+        + float(tm.microsecond / 1e6)
+    )
     return tot_sec
 
 
@@ -123,7 +132,11 @@ class TimeConverter(units.ConversionInterface):
     @staticmethod
     def convert(value, unit, axis):
         valid_types = (str, pydt.time)
-        if isinstance(value, valid_types) or is_integer(value) or is_float(value):
+        if (
+            isinstance(value, valid_types)
+            or is_integer(value)
+            or is_float(value)
+        ):
             return time2num(value)
         if isinstance(value, Index):
             return value.map(time2num)
@@ -193,7 +206,9 @@ class PeriodConverter(dates.DateConverter):
     @staticmethod
     def convert(values, units, axis):
         if is_nested_list_like(values):
-            values = [PeriodConverter._convert_1d(v, units, axis) for v in values]
+            values = [
+                PeriodConverter._convert_1d(v, units, axis) for v in values
+            ]
         else:
             values = PeriodConverter._convert_1d(values, units, axis)
         return values
@@ -202,8 +217,19 @@ class PeriodConverter(dates.DateConverter):
     def _convert_1d(values, units, axis):
         if not hasattr(axis, "freq"):
             raise TypeError("Axis must have `freq` set to convert to Periods")
-        valid_types = (str, datetime, Period, pydt.date, pydt.time, np.datetime64)
-        if isinstance(values, valid_types) or is_integer(values) or is_float(values):
+        valid_types = (
+            str,
+            datetime,
+            Period,
+            pydt.date,
+            pydt.time,
+            np.datetime64,
+        )
+        if (
+            isinstance(values, valid_types)
+            or is_integer(values)
+            or is_float(values)
+        ):
             return get_datevalue(values, axis.freq)
         elif isinstance(values, PeriodIndex):
             return values.asfreq(axis.freq)._ndarray_values
@@ -221,7 +247,9 @@ class PeriodConverter(dates.DateConverter):
 def get_datevalue(date, freq):
     if isinstance(date, Period):
         return date.asfreq(freq).ordinal
-    elif isinstance(date, (str, datetime, pydt.date, pydt.time, np.datetime64)):
+    elif isinstance(
+        date, (str, datetime, pydt.date, pydt.time, np.datetime64)
+    ):
         return Period(date, freq).ordinal
     elif (
         is_integer(date)
@@ -240,7 +268,9 @@ def _dt_to_float_ordinal(dt):
     preserving hours, minutes, seconds and microseconds.  Return value
     is a :func:`float`.
     """
-    if isinstance(dt, (np.ndarray, Index, ABCSeries)) and is_datetime64_ns_dtype(dt):
+    if isinstance(
+        dt, (np.ndarray, Index, ABCSeries)
+    ) and is_datetime64_ns_dtype(dt):
         base = dates.epoch2num(dt.asi8 / 1.0e9)
     else:
         base = dates.date2num(dt)
@@ -254,7 +284,9 @@ class DatetimeConverter(dates.DateConverter):
         # values might be a 1-d array, or a list-like of arrays.
         _check_implicitly_registered()
         if is_nested_list_like(values):
-            values = [DatetimeConverter._convert_1d(v, unit, axis) for v in values]
+            values = [
+                DatetimeConverter._convert_1d(v, unit, axis) for v in values
+            ]
         else:
             values = DatetimeConverter._convert_1d(values, unit, axis)
         return values
@@ -317,7 +349,10 @@ class DatetimeConverter(dates.DateConverter):
         datemax = pydt.date(2010, 1, 1)
 
         return units.AxisInfo(
-            majloc=majloc, majfmt=majfmt, label="", default_limits=(datemin, datemax)
+            majloc=majloc,
+            majfmt=majfmt,
+            label="",
+            default_limits=(datemin, datemax),
         )
 
 
@@ -418,14 +453,21 @@ class MilliSecondLocator(dates.DateLocator):
                     "{estimate:d} ticks from {dmin} to {dmax}: "
                     "exceeds Locator.MAXTICKS"
                     "* 2 ({arg:d}) "
-                ).format(estimate=estimate, dmin=dmin, dmax=dmax, arg=self.MAXTICKS * 2)
+                ).format(
+                    estimate=estimate,
+                    dmin=dmin,
+                    dmax=dmax,
+                    arg=self.MAXTICKS * 2,
+                )
             )
 
         freq = "%dL" % self._get_interval()
         tz = self.tz.tzname(None)
         st = _from_ordinal(dates.date2num(dmin))  # strip tz
         ed = _from_ordinal(dates.date2num(dmax))
-        all_dates = date_range(start=st, end=ed, freq=freq, tz=tz).astype(object)
+        all_dates = date_range(start=st, end=ed, freq=freq, tz=tz).astype(
+            object
+        )
 
         try:
             if len(all_dates) > 0:
@@ -483,7 +525,13 @@ def _from_ordinal(x, tz=None):
     if microsecond < 10:
         microsecond = 0  # compensate for rounding errors
     dt = datetime(
-        dt.year, dt.month, dt.day, int(hour), int(minute), int(second), microsecond
+        dt.year,
+        dt.month,
+        dt.day,
+        int(hour),
+        int(minute),
+        int(second),
+        microsecond,
     )
     if tz is not None:
         dt = dt.astimezone(tz)
@@ -599,7 +647,13 @@ def _daily_finder(vmin, vmax, freq):
     dates_ = period_range(start=vmin, end=vmax, freq=freq)
     # Initialize the output
     info = np.zeros(
-        span, dtype=[("val", np.int64), ("maj", bool), ("min", bool), ("fmt", "|S20")]
+        span,
+        dtype=[
+            ("val", np.int64),
+            ("maj", bool),
+            ("min", bool),
+            ("fmt", "|S20"),
+        ],
     )
     info["val"][:] = dates_._ndarray_values
     info["fmt"][:] = ""
@@ -610,7 +664,11 @@ def _daily_finder(vmin, vmax, freq):
     info_fmt = info["fmt"]
 
     def first_label(label_flags):
-        if (label_flags[0] == 0) and (label_flags.size > 1) and ((vmin_orig % 1) > 0.0):
+        if (
+            (label_flags[0] == 0)
+            and (label_flags.size > 1)
+            and ((vmin_orig % 1) > 0.0)
+        ):
             return label_flags[1]
         else:
             return label_flags[0]
@@ -655,7 +713,9 @@ def _daily_finder(vmin, vmax, freq):
             info["min"][second_start & (_second % label_interval == 0)] = True
             year_start = period_break(dates_, "year")
             info_fmt = info["fmt"]
-            info_fmt[second_start & (_second % label_interval == 0)] = "%H:%M:%S"
+            info_fmt[
+                second_start & (_second % label_interval == 0)
+            ] = "%H:%M:%S"
             info_fmt[day_start] = "%H:%M:%S\n%d-%b"
             info_fmt[year_start] = "%H:%M:%S\n%d-%b\n%Y"
 
@@ -790,7 +850,8 @@ def _monthly_finder(vmin, vmax, freq):
 
     # Initialize the output
     info = np.zeros(
-        span, dtype=[("val", int), ("maj", bool), ("min", bool), ("fmt", "|S8")]
+        span,
+        dtype=[("val", int), ("maj", bool), ("min", bool), ("fmt", "|S8")],
     )
     info["val"] = np.arange(vmin, vmax + 1)
     dates_ = info["val"]
@@ -858,7 +919,8 @@ def _quarterly_finder(vmin, vmax, freq):
     span = vmax - vmin + 1
 
     info = np.zeros(
-        span, dtype=[("val", int), ("maj", bool), ("min", bool), ("fmt", "|S8")]
+        span,
+        dtype=[("val", int), ("maj", bool), ("min", bool), ("fmt", "|S8")],
     )
     info["val"] = np.arange(vmin, vmax + 1)
     info["fmt"] = ""
@@ -902,7 +964,8 @@ def _annual_finder(vmin, vmax, freq):
     span = vmax - vmin + 1
 
     info = np.zeros(
-        span, dtype=[("val", int), ("maj", bool), ("min", bool), ("fmt", "|S8")]
+        span,
+        dtype=[("val", int), ("maj", bool), ("min", bool), ("fmt", "|S8")],
     )
     info["val"] = np.arange(vmin, vmax + 1)
     info["fmt"] = ""
@@ -1044,7 +1107,9 @@ class TimeSeries_DateFormatter(Formatter):
         Whether the formatter works in dynamic mode or not.
     """
 
-    def __init__(self, freq, minor_locator=False, dynamic_mode=True, plot_obj=None):
+    def __init__(
+        self, freq, minor_locator=False, dynamic_mode=True, plot_obj=None
+    ):
         if isinstance(freq, str):
             freq = get_freq(freq)
         self.format = None
@@ -1065,7 +1130,9 @@ class TimeSeries_DateFormatter(Formatter):
         info = self.plot_obj.date_axis_info
 
         if self.isminor:
-            format = np.compress(info["min"] & np.logical_not(info["maj"]), info)
+            format = np.compress(
+                info["min"] & np.logical_not(info["maj"]), info
+            )
         else:
             format = np.compress(info["maj"], info)
         self.formatdict = {x: f for (x, _, _, f) in format}

@@ -17,7 +17,10 @@ import pandas.util.testing as tm
 @pytest.mark.parametrize(
     "kwargs,msg",
     [
-        (dict(quotechar="foo"), '"quotechar" must be a(n)? 1-character string'),
+        (
+            dict(quotechar="foo"),
+            '"quotechar" must be a(n)? 1-character string',
+        ),
         (
             dict(quotechar=None, quoting=csv.QUOTE_MINIMAL),
             "quotechar must be set if quoting enabled",
@@ -101,7 +104,10 @@ def test_null_quote_char(all_parsers, quoting, quote_char):
         (dict(quotechar='"', quoting=csv.QUOTE_NONE), [[1, 2, '"foo"']]),
         # QUOTE_NONNUMERIC tells the reader to cast
         # all non-quoted fields to float
-        (dict(quotechar='"', quoting=csv.QUOTE_NONNUMERIC), [[1.0, 2.0, "foo"]]),
+        (
+            dict(quotechar='"', quoting=csv.QUOTE_NONNUMERIC),
+            [[1.0, 2.0, "foo"]],
+        ),
     ],
 )
 def test_quoting_various(all_parsers, kwargs, exp_data):
@@ -121,7 +127,9 @@ def test_double_quote(all_parsers, doublequote, exp_data):
     parser = all_parsers
     data = 'a,b\n3,"4 "" 5"'
 
-    result = parser.read_csv(StringIO(data), quotechar='"', doublequote=doublequote)
+    result = parser.read_csv(
+        StringIO(data), quotechar='"', doublequote=doublequote
+    )
     expected = DataFrame(exp_data, columns=["a", "b"])
     tm.assert_frame_equal(result, expected)
 

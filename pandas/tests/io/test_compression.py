@@ -25,7 +25,8 @@ def catch_to_csv_depr():
     "obj",
     [
         pd.DataFrame(
-            100 * [[0.123456, 0.234567, 0.567567], [12.32112, 123123.2, 321321.2]],
+            100
+            * [[0.123456, 0.234567, 0.567567], [12.32112, 123123.2, 321321.2]],
             columns=["X", "Y", "Z"],
         ),
         pd.Series(100 * [0.123456, 0.234567, 0.567567], name="X"),
@@ -46,7 +47,8 @@ def test_compression_size(obj, method, compression_only):
     "obj",
     [
         pd.DataFrame(
-            100 * [[0.123456, 0.234567, 0.567567], [12.32112, 123123.2, 321321.2]],
+            100
+            * [[0.123456, 0.234567, 0.567567], [12.32112, 123123.2, 321321.2]],
             columns=["X", "Y", "Z"],
         ),
         pd.Series(100 * [0.123456, 0.234567, 0.567567], name="X"),
@@ -96,7 +98,12 @@ def test_dataframe_compression_defaults_to_infer(
 @pytest.mark.parametrize(
     "write_method,write_kwargs,read_method,read_kwargs",
     [
-        ("to_csv", {"index": False, "header": True}, pd.read_csv, {"squeeze": True}),
+        (
+            "to_csv",
+            {"index": False, "header": True},
+            pd.read_csv,
+            {"squeeze": True},
+        ),
         ("to_json", {}, pd.read_json, {"typ": "series"}),
         ("to_pickle", {}, pd.read_pickle, {}),
     ],
@@ -122,6 +129,8 @@ def test_compression_warning(compression_only):
     )
     with tm.ensure_clean() as path:
         f, handles = icom._get_handle(path, "w", compression=compression_only)
-        with tm.assert_produces_warning(RuntimeWarning, check_stacklevel=False):
+        with tm.assert_produces_warning(
+            RuntimeWarning, check_stacklevel=False
+        ):
             with f:
                 df.to_csv(f, compression=compression_only)

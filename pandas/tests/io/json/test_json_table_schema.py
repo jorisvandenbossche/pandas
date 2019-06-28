@@ -5,7 +5,11 @@ import json
 import numpy as np
 import pytest
 
-from pandas.core.dtypes.dtypes import CategoricalDtype, DatetimeTZDtype, PeriodDtype
+from pandas.core.dtypes.dtypes import (
+    CategoricalDtype,
+    DatetimeTZDtype,
+    PeriodDtype,
+)
 
 import pandas as pd
 from pandas import DataFrame
@@ -100,22 +104,32 @@ class TestBuildSchema:
 
 
 class TestTableSchemaType:
-    @pytest.mark.parametrize("int_type", [np.int, np.int16, np.int32, np.int64])
+    @pytest.mark.parametrize(
+        "int_type", [np.int, np.int16, np.int32, np.int64]
+    )
     def test_as_json_table_type_int_data(self, int_type):
         int_data = [1, 2, 3]
-        assert as_json_table_type(np.array(int_data, dtype=int_type)) == "integer"
+        assert (
+            as_json_table_type(np.array(int_data, dtype=int_type)) == "integer"
+        )
 
     @pytest.mark.parametrize(
         "float_type", [np.float, np.float16, np.float32, np.float64]
     )
     def test_as_json_table_type_float_data(self, float_type):
         float_data = [1.0, 2.0, 3.0]
-        assert as_json_table_type(np.array(float_data, dtype=float_type)) == "number"
+        assert (
+            as_json_table_type(np.array(float_data, dtype=float_type))
+            == "number"
+        )
 
     @pytest.mark.parametrize("bool_type", [bool, np.bool])
     def test_as_json_table_type_bool_data(self, bool_type):
         bool_data = [True, False]
-        assert as_json_table_type(np.array(bool_data, dtype=bool_type)) == "boolean"
+        assert (
+            as_json_table_type(np.array(bool_data, dtype=bool_type))
+            == "boolean"
+        )
 
     @pytest.mark.parametrize(
         "date_data",
@@ -130,7 +144,9 @@ class TestTableSchemaType:
     def test_as_json_table_type_date_data(self, date_data):
         assert as_json_table_type(date_data) == "datetime"
 
-    @pytest.mark.parametrize("str_data", [pd.Series(["a", "b"]), pd.Index(["a", "b"])])
+    @pytest.mark.parametrize(
+        "str_data", [pd.Series(["a", "b"]), pd.Index(["a", "b"])]
+    )
     def test_as_json_table_type_string_data(self, str_data):
         assert as_json_table_type(str_data) == "string"
 
@@ -150,7 +166,9 @@ class TestTableSchemaType:
     # ------
     # dtypes
     # ------
-    @pytest.mark.parametrize("int_dtype", [np.int, np.int16, np.int32, np.int64])
+    @pytest.mark.parametrize(
+        "int_dtype", [np.int, np.int16, np.int32, np.int64]
+    )
     def test_as_json_table_type_int_dtypes(self, int_dtype):
         assert as_json_table_type(int_dtype) == "integer"
 
@@ -202,9 +220,13 @@ class TestTableOrient:
                 "C": pd.date_range("2016-01-01", freq="d", periods=4),
                 "D": pd.timedelta_range("1H", periods=4, freq="T"),
                 "E": pd.Series(pd.Categorical(["a", "b", "c", "c"])),
-                "F": pd.Series(pd.Categorical(["a", "b", "c", "c"], ordered=True)),
+                "F": pd.Series(
+                    pd.Categorical(["a", "b", "c", "c"], ordered=True)
+                ),
                 "G": [1.0, 2.0, 3, 4.0],
-                "H": pd.date_range("2016-01-01", freq="d", periods=4, tz="US/Central"),
+                "H": pd.date_range(
+                    "2016-01-01", freq="d", periods=4, tz="US/Central"
+                ),
             },
             index=pd.Index(range(4), name="idx"),
         )
@@ -218,7 +240,10 @@ class TestTableOrient:
         assert "pandas_version" in result["schema"]
         result["schema"].pop("pandas_version")
 
-        fields = [{"name": "id", "type": "integer"}, {"name": "a", "type": "integer"}]
+        fields = [
+            {"name": "id", "type": "integer"},
+            {"name": "a", "type": "integer"},
+        ]
 
         schema = {"fields": fields, "primaryKey": ["id"]}
 
@@ -368,8 +393,12 @@ class TestTableOrient:
 
         schema = {"fields": fields, "primaryKey": ["index"]}
         data = [
-            OrderedDict([("index", "2015-11-01T00:00:00.000Z"), ("values", 1)]),
-            OrderedDict([("index", "2016-02-01T00:00:00.000Z"), ("values", 1)]),
+            OrderedDict(
+                [("index", "2015-11-01T00:00:00.000Z"), ("values", 1)]
+            ),
+            OrderedDict(
+                [("index", "2016-02-01T00:00:00.000Z"), ("values", 1)]
+            ),
         ]
         expected = OrderedDict([("schema", schema), ("data", data)])
         assert result == expected
@@ -454,7 +483,9 @@ class TestTableOrient:
 
     @pytest.mark.parametrize("kind", [pd.Categorical, pd.CategoricalIndex])
     @pytest.mark.parametrize("ordered", [True, False])
-    def test_convert_pandas_type_to_json_field_categorical(self, kind, ordered):
+    def test_convert_pandas_type_to_json_field_categorical(
+        self, kind, ordered
+    ):
         data = ["a", "b", "c"]
         if kind is pd.Categorical:
             arr = pd.Series(kind(data, ordered=ordered), name="cats")
@@ -478,7 +509,10 @@ class TestTableOrient:
             ({"type": "boolean"}, "bool"),
             ({"type": "duration"}, "timedelta64"),
             ({"type": "datetime"}, "datetime64[ns]"),
-            ({"type": "datetime", "tz": "US/Hawaii"}, "datetime64[ns, US/Hawaii]"),
+            (
+                {"type": "datetime", "tz": "US/Hawaii"},
+                "datetime64[ns, US/Hawaii]",
+            ),
             ({"type": "any"}, "object"),
             (
                 {
@@ -508,7 +542,8 @@ class TestTableOrient:
     def test_convert_json_field_to_pandas_type_raises(self, inp):
         field = {"type": inp}
         with pytest.raises(
-            ValueError, match=("Unsupported or invalid field " "type: {}".format(inp))
+            ValueError,
+            match=("Unsupported or invalid field " "type: {}".format(inp)),
         ):
             convert_json_field_to_pandas_type(field)
 
@@ -579,8 +614,12 @@ class TestTableOrient:
         "idx",
         [
             pd.Index([], name="index"),
-            pd.MultiIndex.from_arrays([["foo"], ["bar"]], names=("level_0", "level_1")),
-            pd.MultiIndex.from_arrays([["foo"], ["bar"]], names=("foo", "level_1")),
+            pd.MultiIndex.from_arrays(
+                [["foo"], ["bar"]], names=("level_0", "level_1")
+            ),
+            pd.MultiIndex.from_arrays(
+                [["foo"], ["bar"]], names=("foo", "level_1")
+            ),
         ],
     )
     def test_warns_non_roundtrippable_names(self, idx):
@@ -592,7 +631,8 @@ class TestTableOrient:
 
     def test_timestamp_in_columns(self):
         df = pd.DataFrame(
-            [[1, 2]], columns=[pd.Timestamp("2016"), pd.Timedelta(10, unit="s")]
+            [[1, 2]],
+            columns=[pd.Timestamp("2016"), pd.Timedelta(10, unit="s")],
         )
         result = df.to_json(orient="table")
         js = json.loads(result)
@@ -606,7 +646,9 @@ class TestTableOrient:
             pd.DataFrame({"A": [1]}, index=pd.Index([1], name="A")),
             pd.DataFrame(
                 {"A": [1]},
-                index=pd.MultiIndex.from_arrays([["a"], [1]], names=["A", "a"]),
+                index=pd.MultiIndex.from_arrays(
+                    [["a"], [1]], names=["A", "a"]
+                ),
             ),
         ],
     )
@@ -627,7 +669,12 @@ class TestTableOrient:
 class TestTableOrientReader:
     @pytest.mark.parametrize(
         "index_nm",
-        [None, "idx", pytest.param("index", marks=pytest.mark.xfail), "level_0"],
+        [
+            None,
+            "idx",
+            pytest.param("index", marks=pytest.mark.xfail),
+            "level_0",
+        ],
     )
     @pytest.mark.parametrize(
         "vals",
@@ -679,7 +726,9 @@ class TestTableOrientReader:
                 "C": pd.date_range("2016-01-01", freq="d", periods=4),
                 # 'D': pd.timedelta_range('1H', periods=4, freq='T'),
                 "E": pd.Series(pd.Categorical(["a", "b", "c", "c"])),
-                "F": pd.Series(pd.Categorical(["a", "b", "c", "c"], ordered=True)),
+                "F": pd.Series(
+                    pd.Categorical(["a", "b", "c", "c"], ordered=True)
+                ),
                 "G": [1.1, 2.2, 3.3, 4.4],
                 # 'H': pd.date_range('2016-01-01', freq='d', periods=4,
                 #                   tz='US/Central'),
@@ -694,12 +743,21 @@ class TestTableOrientReader:
 
     @pytest.mark.parametrize(
         "index_names",
-        [[None, None], ["foo", "bar"], ["foo", None], [None, "foo"], ["index", "foo"]],
+        [
+            [None, None],
+            ["foo", "bar"],
+            ["foo", None],
+            [None, "foo"],
+            ["index", "foo"],
+        ],
     )
     def test_multiindex(self, index_names):
         # GH 18912
         df = pd.DataFrame(
-            [["Arr", "alpha", [1, 2, 3, 4]], ["Bee", "Beta", [10, 20, 30, 40]]],
+            [
+                ["Arr", "alpha", [1, 2, 3, 4]],
+                ["Bee", "Beta", [10, 20, 30, 40]],
+            ],
             index=[["A", "B"], ["Null", "Eins"]],
             columns=["Aussprache", "Griechisch", "Args"],
         )

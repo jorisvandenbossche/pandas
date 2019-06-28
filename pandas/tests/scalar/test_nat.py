@@ -85,7 +85,9 @@ def test_nat_vector_field_access():
 
 
 @pytest.mark.parametrize("klass", [Timestamp, Timedelta, Period])
-@pytest.mark.parametrize("value", [None, np.nan, iNaT, float("nan"), NaT, "NaT", "nat"])
+@pytest.mark.parametrize(
+    "value", [None, np.nan, iNaT, float("nan"), NaT, "NaT", "nat"]
+)
 def test_identity(klass, value):
     assert klass(value) is NaT
 
@@ -168,7 +170,10 @@ def test_nat_iso_format(get_nat):
 @pytest.mark.parametrize(
     "klass,expected",
     [
-        (Timestamp, ["freqstr", "normalize", "to_julian_date", "to_period", "tz"]),
+        (
+            Timestamp,
+            ["freqstr", "normalize", "to_julian_date", "to_period", "tz"],
+        ),
         (
             Timedelta,
             [
@@ -192,7 +197,9 @@ def test_missing_public_nat_methods(klass, expected):
     nat_names = dir(NaT)
     klass_names = dir(klass)
 
-    missing = [x for x in klass_names if x not in nat_names and not x.startswith("_")]
+    missing = [
+        x for x in klass_names if x not in nat_names and not x.startswith("_")
+    ]
     missing.sort()
 
     assert missing == expected
@@ -219,7 +226,9 @@ def _get_overlap_public_nat_methods(klass, as_tuple=False):
     overlap = [
         x
         for x in nat_names
-        if x in klass_names and not x.startswith("_") and callable(getattr(klass, x))
+        if x in klass_names
+        and not x.startswith("_")
+        and callable(getattr(klass, x))
     ]
 
     # Timestamp takes precedence over Timedelta in terms of overlap.
@@ -339,7 +348,10 @@ _ops = {
         (Timestamp("2014-01-01"), "timestamp"),
         (Timestamp("2014-01-01", tz="UTC"), "timestamp"),
         (Timestamp("2014-01-01", tz="US/Eastern"), "timestamp"),
-        (pytz.timezone("Asia/Tokyo").localize(datetime(2014, 1, 1)), "timestamp"),
+        (
+            pytz.timezone("Asia/Tokyo").localize(datetime(2014, 1, 1)),
+            "timestamp",
+        ),
     ],
 )
 def test_nat_arithmetic_scalar(op_name, value, val_type):
@@ -379,7 +391,8 @@ def test_nat_arithmetic_scalar(op_name, value, val_type):
 
 
 @pytest.mark.parametrize(
-    "val,expected", [(np.nan, NaT), (NaT, np.nan), (np.timedelta64("NaT"), np.nan)]
+    "val,expected",
+    [(np.nan, NaT), (NaT, np.nan), (np.timedelta64("NaT"), np.nan)],
 )
 def test_nat_rfloordiv_timedelta(val, expected):
     # see gh-#18846
@@ -391,7 +404,12 @@ def test_nat_rfloordiv_timedelta(val, expected):
 
 @pytest.mark.parametrize(
     "op_name",
-    ["left_plus_right", "right_plus_left", "left_minus_right", "right_minus_left"],
+    [
+        "left_plus_right",
+        "right_plus_left",
+        "left_minus_right",
+        "right_minus_left",
+    ],
 )
 @pytest.mark.parametrize(
     "value",
@@ -416,7 +434,12 @@ def test_nat_arithmetic_index(op_name, value):
 
 @pytest.mark.parametrize(
     "op_name",
-    ["left_plus_right", "right_plus_left", "left_minus_right", "right_minus_left"],
+    [
+        "left_plus_right",
+        "right_plus_left",
+        "left_minus_right",
+        "right_minus_left",
+    ],
 )
 @pytest.mark.parametrize("box", [TimedeltaIndex, Series])
 def test_nat_arithmetic_td64_vector(op_name, box):

@@ -36,7 +36,10 @@ def deep_nested():
         {
             "country": "Germany",
             "states": [
-                {"name": "Bayern", "cities": [{"name": "Munich", "pop": 12347}]},
+                {
+                    "name": "Bayern",
+                    "cities": [{"name": "Munich", "pop": 12347}],
+                },
                 {
                     "name": "Nordrhein-Westfalen",
                     "cities": [
@@ -172,7 +175,9 @@ class TestJSONNormalize:
             meta=["country", ["states", "name"]],
             sep="_",
         )
-        expected = Index(["name", "pop", "country", "states_name"]).sort_values()
+        expected = Index(
+            ["name", "pop", "country", "states_name"]
+        ).sort_values()
         assert result.columns.sort_values().equals(expected)
 
     def test_value_array_record_prefix(self):
@@ -204,7 +209,9 @@ class TestJSONNormalize:
     def test_more_deeply_nested(self, deep_nested):
 
         result = json_normalize(
-            deep_nested, ["states", "cities"], meta=["country", ["states", "name"]]
+            deep_nested,
+            ["states", "cities"],
+            meta=["country", ["states", "name"]],
         )
         # meta_prefix={'states': 'state_'})
 
@@ -282,11 +289,16 @@ class TestJSONNormalize:
             }
         ]
 
-        msg = r"Conflicting metadata name (foo|bar)," " need distinguishing prefix"
+        msg = (
+            r"Conflicting metadata name (foo|bar),"
+            " need distinguishing prefix"
+        )
         with pytest.raises(ValueError, match=msg):
             json_normalize(data, "data", meta=["foo", "bar"])
 
-        result = json_normalize(data, "data", meta=["foo", "bar"], meta_prefix="meta")
+        result = json_normalize(
+            data, "data", meta=["foo", "bar"], meta_prefix="meta"
+        )
 
         for val in ["metafoo", "metabar", "foo", "bar"]:
             assert val in result
@@ -385,7 +397,9 @@ class TestNestedToRecord:
         assert result == expected
 
     def test_nested_flattens(self):
-        data = dict(flat1=1, dict1=dict(c=1, d=2), nested=dict(e=dict(c=1, d=2), d=2))
+        data = dict(
+            flat1=1, dict1=dict(c=1, d=2), nested=dict(e=dict(c=1, d=2), d=2)
+        )
 
         result = nested_to_record(data)
         expected = {
@@ -404,7 +418,10 @@ class TestNestedToRecord:
         # If meta keys are not always present a new option to set
         # errors='ignore' has been implemented
 
-        msg = "Try running with errors='ignore' as key 'name'" " is not always present"
+        msg = (
+            "Try running with errors='ignore' as key 'name'"
+            " is not always present"
+        )
         with pytest.raises(KeyError, match=msg):
             json_normalize(
                 data=missing_metadata,
@@ -418,7 +435,10 @@ class TestNestedToRecord:
         # If metadata is nullable with errors set to ignore, the null values
         # should be numpy.nan values
         result = json_normalize(
-            data=missing_metadata, record_path="addresses", meta="name", errors="ignore"
+            data=missing_metadata,
+            record_path="addresses",
+            meta="name",
+            errors="ignore",
         )
         ex_data = [
             {
@@ -449,9 +469,15 @@ class TestNestedToRecord:
     def test_donot_drop_nonevalues(self):
         # GH21356
         data = [
-            {"info": None, "author_name": {"first": "Smith", "last_name": "Appleseed"}},
             {
-                "info": {"created_at": "11/08/1993", "last_updated": "26/05/2012"},
+                "info": None,
+                "author_name": {"first": "Smith", "last_name": "Appleseed"},
+            },
+            {
+                "info": {
+                    "created_at": "11/08/1993",
+                    "last_updated": "26/05/2012",
+                },
                 "author_name": {"first": "Jane", "last_name": "Doe"},
             },
         ]

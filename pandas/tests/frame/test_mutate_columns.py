@@ -50,7 +50,8 @@ class TestDataFrameMutateColumns:
         df = DataFrame([[1, 4], [2, 5], [3, 6]], columns=["A", "B"])
         result = df.assign(C=[7, 8, 9], D=df.A, E=lambda x: x.B)
         expected = DataFrame(
-            [[1, 4, 7, 1, 4], [2, 5, 8, 2, 5], [3, 6, 9, 3, 6]], columns=list("ABCDE")
+            [[1, 4, 7, 1, 4], [2, 5, 8, 2, 5], [3, 6, 9, 3, 6]],
+            columns=list("ABCDE"),
         )
         assert_frame_equal(result, expected)
 
@@ -60,13 +61,19 @@ class TestDataFrameMutateColumns:
         result = df.assign(D=df.A + df.B, C=df.A - df.B)
 
         if PY36:
-            expected = DataFrame([[1, 2, 3, -1], [3, 4, 7, -1]], columns=list("ABDC"))
+            expected = DataFrame(
+                [[1, 2, 3, -1], [3, 4, 7, -1]], columns=list("ABDC")
+            )
         else:
-            expected = DataFrame([[1, 2, -1, 3], [3, 4, -1, 7]], columns=list("ABCD"))
+            expected = DataFrame(
+                [[1, 2, -1, 3], [3, 4, -1, 7]], columns=list("ABCD")
+            )
         assert_frame_equal(result, expected)
         result = df.assign(C=df.A - df.B, D=df.A + df.B)
 
-        expected = DataFrame([[1, 2, -1, 3], [3, 4, -1, 7]], columns=list("ABCD"))
+        expected = DataFrame(
+            [[1, 2, -1, 3], [3, 4, -1, 7]], columns=list("ABCD")
+        )
 
         assert_frame_equal(result, expected)
 
@@ -102,11 +109,15 @@ class TestDataFrameMutateColumns:
         df = DataFrame({"A": [1, 2], "B": [3, 4]})
 
         result = df.assign(C=df.A, D=lambda x: x["A"] + x["C"])
-        expected = DataFrame([[1, 3, 1, 2], [2, 4, 2, 4]], columns=list("ABCD"))
+        expected = DataFrame(
+            [[1, 3, 1, 2], [2, 4, 2, 4]], columns=list("ABCD")
+        )
         assert_frame_equal(result, expected)
 
         result = df.assign(C=lambda df: df.A, D=lambda df: df["A"] + df["C"])
-        expected = DataFrame([[1, 3, 1, 2], [2, 4, 2, 4]], columns=list("ABCD"))
+        expected = DataFrame(
+            [[1, 3, 1, 2], [2, 4, 2, 4]], columns=list("ABCD")
+        )
         assert_frame_equal(result, expected)
 
     def test_insert_error_msmgs(self):
@@ -123,7 +134,9 @@ class TestDataFrameMutateColumns:
             df["newcol"] = s
 
         # GH 4107, more descriptive error message
-        df = DataFrame(np.random.randint(0, 2, (4, 4)), columns=["a", "b", "c", "d"])
+        df = DataFrame(
+            np.random.randint(0, 2, (4, 4)), columns=["a", "b", "c", "d"]
+        )
 
         msg = "incompatible index of inserted column with frame index"
         with pytest.raises(TypeError, match=msg):
@@ -137,7 +150,9 @@ class TestDataFrameMutateColumns:
         new_col = np.random.randn(N)
         for i in range(K):
             df[i] = new_col
-        expected = DataFrame(np.repeat(new_col, K).reshape(N, K), index=range(N))
+        expected = DataFrame(
+            np.repeat(new_col, K).reshape(N, K), index=range(N)
+        )
         assert_frame_equal(df, expected)
 
     def test_insert(self):
@@ -229,12 +244,16 @@ class TestDataFrameMutateColumns:
         assert float_frame.columns.name == "baz"
 
         # gh-10912: inplace ops cause caching issue
-        a = DataFrame([[1, 2, 3], [4, 5, 6]], columns=["A", "B", "C"], index=["X", "Y"])
+        a = DataFrame(
+            [[1, 2, 3], [4, 5, 6]], columns=["A", "B", "C"], index=["X", "Y"]
+        )
         b = a.pop("B")
         b += 1
 
         # original frame
-        expected = DataFrame([[1, 3], [4, 6]], columns=["A", "C"], index=["X", "Y"])
+        expected = DataFrame(
+            [[1, 3], [4, 6]], columns=["A", "C"], index=["X", "Y"]
+        )
         tm.assert_frame_equal(a, expected)
 
         # result
@@ -269,5 +288,7 @@ class TestDataFrameMutateColumns:
         result = df.rename(columns={})
         str(result)
 
-        expected = DataFrame([[1.3, 1, 1.1], [2.3, 2, 2.2]], columns=["c", "a", "b"])
+        expected = DataFrame(
+            [[1.3, 1, 1.1], [2.3, 2, 2.2]], columns=["c", "a", "b"]
+        )
         assert_frame_equal(result, expected)

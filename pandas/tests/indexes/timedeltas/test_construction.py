@@ -99,11 +99,15 @@ class TestTimedeltaIndex:
     def test_construction_base_constructor(self):
         arr = [pd.Timedelta("1 days"), pd.NaT, pd.Timedelta("3 days")]
         tm.assert_index_equal(pd.Index(arr), pd.TimedeltaIndex(arr))
-        tm.assert_index_equal(pd.Index(np.array(arr)), pd.TimedeltaIndex(np.array(arr)))
+        tm.assert_index_equal(
+            pd.Index(np.array(arr)), pd.TimedeltaIndex(np.array(arr))
+        )
 
         arr = [np.nan, pd.NaT, pd.Timedelta("1 days")]
         tm.assert_index_equal(pd.Index(arr), pd.TimedeltaIndex(arr))
-        tm.assert_index_equal(pd.Index(np.array(arr)), pd.TimedeltaIndex(np.array(arr)))
+        tm.assert_index_equal(
+            pd.Index(np.array(arr)), pd.TimedeltaIndex(np.array(arr))
+        )
 
     def test_constructor(self):
         expected = TimedeltaIndex(
@@ -146,9 +150,15 @@ class TestTimedeltaIndex:
         )
         tm.assert_index_equal(TimedeltaIndex([0, 5, 9], unit="s"), expected)
         expected = TimedeltaIndex(
-            ["0 days 00:00:00.400", "0 days 00:00:00.450", "0 days 00:00:01.200"]
+            [
+                "0 days 00:00:00.400",
+                "0 days 00:00:00.450",
+                "0 days 00:00:01.200",
+            ]
         )
-        tm.assert_index_equal(TimedeltaIndex([400, 450, 1200], unit="ms"), expected)
+        tm.assert_index_equal(
+            TimedeltaIndex([400, 450, 1200], unit="ms"), expected
+        )
 
     def test_constructor_iso(self):
         # GH #21877

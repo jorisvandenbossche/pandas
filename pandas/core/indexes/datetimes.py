@@ -72,9 +72,13 @@ class DatetimeDelegateMixin(DatetimelikeDelegateMixin):
     _extra_methods = ["to_period", "to_perioddelta", "to_julian_date"]
     _extra_raw_methods = ["to_pydatetime", "_local_timestamps", "_has_same_tz"]
     _extra_raw_properties = ["_box_func", "tz", "tzinfo"]
-    _delegated_properties = DatetimeArray._datetimelike_ops + _extra_raw_properties
+    _delegated_properties = (
+        DatetimeArray._datetimelike_ops + _extra_raw_properties
+    )
     _delegated_methods = (
-        DatetimeArray._datetimelike_methods + _extra_methods + _extra_raw_methods
+        DatetimeArray._datetimelike_methods
+        + _extra_methods
+        + _extra_raw_methods
     )
     _raw_properties = (
         {"date", "time", "timetz"}
@@ -228,7 +232,9 @@ class DatetimeIndex(DatetimeIndexOpsMixin, Int64Index, DatetimeDelegateMixin):
     _join_precedence = 10
 
     def _join_i8_wrapper(joinf, **kwargs):
-        return DatetimeIndexOpsMixin._join_i8_wrapper(joinf, dtype="M8[ns]", **kwargs)
+        return DatetimeIndexOpsMixin._join_i8_wrapper(
+            joinf, dtype="M8[ns]", **kwargs
+        )
 
     _inner_indexer = _join_i8_wrapper(libjoin.inner_join_indexer_int64)
     _outer_indexer = _join_i8_wrapper(libjoin.outer_join_indexer_int64)
@@ -306,7 +312,9 @@ class DatetimeIndex(DatetimeIndexOpsMixin, Int64Index, DatetimeDelegateMixin):
                 FutureWarning,
                 stacklevel=2,
             )
-            return cls._simple_new(dtarr._data, freq=dtarr.freq, tz=dtarr.tz, name=name)
+            return cls._simple_new(
+                dtarr._data, freq=dtarr.freq, tz=dtarr.tz, name=name
+            )
 
         if is_scalar(data):
             raise TypeError(
@@ -333,7 +341,9 @@ class DatetimeIndex(DatetimeIndexOpsMixin, Int64Index, DatetimeDelegateMixin):
             int_as_wall_time=True,
         )
 
-        subarr = cls._simple_new(dtarr, name=name, freq=dtarr.freq, tz=dtarr.tz)
+        subarr = cls._simple_new(
+            dtarr, name=name, freq=dtarr.freq, tz=dtarr.tz
+        )
         return subarr
 
     @classmethod
@@ -765,9 +775,13 @@ class DatetimeIndex(DatetimeIndexOpsMixin, Int64Index, DatetimeDelegateMixin):
             snapped[i] = s
 
         # we know it conforms; skip check
-        return DatetimeIndex._simple_new(snapped, name=self.name, tz=self.tz, freq=freq)
+        return DatetimeIndex._simple_new(
+            snapped, name=self.name, tz=self.tz, freq=freq
+        )
 
-    def join(self, other, how="left", level=None, return_indexers=False, sort=False):
+    def join(
+        self, other, how="left", level=None, return_indexers=False, sort=False
+    ):
         """
         See Index.join
         """
@@ -807,7 +821,9 @@ class DatetimeIndex(DatetimeIndexOpsMixin, Int64Index, DatetimeDelegateMixin):
                         "Cannot join tz-naive with tz-aware " "DatetimeIndex"
                     )
             elif other.tz is not None:
-                raise TypeError("Cannot join tz-naive with tz-aware " "DatetimeIndex")
+                raise TypeError(
+                    "Cannot join tz-naive with tz-aware " "DatetimeIndex"
+                )
 
             if not timezones.tz_compare(self.tz, other.tz):
                 this = self.tz_convert("UTC")
@@ -874,11 +890,17 @@ class DatetimeIndex(DatetimeIndexOpsMixin, Int64Index, DatetimeDelegateMixin):
             start = Timestamp(parsed.year, parsed.month, parsed.day)
             end = start + timedelta(days=1) - Nano(1)
         elif reso == "hour":
-            start = Timestamp(parsed.year, parsed.month, parsed.day, parsed.hour)
+            start = Timestamp(
+                parsed.year, parsed.month, parsed.day, parsed.hour
+            )
             end = start + timedelta(hours=1) - Nano(1)
         elif reso == "minute":
             start = Timestamp(
-                parsed.year, parsed.month, parsed.day, parsed.hour, parsed.minute
+                parsed.year,
+                parsed.month,
+                parsed.day,
+                parsed.hour,
+                parsed.minute,
             )
             end = start + timedelta(minutes=1) - Nano(1)
         elif reso == "second":
@@ -946,13 +968,25 @@ class DatetimeIndex(DatetimeIndexOpsMixin, Int64Index, DatetimeDelegateMixin):
             # we are out of range
             if len(stamps) and (
                 (use_lhs and t1.value < stamps[0] and t2.value < stamps[0])
-                or ((use_rhs and t1.value > stamps[-1] and t2.value > stamps[-1]))
+                or (
+                    (
+                        use_rhs
+                        and t1.value > stamps[-1]
+                        and t2.value > stamps[-1]
+                    )
+                )
             ):
                 raise KeyError
 
             # a monotonic (sorted) series can be sliced
-            left = stamps.searchsorted(t1.value, side="left") if use_lhs else None
-            right = stamps.searchsorted(t2.value, side="right") if use_rhs else None
+            left = (
+                stamps.searchsorted(t1.value, side="left") if use_lhs else None
+            )
+            right = (
+                stamps.searchsorted(t2.value, side="right")
+                if use_rhs
+                else None
+            )
 
             return slice(left, right)
 
@@ -989,7 +1023,9 @@ class DatetimeIndex(DatetimeIndexOpsMixin, Int64Index, DatetimeDelegateMixin):
             return series.take(locs)
 
         try:
-            return com.maybe_box(self, Index.get_value(self, series, key), series, key)
+            return com.maybe_box(
+                self, Index.get_value(self, series, key), series, key
+            )
         except KeyError:
             try:
                 loc = self._get_string_slice(key)
@@ -1012,7 +1048,9 @@ class DatetimeIndex(DatetimeIndexOpsMixin, Int64Index, DatetimeDelegateMixin):
                 key = key.tz_localize(self.tz)
         elif not isinstance(key, Timestamp):
             key = Timestamp(key)
-        values = self._engine.get_value(com.values_from_object(series), key, tz=self.tz)
+        values = self._engine.get_value(
+            com.values_from_object(series), key, tz=self.tz
+        )
         return com.maybe_box(self, values, series, key)
 
     def get_loc(self, key, method=None, tolerance=None):
@@ -1048,7 +1086,8 @@ class DatetimeIndex(DatetimeIndexOpsMixin, Int64Index, DatetimeDelegateMixin):
         if isinstance(key, time):
             if method is not None:
                 raise NotImplementedError(
-                    "cannot yet lookup inexact labels " "when key is a time object"
+                    "cannot yet lookup inexact labels "
+                    "when key is a time object"
                 )
             return self.indexer_at_time(key)
 
@@ -1100,7 +1139,9 @@ class DatetimeIndex(DatetimeIndexOpsMixin, Int64Index, DatetimeDelegateMixin):
             self._invalid_indexer("slice", label)
 
         if isinstance(label, str):
-            freq = getattr(self, "freqstr", getattr(self, "inferred_freq", None))
+            freq = getattr(
+                self, "freqstr", getattr(self, "inferred_freq", None)
+            )
             _, parsed, reso = parsing.parse_time_string(label, freq)
             lower, upper = self._parsed_string_to_bounds(reso, parsed)
             # lower, upper form the half-open interval:
@@ -1118,7 +1159,9 @@ class DatetimeIndex(DatetimeIndexOpsMixin, Int64Index, DatetimeDelegateMixin):
     def _get_string_slice(self, key, use_lhs=True, use_rhs=True):
         freq = getattr(self, "freqstr", getattr(self, "inferred_freq", None))
         _, parsed, reso = parsing.parse_time_string(key, freq)
-        loc = self._partial_date_slice(reso, parsed, use_lhs=use_lhs, use_rhs=use_rhs)
+        loc = self._partial_date_slice(
+            reso, parsed, use_lhs=use_lhs, use_rhs=use_rhs
+        )
         return loc
 
     def slice_indexer(self, start=None, end=None, step=None, kind=None):
@@ -1157,11 +1200,15 @@ class DatetimeIndex(DatetimeIndexOpsMixin, Int64Index, DatetimeDelegateMixin):
             ):
                 mask = True
                 if start is not None:
-                    start_casted = self._maybe_cast_slice_bound(start, "left", kind)
+                    start_casted = self._maybe_cast_slice_bound(
+                        start, "left", kind
+                    )
                     mask = start_casted <= self
 
                 if end is not None:
-                    end_casted = self._maybe_cast_slice_bound(end, "right", kind)
+                    end_casted = self._maybe_cast_slice_bound(
+                        end, "right", kind
+                    )
                     mask = (self <= end_casted) & mask
 
                 indexer = mask.nonzero()[0][::step]
@@ -1181,8 +1228,12 @@ class DatetimeIndex(DatetimeIndexOpsMixin, Int64Index, DatetimeDelegateMixin):
     _is_unique = Index.is_unique
 
     _timezone = cache_readonly(DatetimeArray._timezone.fget)  # type: ignore
-    is_normalized = cache_readonly(DatetimeArray.is_normalized.fget)  # type: ignore
-    _resolution = cache_readonly(DatetimeArray._resolution.fget)  # type: ignore
+    is_normalized = cache_readonly(
+        DatetimeArray.is_normalized.fget
+    )  # type: ignore
+    _resolution = cache_readonly(
+        DatetimeArray._resolution.fget
+    )  # type: ignore
 
     strftime = ea_passthrough(DatetimeArray.strftime)
     _has_same_tz = ea_passthrough(DatetimeArray._has_same_tz)
@@ -1279,10 +1330,14 @@ class DatetimeIndex(DatetimeIndexOpsMixin, Int64Index, DatetimeDelegateMixin):
         if isinstance(item, (datetime, np.datetime64)):
             self._assert_can_do_op(item)
             if not self._has_same_tz(item) and not isna(item):
-                raise ValueError("Passed item and index have different timezone")
+                raise ValueError(
+                    "Passed item and index have different timezone"
+                )
             # check freq can be preserved on edge cases
             if self.size and self.freq is not None:
-                if (loc == 0 or loc == -len(self)) and item + self.freq == self[0]:
+                if (
+                    loc == 0 or loc == -len(self)
+                ) and item + self.freq == self[0]:
                     freq = self.freq
                 elif (loc == len(self)) and item - self.freq == self[-1]:
                     freq = self.freq
@@ -1298,7 +1353,9 @@ class DatetimeIndex(DatetimeIndexOpsMixin, Int64Index, DatetimeDelegateMixin):
             # fall back to object index
             if isinstance(item, str):
                 return self.astype(object).insert(loc, item)
-            raise TypeError("cannot insert DatetimeIndex with incompatible label")
+            raise TypeError(
+                "cannot insert DatetimeIndex with incompatible label"
+            )
 
     def delete(self, loc):
         """
@@ -1321,7 +1378,9 @@ class DatetimeIndex(DatetimeIndexOpsMixin, Int64Index, DatetimeDelegateMixin):
                 freq = self.freq
         else:
             if is_list_like(loc):
-                loc = lib.maybe_indices_to_slice(ensure_int64(np.array(loc)), len(self))
+                loc = lib.maybe_indices_to_slice(
+                    ensure_int64(np.array(loc)), len(self)
+                )
             if isinstance(loc, slice) and loc.step in (1, None):
                 if loc.start in (0, None) or loc.stop in (len(self), None):
                     freq = self.freq
@@ -1411,7 +1470,9 @@ class DatetimeIndex(DatetimeIndexOpsMixin, Int64Index, DatetimeDelegateMixin):
         else:
             join_op = operator.or_
 
-        mask = join_op(lop(start_micros, time_micros), rop(time_micros, end_micros))
+        mask = join_op(
+            lop(start_micros, time_micros), rop(time_micros, end_micros)
+        )
 
         return mask.nonzero()[0]
 
@@ -1583,7 +1644,9 @@ def date_range(
         closed=closed,
         **kwargs
     )
-    return DatetimeIndex._simple_new(dtarr, tz=dtarr.tz, freq=dtarr.freq, name=name)
+    return DatetimeIndex._simple_new(
+        dtarr, tz=dtarr.tz, freq=dtarr.freq, name=name
+    )
 
 
 def bdate_range(
@@ -1751,7 +1814,9 @@ def cdate_range(
     """
     warnings.warn(
         "cdate_range is deprecated and will be removed in a future "
-        "version, instead use pd.bdate_range(..., freq='{freq}')".format(freq=freq),
+        "version, instead use pd.bdate_range(..., freq='{freq}')".format(
+            freq=freq
+        ),
         FutureWarning,
         stacklevel=2,
     )

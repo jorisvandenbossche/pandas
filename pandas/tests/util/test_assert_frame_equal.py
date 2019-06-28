@@ -86,7 +86,10 @@ def test_frame_equal_row_order_mismatch(check_like):
     "df1,df2",
     [
         (DataFrame({"A": [1, 2, 3]}), DataFrame({"A": [1, 2, 3, 4]})),
-        (DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]}), DataFrame({"A": [1, 2, 3]})),
+        (
+            DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]}),
+            DataFrame({"A": [1, 2, 3]}),
+        ),
     ],
 )
 def test_frame_equal_shape_mismatch(df1, df2):
@@ -101,17 +104,23 @@ def test_frame_equal_shape_mismatch(df1, df2):
     [
         # Index
         (
-            DataFrame.from_records({"a": [1, 2], "c": ["l1", "l2"]}, index=["a"]),
-            DataFrame.from_records({"a": [1.0, 2.0], "c": ["l1", "l2"]}, index=["a"]),
+            DataFrame.from_records(
+                {"a": [1, 2], "c": ["l1", "l2"]}, index=["a"]
+            ),
+            DataFrame.from_records(
+                {"a": [1.0, 2.0], "c": ["l1", "l2"]}, index=["a"]
+            ),
             "DataFrame\\.index are different",
         ),
         # MultiIndex
         (
             DataFrame.from_records(
-                {"a": [1, 2], "b": [2.1, 1.5], "c": ["l1", "l2"]}, index=["a", "b"]
+                {"a": [1, 2], "b": [2.1, 1.5], "c": ["l1", "l2"]},
+                index=["a", "b"],
             ),
             DataFrame.from_records(
-                {"a": [1.0, 2.0], "b": [2.1, 1.5], "c": ["l1", "l2"]}, index=["a", "b"]
+                {"a": [1.0, 2.0], "b": [2.1, 1.5], "c": ["l1", "l2"]},
+                index=["a", "b"],
             ),
             "MultiIndex level \\[0\\] are different",
         ),

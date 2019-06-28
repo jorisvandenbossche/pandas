@@ -108,7 +108,9 @@ class TestArithmetic:
         [
             pytest.param(
                 pd.Index,
-                marks=pytest.mark.xfail(reason="Does not mask nulls", raises=TypeError),
+                marks=pytest.mark.xfail(
+                    reason="Does not mask nulls", raises=TypeError
+                ),
             ),
             pd.Series,
             pd.DataFrame,
@@ -130,7 +132,9 @@ class TestArithmetic:
         [
             pytest.param(
                 pd.Index,
-                marks=pytest.mark.xfail(reason="Does not mask nulls", raises=TypeError),
+                marks=pytest.mark.xfail(
+                    reason="Does not mask nulls", raises=TypeError
+                ),
             ),
             pd.Series,
             pd.DataFrame,
@@ -164,7 +168,9 @@ class TestArithmetic:
         with pytest.raises(TypeError):
             "foo_" + ser
 
-    @pytest.mark.parametrize("op", [operator.add, ops.radd, operator.sub, ops.rsub])
+    @pytest.mark.parametrize(
+        "op", [operator.add, ops.radd, operator.sub, ops.rsub]
+    )
     def test_objarr_add_invalid(self, op, box):
         # invalid ops
 
@@ -181,11 +187,15 @@ class TestArithmetic:
     def test_operators_na_handling(self):
         ser = Series(["foo", "bar", "baz", np.nan])
         result = "prefix_" + ser
-        expected = pd.Series(["prefix_foo", "prefix_bar", "prefix_baz", np.nan])
+        expected = pd.Series(
+            ["prefix_foo", "prefix_bar", "prefix_baz", np.nan]
+        )
         tm.assert_series_equal(result, expected)
 
         result = ser + "_suffix"
-        expected = pd.Series(["foo_suffix", "bar_suffix", "baz_suffix", np.nan])
+        expected = pd.Series(
+            ["foo_suffix", "bar_suffix", "baz_suffix", np.nan]
+        )
         tm.assert_series_equal(result, expected)
 
     # TODO: parametrize over box
@@ -193,11 +203,19 @@ class TestArithmetic:
     def test_series_with_dtype_radd_timedelta(self, dtype):
         # note this test is _not_ aimed at timedelta64-dtyped Series
         ser = pd.Series(
-            [pd.Timedelta("1 days"), pd.Timedelta("2 days"), pd.Timedelta("3 days")],
+            [
+                pd.Timedelta("1 days"),
+                pd.Timedelta("2 days"),
+                pd.Timedelta("3 days"),
+            ],
             dtype=dtype,
         )
         expected = pd.Series(
-            [pd.Timedelta("4 days"), pd.Timedelta("5 days"), pd.Timedelta("6 days")]
+            [
+                pd.Timedelta("4 days"),
+                pd.Timedelta("5 days"),
+                pd.Timedelta("6 days"),
+            ]
         )
 
         result = pd.Timedelta("3 days") + ser
@@ -237,7 +255,9 @@ class TestArithmetic:
             name="xxx",
         )
         assert ser2.dtype == object
-        exp = pd.Series([pd.Timedelta("2 days"), pd.Timedelta("4 days")], name="xxx")
+        exp = pd.Series(
+            [pd.Timedelta("2 days"), pd.Timedelta("4 days")], name="xxx"
+        )
         tm.assert_series_equal(ser2 - ser, exp)
         tm.assert_series_equal(ser - ser2, -exp)
 

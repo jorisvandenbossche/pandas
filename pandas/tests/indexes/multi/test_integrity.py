@@ -138,7 +138,10 @@ def test_dims():
 
 
 def take_invalid_kwargs():
-    vals = [["A", "B"], [pd.Timestamp("2011-01-01"), pd.Timestamp("2011-01-02")]]
+    vals = [
+        ["A", "B"],
+        [pd.Timestamp("2011-01-01"), pd.Timestamp("2011-01-02")],
+    ]
     idx = pd.MultiIndex.from_product(vals, names=["str", "dt"])
     indices = [1, 2]
 
@@ -167,14 +170,18 @@ def test_isna_behavior(idx):
 def test_large_multiindex_error():
     # GH12527
     df_below_1000000 = pd.DataFrame(
-        1, index=pd.MultiIndex.from_product([[1, 2], range(499999)]), columns=["dest"]
+        1,
+        index=pd.MultiIndex.from_product([[1, 2], range(499999)]),
+        columns=["dest"],
     )
     with pytest.raises(KeyError, match=r"^\(-1, 0\)$"):
         df_below_1000000.loc[(-1, 0), "dest"]
     with pytest.raises(KeyError, match=r"^\(3, 0\)$"):
         df_below_1000000.loc[(3, 0), "dest"]
     df_above_1000000 = pd.DataFrame(
-        1, index=pd.MultiIndex.from_product([[1, 2], range(500001)]), columns=["dest"]
+        1,
+        index=pd.MultiIndex.from_product([[1, 2], range(500001)]),
+        columns=["dest"],
     )
     with pytest.raises(KeyError, match=r"^\(-1, 0\)$"):
         df_above_1000000.loc[(-1, 0), "dest"]
@@ -219,7 +226,9 @@ def test_metadata_immutable(idx):
 
 
 def test_level_setting_resets_attributes():
-    ind = pd.MultiIndex.from_arrays([["A", "A", "B", "B", "B"], [1, 2, 1, 2, 3]])
+    ind = pd.MultiIndex.from_arrays(
+        [["A", "A", "B", "B", "B"], [1, 2, 1, 2, 3]]
+    )
     assert ind.is_monotonic
     ind.set_levels([["A", "B"], [1, 3, 2]], inplace=True)
     # if this fails, probably didn't reset the cache correctly.
@@ -253,7 +262,9 @@ def test_rangeindex_fallback_coercion_bug():
 
 def test_hash_error(indices):
     index = indices
-    with pytest.raises(TypeError, match=("unhashable type: %r" % type(index).__name__)):
+    with pytest.raises(
+        TypeError, match=("unhashable type: %r" % type(index).__name__)
+    ):
         hash(indices)
 
 

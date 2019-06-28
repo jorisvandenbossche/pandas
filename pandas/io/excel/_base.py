@@ -11,7 +11,12 @@ from pandas._config import config
 from pandas.errors import EmptyDataError
 from pandas.util._decorators import Appender, deprecate_kwarg
 
-from pandas.core.dtypes.common import is_bool, is_float, is_integer, is_list_like
+from pandas.core.dtypes.common import (
+    is_bool,
+    is_float,
+    is_integer,
+    is_list_like,
+)
 
 from pandas.core.frame import DataFrame
 
@@ -297,7 +302,8 @@ def read_excel(
     for arg in ("sheet", "sheetname", "parse_cols"):
         if arg in kwds:
             raise TypeError(
-                "read_excel() got an unexpected keyword argument " "`{}`".format(arg)
+                "read_excel() got an unexpected keyword argument "
+                "`{}`".format(arg)
             )
 
     if not isinstance(io, ExcelFile):
@@ -340,8 +346,12 @@ class _BaseExcelReader(metaclass=abc.ABCMeta):
         # If filepath_or_buffer is a url, load the data into a BytesIO
         if _is_url(filepath_or_buffer):
             filepath_or_buffer = BytesIO(urlopen(filepath_or_buffer).read())
-        elif not isinstance(filepath_or_buffer, (ExcelFile, self._workbook_class)):
-            filepath_or_buffer, _, _, _ = get_filepath_or_buffer(filepath_or_buffer)
+        elif not isinstance(
+            filepath_or_buffer, (ExcelFile, self._workbook_class)
+        ):
+            filepath_or_buffer, _, _, _ = get_filepath_or_buffer(
+                filepath_or_buffer
+            )
 
         if isinstance(filepath_or_buffer, self._workbook_class):
             self.book = filepath_or_buffer
@@ -353,7 +363,8 @@ class _BaseExcelReader(metaclass=abc.ABCMeta):
             self.book = self.load_workbook(filepath_or_buffer)
         else:
             raise ValueError(
-                "Must explicitly set engine if not passing in" " buffer or path for io."
+                "Must explicitly set engine if not passing in"
+                " buffer or path for io."
             )
 
     @property
@@ -455,7 +466,9 @@ class _BaseExcelReader(metaclass=abc.ABCMeta):
                     if is_integer(skiprows):
                         row += skiprows
 
-                    data[row], control_row = _fill_mi_header(data[row], control_row)
+                    data[row], control_row = _fill_mi_header(
+                        data[row], control_row
+                    )
 
                     if index_col is not None:
                         header_name, _ = _pop_header_name(data[row], index_col)
@@ -614,18 +627,24 @@ class ExcelWriter(metaclass=abc.ABCMeta):
         # only switch class if generic(ExcelWriter)
 
         if cls is ExcelWriter:
-            if engine is None or (isinstance(engine, str) and engine == "auto"):
+            if engine is None or (
+                isinstance(engine, str) and engine == "auto"
+            ):
                 if isinstance(path, str):
                     ext = os.path.splitext(path)[-1][1:]
                 else:
                     ext = "xlsx"
 
                 try:
-                    engine = config.get_option("io.excel.{ext}.writer".format(ext=ext))
+                    engine = config.get_option(
+                        "io.excel.{ext}.writer".format(ext=ext)
+                    )
                     if engine == "auto":
                         engine = _get_default_writer(ext)
                 except KeyError:
-                    raise ValueError("No engine for filetype: '{ext}'".format(ext=ext))
+                    raise ValueError(
+                        "No engine for filetype: '{ext}'".format(ext=ext)
+                    )
             cls = get_writer(engine)
 
         return object.__new__(cls)

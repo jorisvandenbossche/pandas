@@ -12,7 +12,9 @@ import pandas.util.testing as tm
 
 class TestCategoricalOpsWithFactor(TestCategorical):
     def test_categories_none_comparisons(self):
-        factor = Categorical(["a", "b", "b", "a", "a", "c", "c", "c"], ordered=True)
+        factor = Categorical(
+            ["a", "b", "b", "a", "a", "c", "c", "c"], ordered=True
+        )
         tm.assert_categorical_equal(factor, self.factor)
 
     def test_comparisons(self):
@@ -52,12 +54,16 @@ class TestCategoricalOpsWithFactor(TestCategorical):
         tm.assert_numpy_array_equal(result, expected)
 
         # comparisons with categoricals
-        cat_rev = Categorical(["a", "b", "c"], categories=["c", "b", "a"], ordered=True)
+        cat_rev = Categorical(
+            ["a", "b", "c"], categories=["c", "b", "a"], ordered=True
+        )
         cat_rev_base = Categorical(
             ["b", "b", "b"], categories=["c", "b", "a"], ordered=True
         )
         cat = Categorical(["a", "b", "c"], ordered=True)
-        cat_base = Categorical(["b", "b", "b"], categories=cat.categories, ordered=True)
+        cat_base = Categorical(
+            ["b", "b", "b"], categories=cat.categories, ordered=True
+        )
 
         # comparisons need to take categories ordering into account
         res_rev = cat_rev > cat_rev_base
@@ -76,7 +82,9 @@ class TestCategoricalOpsWithFactor(TestCategorical):
         with pytest.raises(TypeError):
             cat > cat_rev
 
-        cat_rev_base2 = Categorical(["b", "b", "b"], categories=["c", "b", "a", "d"])
+        cat_rev_base2 = Categorical(
+            ["b", "b", "b"], categories=["c", "b", "a", "d"]
+        )
 
         with pytest.raises(TypeError):
             cat_rev > cat_rev_base2
@@ -113,7 +121,9 @@ class TestCategoricalOpsWithFactor(TestCategorical):
 
         # Make sure that unequal comparison take the categories order in
         # account
-        cat_rev = Categorical(list("abc"), categories=list("cba"), ordered=True)
+        cat_rev = Categorical(
+            list("abc"), categories=list("cba"), ordered=True
+        )
         exp = np.array([True, False, False])
         res = cat_rev > "b"
         tm.assert_numpy_array_equal(res, exp)
@@ -153,14 +163,22 @@ class TestCategoricalOps:
 
     def test_datetime_categorical_comparison(self):
         dt_cat = Categorical(date_range("2014-01-01", periods=3), ordered=True)
-        tm.assert_numpy_array_equal(dt_cat > dt_cat[0], np.array([False, True, True]))
-        tm.assert_numpy_array_equal(dt_cat[0] < dt_cat, np.array([False, True, True]))
+        tm.assert_numpy_array_equal(
+            dt_cat > dt_cat[0], np.array([False, True, True])
+        )
+        tm.assert_numpy_array_equal(
+            dt_cat[0] < dt_cat, np.array([False, True, True])
+        )
 
     def test_reflected_comparison_with_scalars(self):
         # GH8658
         cat = Categorical([1, 2, 3], ordered=True)
-        tm.assert_numpy_array_equal(cat > cat[0], np.array([False, True, True]))
-        tm.assert_numpy_array_equal(cat[0] < cat, np.array([False, True, True]))
+        tm.assert_numpy_array_equal(
+            cat > cat[0], np.array([False, True, True])
+        )
+        tm.assert_numpy_array_equal(
+            cat[0] < cat, np.array([False, True, True])
+        )
 
     def test_comparison_with_unknown_scalars(self):
         # https://github.com/pandas-dev/pandas/issues/9836#issuecomment-92123057
@@ -196,7 +214,9 @@ class TestCategoricalOps:
         scalar = 2
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
-            expected = getattr(np.array(cat), compare_operators_no_eq_ne)(scalar)
+            expected = getattr(np.array(cat), compare_operators_no_eq_ne)(
+                scalar
+            )
         actual = getattr(cat, compare_operators_no_eq_ne)(scalar)
         tm.assert_numpy_array_equal(actual, expected)
 
@@ -217,11 +237,16 @@ class TestCategoricalOps:
 
     @pytest.mark.parametrize(
         "data,reverse,base",
-        [(list("abc"), list("cba"), list("bbb")), ([1, 2, 3], [3, 2, 1], [2, 2, 2])],
+        [
+            (list("abc"), list("cba"), list("bbb")),
+            ([1, 2, 3], [3, 2, 1], [2, 2, 2]),
+        ],
     )
     def test_comparisons(self, data, reverse, base):
         cat_rev = Series(Categorical(data, categories=reverse, ordered=True))
-        cat_rev_base = Series(Categorical(base, categories=reverse, ordered=True))
+        cat_rev_base = Series(
+            Categorical(base, categories=reverse, ordered=True)
+        )
         cat = Series(Categorical(data, ordered=True))
         cat_base = Series(
             Categorical(base, categories=cat.cat.categories, ordered=True)
@@ -313,7 +338,9 @@ class TestCategoricalOps:
         c1 = Categorical(["a", "b"], categories=["a", "b"], ordered=False)
         c2 = Categorical(["a", "c"], categories=["c", "a"], ordered=False)
 
-        with pytest.raises(TypeError, match=("Categoricals can " "only be compared")):
+        with pytest.raises(
+            TypeError, match=("Categoricals can " "only be compared")
+        ):
             c1 == c2
 
     def test_compare_different_lengths(self):

@@ -16,7 +16,10 @@ class TestSeriesPeriod:
         assert series.dtype == "Period[D]"
 
         series = pd.Series(
-            [pd.Period("2011-01-01", freq="D"), pd.Period("2011-02-01", freq="D")]
+            [
+                pd.Period("2011-01-01", freq="D"),
+                pd.Period("2011-02-01", freq="D"),
+            ]
         )
         assert series.dtype == "Period[D]"
 
@@ -25,7 +28,10 @@ class TestSeriesPeriod:
 
         result = self.series[[2, 4]]
         exp = pd.Series(
-            [pd.Period("2000-01-03", freq="D"), pd.Period("2000-01-05", freq="D")],
+            [
+                pd.Period("2000-01-03", freq="D"),
+                pd.Period("2000-01-05", freq="D"),
+            ],
             index=[2, 4],
             dtype="Period[D]",
         )
@@ -34,23 +40,33 @@ class TestSeriesPeriod:
 
     def test_isna(self):
         # GH 13737
-        s = Series([pd.Period("2011-01", freq="M"), pd.Period("NaT", freq="M")])
+        s = Series(
+            [pd.Period("2011-01", freq="M"), pd.Period("NaT", freq="M")]
+        )
         tm.assert_series_equal(s.isna(), Series([False, True]))
         tm.assert_series_equal(s.notna(), Series([True, False]))
 
     def test_fillna(self):
         # GH 13737
-        s = Series([pd.Period("2011-01", freq="M"), pd.Period("NaT", freq="M")])
+        s = Series(
+            [pd.Period("2011-01", freq="M"), pd.Period("NaT", freq="M")]
+        )
 
         res = s.fillna(pd.Period("2012-01", freq="M"))
-        exp = Series([pd.Period("2011-01", freq="M"), pd.Period("2012-01", freq="M")])
+        exp = Series(
+            [pd.Period("2011-01", freq="M"), pd.Period("2012-01", freq="M")]
+        )
         tm.assert_series_equal(res, exp)
         assert res.dtype == "Period[M]"
 
     def test_dropna(self):
         # GH 13737
-        s = Series([pd.Period("2011-01", freq="M"), pd.Period("NaT", freq="M")])
-        tm.assert_series_equal(s.dropna(), Series([pd.Period("2011-01", freq="M")]))
+        s = Series(
+            [pd.Period("2011-01", freq="M"), pd.Period("NaT", freq="M")]
+        )
+        tm.assert_series_equal(
+            s.dropna(), Series([pd.Period("2011-01", freq="M")])
+        )
 
     def test_between(self):
         left, right = self.series[[2, 7]]
@@ -95,7 +111,9 @@ class TestSeriesPeriod:
     def test_intercept_astype_object(self):
         expected = self.series.astype("object")
 
-        df = DataFrame({"a": self.series, "b": np.random.randn(len(self.series))})
+        df = DataFrame(
+            {"a": self.series, "b": np.random.randn(len(self.series))}
+        )
 
         result = df.values.squeeze()
         assert (result[:, 0] == expected.values).all()
@@ -114,7 +132,11 @@ class TestSeriesPeriod:
     def test_truncate(self):
         # GH 17717
         idx1 = pd.PeriodIndex(
-            [pd.Period("2017-09-02"), pd.Period("2017-09-02"), pd.Period("2017-09-03")]
+            [
+                pd.Period("2017-09-02"),
+                pd.Period("2017-09-02"),
+                pd.Period("2017-09-03"),
+            ]
         )
         series1 = pd.Series([1, 2, 3], index=idx1)
         result1 = series1.truncate(after="2017-09-02")
@@ -125,7 +147,11 @@ class TestSeriesPeriod:
         tm.assert_series_equal(result1, pd.Series([1, 2], index=expected_idx1))
 
         idx2 = pd.PeriodIndex(
-            [pd.Period("2017-09-03"), pd.Period("2017-09-02"), pd.Period("2017-09-03")]
+            [
+                pd.Period("2017-09-03"),
+                pd.Period("2017-09-02"),
+                pd.Period("2017-09-03"),
+            ]
         )
         series2 = pd.Series([1, 2, 3], index=idx2)
         result2 = series2.sort_index().truncate(after="2017-09-02")

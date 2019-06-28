@@ -133,7 +133,9 @@ class TestPandasDelegate:
             typ="property",
         )
         self.Delegate._add_delegate_accessors(
-            delegate=self.Delegator, accessors=self.Delegator._methods, typ="method"
+            delegate=self.Delegator,
+            accessors=self.Delegator._methods,
+            typ="method",
         )
 
         delegate = self.Delegate(self.Delegator())
@@ -159,7 +161,9 @@ class TestPandasDelegate:
 class Ops:
     def _allow_na_ops(self, obj):
         """Whether to skip test cases including NaN"""
-        if isinstance(obj, Index) and (obj.is_boolean() or not obj._can_hold_na):
+        if isinstance(obj, Index) and (
+            obj.is_boolean() or not obj._can_hold_na
+        ):
             # don't test boolean / int64 index
             return False
         return True
@@ -169,7 +173,9 @@ class Ops:
         self.int_index = tm.makeIntIndex(10, name="a")
         self.float_index = tm.makeFloatIndex(10, name="a")
         self.dt_index = tm.makeDateIndex(10, name="a")
-        self.dt_tz_index = tm.makeDateIndex(10, name="a").tz_localize(tz="US/Eastern")
+        self.dt_tz_index = tm.makeDateIndex(10, name="a").tz_localize(
+            tz="US/Eastern"
+        )
         self.period_index = tm.makePeriodIndex(10, name="a")
         self.string_index = tm.makeStringIndex(10, name="a")
         self.unicode_index = tm.makeUnicodeIndex(10, name="a")
@@ -184,7 +190,16 @@ class Ops:
         self.string_series = Series(arr, index=self.string_index, name="a")
         self.unicode_series = Series(arr, index=self.unicode_index, name="a")
 
-        types = ["bool", "int", "float", "dt", "dt_tz", "period", "string", "unicode"]
+        types = [
+            "bool",
+            "int",
+            "float",
+            "dt",
+            "dt_tz",
+            "period",
+            "string",
+            "unicode",
+        ]
         self.indexes = [getattr(self, "{}_index".format(t)) for t in types]
         self.series = [getattr(self, "{}_series".format(t)) for t in types]
         self.objs = self.indexes + self.series
@@ -201,7 +216,9 @@ class Ops:
 
                 try:
                     if isinstance(o, Series):
-                        expected = Series(getattr(o.index, op), index=o.index, name="a")
+                        expected = Series(
+                            getattr(o.index, op), index=o.index, name="a"
+                        )
                     else:
                         expected = getattr(o, op)
                 except (AttributeError):
@@ -563,11 +580,25 @@ class TestIndexOps(Ops):
         tm.assert_series_equal(res4, exp4)
 
         res4n = s1.value_counts(bins=4, normalize=True)
-        exp4n = Series([0.5, 0.25, 0.25, 0], index=intervals.take([0, 3, 1, 2]))
+        exp4n = Series(
+            [0.5, 0.25, 0.25, 0], index=intervals.take([0, 3, 1, 2])
+        )
         tm.assert_series_equal(res4n, exp4n)
 
         # handle NA's properly
-        s_values = ["a", "b", "b", "b", np.nan, np.nan, "d", "d", "a", "a", "b"]
+        s_values = [
+            "a",
+            "b",
+            "b",
+            "b",
+            np.nan,
+            np.nan,
+            "d",
+            "d",
+            "a",
+            "a",
+            "b",
+        ]
         s = klass(s_values)
         expected = Series([4, 3, 2], index=["b", "a", "d"])
         tm.assert_series_equal(s.value_counts(), expected)
@@ -582,12 +613,16 @@ class TestIndexOps(Ops):
 
         s = klass({})
         expected = Series([], dtype=np.int64)
-        tm.assert_series_equal(s.value_counts(), expected, check_index_type=False)
+        tm.assert_series_equal(
+            s.value_counts(), expected, check_index_type=False
+        )
         # returned dtype differs depending on original
         if isinstance(s, Index):
             tm.assert_index_equal(s.unique(), Index([]), exact=False)
         else:
-            tm.assert_numpy_array_equal(s.unique(), np.array([]), check_dtype=False)
+            tm.assert_numpy_array_equal(
+                s.unique(), np.array([]), check_dtype=False
+            )
 
         assert s.nunique() == 0
 
@@ -608,19 +643,30 @@ class TestIndexOps(Ops):
         )
         f = StringIO(txt)
         df = pd.read_fwf(
-            f, widths=[6, 8, 3], names=["person_id", "dt", "food"], parse_dates=["dt"]
+            f,
+            widths=[6, 8, 3],
+            names=["person_id", "dt", "food"],
+            parse_dates=["dt"],
         )
 
         s = klass(df["dt"].copy())
         s.name = None
         idx = pd.to_datetime(
-            ["2010-01-01 00:00:00", "2008-09-09 00:00:00", "2009-01-01 00:00:00"]
+            [
+                "2010-01-01 00:00:00",
+                "2008-09-09 00:00:00",
+                "2009-01-01 00:00:00",
+            ]
         )
         expected_s = Series([3, 2, 1], index=idx)
         tm.assert_series_equal(s.value_counts(), expected_s)
 
         expected = np_array_datetime64_compat(
-            ["2010-01-01 00:00:00", "2009-01-01 00:00:00", "2008-09-09 00:00:00"],
+            [
+                "2010-01-01 00:00:00",
+                "2009-01-01 00:00:00",
+                "2008-09-09 00:00:00",
+            ],
             dtype="datetime64[ns]",
         )
         if isinstance(s, Index):
@@ -725,7 +771,9 @@ class TestIndexOps(Ops):
             else:
                 tm.assert_index_equal(uniques, o, check_names=False)
 
-            exp_arr = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4], np.intp)
+            exp_arr = np.array(
+                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4], np.intp
+            )
             labels, uniques = n.factorize(sort=False)
             tm.assert_numpy_array_equal(labels, exp_arr)
 
@@ -762,7 +810,9 @@ class TestIndexOps(Ops):
 
                 # create repeated values, 3rd and 5th values are duplicated
                 idx = original[list(range(len(original))) + [5, 3]]
-                expected = np.array([False] * len(original) + [True, True], dtype=bool)
+                expected = np.array(
+                    [False] * len(original) + [True, True], dtype=bool
+                )
                 duplicated = idx.duplicated()
                 tm.assert_numpy_array_equal(duplicated, expected)
                 assert duplicated.dtype == bool
@@ -793,7 +843,8 @@ class TestIndexOps(Ops):
                 with pytest.raises(
                     TypeError,
                     match=(
-                        r"drop_duplicates\(\) got an " r"unexpected keyword argument"
+                        r"drop_duplicates\(\) got an "
+                        r"unexpected keyword argument"
                     ),
                 ):
                     idx.drop_duplicates(inplace=True)
@@ -1094,7 +1145,9 @@ class TestToIterable:
         ids=["tolist", "to_list", "list", "iter"],
     )
     @pytest.mark.parametrize("typ", [Series, Index])
-    def test_iterable_object_and_category(self, typ, method, dtype, rdtype, obj):
+    def test_iterable_object_and_category(
+        self, typ, method, dtype, rdtype, obj
+    ):
         # gh-10904
         # gh-13258
         # coerce iteration to underlying python / pandas types
@@ -1140,7 +1193,9 @@ class TestToIterable:
         ids=["tolist", "to_list", "list", "iter"],
     )
     def test_categorial_datetimelike(self, method):
-        i = CategoricalIndex([Timestamp("1999-12-31"), Timestamp("2000-12-31")])
+        i = CategoricalIndex(
+            [Timestamp("1999-12-31"), Timestamp("2000-12-31")]
+        )
 
         result = method(i)[0]
         assert isinstance(result, Timestamp)
@@ -1175,7 +1230,10 @@ class TestToIterable:
             assert res == exp
 
         # period
-        vals = [pd.Period("2011-01-01", freq="M"), pd.Period("2011-01-02", freq="M")]
+        vals = [
+            pd.Period("2011-01-01", freq="M"),
+            pd.Period("2011-01-02", freq="M"),
+        ]
         s = Series(vals)
         assert s.dtype == "Period[M]"
         for res, exp in zip(s, vals):
@@ -1297,7 +1355,8 @@ def test_numpy_array_all_dtypes(any_numpy_dtype):
         (
             DatetimeArray(
                 np.array(
-                    ["2000-01-01T12:00:00", "2000-01-02T12:00:00"], dtype="M8[ns]"
+                    ["2000-01-01T12:00:00", "2000-01-02T12:00:00"],
+                    dtype="M8[ns]",
                 ),
                 dtype=DatetimeTZDtype(tz="US/Central"),
             ),
@@ -1331,7 +1390,9 @@ def test_array_multiindex_raises():
         (pd.Categorical(["a", "b"]), np.array(["a", "b"], dtype=object)),
         (
             pd.core.arrays.period_array(["2000", "2001"], freq="D"),
-            np.array([pd.Period("2000", freq="D"), pd.Period("2001", freq="D")]),
+            np.array(
+                [pd.Period("2000", freq="D"), pd.Period("2001", freq="D")]
+            ),
         ),
         (
             pd.core.arrays.integer_array([0, np.nan]),
@@ -1351,7 +1412,8 @@ def test_array_multiindex_raises():
         (
             DatetimeArray(
                 np.array(
-                    ["2000-01-01T06:00:00", "2000-01-02T06:00:00"], dtype="M8[ns]"
+                    ["2000-01-01T06:00:00", "2000-01-02T06:00:00"],
+                    dtype="M8[ns]",
                 ),
                 dtype=DatetimeTZDtype(tz="US/Central"),
             ),
@@ -1382,7 +1444,11 @@ def test_to_numpy(array, expected, box):
 
 @pytest.mark.parametrize("as_series", [True, False])
 @pytest.mark.parametrize(
-    "arr", [np.array([1, 2, 3], dtype="int64"), np.array(["a", "b", "c"], dtype=object)]
+    "arr",
+    [
+        np.array([1, 2, 3], dtype="int64"),
+        np.array(["a", "b", "c"], dtype=object),
+    ],
 )
 def test_to_numpy_copy(arr, as_series):
     obj = pd.Index(arr, copy=False)
@@ -1411,7 +1477,8 @@ def test_to_numpy_dtype(as_series):
     # preserve tz by default
     result = obj.to_numpy()
     expected = np.array(
-        [pd.Timestamp("2000", tz=tz), pd.Timestamp("2001", tz=tz)], dtype=object
+        [pd.Timestamp("2000", tz=tz), pd.Timestamp("2001", tz=tz)],
+        dtype=object,
     )
     tm.assert_numpy_array_equal(result, expected)
 
@@ -1433,7 +1500,8 @@ class TestConstruction:
             Series,
             lambda x, **kwargs: DataFrame({"a": x}, **kwargs)["a"],
             pytest.param(
-                lambda x, **kwargs: DataFrame(x, **kwargs)[0], marks=pytest.mark.xfail
+                lambda x, **kwargs: DataFrame(x, **kwargs)[0],
+                marks=pytest.mark.xfail,
             ),
             Index,
         ],

@@ -118,7 +118,10 @@ def test_to_html_escaped(kwargs, string, expected, datapath):
     a = "str<ing1 &amp;"
     b = "stri>ng2 &amp;"
 
-    test_dict = {"co<l1": {a: string, b: string}, "co>l2": {a: string, b: string}}
+    test_dict = {
+        "co<l1": {a: string, b: string},
+        "co>l2": {a: string, b: string},
+    }
     result = DataFrame(test_dict).to_html(**kwargs)
     expected = expected_html(datapath, expected)
     assert result == expected
@@ -148,7 +151,9 @@ def test_to_html_multiindex_index_false(index_is_named, datapath):
     ],
 )
 def test_to_html_multiindex_sparsify(multi_sparse, expected, datapath):
-    index = MultiIndex.from_arrays([[0, 0, 1, 1], [0, 1, 0, 1]], names=["foo", None])
+    index = MultiIndex.from_arrays(
+        [[0, 0, 1, 1], [0, 1, 0, 1]], names=["foo", None]
+    )
     df = DataFrame([[0, 1], [2, 3], [4, 5], [6, 7]], index=index)
     if expected.endswith("2"):
         df.columns = index[::2]
@@ -169,7 +174,8 @@ def test_to_html_multiindex_sparsify(multi_sparse, expected, datapath):
 def test_to_html_multiindex_odd_even_truncate(max_rows, expected, datapath):
     # GH 14882 - Issue on truncation with odd length DataFrame
     index = MultiIndex.from_product(
-        [[100, 200, 300], [10, 20, 30], [1, 2, 3, 4, 5, 6, 7]], names=["a", "b", "c"]
+        [[100, 200, 300], [10, 20, 30], [1, 2, 3, 4, 5, 6, 7]],
+        names=["a", "b", "c"],
     )
     df = DataFrame({"n": range(len(index))}, index=index)
     result = df.to_html(max_rows=max_rows)
@@ -190,7 +196,9 @@ def test_to_html_multiindex_odd_even_truncate(max_rows, expected, datapath):
             "index_formatter",
         ),
         (
-            DataFrame({"months": [datetime(2016, 1, 1), datetime(2016, 2, 2)]}),
+            DataFrame(
+                {"months": [datetime(2016, 1, 1), datetime(2016, 2, 2)]}
+            ),
             {"months": lambda x: x.strftime("%Y-%m")},
             "datetime64_monthformatter",
         ),
@@ -237,7 +245,10 @@ def test_to_html_truncate(datapath):
 
 @pytest.mark.parametrize(
     "sparsify,expected",
-    [(True, "truncate_multi_index"), (False, "truncate_multi_index_sparse_off")],
+    [
+        (True, "truncate_multi_index"),
+        (False, "truncate_multi_index_sparse_off"),
+    ],
 )
 def test_to_html_truncate_multi_index(sparsify, expected, datapath):
     arrays = [
@@ -284,7 +295,9 @@ def test_to_html(biggie_df_fixture):
     assert isinstance(s, str)
 
     df.to_html(columns=["B", "A"], col_space=17)
-    df.to_html(columns=["B", "A"], formatters={"A": lambda x: "{x:.1f}".format(x=x)})
+    df.to_html(
+        columns=["B", "A"], formatters={"A": lambda x: "{x:.1f}".format(x=x)}
+    )
 
     df.to_html(columns=["B", "A"], float_format=str)
     df.to_html(columns=["B", "A"], col_space=12, float_format=str)
@@ -403,7 +416,9 @@ def test_to_html_index(datapath):
     assert df.to_html(index=False) == expected_without_index
 
 
-@pytest.mark.parametrize("classes", ["sortable draggable", ["sortable", "draggable"]])
+@pytest.mark.parametrize(
+    "classes", ["sortable draggable", ["sortable", "draggable"]]
+)
 def test_to_html_with_classes(classes, datapath):
     df = DataFrame()
     expected = expected_html(datapath, "with_classes")
@@ -443,7 +458,12 @@ def test_to_html_multiindex_max_cols(datapath):
 def test_to_html_multi_indexes_index_false(datapath):
     # GH 22579
     df = DataFrame(
-        {"a": range(10), "b": range(10, 20), "c": range(10, 20), "d": range(10, 20)}
+        {
+            "a": range(10),
+            "b": range(10, 20),
+            "c": range(10, 20),
+            "d": range(10, 20),
+        }
     )
     df.columns = MultiIndex.from_product([["a", "b"], ["c", "d"]])
     df.index = MultiIndex.from_product([["a", "b"], ["c", "d", "e", "f", "g"]])
@@ -484,10 +504,19 @@ def test_to_html_multi_indexes_index_false(datapath):
     ],
 )
 def test_to_html_basic_alignment(
-    datapath, row_index, row_type, column_index, column_type, index, header, index_names
+    datapath,
+    row_index,
+    row_type,
+    column_index,
+    column_type,
+    index,
+    header,
+    index_names,
 ):
     # GH 22747, GH 22579
-    df = DataFrame(np.zeros((2, 2), dtype=int), index=row_index, columns=column_index)
+    df = DataFrame(
+        np.zeros((2, 2), dtype=int), index=row_index, columns=column_index
+    )
     result = df.to_html(index=index, header=header, index_names=index_names)
 
     if not index:
@@ -519,7 +548,8 @@ def test_to_html_basic_alignment(
         ),
         (
             MultiIndex.from_product(
-                [["a", "b"], ["c", "d"], ["e", "f"]], names=["foo", None, "baz"]
+                [["a", "b"], ["c", "d"], ["e", "f"]],
+                names=["foo", None, "baz"],
             ),
             "named_multi",
         ),
@@ -536,19 +566,33 @@ def test_to_html_basic_alignment(
         ),
         (
             MultiIndex.from_product(
-                [["a", "b"], ["c", "d"], ["e", "f"]], names=["foo", None, "baz"]
+                [["a", "b"], ["c", "d"], ["e", "f"]],
+                names=["foo", None, "baz"],
             ),
             "named_multi",
         ),
     ],
 )
 def test_to_html_alignment_with_truncation(
-    datapath, row_index, row_type, column_index, column_type, index, header, index_names
+    datapath,
+    row_index,
+    row_type,
+    column_index,
+    column_type,
+    index,
+    header,
+    index_names,
 ):
     # GH 22747, GH 22579
-    df = DataFrame(np.arange(64).reshape(8, 8), index=row_index, columns=column_index)
+    df = DataFrame(
+        np.arange(64).reshape(8, 8), index=row_index, columns=column_index
+    )
     result = df.to_html(
-        max_rows=4, max_cols=4, index=index, header=header, index_names=index_names
+        max_rows=4,
+        max_cols=4,
+        index=index,
+        header=header,
+        index_names=index_names,
     )
 
     if not index:
@@ -585,7 +629,10 @@ def test_to_html_truncation_index_false_max_rows(datapath, index):
 @pytest.mark.parametrize("index", [False, 0])
 @pytest.mark.parametrize(
     "col_index_named, expected_output",
-    [(False, "gh22783_expected_output"), (True, "gh22783_named_columns_index")],
+    [
+        (False, "gh22783_expected_output"),
+        (True, "gh22783_named_columns_index"),
+    ],
 )
 def test_to_html_truncation_index_false_max_cols(
     datapath, index, col_index_named, expected_output
@@ -639,7 +686,9 @@ def test_to_html_with_id():
         (100.0, "%.0f", "gh22270_expected_output"),
     ],
 )
-def test_to_html_float_format_no_fixed_width(value, float_format, expected, datapath):
+def test_to_html_float_format_no_fixed_width(
+    value, float_format, expected, datapath
+):
     # GH 21625, GH 22270
     df = DataFrame({"x": [value]})
     expected = expected_html(datapath, expected)
@@ -668,7 +717,10 @@ def test_to_html_render_links(render_links, expected, datapath):
     "method,expected",
     [
         ("to_html", lambda x: lorem_ipsum),
-        ("_repr_html_", lambda x: lorem_ipsum[: x - 4] + "..."),  # regression case
+        (
+            "_repr_html_",
+            lambda x: lorem_ipsum[: x - 4] + "...",
+        ),  # regression case
     ],
 )
 @pytest.mark.parametrize("max_colwidth", [10, 20, 50, 100])

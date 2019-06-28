@@ -136,7 +136,11 @@ class TestSeriesAsof:
 
         s = Series(
             [1, 2, 3],
-            index=[Timestamp("20130101"), Timestamp("20130103"), Timestamp("20130102")],
+            index=[
+                Timestamp("20130101"),
+                Timestamp("20130103"),
+                Timestamp("20130102"),
+            ],
         )
 
         # non-monotonic

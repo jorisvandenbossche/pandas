@@ -123,7 +123,9 @@ def _coerce_method(converter):
     def wrapper(self):
         if len(self) == 1:
             return converter(self.iloc[0])
-        raise TypeError("cannot convert the series to " "{0}".format(str(converter)))
+        raise TypeError(
+            "cannot convert the series to " "{0}".format(str(converter))
+        )
 
     wrapper.__name__ = "__{name}__".format(name=converter.__name__)
     return wrapper
@@ -174,7 +176,15 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
     _accessors = {"dt", "cat", "str", "sparse"}
     # tolist is not actually deprecated, just suppressed in the __dir__
     _deprecations = generic.NDFrame._deprecations | frozenset(
-        ["asobject", "reshape", "get_value", "set_value", "from_csv", "valid", "tolist"]
+        [
+            "asobject",
+            "reshape",
+            "get_value",
+            "set_value",
+            "from_csv",
+            "valid",
+            "tolist",
+        ]
     )
 
     # Override cache_readonly bc Series is mutable
@@ -187,7 +197,13 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
     # Constructors
 
     def __init__(
-        self, data=None, index=None, dtype=None, name=None, copy=False, fastpath=False
+        self,
+        data=None,
+        index=None,
+        dtype=None,
+        name=None,
+        copy=False,
+        fastpath=False,
     ):
 
         # we are called internally, so short-circuit
@@ -213,7 +229,8 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
 
             if isinstance(data, MultiIndex):
                 raise NotImplementedError(
-                    "initializing a Series from a " "MultiIndex is not supported"
+                    "initializing a Series from a "
+                    "MultiIndex is not supported"
                 )
             elif isinstance(data, Index):
                 if name is None:
@@ -225,7 +242,10 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
                 else:
                     # need to copy to avoid aliasing issues
                     data = data._values.copy()
-                    if isinstance(data, ABCDatetimeIndex) and data.tz is not None:
+                    if (
+                        isinstance(data, ABCDatetimeIndex)
+                        and data.tz is not None
+                    ):
                         # GH#24096 need copy to be deep for datetime64tz case
                         # TODO: See if we can avoid these copies
                         data = data._values.copy(deep=True)
@@ -262,7 +282,8 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
                 pass
             elif isinstance(data, (set, frozenset)):
                 raise TypeError(
-                    "{0!r} type is unordered" "".format(data.__class__.__name__)
+                    "{0!r} type is unordered"
+                    "".format(data.__class__.__name__)
                 )
             elif isinstance(data, ABCSparseArray):
                 # handle sparse passed here (and force conversion)
@@ -282,7 +303,9 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
                     if len(index) != len(data):
                         raise ValueError(
                             "Length of passed values is {val}, "
-                            "index implies {ind}".format(val=len(data), ind=len(index))
+                            "index implies {ind}".format(
+                                val=len(data), ind=len(index)
+                            )
                         )
                 except TypeError:
                     pass
@@ -294,7 +317,9 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
                 elif copy:
                     data = data.copy()
             else:
-                data = sanitize_array(data, index, dtype, copy, raise_cast_failure=True)
+                data = sanitize_array(
+                    data, index, dtype, copy, raise_cast_failure=True
+                )
 
                 data = SingleBlockManager(data, index, fastpath=True)
 
@@ -377,7 +402,12 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
 
             cls = SparseSeries
         return cls(
-            arr, index=index, name=name, dtype=dtype, copy=copy, fastpath=fastpath
+            arr,
+            index=index,
+            name=name,
+            dtype=dtype,
+            copy=copy,
+            fastpath=fastpath,
         )
 
     # ----------------------------------------------------------------------
@@ -409,7 +439,9 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
 
         is_all_dates = labels.is_all_dates
         if is_all_dates:
-            if not isinstance(labels, (DatetimeIndex, PeriodIndex, TimedeltaIndex)):
+            if not isinstance(
+                labels, (DatetimeIndex, PeriodIndex, TimedeltaIndex)
+            ):
                 try:
                     labels = DatetimeIndex(labels)
                     # need to set here because we changed the index
@@ -831,9 +863,9 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
         """
         Gets called after a ufunc.
         """
-        return self._constructor(result, index=self.index, copy=False).__finalize__(
-            self
-        )
+        return self._constructor(
+            result, index=self.index, copy=False
+        ).__finalize__(self)
 
     def __array_prepare__(self, result, context=None):
         """
@@ -963,7 +995,9 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
         return False
 
     def _slice(self, slobj, axis=0, kind=None):
-        slobj = self.index._convert_slice_indexer(slobj, kind=kind or "getitem")
+        slobj = self.index._convert_slice_indexer(
+            slobj, kind=kind or "getitem"
+        )
         return self._get_values(slobj)
 
     def __getitem__(self, key):
@@ -979,7 +1013,9 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
                     try:
                         if not is_scalar(self.index.get_loc(key)):
                             result = self._constructor(
-                                result, index=[key] * len(result), dtype=self.dtype
+                                result,
+                                index=[key] * len(result),
+                                dtype=self.dtype,
                             ).__finalize__(self)
                     except KeyError:
                         pass
@@ -997,7 +1033,9 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
             else:
 
                 # we can try to coerce the indexer (or this will raise)
-                new_key = self.index._convert_scalar_indexer(key, kind="getitem")
+                new_key = self.index._convert_scalar_indexer(
+                    key, kind="getitem"
+                )
                 if type(new_key) != type(key):
                     return self.__getitem__(new_key)
                 raise
@@ -1074,9 +1112,9 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
 
         # If key is contained, would have returned by now
         indexer, new_index = self.index.get_loc_level(key)
-        return self._constructor(self._values[indexer], index=new_index).__finalize__(
-            self
-        )
+        return self._constructor(
+            self._values[indexer], index=new_index
+        ).__finalize__(self)
 
     def _get_values(self, indexer):
         try:
@@ -1097,7 +1135,10 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
                 raise
             except (KeyError, ValueError):
                 values = self._values
-                if is_integer(key) and not self.index.inferred_type == "integer":
+                if (
+                    is_integer(key)
+                    and not self.index.inferred_type == "integer"
+                ):
 
                     values[key] = value
                     return
@@ -1112,7 +1153,9 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
                         value = iNaT
 
                         try:
-                            self.index._engine.set_value(self._values, key, value)
+                            self.index._engine.set_value(
+                                self._values, key, value
+                            )
                             return
                         except TypeError:
                             pass
@@ -1121,7 +1164,9 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
                 return
 
             except TypeError as e:
-                if isinstance(key, tuple) and not isinstance(self.index, MultiIndex):
+                if isinstance(key, tuple) and not isinstance(
+                    self.index, MultiIndex
+                ):
                     raise ValueError("Can only tuple-index with a MultiIndex")
 
                 # python 3 type errors should be raised
@@ -1260,7 +1305,9 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
         nv.validate_repeat(tuple(), dict(axis=axis))
         new_index = self.index.repeat(repeats)
         new_values = self._values.repeat(repeats)
-        return self._constructor(new_values, index=new_index).__finalize__(self)
+        return self._constructor(new_values, index=new_index).__finalize__(
+            self
+        )
 
     def get_value(self, label, takeable=False):
         """
@@ -1470,7 +1517,8 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
                 ).__finalize__(self)
         elif inplace:
             raise TypeError(
-                "Cannot reset_index inplace on a Series " "to create a DataFrame"
+                "Cannot reset_index inplace on a Series "
+                "to create a DataFrame"
             )
         else:
             df = self.to_frame(name)
@@ -1710,7 +1758,8 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
         """
 
         warnings.warn(
-            "Series.to_sparse is deprecated and will be removed " "in a future version",
+            "Series.to_sparse is deprecated and will be removed "
+            "in a future version",
             FutureWarning,
             stacklevel=2,
         )
@@ -1719,9 +1768,9 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
         values = SparseArray(self, kind=kind, fill_value=fill_value)
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", message="SparseSeries")
-            return SparseSeries(values, index=self.index, name=self.name).__finalize__(
-                self
-            )
+            return SparseSeries(
+                values, index=self.index, name=self.name
+            ).__finalize__(self)
 
     def _set_name(self, name, inplace=False):
         """
@@ -1780,7 +1829,9 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
 
         obs = level_codes[notna(self.values)]
         out = np.bincount(obs, minlength=len(lev) or None)
-        return self._constructor(out, index=lev, dtype="int64").__finalize__(self)
+        return self._constructor(out, index=lev, dtype="int64").__finalize__(
+            self
+        )
 
     def mode(self, dropna=True):
         """
@@ -2275,13 +2326,17 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
         #  about 2D cases.
         df = self.to_frame()
 
-        result = df.quantile(q=q, interpolation=interpolation, numeric_only=False)
+        result = df.quantile(
+            q=q, interpolation=interpolation, numeric_only=False
+        )
         if result.ndim == 2:
             result = result.iloc[:, 0]
 
         if is_list_like(q):
             result.name = self.name
-            return self._constructor(result, index=Float64Index(q), name=self.name)
+            return self._constructor(
+                result, index=Float64Index(q), name=self.name
+            )
         else:
             # scalar
             return result.iloc[0]
@@ -2328,7 +2383,10 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
 
         if method in ["pearson", "spearman", "kendall"] or callable(method):
             return nanops.nancorr(
-                this.values, other.values, method=method, min_periods=min_periods
+                this.values,
+                other.values,
+                method=method,
+                min_periods=min_periods,
             )
 
         raise ValueError(
@@ -2364,7 +2422,9 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
         this, other = self.align(other, join="inner", copy=False)
         if len(this) == 0:
             return np.nan
-        return nanops.nancov(this.values, other.values, min_periods=min_periods)
+        return nanops.nancov(
+            this.values, other.values, min_periods=min_periods
+        )
 
     def diff(self, periods=1):
         """
@@ -2541,7 +2601,8 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
             rvals = np.asarray(other)
             if lvals.shape[0] != rvals.shape[0]:
                 raise Exception(
-                    "Dot product shape mismatch, %s vs %s" % (lvals.shape, rvals.shape)
+                    "Dot product shape mismatch, %s vs %s"
+                    % (lvals.shape, rvals.shape)
                 )
 
         if isinstance(other, DataFrame):
@@ -2570,7 +2631,9 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
     @Substitution(klass="Series")
     @Appender(base._shared_docs["searchsorted"])
     def searchsorted(self, value, side="left", sorter=None):
-        return algorithms.searchsorted(self._values, value, side=side, sorter=sorter)
+        return algorithms.searchsorted(
+            self._values, value, side=side, sorter=sorter
+        )
 
     # -------------------------------------------------------------------
     # Combination
@@ -2655,7 +2718,9 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
         else:
             to_concat = [self, to_append]
         return concat(
-            to_concat, ignore_index=ignore_index, verify_integrity=verify_integrity
+            to_concat,
+            ignore_index=ignore_index,
+            verify_integrity=verify_integrity,
         )
 
     def _binop(self, other, func, level=None, fill_value=None):
@@ -2685,10 +2750,14 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
         this = self
 
         if not self.index.equals(other.index):
-            this, other = self.align(other, level=level, join="outer", copy=False)
+            this, other = self.align(
+                other, level=level, join="outer", copy=False
+            )
             new_index = this.index
 
-        this_vals, other_vals = ops.fill_binop(this.values, other.values, fill_value)
+        this_vals, other_vals = ops.fill_binop(
+            this.values, other.values, fill_value
+        )
 
         with np.errstate(all="ignore"):
             result = func(this_vals, other_vals)
@@ -3272,10 +3341,14 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
         mask = isna(values)
 
         if mask.any():
-            result = Series(-1, index=self.index, name=self.name, dtype="int64")
+            result = Series(
+                -1, index=self.index, name=self.name, dtype="int64"
+            )
             notmask = ~mask
             result[notmask] = np.argsort(values[notmask], kind=kind)
-            return self._constructor(result, index=self.index).__finalize__(self)
+            return self._constructor(result, index=self.index).__finalize__(
+                self
+            )
         else:
             return self._constructor(
                 np.argsort(values, kind=kind), index=self.index, dtype="int64"
@@ -3496,9 +3569,9 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
            the two innermost levels of the index.
         """
         new_index = self.index.swaplevel(i, j)
-        return self._constructor(self._values, index=new_index, copy=copy).__finalize__(
-            self
-        )
+        return self._constructor(
+            self._values, index=new_index, copy=copy
+        ).__finalize__(self)
 
     def reorder_levels(self, order):
         """
@@ -3646,7 +3719,9 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
         dtype: object
         """
         new_values = super()._map_values(arg, na_action=na_action)
-        return self._constructor(new_values, index=self.index).__finalize__(self)
+        return self._constructor(new_values, index=self.index).__finalize__(
+            self
+        )
 
     def _gotitem(self, key, ndim, subset=None):
         """
@@ -3832,9 +3907,9 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
         dtype: float64
         """
         if len(self) == 0:
-            return self._constructor(dtype=self.dtype, index=self.index).__finalize__(
-                self
-            )
+            return self._constructor(
+                dtype=self.dtype, index=self.index
+            ).__finalize__(self)
 
         # dispatch to agg
         if isinstance(func, (list, dict)):
@@ -3867,12 +3942,23 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
         if len(mapped) and isinstance(mapped[0], Series):
             # GH 25959 use pd.array instead of tolist
             # so extension arrays can be used
-            return self._constructor_expanddim(pd.array(mapped), index=self.index)
+            return self._constructor_expanddim(
+                pd.array(mapped), index=self.index
+            )
         else:
-            return self._constructor(mapped, index=self.index).__finalize__(self)
+            return self._constructor(mapped, index=self.index).__finalize__(
+                self
+            )
 
     def _reduce(
-        self, op, name, axis=0, skipna=True, numeric_only=None, filter_type=None, **kwds
+        self,
+        op,
+        name,
+        axis=0,
+        skipna=True,
+        numeric_only=None,
+        filter_type=None,
+        **kwds
     ):
         """
         Perform a reduction operation.
@@ -3904,7 +3990,8 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
         elif isinstance(delegate, np.ndarray):
             if numeric_only:
                 raise NotImplementedError(
-                    "Series.{0} does not implement " "numeric_only.".format(name)
+                    "Series.{0} does not implement "
+                    "numeric_only.".format(name)
                 )
             with np.errstate(all="ignore"):
                 return op(delegate, skipna=skipna, **kwds)
@@ -4028,7 +4115,9 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
         5    3
         dtype: int64
         """
-        kwargs["inplace"] = validate_bool_kwarg(kwargs.get("inplace", False), "inplace")
+        kwargs["inplace"] = validate_bool_kwarg(
+            kwargs.get("inplace", False), "inplace"
+        )
 
         non_mapping = is_scalar(index) or (
             is_list_like(index) and not is_dict_like(index)
@@ -4767,7 +4856,9 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
             new_values = new_values.copy()
 
         new_index = self.index.to_timestamp(freq=freq, how=how)
-        return self._constructor(new_values, index=new_index).__finalize__(self)
+        return self._constructor(new_values, index=new_index).__finalize__(
+            self
+        )
 
     def to_period(self, freq=None, copy=True):
         """
@@ -4791,7 +4882,9 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
             new_values = new_values.copy()
 
         new_index = self.index.to_period(freq=freq)
-        return self._constructor(new_values, index=new_index).__finalize__(self)
+        return self._constructor(new_values, index=new_index).__finalize__(
+            self
+        )
 
     # ----------------------------------------------------------------------
     # Accessor Methods

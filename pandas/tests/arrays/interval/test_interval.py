@@ -11,7 +11,10 @@ import pandas.util.testing as tm
     params=[
         (Index([0, 2, 4]), Index([1, 3, 5])),
         (Index([0.0, 1.0, 2.0]), Index([1.0, 2.0, 3.0])),
-        (timedelta_range("0 days", periods=3), timedelta_range("1 day", periods=3)),
+        (
+            timedelta_range("0 days", periods=3),
+            timedelta_range("1 day", periods=3),
+        ),
         (date_range("20170101", periods=3), date_range("20170102", periods=3)),
         (
             date_range("20170101", periods=3, tz="US/Eastern"),
@@ -28,7 +31,9 @@ def left_right_dtypes(request):
 
 
 class TestMethods:
-    @pytest.mark.parametrize("new_closed", ["left", "right", "both", "neither"])
+    @pytest.mark.parametrize(
+        "new_closed", ["left", "right", "both", "neither"]
+    )
     def test_set_closed(self, closed, new_closed):
         # GH 21670
         array = IntervalArray.from_breaks(range(10), closed=closed)

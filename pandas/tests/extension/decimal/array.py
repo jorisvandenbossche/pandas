@@ -40,7 +40,9 @@ class DecimalDtype(ExtensionDtype):
         if string == cls.name:
             return cls()
         else:
-            raise TypeError("Cannot construct a '{}' from " "'{}'".format(cls, string))
+            raise TypeError(
+                "Cannot construct a '{}' from " "'{}'".format(cls, string)
+            )
 
     @property
     def _is_numeric(self):
@@ -53,7 +55,9 @@ class DecimalArray(ExtensionArray, ExtensionScalarOpsMixin):
     def __init__(self, values, dtype=None, copy=False, context=None):
         for val in values:
             if not isinstance(val, decimal.Decimal):
-                raise TypeError("All values must be of type " + str(decimal.Decimal))
+                raise TypeError(
+                    "All values must be of type " + str(decimal.Decimal)
+                )
         values = np.asarray(values, dtype=object)
 
         self._data = values
@@ -75,7 +79,9 @@ class DecimalArray(ExtensionArray, ExtensionScalarOpsMixin):
 
     @classmethod
     def _from_sequence_of_strings(cls, strings, dtype=None, copy=False):
-        return cls._from_sequence([decimal.Decimal(x) for x in strings], dtype, copy)
+        return cls._from_sequence(
+            [decimal.Decimal(x) for x in strings], dtype, copy
+        )
 
     @classmethod
     def _from_factorized(cls, values, original):
@@ -94,7 +100,9 @@ class DecimalArray(ExtensionArray, ExtensionScalarOpsMixin):
         if allow_fill and fill_value is None:
             fill_value = self.dtype.na_value
 
-        result = take(data, indexer, fill_value=fill_value, allow_fill=allow_fill)
+        result = take(
+            data, indexer, fill_value=fill_value, allow_fill=allow_fill
+        )
         return self._from_sequence(result)
 
     def copy(self):

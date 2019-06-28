@@ -88,7 +88,8 @@ class BaseMethodsTests(BaseExtensionTests):
         df = pd.DataFrame({"A": [1, 2, 1], "B": data_for_sorting})
         result = df.sort_values(["A", "B"])
         expected = pd.DataFrame(
-            {"A": [1, 1, 2], "B": data_for_sorting.take([2, 0, 1])}, index=[2, 0, 1]
+            {"A": [1, 1, 2], "B": data_for_sorting.take([2, 0, 1])},
+            index=[2, 0, 1],
         )
         self.assert_frame_equal(result, expected)
 
@@ -105,7 +106,9 @@ class BaseMethodsTests(BaseExtensionTests):
 
     @pytest.mark.parametrize("na_sentinel", [-1, -2])
     def test_factorize(self, data_for_grouping, na_sentinel):
-        labels, uniques = pd.factorize(data_for_grouping, na_sentinel=na_sentinel)
+        labels, uniques = pd.factorize(
+            data_for_grouping, na_sentinel=na_sentinel
+        )
         expected_labels = np.array(
             [0, 0, na_sentinel, na_sentinel, 1, 1, 0, 2], dtype=np.intp
         )
@@ -180,7 +183,10 @@ class BaseMethodsTests(BaseExtensionTests):
         with np.errstate(over="ignore"):
             expected = pd.Series(
                 orig_data1._from_sequence(
-                    [a + b for (a, b) in zip(list(orig_data1), list(orig_data2))]
+                    [
+                        a + b
+                        for (a, b) in zip(list(orig_data1), list(orig_data2))
+                    ]
                 )
             )
         self.assert_series_equal(result, expected)
@@ -203,7 +209,11 @@ class BaseMethodsTests(BaseExtensionTests):
     @pytest.mark.parametrize("frame", [True, False])
     @pytest.mark.parametrize(
         "periods, indices",
-        [(-2, [2, 3, 4, -1, -1]), (0, [0, 1, 2, 3, 4]), (2, [-1, -1, 0, 1, 2])],
+        [
+            (-2, [2, 3, 4, -1, -1]),
+            (0, [0, 1, 2, 3, 4]),
+            (2, [-1, -1, 0, 1, 2]),
+        ],
     )
     def test_container_shift(self, data, frame, periods, indices):
         # https://github.com/pandas-dev/pandas/issues/22386
@@ -225,7 +235,13 @@ class BaseMethodsTests(BaseExtensionTests):
 
     @pytest.mark.parametrize(
         "periods, indices",
-        [[-4, [-1, -1]], [-1, [1, -1]], [0, [0, 1]], [1, [-1, 0]], [4, [-1, -1]]],
+        [
+            [-4, [-1, -1]],
+            [-1, [1, -1]],
+            [0, [0, 1]],
+            [1, [-1, 0]],
+            [4, [-1, -1]],
+        ],
     )
     def test_shift_non_empty_array(self, data, periods, indices):
         # https://github.com/pandas-dev/pandas/issues/23911
@@ -314,7 +330,9 @@ class BaseMethodsTests(BaseExtensionTests):
             other = pd.DataFrame({"a": other})
             cond = pd.DataFrame({"a": cond})
         result = ser.where(cond, other)
-        expected = pd.Series(cls._from_sequence([a, b, b, b], dtype=data.dtype))
+        expected = pd.Series(
+            cls._from_sequence([a, b, b, b], dtype=data.dtype)
+        )
         if as_frame:
             expected = expected.to_frame(name="a")
         self.assert_equal(result, expected)

@@ -105,9 +105,9 @@ def test_construction():
         Timedelta(day=10)
 
     # floats
-    expected = np.timedelta64(10, "s").astype("m8[ns]").view("i8") + np.timedelta64(
-        500, "ms"
-    ).astype("m8[ns]").view("i8")
+    expected = np.timedelta64(10, "s").astype("m8[ns]").view(
+        "i8"
+    ) + np.timedelta64(500, "ms").astype("m8[ns]").view("i8")
     assert Timedelta(10.5, unit="s").value == expected
 
     # offset
@@ -140,7 +140,8 @@ def test_construction():
     ),
 )
 @pytest.mark.parametrize(
-    "npdtype", [np.int64, np.int32, np.int16, np.float64, np.float32, np.float16]
+    "npdtype",
+    [np.int64, np.int32, np.int16, np.float64, np.float32, np.float16],
 )
 def test_td_construction_with_np_dtypes(npdtype, item):
     # GH#8757: test construction with np dtypes
@@ -240,7 +241,8 @@ def test_iso_constructor(fmt, exp):
 )
 def test_iso_constructor_raises(fmt):
     with pytest.raises(
-        ValueError, match=("Invalid ISO 8601 Duration " "format - {}".format(fmt))
+        ValueError,
+        match=("Invalid ISO 8601 Duration " "format - {}".format(fmt)),
     ):
         Timedelta(fmt)
 

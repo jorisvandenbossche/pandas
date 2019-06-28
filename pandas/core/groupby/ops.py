@@ -128,7 +128,13 @@ class BaseGrouper:
     """
 
     def __init__(
-        self, axis, groupings, sort=True, group_keys=True, mutated=False, indexer=None
+        self,
+        axis,
+        groupings,
+        sort=True,
+        group_keys=True,
+        mutated=False,
+        indexer=None,
     ):
         self._filter_empty_groups = self.compressed = len(groupings) != 1
         self.axis = axis
@@ -183,7 +189,9 @@ class BaseGrouper:
             comp_ids, _, ngroups = self.group_info
 
             # provide "flattened" iterator for multi-group setting
-            return get_flattened_iterator(comp_ids, ngroups, self.levels, self.labels)
+            return get_flattened_iterator(
+                comp_ids, ngroups, self.levels, self.labels
+            )
 
     def apply(self, f, data, axis=0):
         mutated = self.mutated
@@ -247,7 +255,10 @@ class BaseGrouper:
             return self.groupings[0].indices
         else:
             label_list = [ping.labels for ping in self.groupings]
-            keys = [com.values_from_object(ping.group_index) for ping in self.groupings]
+            keys = [
+                com.values_from_object(ping.group_index)
+                for ping in self.groupings
+            ]
             return get_indexer_dict(label_list, keys)
 
     @property
@@ -310,7 +321,9 @@ class BaseGrouper:
     def _get_compressed_labels(self):
         all_labels = [ping.labels for ping in self.groupings]
         if len(all_labels) > 1:
-            group_index = get_group_index(all_labels, self.shape, sort=True, xnull=True)
+            group_index = get_group_index(
+                all_labels, self.shape, sort=True, xnull=True
+            )
             return compress_group_index(group_index, sort=self.sort)
 
         ping = self.groupings[0]
@@ -324,7 +337,9 @@ class BaseGrouper:
     def recons_labels(self):
         comp_ids, obs_ids, _ = self.group_info
         labels = (ping.labels for ping in self.groupings)
-        return decons_obs_group_ids(comp_ids, obs_ids, self.shape, labels, xnull=True)
+        return decons_obs_group_ids(
+            comp_ids, obs_ids, self.shape, labels, xnull=True
+        )
 
     @cache_readonly
     def result_index(self):
@@ -334,7 +349,10 @@ class BaseGrouper:
         codes = self.recons_labels
         levels = [ping.result_index for ping in self.groupings]
         result = MultiIndex(
-            levels=levels, codes=codes, verify_integrity=False, names=self.names
+            levels=levels,
+            codes=codes,
+            verify_integrity=False,
+            names=self.names,
         )
         return result
 
@@ -444,12 +462,16 @@ class BaseGrouper:
         if func is None:
             raise NotImplementedError(
                 "function is not implemented for this dtype: "
-                "[how->{how},dtype->{dtype_str}]".format(how=how, dtype_str=dtype_str)
+                "[how->{how},dtype->{dtype_str}]".format(
+                    how=how, dtype_str=dtype_str
+                )
             )
 
         return func
 
-    def _cython_operation(self, kind, values, how, axis, min_count=-1, **kwargs):
+    def _cython_operation(
+        self, kind, values, how, axis, min_count=-1, **kwargs
+    ):
         assert kind in ["transform", "aggregate"]
 
         # can we do this operation with our cython functions
@@ -461,16 +483,20 @@ class BaseGrouper:
         # categoricals are only 1d, so we
         # are not setup for dim transforming
         if is_categorical_dtype(values):
-            raise NotImplementedError("categoricals are not support in cython ops ATM")
+            raise NotImplementedError(
+                "categoricals are not support in cython ops ATM"
+            )
         elif is_datetime64_any_dtype(values):
             if how in ["add", "prod", "cumsum", "cumprod"]:
                 raise NotImplementedError(
-                    "datetime64 type does not support {} " "operations".format(how)
+                    "datetime64 type does not support {} "
+                    "operations".format(how)
                 )
         elif is_timedelta64_dtype(values):
             if how in ["prod", "cumprod"]:
                 raise NotImplementedError(
-                    "timedelta64 type does not support {} " "operations".format(how)
+                    "timedelta64 type does not support {} "
+                    "operations".format(how)
                 )
 
         arity = self._cython_arity.get(how, 1)
@@ -486,7 +512,8 @@ class BaseGrouper:
                 values = values.swapaxes(0, axis)
             if arity > 1:
                 raise NotImplementedError(
-                    "arity of more than 1 is not " "supported for the 'how' argument"
+                    "arity of more than 1 is not "
+                    "supported for the 'how' argument"
                 )
             out_shape = (self.ngroups,) + values.shape[1:]
 
@@ -553,7 +580,13 @@ class BaseGrouper:
 
             # TODO: min_count
             result = self._transform(
-                result, values, labels, func, is_numeric, is_datetimelike, **kwargs
+                result,
+                values,
+                labels,
+                func,
+                is_numeric,
+                is_datetimelike,
+                **kwargs
             )
 
         if is_integer_dtype(result) and not is_datetimelike:
@@ -562,10 +595,16 @@ class BaseGrouper:
                 result = result.astype("float64")
                 result[mask] = np.nan
 
-        if kind == "aggregate" and self._filter_empty_groups and not counts.all():
+        if (
+            kind == "aggregate"
+            and self._filter_empty_groups
+            and not counts.all()
+        ):
             if result.ndim == 2:
                 try:
-                    result = lib.row_bool_subset(result, (counts > 0).view(np.uint8))
+                    result = lib.row_bool_subset(
+                        result, (counts > 0).view(np.uint8)
+                    )
                 except ValueError:
                     result = lib.row_bool_subset_object(
                         ensure_object(result), (counts > 0).view(np.uint8)
@@ -650,7 +689,9 @@ class BaseGrouper:
                     **kwargs
                 )
         else:
-            transform_func(result, values, comp_ids, ngroups, is_datetimelike, **kwargs)
+            transform_func(
+                result, values, comp_ids, ngroups, is_datetimelike, **kwargs
+            )
 
         return result
 
@@ -672,8 +713,12 @@ class BaseGrouper:
         dummy = obj._get_values(slice(None, 0))
         indexer = get_group_index_sorter(group_index, ngroups)
         obj = obj._take(indexer)
-        group_index = algorithms.take_nd(group_index, indexer, allow_fill=False)
-        grouper = reduction.SeriesGrouper(obj, func, group_index, ngroups, dummy)
+        group_index = algorithms.take_nd(
+            group_index, indexer, allow_fill=False
+        )
+        grouper = reduction.SeriesGrouper(
+            obj, func, group_index, ngroups, dummy
+        )
         result, counts = grouper.get_result()
         return result, counts
 
@@ -776,7 +821,9 @@ class BinGrouper(BaseGrouper):
         for each group
         """
         if isinstance(data, NDFrame):
-            slicer = lambda start, edge: data._slice(slice(start, edge), axis=axis)
+            slicer = lambda start, edge: data._slice(
+                slice(start, edge), axis=axis
+            )
             length = len(data.axes[axis])
         else:
             slicer = lambda start, edge: data[slice(start, edge)]

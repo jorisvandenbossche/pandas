@@ -33,21 +33,27 @@ class TestObj:
 
     def test_decode_hook(self):
         packed = packb([3, {b"__complex__": True, b"real": 1, b"imag": 2}])
-        unpacked = unpackb(packed, object_hook=self._decode_complex, use_list=1)
+        unpacked = unpackb(
+            packed, object_hook=self._decode_complex, use_list=1
+        )
         assert unpacked[1] == 1 + 2j
 
     def test_decode_pairs_hook(self):
         packed = packb([3, {1: 2, 3: 4}])
         prod_sum = 1 * 2 + 3 * 4
         unpacked = unpackb(
-            packed, object_pairs_hook=lambda l: sum(k * v for k, v in l), use_list=1
+            packed,
+            object_pairs_hook=lambda l: sum(k * v for k, v in l),
+            use_list=1,
         )
         assert unpacked[1] == prod_sum
 
     def test_only_one_obj_hook(self):
         msg = "object_pairs_hook and object_hook are mutually exclusive"
         with pytest.raises(TypeError, match=msg):
-            unpackb(b"", object_hook=lambda x: x, object_pairs_hook=lambda x: x)
+            unpackb(
+                b"", object_hook=lambda x: x, object_pairs_hook=lambda x: x
+            )
 
     def test_bad_hook(self):
         msg = r"can't serialize \(1\+2j\)"

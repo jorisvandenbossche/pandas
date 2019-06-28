@@ -45,7 +45,12 @@ def test_excel_multiindex_index(ext):
 def test_to_excel_styleconverter(ext):
     hstyle = {
         "font": {"bold": True},
-        "borders": {"top": "thin", "right": "thin", "bottom": "thin", "left": "thin"},
+        "borders": {
+            "top": "thin",
+            "right": "thin",
+            "bottom": "thin",
+            "left": "thin",
+        },
         "alignment": {"horizontal": "center", "vertical": "top"},
     }
 

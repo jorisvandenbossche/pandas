@@ -2,7 +2,11 @@ import numpy as np
 import pytest
 
 from pandas.core.dtypes.cast import find_common_type
-from pandas.core.dtypes.dtypes import CategoricalDtype, DatetimeTZDtype, PeriodDtype
+from pandas.core.dtypes.dtypes import (
+    CategoricalDtype,
+    DatetimeTZDtype,
+    PeriodDtype,
+)
 
 
 @pytest.mark.parametrize(

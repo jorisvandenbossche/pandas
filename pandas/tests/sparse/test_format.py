@@ -50,7 +50,9 @@ class TestSparseSeriesFormatting:
         idx = pd.MultiIndex.from_tuples(
             [("A", 0), ("A", 1), ("B", 0), ("C", 0), ("C", 1), ("C", 2)]
         )
-        s = pd.Series([1, np.nan, np.nan, 3, np.nan, np.nan], index=idx).to_sparse()
+        s = pd.Series(
+            [1, np.nan, np.nan, 3, np.nan, np.nan], index=idx
+        ).to_sparse()
         result = repr(s)
         dfm = self.dtype_format_for_platform
         exp = (
@@ -62,7 +64,9 @@ class TestSparseSeriesFormatting:
         )
         assert result == exp
 
-        with option_context("display.max_rows", 3, "display.show_dimensions", False):
+        with option_context(
+            "display.max_rows", 3, "display.show_dimensions", False
+        ):
             # GH 13144
             result = repr(s)
             exp = (
@@ -75,7 +79,9 @@ class TestSparseSeriesFormatting:
 
     def test_sparse_bool(self):
         # GH 13110
-        s = pd.SparseSeries([True, False, False, True, False, False], fill_value=False)
+        s = pd.SparseSeries(
+            [True, False, False, True, False, False], fill_value=False
+        )
         result = repr(s)
         dtype = "" if use_32bit_repr else ", dtype=int32"
         exp = (
@@ -111,7 +117,9 @@ class TestSparseSeriesFormatting:
         )
         assert result == exp
 
-        with option_context("display.max_rows", 3, "display.show_dimensions", False):
+        with option_context(
+            "display.max_rows", 3, "display.show_dimensions", False
+        ):
             result = repr(s)
             exp = (
                 "0    0\n    ..\n5    0\n"

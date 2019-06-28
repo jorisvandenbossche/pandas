@@ -38,7 +38,9 @@ class TestPeriodRepresentation:
     def test_monthly(self):
         self._check_freq("M", "1970-01")
 
-    @pytest.mark.parametrize("freq", ["W-THU", "D", "B", "H", "T", "S", "L", "U", "N"])
+    @pytest.mark.parametrize(
+        "freq", ["W-THU", "D", "B", "H", "T", "S", "L", "U", "N"]
+    )
     def test_freq(self, freq):
         self._check_freq(freq, "1970-01-01")
 
@@ -103,7 +105,9 @@ class TestPeriodIndex:
         index = period_range(freq="H", start="1/1/2001", end="1/2/2001")
         series = Series(1, index=index, name="foo")
 
-        exp_index = date_range("1/1/2001 00:59:59", end="1/2/2001 00:59:59", freq="H")
+        exp_index = date_range(
+            "1/1/2001 00:59:59", end="1/2/2001 00:59:59", freq="H"
+        )
         result = series.to_timestamp(how="end")
         exp_index = exp_index + Timedelta(1, "s") - Timedelta(1, "ns")
         tm.assert_index_equal(result.index, exp_index)
@@ -150,7 +154,9 @@ class TestPeriodIndex:
         assert pi2[-1] == Period("11/30/2005", freq="D")
         assert pi3[-1], Period("11/30/2005", freq="3D")
 
-        tm.assert_index_equal(pi1, period_range("1/1/2005", "11/1/2005", freq="M"))
+        tm.assert_index_equal(
+            pi1, period_range("1/1/2005", "11/1/2005", freq="M")
+        )
         tm.assert_index_equal(
             pi2, period_range("1/1/2005", "11/1/2005", freq="M").asfreq("D")
         )
@@ -215,13 +221,21 @@ class TestPeriodIndex:
             b = pd.Series([9, 9, 9, 9, 9, 9, 9], index=idx)
 
             result = a.combine_first(b)
-            expected = pd.Series([1, 9, 9, 4, 5, 9, 7], index=idx, dtype=np.float64)
+            expected = pd.Series(
+                [1, 9, 9, 4, 5, 9, 7], index=idx, dtype=np.float64
+            )
             tm.assert_series_equal(result, expected)
 
     @pytest.mark.parametrize("freq", ["D", "2D"])
     def test_searchsorted(self, freq):
         pidx = pd.PeriodIndex(
-            ["2014-01-01", "2014-01-02", "2014-01-03", "2014-01-04", "2014-01-05"],
+            [
+                "2014-01-01",
+                "2014-01-02",
+                "2014-01-03",
+                "2014-01-04",
+                "2014-01-05",
+            ],
             freq=freq,
         )
 
@@ -252,7 +266,9 @@ class TestPeriodIndexConversion:
 
     def test_to_timestamp_pi_nat(self):
         # GH#7228
-        index = PeriodIndex(["NaT", "2011-01", "2011-02"], freq="M", name="idx")
+        index = PeriodIndex(
+            ["NaT", "2011-01", "2011-02"], freq="M", name="idx"
+        )
 
         result = index.to_timestamp("D")
         expected = DatetimeIndex(
@@ -275,7 +291,9 @@ class TestPeriodIndexConversion:
             result.to_period(freq="-2A")
 
     def test_to_timestamp_preserve_name(self):
-        index = period_range(freq="A", start="1/1/2001", end="12/1/2009", name="foo")
+        index = period_range(
+            freq="A", start="1/1/2001", end="12/1/2009", name="foo"
+        )
         assert index.name == "foo"
 
         conv = index.to_timestamp("D")
@@ -295,11 +313,15 @@ class TestPeriodIndexConversion:
         idx = PeriodIndex(["2011-01", "NaT", "2011-02"], freq="2M", name="idx")
 
         result = idx.to_timestamp()
-        expected = DatetimeIndex(["2011-01-01", "NaT", "2011-02-01"], name="idx")
+        expected = DatetimeIndex(
+            ["2011-01-01", "NaT", "2011-02-01"], name="idx"
+        )
         tm.assert_index_equal(result, expected)
 
         result = idx.to_timestamp(how="E")
-        expected = DatetimeIndex(["2011-02-28", "NaT", "2011-03-31"], name="idx")
+        expected = DatetimeIndex(
+            ["2011-02-28", "NaT", "2011-03-31"], name="idx"
+        )
         expected = expected + Timedelta(1, "D") - Timedelta(1, "ns")
         tm.assert_index_equal(result, expected)
 
@@ -307,7 +329,9 @@ class TestPeriodIndexConversion:
         idx = period_range(start="2011", periods=2, freq="1D1H", name="idx")
 
         result = idx.to_timestamp()
-        expected = DatetimeIndex(["2011-01-01 00:00", "2011-01-02 01:00"], name="idx")
+        expected = DatetimeIndex(
+            ["2011-01-01 00:00", "2011-01-02 01:00"], name="idx"
+        )
         tm.assert_index_equal(result, expected)
 
         result = idx.to_timestamp(how="E")
@@ -318,7 +342,9 @@ class TestPeriodIndexConversion:
         tm.assert_index_equal(result, expected)
 
         result = idx.to_timestamp(how="E", freq="H")
-        expected = DatetimeIndex(["2011-01-02 00:00", "2011-01-03 01:00"], name="idx")
+        expected = DatetimeIndex(
+            ["2011-01-02 00:00", "2011-01-03 01:00"], name="idx"
+        )
         expected = expected + Timedelta(1, "h") - Timedelta(1, "ns")
         tm.assert_index_equal(result, expected)
 

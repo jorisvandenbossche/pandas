@@ -97,11 +97,14 @@ def to_timedelta(arg, unit="ns", box=True, errors="raise"):
     unit = parse_timedelta_unit(unit)
 
     if errors not in ("ignore", "raise", "coerce"):
-        raise ValueError("errors must be one of 'ignore', " "'raise', or 'coerce'}")
+        raise ValueError(
+            "errors must be one of 'ignore', " "'raise', or 'coerce'}"
+        )
 
     if unit in {"Y", "y", "M"}:
         warnings.warn(
-            "M and Y units are deprecated and " "will be removed in a future version.",
+            "M and Y units are deprecated and "
+            "will be removed in a future version.",
             FutureWarning,
             stacklevel=2,
         )
@@ -109,10 +112,14 @@ def to_timedelta(arg, unit="ns", box=True, errors="raise"):
     if arg is None:
         return arg
     elif isinstance(arg, ABCSeries):
-        values = _convert_listlike(arg._values, unit=unit, box=False, errors=errors)
+        values = _convert_listlike(
+            arg._values, unit=unit, box=False, errors=errors
+        )
         return arg._constructor(values, index=arg.index, name=arg.name)
     elif isinstance(arg, ABCIndexClass):
-        return _convert_listlike(arg, unit=unit, box=box, errors=errors, name=arg.name)
+        return _convert_listlike(
+            arg, unit=unit, box=box, errors=errors, name=arg.name
+        )
     elif isinstance(arg, np.ndarray) and arg.ndim == 0:
         # extract array scalar and process below
         arg = arg.item()
@@ -120,11 +127,14 @@ def to_timedelta(arg, unit="ns", box=True, errors="raise"):
         return _convert_listlike(arg, unit=unit, box=box, errors=errors)
     elif getattr(arg, "ndim", 1) > 1:
         raise TypeError(
-            "arg must be a string, timedelta, list, tuple, " "1-d array, or Series"
+            "arg must be a string, timedelta, list, tuple, "
+            "1-d array, or Series"
         )
 
     # ...so it must be a scalar value. Return scalar.
-    return _coerce_scalar_to_timedelta_type(arg, unit=unit, box=box, errors=errors)
+    return _coerce_scalar_to_timedelta_type(
+        arg, unit=unit, box=box, errors=errors
+    )
 
 
 def _coerce_scalar_to_timedelta_type(r, unit="ns", box=True, errors="raise"):
@@ -158,7 +168,9 @@ def _convert_listlike(arg, unit="ns", box=True, errors="raise", name=None):
         arg = np.array(list(arg), dtype=object)
 
     try:
-        value = sequence_to_td64ns(arg, unit=unit, errors=errors, copy=False)[0]
+        value = sequence_to_td64ns(arg, unit=unit, errors=errors, copy=False)[
+            0
+        ]
     except ValueError:
         if errors == "ignore":
             return arg

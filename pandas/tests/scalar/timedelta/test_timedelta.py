@@ -8,7 +8,13 @@ import pytest
 from pandas._libs.tslibs import NaT, iNaT
 
 import pandas as pd
-from pandas import Series, Timedelta, TimedeltaIndex, timedelta_range, to_timedelta
+from pandas import (
+    Series,
+    Timedelta,
+    TimedeltaIndex,
+    timedelta_range,
+    to_timedelta,
+)
 import pandas.util.testing as tm
 
 
@@ -198,11 +204,16 @@ class TestTimedeltas:
 
     def test_conversion(self):
 
-        for td in [Timedelta(10, unit="d"), Timedelta("1 days, 10:11:12.012345")]:
+        for td in [
+            Timedelta(10, unit="d"),
+            Timedelta("1 days, 10:11:12.012345"),
+        ]:
             pydt = td.to_pytimedelta()
             assert td == Timedelta(pydt)
             assert td == pydt
-            assert isinstance(pydt, timedelta) and not isinstance(pydt, Timedelta)
+            assert isinstance(pydt, timedelta) and not isinstance(
+                pydt, Timedelta
+            )
 
             assert td == np.timedelta64(td.value, "ns")
             td64 = td.to_timedelta64()
@@ -333,10 +344,32 @@ class TestTimedeltas:
             (["W", "w"], "W"),
             (["D", "d", "days", "day", "Days", "Day"], "D"),
             (
-                ["m", "minute", "min", "minutes", "t", "Minute", "Min", "Minutes", "T"],
+                [
+                    "m",
+                    "minute",
+                    "min",
+                    "minutes",
+                    "t",
+                    "Minute",
+                    "Min",
+                    "Minutes",
+                    "T",
+                ],
                 "m",
             ),
-            (["s", "seconds", "sec", "second", "S", "Seconds", "Sec", "Second"], "s"),
+            (
+                [
+                    "s",
+                    "seconds",
+                    "sec",
+                    "second",
+                    "S",
+                    "Seconds",
+                    "Sec",
+                    "Second",
+                ],
+                "s",
+            ),
             (
                 [
                     "ms",
@@ -416,7 +449,9 @@ class TestTimedeltas:
             tm.assert_index_equal(result, expected)
 
             # scalar
-            expected = Timedelta(np.timedelta64(2, np_unit).astype("timedelta64[ns]"))
+            expected = Timedelta(
+                np.timedelta64(2, np_unit).astype("timedelta64[ns]")
+            )
 
             result = to_timedelta(2, unit=unit)
             assert result == expected
@@ -424,7 +459,9 @@ class TestTimedeltas:
             assert result == expected
 
             if unit == "M":
-                expected = Timedelta(np.timedelta64(2, "m").astype("timedelta64[ns]"))
+                expected = Timedelta(
+                    np.timedelta64(2, "m").astype("timedelta64[ns]")
+                )
 
             result = to_timedelta("2{}".format(unit))
             assert result == expected
@@ -437,11 +474,15 @@ class TestTimedeltas:
             Timedelta(10, unit)
         msg = r".* units are deprecated .*"
         assert re.match(msg, str(w1[0].message))
-        with tm.assert_produces_warning(FutureWarning, check_stacklevel=False) as w2:
+        with tm.assert_produces_warning(
+            FutureWarning, check_stacklevel=False
+        ) as w2:
             to_timedelta(10, unit)
         msg = r".* units are deprecated .*"
         assert re.match(msg, str(w2[0].message))
-        with tm.assert_produces_warning(FutureWarning, check_stacklevel=False) as w3:
+        with tm.assert_produces_warning(
+            FutureWarning, check_stacklevel=False
+        ) as w3:
             to_timedelta([1, 2], unit)
         msg = r".* units are deprecated .*"
         assert re.match(msg, str(w3[0].message))
@@ -457,13 +498,15 @@ class TestTimedeltas:
         assert Timedelta(10, unit="d") == np.timedelta64(10, "D")
 
     def test_timedelta_conversions(self):
-        assert Timedelta(timedelta(seconds=1)) == np.timedelta64(1, "s").astype(
+        assert Timedelta(timedelta(seconds=1)) == np.timedelta64(
+            1, "s"
+        ).astype("m8[ns]")
+        assert Timedelta(timedelta(microseconds=1)) == np.timedelta64(
+            1, "us"
+        ).astype("m8[ns]")
+        assert Timedelta(timedelta(days=1)) == np.timedelta64(1, "D").astype(
             "m8[ns]"
         )
-        assert Timedelta(timedelta(microseconds=1)) == np.timedelta64(1, "us").astype(
-            "m8[ns]"
-        )
-        assert Timedelta(timedelta(days=1)) == np.timedelta64(1, "D").astype("m8[ns]")
 
     def test_to_numpy_alias(self):
         # GH 24653: alias .to_numpy() for scalars
@@ -488,10 +531,22 @@ class TestTimedeltas:
                 Timedelta("-1 days 02:34:56.789000000"),
             ),
             ("S", Timedelta("1 days 02:34:57"), Timedelta("-1 days 02:34:57")),
-            ("2S", Timedelta("1 days 02:34:56"), Timedelta("-1 days 02:34:56")),
-            ("5S", Timedelta("1 days 02:34:55"), Timedelta("-1 days 02:34:55")),
+            (
+                "2S",
+                Timedelta("1 days 02:34:56"),
+                Timedelta("-1 days 02:34:56"),
+            ),
+            (
+                "5S",
+                Timedelta("1 days 02:34:55"),
+                Timedelta("-1 days 02:34:55"),
+            ),
             ("T", Timedelta("1 days 02:35:00"), Timedelta("-1 days 02:35:00")),
-            ("12T", Timedelta("1 days 02:36:00"), Timedelta("-1 days 02:36:00")),
+            (
+                "12T",
+                Timedelta("1 days 02:36:00"),
+                Timedelta("-1 days 02:36:00"),
+            ),
             ("H", Timedelta("1 days 03:00:00"), Timedelta("-1 days 03:00:00")),
             ("d", Timedelta("1 days"), Timedelta("-1 days")),
         ]:
@@ -522,7 +577,11 @@ class TestTimedeltas:
                 "L",
                 t1a,
                 TimedeltaIndex(
-                    ["-1 days +00:00:00", "-2 days +23:58:58", "-2 days +23:57:56"],
+                    [
+                        "-1 days +00:00:00",
+                        "-2 days +23:58:58",
+                        "-2 days +23:57:56",
+                    ],
                     dtype="timedelta64[ns]",
                     freq=None,
                 ),
@@ -531,7 +590,11 @@ class TestTimedeltas:
                 "S",
                 t1a,
                 TimedeltaIndex(
-                    ["-1 days +00:00:00", "-2 days +23:58:58", "-2 days +23:57:56"],
+                    [
+                        "-1 days +00:00:00",
+                        "-2 days +23:58:58",
+                        "-2 days +23:57:56",
+                    ],
                     dtype="timedelta64[ns]",
                     freq=None,
                 ),
@@ -648,12 +711,16 @@ class TestTimedeltas:
 
         assert Timedelta("00:00:01") == conv(np.timedelta64(1, "s"))
         assert Timedelta("06:00:01") == conv(np.timedelta64(6 * 3600 + 1, "s"))
-        assert Timedelta("06:00:01.0") == conv(np.timedelta64(6 * 3600 + 1, "s"))
+        assert Timedelta("06:00:01.0") == conv(
+            np.timedelta64(6 * 3600 + 1, "s")
+        )
         assert Timedelta("06:00:01.01") == conv(
             np.timedelta64(1000 * (6 * 3600 + 1) + 10, "ms")
         )
 
-        assert Timedelta("- 1days, 00:00:01") == conv(-d1 + np.timedelta64(1, "s"))
+        assert Timedelta("- 1days, 00:00:01") == conv(
+            -d1 + np.timedelta64(1, "s")
+        )
         assert Timedelta("1days, 06:00:01") == conv(
             d1 + np.timedelta64(6 * 3600 + 1, "s")
         )
@@ -672,7 +739,9 @@ class TestTimedeltas:
 
         # mean
         result = (s - s.min()).mean()
-        expected = pd.Timedelta((pd.TimedeltaIndex((s - s.min())).asi8 / len(s)).sum())
+        expected = pd.Timedelta(
+            (pd.TimedeltaIndex((s - s.min())).asi8 / len(s)).sum()
+        )
 
         # the computation is converted to float so
         # might be some loss of precision

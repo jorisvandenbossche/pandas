@@ -35,7 +35,9 @@ from pandas.core.dtypes.missing import isna, na_value_for_dtype, notna
 
 import pandas.core.common as com
 
-bn = import_optional_dependency("bottleneck", raise_on_missing=False, on_version="warn")
+bn = import_optional_dependency(
+    "bottleneck", raise_on_missing=False, on_version="warn"
+)
 _BOTTLENECK_INSTALLED = bn is not None
 _USE_BOTTLENECK = False
 
@@ -56,7 +58,9 @@ class disallow:
         self.dtypes = tuple(pandas_dtype(dtype).type for dtype in dtypes)
 
     def check(self, obj):
-        return hasattr(obj, "dtype") and issubclass(obj.dtype.type, self.dtypes)
+        return hasattr(obj, "dtype") and issubclass(
+            obj.dtype.type, self.dtypes
+        )
 
     def __call__(self, f):
         @functools.wraps(f)
@@ -108,7 +112,11 @@ class bottleneck_switch:
                     # It *may* just be `var`
                     return _na_for_min_count(values, axis)
 
-                if _USE_BOTTLENECK and skipna and _bn_ok_dtype(values.dtype, bn_name):
+                if (
+                    _USE_BOTTLENECK
+                    and skipna
+                    and _bn_ok_dtype(values.dtype, bn_name)
+                ):
                     result = bn_func(values, axis=axis, **kwds)
 
                     # prefer to treat inf/-inf as NA, but must compute the func
@@ -338,7 +346,9 @@ def _isfinite(values):
 
 def _na_ok_dtype(dtype):
     # TODO: what about datetime64tz?  PeriodDtype?
-    return not issubclass(dtype.type, (np.integer, np.timedelta64, np.datetime64))
+    return not issubclass(
+        dtype.type, (np.integer, np.timedelta64, np.datetime64)
+    )
 
 
 def _wrap_results(result, dtype, fill_value=None):
@@ -429,7 +439,9 @@ def nanany(values, axis=None, skipna=True, mask=None):
     >>> nanops.nanany(s)
     False
     """
-    values, _, _, _, _ = _get_values(values, skipna, fill_value=False, mask=mask)
+    values, _, _, _, _ = _get_values(
+        values, skipna, fill_value=False, mask=mask
+    )
     return values.any(axis)
 
 
@@ -461,7 +473,9 @@ def nanall(values, axis=None, skipna=True, mask=None):
     >>> nanops.nanall(s)
     False
     """
-    values, _, _, _, _ = _get_values(values, skipna, fill_value=True, mask=mask)
+    values, _, _, _, _ = _get_values(
+        values, skipna, fill_value=True, mask=mask
+    )
     return values.all(axis)
 
 
@@ -499,7 +513,9 @@ def nansum(values, axis=None, skipna=True, min_count=0, mask=None):
     elif is_timedelta64_dtype(dtype):
         dtype_sum = np.float64
     the_sum = values.sum(axis, dtype=dtype_sum)
-    the_sum = _maybe_null_out(the_sum, axis, mask, values.shape, min_count=min_count)
+    the_sum = _maybe_null_out(
+        the_sum, axis, mask, values.shape, min_count=min_count
+    )
 
     return _wrap_results(the_sum, dtype)
 
@@ -707,7 +723,9 @@ def nanstd(values, axis=None, skipna=True, ddof=1, mask=None):
     >>> nanops.nanstd(s)
     1.0
     """
-    result = np.sqrt(nanvar(values, axis=axis, skipna=skipna, ddof=ddof, mask=mask))
+    result = np.sqrt(
+        nanvar(values, axis=axis, skipna=skipna, ddof=ddof, mask=mask)
+    )
     return _wrap_results(result, values.dtype)
 
 
@@ -750,7 +768,9 @@ def nanvar(values, axis=None, skipna=True, ddof=1, mask=None):
             values[mask] = np.nan
 
     if is_float_dtype(values):
-        count, d = _get_counts_nanvar(values.shape, mask, axis, ddof, values.dtype)
+        count, d = _get_counts_nanvar(
+            values.shape, mask, axis, ddof, values.dtype
+        )
     else:
         count, d = _get_counts_nanvar(values.shape, mask, axis, ddof)
 
@@ -836,7 +856,12 @@ def _nanminmax(meth, fill_value_typ):
             try:
                 result = getattr(values, meth)(axis, dtype=dtype_max)
                 result.fill(np.nan)
-            except (AttributeError, TypeError, ValueError, np.core._internal.AxisError):
+            except (
+                AttributeError,
+                TypeError,
+                ValueError,
+                np.core._internal.AxisError,
+            ):
                 result = np.nan
         else:
             result = getattr(values, meth)(axis)
@@ -1113,11 +1138,16 @@ def nanprod(values, axis=None, skipna=True, min_count=0, mask=None):
         values = values.copy()
         values[mask] = 1
     result = values.prod(axis)
-    return _maybe_null_out(result, axis, mask, values.shape, min_count=min_count)
+    return _maybe_null_out(
+        result, axis, mask, values.shape, min_count=min_count
+    )
 
 
 def _maybe_arg_null_out(
-    result: np.ndarray, axis: Optional[int], mask: Optional[np.ndarray], skipna: bool
+    result: np.ndarray,
+    axis: Optional[int],
+    mask: Optional[np.ndarray],
+    skipna: bool,
 ) -> Union[np.ndarray, int]:
     # helper function for nanargmin/nanargmax
     if mask is None:
@@ -1191,7 +1221,11 @@ def _maybe_null_out(
     shape: Tuple,
     min_count: int = 1,
 ) -> np.ndarray:
-    if mask is not None and axis is not None and getattr(result, "ndim", False):
+    if (
+        mask is not None
+        and axis is not None
+        and getattr(result, "ndim", False)
+    ):
         null_mask = (mask.shape[axis] - mask.sum(axis) - min_count) < 0
         if np.any(null_mask):
             if is_numeric_dtype(result):
@@ -1264,7 +1298,11 @@ def get_corr_func(method):
     def _spearman(a, b):
         return spearmanr(a, b)[0]
 
-    _cor_methods = {"pearson": _pearson, "kendall": _kendall, "spearman": _spearman}
+    _cor_methods = {
+        "pearson": _pearson,
+        "kendall": _kendall,
+        "spearman": _spearman,
+    }
     return _cor_methods[method]
 
 
@@ -1406,7 +1444,9 @@ def nanpercentile(values, q, axis, na_value, mask, ndim, interpolation):
                 values = values.T
                 mask = mask.T
             result = [
-                _nanpercentile_1d(val, m, q, na_value, interpolation=interpolation)
+                _nanpercentile_1d(
+                    val, m, q, na_value, interpolation=interpolation
+                )
                 for (val, m) in zip(list(values), list(mask))
             ]
             result = np.array(result, dtype=values.dtype, copy=False).T

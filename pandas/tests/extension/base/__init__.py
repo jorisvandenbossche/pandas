@@ -47,7 +47,11 @@ from .getitem import BaseGetitemTests  # noqa
 from .groupby import BaseGroupbyTests  # noqa
 from .interface import BaseInterfaceTests  # noqa
 from .methods import BaseMethodsTests  # noqa
-from .ops import BaseArithmeticOpsTests, BaseComparisonOpsTests, BaseOpsUtil  # noqa
+from .ops import (
+    BaseArithmeticOpsTests,
+    BaseComparisonOpsTests,
+    BaseOpsUtil,
+)  # noqa
 from .printing import BasePrintingTests  # noqa
 from .reduce import (  # noqa
     BaseNoReduceTests,

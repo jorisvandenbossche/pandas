@@ -309,14 +309,20 @@ class Base:
             result = index_type(index.values, copy=True, **init_kwargs)
             tm.assert_index_equal(index, result)
             tm.assert_numpy_array_equal(
-                index._ndarray_values, result._ndarray_values, check_same="copy"
+                index._ndarray_values,
+                result._ndarray_values,
+                check_same="copy",
             )
 
             if isinstance(index, PeriodIndex):
                 # .values an object array of Period, thus copied
-                result = index_type(ordinal=index.asi8, copy=False, **init_kwargs)
+                result = index_type(
+                    ordinal=index.asi8, copy=False, **init_kwargs
+                )
                 tm.assert_numpy_array_equal(
-                    index._ndarray_values, result._ndarray_values, check_same="same"
+                    index._ndarray_values,
+                    result._ndarray_values,
+                    check_same="same",
                 )
             elif isinstance(index, IntervalIndex):
                 # checked in test_interval.py
@@ -327,7 +333,9 @@ class Base:
                     index.values, result.values, check_same="same"
                 )
                 tm.assert_numpy_array_equal(
-                    index._ndarray_values, result._ndarray_values, check_same="same"
+                    index._ndarray_values,
+                    result._ndarray_values,
+                    check_same="same",
                 )
 
     def test_memory_usage(self):
@@ -400,7 +408,9 @@ class Base:
             expected = ind[indexer]
             assert result.equals(expected)
 
-            if not isinstance(ind, (DatetimeIndex, PeriodIndex, TimedeltaIndex)):
+            if not isinstance(
+                ind, (DatetimeIndex, PeriodIndex, TimedeltaIndex)
+            ):
                 # GH 10791
                 with pytest.raises(AttributeError):
                     ind.freq
@@ -458,7 +468,8 @@ class Base:
 
     @pytest.mark.parametrize("case", [0.5, "xxx"])
     @pytest.mark.parametrize(
-        "method", ["intersection", "union", "difference", "symmetric_difference"]
+        "method",
+        ["intersection", "union", "difference", "symmetric_difference"],
     )
     def test_set_ops_error_cases(self, case, method):
         for name, idx in self.indices.items():
@@ -480,7 +491,9 @@ class Base:
                 assert tm.equalContents(intersect, second)
 
             # GH 10149
-            cases = [klass(second.values) for klass in [np.array, Series, list]]
+            cases = [
+                klass(second.values) for klass in [np.array, Series, list]
+            ]
             for case in cases:
                 if isinstance(idx, CategoricalIndex):
                     pass
@@ -502,7 +515,9 @@ class Base:
             assert tm.equalContents(union, everything)
 
             # GH 10149
-            cases = [klass(second.values) for klass in [np.array, Series, list]]
+            cases = [
+                klass(second.values) for klass in [np.array, Series, list]
+            ]
             for case in cases:
                 if isinstance(idx, CategoricalIndex):
                     pass
@@ -529,7 +544,9 @@ class Base:
                 assert tm.equalContents(result, answer)
 
             # GH 10149
-            cases = [klass(second.values) for klass in [np.array, Series, list]]
+            cases = [
+                klass(second.values) for klass in [np.array, Series, list]
+            ]
             for case in cases:
                 if isinstance(idx, CategoricalIndex):
                     pass
@@ -559,7 +576,9 @@ class Base:
                 assert tm.equalContents(result, answer)
 
             # GH 10149
-            cases = [klass(second.values) for klass in [np.array, Series, list]]
+            cases = [
+                klass(second.values) for klass in [np.array, Series, list]
+            ]
             for case in cases:
                 if isinstance(idx, CategoricalIndex):
                     pass
@@ -774,7 +793,9 @@ class Base:
 
         for name, index in self.indices.items():
             if len(index) == 0:
-                tm.assert_numpy_array_equal(index.isna(), np.array([], dtype=bool))
+                tm.assert_numpy_array_equal(
+                    index.isna(), np.array([], dtype=bool)
+                )
             elif isinstance(index, MultiIndex):
                 idx = index.copy()
                 msg = "isna is not defined for MultiIndex"

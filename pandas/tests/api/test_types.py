@@ -52,7 +52,12 @@ class TestTypes(Base):
         "is_extension_array_dtype",
     ]
     deprecated = ["is_period", "is_datetimetz"]
-    dtypes = ["CategoricalDtype", "DatetimeTZDtype", "PeriodDtype", "IntervalDtype"]
+    dtypes = [
+        "CategoricalDtype",
+        "DatetimeTZDtype",
+        "PeriodDtype",
+        "IntervalDtype",
+    ]
 
     def test_types(self):
 
@@ -61,5 +66,7 @@ class TestTypes(Base):
     def test_deprecated_from_api_types(self):
 
         for t in self.deprecated:
-            with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
+            with tm.assert_produces_warning(
+                FutureWarning, check_stacklevel=False
+            ):
                 getattr(types, t)(1)

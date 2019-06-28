@@ -28,12 +28,24 @@ from pandas.io.formats.excel import CSSToExcelConverter
         # - family
         ("font-family: serif", {"font": {"name": "serif", "family": 1}}),
         ("font-family: Serif", {"font": {"name": "serif", "family": 1}}),
-        ("font-family: roman, serif", {"font": {"name": "roman", "family": 1}}),
-        ("font-family: roman, sans-serif", {"font": {"name": "roman", "family": 2}}),
+        (
+            "font-family: roman, serif",
+            {"font": {"name": "roman", "family": 1}},
+        ),
+        (
+            "font-family: roman, sans-serif",
+            {"font": {"name": "roman", "family": 2}},
+        ),
         ("font-family: roman, sans serif", {"font": {"name": "roman"}}),
         ("font-family: roman, sansserif", {"font": {"name": "roman"}}),
-        ("font-family: roman, cursive", {"font": {"name": "roman", "family": 4}}),
-        ("font-family: roman, fantasy", {"font": {"name": "roman", "family": 5}}),
+        (
+            "font-family: roman, cursive",
+            {"font": {"name": "roman", "family": 4}},
+        ),
+        (
+            "font-family: roman, fantasy",
+            {"font": {"name": "roman", "family": 5}},
+        ),
         # - size
         ("font-size: 1em", {"font": {"size": 12}}),
         ("font-size: xx-small", {"font": {"size": 6}}),
@@ -158,7 +170,10 @@ from pandas.io.formats.excel import CSSToExcelConverter
             "border-top-style: dotted; border-top-width: thin",
             {"border": {"top": {"style": "dotted"}}},
         ),
-        ("border-top-style: dashed", {"border": {"top": {"style": "mediumDashed"}}}),
+        (
+            "border-top-style: dashed",
+            {"border": {"top": {"style": "mediumDashed"}}},
+        ),
         (
             "border-top-style: dashed; border-top-width: thin",
             {"border": {"top": {"style": "dashed"}}},
@@ -245,7 +260,11 @@ def test_css_to_excel_multiple():
             "font-style: italic",
             {"font": {"bold": True, "italic": True}},
         ),
-        ("font-style: normal", "font-style: italic", {"font": {"italic": False}}),
+        (
+            "font-style: normal",
+            "font-style: italic",
+            {"font": {"italic": False}},
+        ),
         ("font-style: inherit", "", {}),
         (
             "font-style: normal; font-style: inherit",
@@ -263,7 +282,10 @@ def test_css_to_excel_inherited(css, inherited, expected):
     "input_color,output_color",
     (
         [(name, rgb) for name, rgb in CSSToExcelConverter.NAMED_COLORS.items()]
-        + [("#" + rgb, rgb) for rgb in CSSToExcelConverter.NAMED_COLORS.values()]
+        + [
+            ("#" + rgb, rgb)
+            for rgb in CSSToExcelConverter.NAMED_COLORS.values()
+        ]
         + [("#F0F", "FF00FF"), ("#ABC", "AABBCC")]
     ),
 )

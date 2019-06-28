@@ -46,7 +46,11 @@ class TestTimedeltaIndex:
 
         left = TimedeltaIndex(["1 day 15:19:49.695000"])
         right = TimedeltaIndex(
-            ["2 day 13:04:21.322000", "1 day 15:27:24.873000", "1 day 15:31:05.350000"]
+            [
+                "2 day 13:04:21.322000",
+                "1 day 15:27:24.873000",
+                "1 day 15:31:05.350000",
+            ]
         )
 
         result = left.union(right)
@@ -147,27 +151,35 @@ class TestTimedeltaIndex:
         # part intersection works
         [
             (
-                TimedeltaIndex(["5 hour", "2 hour", "4 hour", "9 hour"], name="idx"),
+                TimedeltaIndex(
+                    ["5 hour", "2 hour", "4 hour", "9 hour"], name="idx"
+                ),
                 TimedeltaIndex(["2 hour", "4 hour"], name="idx"),
             ),
             # reordered part intersection
             (
-                TimedeltaIndex(["2 hour", "5 hour", "5 hour", "1 hour"], name="other"),
+                TimedeltaIndex(
+                    ["2 hour", "5 hour", "5 hour", "1 hour"], name="other"
+                ),
                 TimedeltaIndex(["1 hour", "2 hour"], name=None),
             ),
             # reveresed index
             (
-                TimedeltaIndex(["1 hour", "2 hour", "4 hour", "3 hour"], name="idx")[
-                    ::-1
-                ],
-                TimedeltaIndex(["1 hour", "2 hour", "4 hour", "3 hour"], name="idx"),
+                TimedeltaIndex(
+                    ["1 hour", "2 hour", "4 hour", "3 hour"], name="idx"
+                )[::-1],
+                TimedeltaIndex(
+                    ["1 hour", "2 hour", "4 hour", "3 hour"], name="idx"
+                ),
             ),
         ],
     )
     @pytest.mark.parametrize("sort", [None, False])
     def test_intersection_non_monotonic(self, rng, expected, sort):
         # 24471 non-monotonic
-        base = TimedeltaIndex(["1 hour", "2 hour", "4 hour", "3 hour"], name="idx")
+        base = TimedeltaIndex(
+            ["1 hour", "2 hour", "4 hour", "3 hour"], name="idx"
+        )
         result = base.intersection(rng, sort=sort)
         if sort is None:
             expected = expected.sort_values()

@@ -282,13 +282,16 @@ class PeriodArray(dtl.DatetimeLikeArrayMixin, dtl.DatelikeOps):
         if start is not None or end is not None:
             if field_count > 0:
                 raise ValueError(
-                    "Can either instantiate from fields " "or endpoints, but not both"
+                    "Can either instantiate from fields "
+                    "or endpoints, but not both"
                 )
             subarr, freq = _get_ordinal_range(start, end, periods, freq)
         elif field_count > 0:
             subarr, freq = _range_from_fields(freq=freq, **fields)
         else:
-            raise ValueError("Not enough parameters to construct " "Period range")
+            raise ValueError(
+                "Not enough parameters to construct " "Period range"
+            )
 
         return subarr, freq
 
@@ -304,7 +307,9 @@ class PeriodArray(dtl.DatetimeLikeArrayMixin, dtl.DatelikeOps):
             return value.ordinal
         else:
             raise ValueError(
-                "'value' should be a Period. Got '{val}' instead.".format(val=value)
+                "'value' should be a Period. Got '{val}' instead.".format(
+                    val=value
+                )
             )
 
     def _scalar_from_string(self, value: str) -> Period:
@@ -597,7 +602,9 @@ class PeriodArray(dtl.DatetimeLikeArrayMixin, dtl.DatelikeOps):
         assert op in [operator.add, operator.sub]
         if op is operator.sub:
             other = -other
-        res_values = algos.checked_add_with_arr(self.asi8, other, arr_mask=self._isnan)
+        res_values = algos.checked_add_with_arr(
+            self.asi8, other, arr_mask=self._isnan
+        )
         res_values = res_values.view("i8")
         res_values[self._isnan] = iNaT
         return type(self)(res_values, freq=self.freq)
@@ -763,7 +770,9 @@ def _raise_on_incompatible(left, right):
 
 
 def period_array(
-    data: Sequence[Optional[Period]], freq: Optional[Tick] = None, copy: bool = False
+    data: Sequence[Optional[Period]],
+    freq: Optional[Tick] = None,
+    copy: bool = False,
 ) -> PeriodArray:
     """
     Construct a new PeriodArray from a sequence of Period scalars.
@@ -835,7 +844,9 @@ def period_array(
         dtype = None
 
     if is_float_dtype(data) and len(data) > 0:
-        raise TypeError("PeriodIndex does not allow " "floating point in construction")
+        raise TypeError(
+            "PeriodIndex does not allow " "floating point in construction"
+        )
 
     data = ensure_object(data)
 
@@ -871,7 +882,9 @@ def validate_dtype_freq(dtype, freq):
         if freq is None:
             freq = dtype.freq
         elif freq != dtype.freq:
-            raise IncompatibleFrequency("specified freq and dtype " "are different")
+            raise IncompatibleFrequency(
+                "specified freq and dtype " "are different"
+            )
     return freq
 
 
@@ -948,7 +961,10 @@ def _get_ordinal_range(start, end, periods, freq, mult=1):
         periods = periods * mult
         if start is None:
             data = np.arange(
-                end.ordinal - periods + mult, end.ordinal + 1, mult, dtype=np.int64
+                end.ordinal - periods + mult,
+                end.ordinal + 1,
+                mult,
+                dtype=np.int64,
             )
         else:
             data = np.arange(
@@ -999,7 +1015,9 @@ def _range_from_fields(
         base, mult = libfrequencies.get_freq_code(freq)
         arrays = _make_field_arrays(year, month, day, hour, minute, second)
         for y, mth, d, h, mn, s in zip(*arrays):
-            ordinals.append(libperiod.period_ordinal(y, mth, d, h, mn, s, 0, 0, base))
+            ordinals.append(
+                libperiod.period_ordinal(y, mth, d, h, mn, s, 0, 0, base)
+            )
 
     return np.array(ordinals, dtype=np.int64), freq
 

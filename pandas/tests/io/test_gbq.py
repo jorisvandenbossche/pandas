@@ -34,7 +34,8 @@ def _skip_if_no_project_id():
 def _skip_if_no_private_key_path():
     if not _get_private_key_path():
         pytest.skip(
-            "Cannot run integration tests without a " "private key json file path"
+            "Cannot run integration tests without a "
+            "private key json file path"
         )
 
 
@@ -63,7 +64,9 @@ def _get_private_key_path():
 def _get_credentials():
     private_key_path = _get_private_key_path()
     if private_key_path:
-        return service_account.Credentials.from_service_account_file(private_key_path)
+        return service_account.Credentials.from_service_account_file(
+            private_key_path
+        )
 
 
 def _get_client():
@@ -78,7 +81,9 @@ def make_mixed_dataframe_v2(test_size):
     flts = np.random.randn(1, test_size)
     ints = np.random.randint(1, 10, size=(1, test_size))
     strs = np.random.randint(1, 10, size=(1, test_size)).astype(str)
-    times = [datetime.now(pytz.timezone("US/Arizona")) for t in range(test_size)]
+    times = [
+        datetime.now(pytz.timezone("US/Arizona")) for t in range(test_size)
+    ]
     return DataFrame(
         {
             "bools": bools[0],

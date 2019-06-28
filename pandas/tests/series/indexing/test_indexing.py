@@ -8,7 +8,14 @@ import pytest
 from pandas.core.dtypes.common import is_scalar
 
 import pandas as pd
-from pandas import Categorical, DataFrame, MultiIndex, Series, Timedelta, Timestamp
+from pandas import (
+    Categorical,
+    DataFrame,
+    MultiIndex,
+    Series,
+    Timedelta,
+    Timestamp,
+)
 import pandas.util.testing as tm
 from pandas.util.testing import assert_series_equal
 
@@ -66,7 +73,8 @@ def test_basic_getitem_with_labels(test_data):
     # GH12089
     # with tz for values
     s = Series(
-        pd.date_range("2011-01-01", periods=3, tz="US/Eastern"), index=["a", "b", "c"]
+        pd.date_range("2011-01-01", periods=3, tz="US/Eastern"),
+        index=["a", "b", "c"],
     )
     expected = Timestamp("2011-01-01", tz="US/Eastern")
     result = s.loc["a"]
@@ -142,7 +150,9 @@ def test_type_promotion():
     s["a"] = pd.Timestamp("2016-01-01")
     s["b"] = 3.0
     s["c"] = "foo"
-    expected = Series([pd.Timestamp("2016-01-01"), 3.0, "foo"], index=["a", "b", "c"])
+    expected = Series(
+        [pd.Timestamp("2016-01-01"), 3.0, "foo"], index=["a", "b", "c"]
+    )
     assert_series_equal(s, expected)
 
 
@@ -197,7 +207,10 @@ def test_getitem_box_float64(test_data):
 
 @pytest.mark.parametrize(
     "arr",
-    [np.random.randn(10), tm.makeDateIndex(10, name="a").tz_localize(tz="US/Eastern")],
+    [
+        np.random.randn(10),
+        tm.makeDateIndex(10, name="a").tz_localize(tz="US/Eastern"),
+    ],
 )
 def test_get(arr):
     # GH 21260
@@ -318,7 +331,9 @@ def test_setitem(test_data):
     assert not np.isnan(test_data.ts[2])
 
     # caught this bug when writing tests
-    series = Series(tm.makeIntIndex(20).astype(float), index=tm.makeIntIndex(20))
+    series = Series(
+        tm.makeIntIndex(20).astype(float), index=tm.makeIntIndex(20)
+    )
 
     series[::2] = 0
     assert (series[::2] == 0).all()
@@ -548,7 +563,9 @@ def test_categorial_assigning_ops():
     s = orig.copy()
     s.index = ["x", "y"]
     s["y"] = "a"
-    exp = Series(Categorical(["b", "a"], categories=["a", "b"]), index=["x", "y"])
+    exp = Series(
+        Categorical(["b", "a"], categories=["a", "b"]), index=["x", "y"]
+    )
     tm.assert_series_equal(s, exp)
 
     # ensure that one can set something to np.nan
@@ -637,7 +654,9 @@ def test_timedelta_assignment():
     tm.assert_series_equal(s, Series(Timedelta("1 days"), index=["B"]))
 
     s = s.reindex(s.index.insert(0, "A"))
-    tm.assert_series_equal(s, Series([np.nan, Timedelta("1 days")], index=["A", "B"]))
+    tm.assert_series_equal(
+        s, Series([np.nan, Timedelta("1 days")], index=["A", "B"])
+    )
 
     result = s.fillna(timedelta(1))
     expected = Series(Timedelta("1 days"), index=["A", "B"])
@@ -663,7 +682,9 @@ def test_underlying_data_conversion():
     df
     df["val"].update(s)
 
-    expected = DataFrame(dict(a=[1, 2, 3], b=[1, 2, 3], c=[1, 2, 3], val=[0, 1, 0]))
+    expected = DataFrame(
+        dict(a=[1, 2, 3], b=[1, 2, 3], c=[1, 2, 3], val=[0, 1, 0])
+    )
     expected.set_index(["a", "b", "c"], inplace=True)
     tm.assert_frame_equal(df, expected)
 
@@ -817,7 +838,8 @@ def test_take_categorical():
     s = Series(pd.Categorical(["a", "b", "c"]))
     result = s.take([-2, -2, 0])
     expected = Series(
-        pd.Categorical(["b", "b", "a"], categories=["a", "b", "c"]), index=[1, 1, 0]
+        pd.Categorical(["b", "b", "a"], categories=["a", "b", "c"]),
+        index=[1, 1, 0],
     )
     assert_series_equal(result, expected)
 

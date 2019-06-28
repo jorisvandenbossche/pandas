@@ -274,7 +274,9 @@ class TestCommon(Base):
         "Second": Timestamp("2011-01-01 09:00:01"),
         "Milli": Timestamp("2011-01-01 09:00:00.001000"),
         "Micro": Timestamp("2011-01-01 09:00:00.000001"),
-        "Nano": Timestamp(np_datetime64_compat("2011-01-01T09:00:00.000000001Z")),
+        "Nano": Timestamp(
+            np_datetime64_compat("2011-01-01T09:00:00.000000001Z")
+        ),
     }
 
     def test_immutable(self, offset_types):
@@ -337,7 +339,9 @@ class TestCommon(Base):
             code = get_offset(freqstr)
             assert offset.rule_code == code
 
-    def _check_offsetfunc_works(self, offset, funcname, dt, expected, normalize=False):
+    def _check_offsetfunc_works(
+        self, offset, funcname, dt, expected, normalize=False
+    ):
 
         if normalize and issubclass(offset, Tick):
             # normalize=True disallowed for Tick subclasses GH#21427
@@ -403,7 +407,9 @@ class TestCommon(Base):
                 exp_warning = UserWarning
 
             # test nanosecond is preserved
-            with tm.assert_produces_warning(exp_warning, check_stacklevel=False):
+            with tm.assert_produces_warning(
+                exp_warning, check_stacklevel=False
+            ):
                 result = func(ts)
             assert isinstance(result, Timestamp)
             if normalize is False:
@@ -473,7 +479,9 @@ class TestCommon(Base):
 
         for dt in [sdt, ndt]:
             expected = expecteds[offset_types.__name__]
-            self._check_offsetfunc_works(offset_types, "rollforward", dt, expected)
+            self._check_offsetfunc_works(
+                offset_types, "rollforward", dt, expected
+            )
             expected = norm_expected[offset_types.__name__]
             self._check_offsetfunc_works(
                 offset_types, "rollforward", dt, expected, normalize=True
@@ -547,7 +555,9 @@ class TestCommon(Base):
 
         for dt in [sdt, ndt]:
             expected = expecteds[offset_types.__name__]
-            self._check_offsetfunc_works(offset_types, "rollback", dt, expected)
+            self._check_offsetfunc_works(
+                offset_types, "rollback", dt, expected
+            )
 
             expected = norm_expected[offset_types.__name__]
             self._check_offsetfunc_works(
@@ -617,7 +627,9 @@ class TestCommon(Base):
             "Week": Week(1),
         }
 
-        pickle_path = datapath("tseries", "offsets", "data", "dateoffset_0_15_2.pickle")
+        pickle_path = datapath(
+            "tseries", "offsets", "data", "dateoffset_0_15_2.pickle"
+        )
         # This code was executed once on v0.15.2 to generate the pickle:
         # with open(pickle_path, 'wb') as f: pickle.dump(offsets, f)
         #
@@ -715,7 +727,9 @@ class TestBusinessDay(Base):
         assert BDay(10).rollforward(self.d) == self.d
 
     def testRollforward2(self):
-        assert BDay(10).rollforward(datetime(2008, 1, 5)) == datetime(2008, 1, 7)
+        assert BDay(10).rollforward(datetime(2008, 1, 5)) == datetime(
+            2008, 1, 7
+        )
 
     def test_roll_date_object(self):
         offset = BDay()
@@ -844,7 +858,10 @@ class TestBusinessDay(Base):
         assert rs == xp
 
     def test_apply_corner(self):
-        msg = "Only know how to combine business day with datetime or" " timedelta"
+        msg = (
+            "Only know how to combine business day with datetime or"
+            " timedelta"
+        )
         with pytest.raises(ApplyTypeError, match=msg):
             BDay().apply(BMonthEnd())
 
@@ -865,7 +882,9 @@ class TestBusinessHour(Base):
 
         self.offset5 = BusinessHour(start=dt_time(11, 0), end=dt_time(14, 30))
         self.offset6 = BusinessHour(start="20:00", end="05:00")
-        self.offset7 = BusinessHour(n=-2, start=dt_time(21, 30), end=dt_time(6, 30))
+        self.offset7 = BusinessHour(
+            n=-2, start=dt_time(21, 30), end=dt_time(6, 30)
+        )
 
     def test_constructor_errors(self):
         from datetime import time as dt_time
@@ -952,9 +971,9 @@ class TestBusinessHour(Base):
         assert self._offset(5).rollback(self.d) == self.d
 
     def testRollback2(self):
-        assert self._offset(-3).rollback(datetime(2014, 7, 5, 15, 0)) == datetime(
-            2014, 7, 4, 17, 0
-        )
+        assert self._offset(-3).rollback(
+            datetime(2014, 7, 5, 15, 0)
+        ) == datetime(2014, 7, 4, 17, 0)
 
     def testRollforward1(self):
         assert self.offset1.rollforward(self.d) == self.d
@@ -977,9 +996,9 @@ class TestBusinessHour(Base):
         assert self._offset(5).rollforward(self.d) == self.d
 
     def testRollforward2(self):
-        assert self._offset(-3).rollforward(datetime(2014, 7, 5, 16, 0)) == datetime(
-            2014, 7, 7, 9
-        )
+        assert self._offset(-3).rollforward(
+            datetime(2014, 7, 5, 16, 0)
+        ) == datetime(2014, 7, 7, 9)
 
     def test_roll_date_object(self):
         offset = BusinessHour()
@@ -1452,7 +1471,9 @@ class TestBusinessHour(Base):
                 datetime(2014, 7, 1, 15): datetime(2014, 7, 1, 16),
                 datetime(2014, 7, 1, 19): datetime(2014, 7, 2, 10),
                 datetime(2014, 7, 1, 16): datetime(2014, 7, 2, 9),
-                datetime(2014, 7, 1, 16, 30, 15): datetime(2014, 7, 2, 9, 30, 15),
+                datetime(2014, 7, 1, 16, 30, 15): datetime(
+                    2014, 7, 2, 9, 30, 15
+                ),
                 datetime(2014, 7, 1, 17): datetime(2014, 7, 2, 10),
                 datetime(2014, 7, 2, 11): datetime(2014, 7, 2, 12),
                 # out of business hours
@@ -1464,7 +1485,9 @@ class TestBusinessHour(Base):
                 datetime(2014, 7, 5, 15): datetime(2014, 7, 7, 10),
                 datetime(2014, 7, 4, 17): datetime(2014, 7, 7, 10),
                 datetime(2014, 7, 4, 16, 30): datetime(2014, 7, 7, 9, 30),
-                datetime(2014, 7, 4, 16, 30, 30): datetime(2014, 7, 7, 9, 30, 30),
+                datetime(2014, 7, 4, 16, 30, 30): datetime(
+                    2014, 7, 7, 9, 30, 30
+                ),
             },
         )
     )
@@ -1486,7 +1509,9 @@ class TestBusinessHour(Base):
                 datetime(2014, 7, 5, 15): datetime(2014, 7, 7, 13),
                 datetime(2014, 7, 4, 17): datetime(2014, 7, 7, 13),
                 datetime(2014, 7, 4, 16, 30): datetime(2014, 7, 7, 12, 30),
-                datetime(2014, 7, 4, 16, 30, 30): datetime(2014, 7, 7, 12, 30, 30),
+                datetime(2014, 7, 4, 16, 30, 30): datetime(
+                    2014, 7, 7, 12, 30, 30
+                ),
             },
         )
     )
@@ -1500,8 +1525,12 @@ class TestBusinessHour(Base):
                 datetime(2014, 7, 1, 15): datetime(2014, 7, 1, 14),
                 datetime(2014, 7, 1, 16): datetime(2014, 7, 1, 15),
                 datetime(2014, 7, 1, 10): datetime(2014, 6, 30, 17),
-                datetime(2014, 7, 1, 16, 30, 15): datetime(2014, 7, 1, 15, 30, 15),
-                datetime(2014, 7, 1, 9, 30, 15): datetime(2014, 6, 30, 16, 30, 15),
+                datetime(2014, 7, 1, 16, 30, 15): datetime(
+                    2014, 7, 1, 15, 30, 15
+                ),
+                datetime(2014, 7, 1, 9, 30, 15): datetime(
+                    2014, 6, 30, 16, 30, 15
+                ),
                 datetime(2014, 7, 1, 17): datetime(2014, 7, 1, 16),
                 datetime(2014, 7, 1, 5): datetime(2014, 6, 30, 16),
                 datetime(2014, 7, 2, 11): datetime(2014, 7, 2, 10),
@@ -1514,7 +1543,9 @@ class TestBusinessHour(Base):
                 datetime(2014, 7, 5, 15): datetime(2014, 7, 4, 16),
                 datetime(2014, 7, 7, 9): datetime(2014, 7, 4, 16),
                 datetime(2014, 7, 7, 9, 30): datetime(2014, 7, 4, 16, 30),
-                datetime(2014, 7, 7, 9, 30, 30): datetime(2014, 7, 4, 16, 30, 30),
+                datetime(2014, 7, 7, 9, 30, 30): datetime(
+                    2014, 7, 4, 16, 30, 30
+                ),
             },
         )
     )
@@ -1536,7 +1567,9 @@ class TestBusinessHour(Base):
                 datetime(2014, 7, 5, 15): datetime(2014, 7, 4, 13),
                 datetime(2014, 7, 4, 18): datetime(2014, 7, 4, 13),
                 datetime(2014, 7, 7, 9, 30): datetime(2014, 7, 4, 13, 30),
-                datetime(2014, 7, 7, 9, 30, 30): datetime(2014, 7, 4, 13, 30, 30),
+                datetime(2014, 7, 7, 9, 30, 30): datetime(
+                    2014, 7, 4, 13, 30, 30
+                ),
             },
         )
     )
@@ -1550,7 +1583,9 @@ class TestBusinessHour(Base):
                 datetime(2014, 7, 1, 15): datetime(2014, 7, 2, 13),
                 datetime(2014, 7, 1, 19): datetime(2014, 7, 2, 14),
                 datetime(2014, 7, 1, 16): datetime(2014, 7, 2, 14),
-                datetime(2014, 7, 1, 15, 30, 15): datetime(2014, 7, 2, 13, 30, 15),
+                datetime(2014, 7, 1, 15, 30, 15): datetime(
+                    2014, 7, 2, 13, 30, 15
+                ),
                 datetime(2014, 7, 5, 15): datetime(2014, 7, 7, 14),
                 datetime(2014, 7, 4, 17): datetime(2014, 7, 7, 14),
             },
@@ -1570,7 +1605,9 @@ class TestBusinessHour(Base):
                 datetime(2014, 7, 5, 15): datetime(2014, 7, 7, 15),
                 datetime(2014, 7, 4, 17): datetime(2014, 7, 7, 15),
                 datetime(2014, 7, 4, 14, 30): datetime(2014, 7, 7, 13, 30),
-                datetime(2014, 7, 4, 14, 30, 30): datetime(2014, 7, 7, 13, 30, 30),
+                datetime(2014, 7, 4, 14, 30, 30): datetime(
+                    2014, 7, 7, 13, 30, 30
+                ),
             },
         )
     )
@@ -1585,7 +1622,9 @@ class TestBusinessHour(Base):
                 datetime(2014, 7, 2, 15): datetime(2014, 7, 2, 14),
                 datetime(2014, 7, 2, 19): datetime(2014, 7, 2, 15),
                 datetime(2014, 7, 2, 16): datetime(2014, 7, 2, 15),
-                datetime(2014, 7, 2, 13, 30, 15): datetime(2014, 7, 1, 15, 30, 15),
+                datetime(2014, 7, 2, 13, 30, 15): datetime(
+                    2014, 7, 1, 15, 30, 15
+                ),
                 datetime(2014, 7, 5, 15): datetime(2014, 7, 4, 15),
                 datetime(2014, 7, 7, 11): datetime(2014, 7, 4, 15),
             },
@@ -1607,7 +1646,9 @@ class TestBusinessHour(Base):
                 datetime(2014, 7, 5, 15): datetime(2014, 7, 4, 13),
                 datetime(2014, 7, 4, 16): datetime(2014, 7, 4, 13),
                 datetime(2014, 7, 4, 12, 30): datetime(2014, 7, 3, 15, 30),
-                datetime(2014, 7, 4, 12, 30, 30): datetime(2014, 7, 3, 15, 30, 30),
+                datetime(2014, 7, 4, 12, 30, 30): datetime(
+                    2014, 7, 3, 15, 30, 30
+                ),
             },
         )
     )
@@ -1628,7 +1669,9 @@ class TestBusinessHour(Base):
                 datetime(2014, 7, 5, 0): datetime(2014, 7, 5, 1),
                 datetime(2014, 7, 5, 4): datetime(2014, 7, 7, 19),
                 datetime(2014, 7, 5, 4, 30): datetime(2014, 7, 7, 19, 30),
-                datetime(2014, 7, 5, 4, 30, 30): datetime(2014, 7, 7, 19, 30, 30),
+                datetime(2014, 7, 5, 4, 30, 30): datetime(
+                    2014, 7, 7, 19, 30, 30
+                ),
             },
         )
     )
@@ -1650,7 +1693,9 @@ class TestBusinessHour(Base):
                 datetime(2014, 7, 5, 0): datetime(2014, 7, 4, 23),
                 datetime(2014, 7, 5, 4): datetime(2014, 7, 5, 3),
                 datetime(2014, 7, 7, 19, 30): datetime(2014, 7, 5, 4, 30),
-                datetime(2014, 7, 7, 19, 30, 30): datetime(2014, 7, 5, 4, 30, 30),
+                datetime(2014, 7, 7, 19, 30, 30): datetime(
+                    2014, 7, 5, 4, 30, 30
+                ),
             },
         )
     )
@@ -1664,8 +1709,12 @@ class TestBusinessHour(Base):
                 datetime(2014, 7, 4, 22): datetime(2014, 7, 7, 3),
                 datetime(2014, 7, 3, 22, 30): datetime(2014, 7, 4, 3, 30),
                 datetime(2014, 7, 3, 22, 20): datetime(2014, 7, 4, 3, 20),
-                datetime(2014, 7, 4, 22, 30, 30): datetime(2014, 7, 7, 3, 30, 30),
-                datetime(2014, 7, 4, 22, 30, 20): datetime(2014, 7, 7, 3, 30, 20),
+                datetime(2014, 7, 4, 22, 30, 30): datetime(
+                    2014, 7, 7, 3, 30, 30
+                ),
+                datetime(2014, 7, 4, 22, 30, 20): datetime(
+                    2014, 7, 7, 3, 30, 20
+                ),
             },
         )
     )
@@ -1678,8 +1727,12 @@ class TestBusinessHour(Base):
                 datetime(2014, 7, 7, 3): datetime(2014, 7, 4, 22),
                 datetime(2014, 7, 4, 3, 30): datetime(2014, 7, 3, 22, 30),
                 datetime(2014, 7, 4, 3, 20): datetime(2014, 7, 3, 22, 20),
-                datetime(2014, 7, 7, 3, 30, 30): datetime(2014, 7, 4, 22, 30, 30),
-                datetime(2014, 7, 7, 3, 30, 20): datetime(2014, 7, 4, 22, 30, 20),
+                datetime(2014, 7, 7, 3, 30, 30): datetime(
+                    2014, 7, 4, 22, 30, 30
+                ),
+                datetime(2014, 7, 7, 3, 30, 20): datetime(
+                    2014, 7, 4, 22, 30, 20
+                ),
             },
         )
     )
@@ -1709,7 +1762,9 @@ class TestBusinessHour(Base):
                 datetime(2014, 7, 5, 15): datetime(2014, 7, 14, 9),
                 datetime(2014, 7, 4, 18): datetime(2014, 7, 14, 9),
                 datetime(2014, 7, 7, 9, 30): datetime(2014, 7, 14, 9, 30),
-                datetime(2014, 7, 7, 9, 30, 30): datetime(2014, 7, 14, 9, 30, 30),
+                datetime(2014, 7, 7, 9, 30, 30): datetime(
+                    2014, 7, 14, 9, 30, 30
+                ),
             },
         )
     )
@@ -1731,7 +1786,9 @@ class TestBusinessHour(Base):
                 datetime(2014, 7, 5, 15): datetime(2014, 7, 1, 16),
                 datetime(2014, 7, 6, 18): datetime(2014, 7, 1, 16),
                 datetime(2014, 7, 7, 9, 30): datetime(2014, 7, 1, 16, 30),
-                datetime(2014, 7, 7, 10, 30, 30): datetime(2014, 7, 2, 9, 30, 30),
+                datetime(2014, 7, 7, 10, 30, 30): datetime(
+                    2014, 7, 2, 9, 30, 30
+                ),
             },
         )
     )
@@ -1806,7 +1863,9 @@ class TestBusinessHour(Base):
                 assert_offset_equal(offset, base, expected)
 
     def test_datetimeindex(self):
-        idx1 = date_range(start="2014-07-04 15:00", end="2014-07-08 10:00", freq="BH")
+        idx1 = date_range(
+            start="2014-07-04 15:00", end="2014-07-08 10:00", freq="BH"
+        )
         idx2 = date_range(start="2014-07-04 15:00", periods=12, freq="BH")
         idx3 = date_range(end="2014-07-08 10:00", periods=12, freq="BH")
         expected = DatetimeIndex(
@@ -1829,7 +1888,9 @@ class TestBusinessHour(Base):
         for idx in [idx1, idx2, idx3]:
             tm.assert_index_equal(idx, expected)
 
-        idx1 = date_range(start="2014-07-04 15:45", end="2014-07-08 10:45", freq="BH")
+        idx1 = date_range(
+            start="2014-07-04 15:45", end="2014-07-08 10:45", freq="BH"
+        )
         idx2 = date_range(start="2014-07-04 15:45", periods=12, freq="BH")
         idx3 = date_range(end="2014-07-08 10:45", periods=12, freq="BH")
 
@@ -1857,7 +1918,11 @@ class TestBusinessHour(Base):
 
 class TestCustomBusinessHour(Base):
     _offset = CustomBusinessHour
-    holidays = ["2014-06-27", datetime(2014, 6, 30), np.datetime64("2014-07-02")]
+    holidays = [
+        "2014-06-27",
+        datetime(2014, 6, 30),
+        np.datetime64("2014-07-02"),
+    ]
 
     def setup_method(self, method):
         # 2014 Calendar to check custom holidays
@@ -1902,17 +1967,19 @@ class TestCustomBusinessHour(Base):
 
         assert CustomBusinessHour() != CustomBusinessHour(-1)
         assert CustomBusinessHour(start="09:00") == CustomBusinessHour()
-        assert CustomBusinessHour(start="09:00") != CustomBusinessHour(start="09:01")
-        assert CustomBusinessHour(start="09:00", end="17:00") != CustomBusinessHour(
-            start="17:00", end="09:01"
+        assert CustomBusinessHour(start="09:00") != CustomBusinessHour(
+            start="09:01"
         )
+        assert CustomBusinessHour(
+            start="09:00", end="17:00"
+        ) != CustomBusinessHour(start="17:00", end="09:01")
 
-        assert CustomBusinessHour(weekmask="Tue Wed Thu Fri") != CustomBusinessHour(
-            weekmask="Mon Tue Wed Thu Fri"
-        )
-        assert CustomBusinessHour(holidays=["2014-06-27"]) != CustomBusinessHour(
-            holidays=["2014-06-28"]
-        )
+        assert CustomBusinessHour(
+            weekmask="Tue Wed Thu Fri"
+        ) != CustomBusinessHour(weekmask="Mon Tue Wed Thu Fri")
+        assert CustomBusinessHour(
+            holidays=["2014-06-27"]
+        ) != CustomBusinessHour(holidays=["2014-06-28"])
 
     def test_sub(self):
         # override the Base.test_sub implementation because self.offset2 is
@@ -1940,9 +2007,9 @@ class TestCustomBusinessHour(Base):
         assert self.offset2.rollback(d) == datetime(2014, 6, 26, 17)
 
     def testRollback2(self):
-        assert self._offset(-3).rollback(datetime(2014, 7, 5, 15, 0)) == datetime(
-            2014, 7, 4, 17, 0
-        )
+        assert self._offset(-3).rollback(
+            datetime(2014, 7, 5, 15, 0)
+        ) == datetime(2014, 7, 4, 17, 0)
 
     def testRollforward1(self):
         assert self.offset1.rollforward(self.d) == self.d
@@ -1953,9 +2020,9 @@ class TestCustomBusinessHour(Base):
         assert self.offset2.rollforward(d) == datetime(2014, 7, 1, 9)
 
     def testRollforward2(self):
-        assert self._offset(-3).rollforward(datetime(2014, 7, 5, 16, 0)) == datetime(
-            2014, 7, 7, 9
-        )
+        assert self._offset(-3).rollforward(
+            datetime(2014, 7, 5, 16, 0)
+        ) == datetime(2014, 7, 7, 9)
 
     def test_roll_date_object(self):
         offset = BusinessHour()
@@ -2007,7 +2074,11 @@ class TestCustomBusinessHour(Base):
     normalize_cases.append(
         (
             CustomBusinessHour(
-                1, normalize=True, start="17:00", end="04:00", holidays=holidays
+                1,
+                normalize=True,
+                start="17:00",
+                end="04:00",
+                holidays=holidays,
             ),
             {
                 datetime(2014, 7, 1, 8): datetime(2014, 7, 1),
@@ -2034,7 +2105,9 @@ class TestCustomBusinessHour(Base):
 
         tests.append(
             (
-                CustomBusinessHour(start="10:00", end="15:00", holidays=self.holidays),
+                CustomBusinessHour(
+                    start="10:00", end="15:00", holidays=self.holidays
+                ),
                 {
                     datetime(2014, 7, 1, 9): False,
                     datetime(2014, 7, 1, 10): True,
@@ -2060,7 +2133,9 @@ class TestCustomBusinessHour(Base):
                 datetime(2014, 7, 1, 15): datetime(2014, 7, 1, 16),
                 datetime(2014, 7, 1, 19): datetime(2014, 7, 3, 10),
                 datetime(2014, 7, 1, 16): datetime(2014, 7, 3, 9),
-                datetime(2014, 7, 1, 16, 30, 15): datetime(2014, 7, 3, 9, 30, 15),
+                datetime(2014, 7, 1, 16, 30, 15): datetime(
+                    2014, 7, 3, 9, 30, 15
+                ),
                 datetime(2014, 7, 1, 17): datetime(2014, 7, 3, 10),
                 datetime(2014, 7, 2, 11): datetime(2014, 7, 3, 10),
                 # out of business hours
@@ -2072,7 +2147,9 @@ class TestCustomBusinessHour(Base):
                 datetime(2014, 7, 5, 15): datetime(2014, 7, 7, 10),
                 datetime(2014, 7, 4, 17): datetime(2014, 7, 7, 10),
                 datetime(2014, 7, 4, 16, 30): datetime(2014, 7, 7, 9, 30),
-                datetime(2014, 7, 4, 16, 30, 30): datetime(2014, 7, 7, 9, 30, 30),
+                datetime(2014, 7, 4, 16, 30, 30): datetime(
+                    2014, 7, 7, 9, 30, 30
+                ),
             },
         )
     )
@@ -2094,7 +2171,9 @@ class TestCustomBusinessHour(Base):
                 datetime(2014, 7, 5, 15): datetime(2014, 7, 7, 13),
                 datetime(2014, 7, 4, 17): datetime(2014, 7, 7, 13),
                 datetime(2014, 7, 4, 16, 30): datetime(2014, 7, 7, 12, 30),
-                datetime(2014, 7, 4, 16, 30, 30): datetime(2014, 7, 7, 12, 30, 30),
+                datetime(2014, 7, 4, 16, 30, 30): datetime(
+                    2014, 7, 7, 12, 30, 30
+                ),
             },
         )
     )
@@ -2202,7 +2281,9 @@ class TestCustomBusinessDay(Base):
         assert CDay(10).rollforward(self.d) == self.d
 
     def testRollforward2(self):
-        assert CDay(10).rollforward(datetime(2008, 1, 5)) == datetime(2008, 1, 7)
+        assert CDay(10).rollforward(datetime(2008, 1, 5)) == datetime(
+            2008, 1, 7
+        )
 
     def test_roll_date_object(self):
         offset = CDay()
@@ -2336,7 +2417,11 @@ class TestCustomBusinessDay(Base):
 
     def test_holidays(self):
         # Define a TradingDay offset
-        holidays = ["2012-05-01", datetime(2013, 5, 1), np.datetime64("2014-05-01")]
+        holidays = [
+            "2012-05-01",
+            datetime(2013, 5, 1),
+            np.datetime64("2014-05-01"),
+        ]
         tday = CDay(holidays=holidays)
         for year in range(2012, 2015):
             dt = datetime(year, 4, 30)
@@ -2365,7 +2450,11 @@ class TestCustomBusinessDay(Base):
 
     def test_weekmask_and_holidays(self):
         weekmask_egypt = "Sun Mon Tue Wed Thu"  # Fri-Sat Weekend
-        holidays = ["2012-05-01", datetime(2013, 5, 1), np.datetime64("2014-05-01")]
+        holidays = [
+            "2012-05-01",
+            datetime(2013, 5, 1),
+            np.datetime64("2014-05-01"),
+        ]
         bday_egypt = CDay(holidays=holidays, weekmask=weekmask_egypt)
         dt = datetime(2013, 4, 30)
         xp_egypt = datetime(2013, 5, 5)
@@ -2443,7 +2532,9 @@ class TestCustomBusinessMonthEnd(CustomBusinessMonthBase, Base):
         assert self.offset2(self.d) == datetime(2008, 2, 29)
 
     def testRollback1(self):
-        assert CDay(10).rollback(datetime(2007, 12, 31)) == datetime(2007, 12, 31)
+        assert CDay(10).rollback(datetime(2007, 12, 31)) == datetime(
+            2007, 12, 31
+        )
 
     def testRollback2(self):
         assert CBMonthEnd(10).rollback(self.d) == datetime(2007, 12, 31)
@@ -2557,7 +2648,11 @@ class TestCustomBusinessMonthEnd(CustomBusinessMonthBase, Base):
 
     def test_holidays(self):
         # Define a TradingDay offset
-        holidays = ["2012-01-31", datetime(2012, 2, 28), np.datetime64("2012-02-29")]
+        holidays = [
+            "2012-01-31",
+            datetime(2012, 2, 28),
+            np.datetime64("2012-02-29"),
+        ]
         bm_offset = CBMonthEnd(holidays=holidays)
         dt = datetime(2012, 1, 1)
         assert dt + bm_offset == datetime(2012, 1, 30)
@@ -2570,9 +2665,9 @@ class TestCustomBusinessMonthEnd(CustomBusinessMonthBase, Base):
         hcal = USFederalHolidayCalendar()
         freq = CBMonthEnd(calendar=hcal)
 
-        assert date_range(start="20120101", end="20130101", freq=freq).tolist()[
-            0
-        ] == datetime(2012, 1, 31)
+        assert date_range(
+            start="20120101", end="20130101", freq=freq
+        ).tolist()[0] == datetime(2012, 1, 31)
 
 
 class TestCustomBusinessMonthBegin(CustomBusinessMonthBase, Base):
@@ -2592,7 +2687,9 @@ class TestCustomBusinessMonthBegin(CustomBusinessMonthBase, Base):
         assert self.offset2(self.d) == datetime(2008, 3, 3)
 
     def testRollback1(self):
-        assert CDay(10).rollback(datetime(2007, 12, 31)) == datetime(2007, 12, 31)
+        assert CDay(10).rollback(datetime(2007, 12, 31)) == datetime(
+            2007, 12, 31
+        )
 
     def testRollback2(self):
         assert CBMonthBegin(10).rollback(self.d) == datetime(2008, 1, 1)
@@ -2707,7 +2804,11 @@ class TestCustomBusinessMonthBegin(CustomBusinessMonthBase, Base):
 
     def test_holidays(self):
         # Define a TradingDay offset
-        holidays = ["2012-02-01", datetime(2012, 2, 2), np.datetime64("2012-03-01")]
+        holidays = [
+            "2012-02-01",
+            datetime(2012, 2, 2),
+            np.datetime64("2012-03-01"),
+        ]
         bm_offset = CBMonthBegin(holidays=holidays)
         dt = datetime(2012, 1, 1)
 
@@ -2718,9 +2819,9 @@ class TestCustomBusinessMonthBegin(CustomBusinessMonthBase, Base):
     def test_datetimeindex(self):
         hcal = USFederalHolidayCalendar()
         cbmb = CBMonthBegin(calendar=hcal)
-        assert date_range(start="20120101", end="20130101", freq=cbmb).tolist()[
-            0
-        ] == datetime(2012, 1, 3)
+        assert date_range(
+            start="20120101", end="20130101", freq=cbmb
+        ).tolist()[0] == datetime(2012, 1, 3)
 
 
 class TestWeek(Base):
@@ -2842,7 +2943,8 @@ class TestWeekOfMonth(Base):
 
     def test_repr(self):
         assert (
-            repr(WeekOfMonth(weekday=1, week=2)) == "<WeekOfMonth: week=2, weekday=1>"
+            repr(WeekOfMonth(weekday=1, week=2))
+            == "<WeekOfMonth: week=2, weekday=1>"
         )
 
     def test_offset(self):
@@ -3530,10 +3632,14 @@ def test_Easter():
 
     assert_offset_equal(-Easter(), datetime(2011, 1, 1), datetime(2010, 4, 4))
     assert_offset_equal(-Easter(), datetime(2010, 4, 5), datetime(2010, 4, 4))
-    assert_offset_equal(-Easter(2), datetime(2011, 1, 1), datetime(2009, 4, 12))
+    assert_offset_equal(
+        -Easter(2), datetime(2011, 1, 1), datetime(2009, 4, 12)
+    )
 
     assert_offset_equal(-Easter(), datetime(2010, 4, 4), datetime(2009, 4, 12))
-    assert_offset_equal(-Easter(2), datetime(2010, 4, 4), datetime(2008, 3, 23))
+    assert_offset_equal(
+        -Easter(2), datetime(2010, 4, 4), datetime(2008, 3, 23)
+    )
 
 
 class TestOffsetNames:
@@ -3678,7 +3784,11 @@ class TestReprNames:
         ]
         days = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
         names += ["W-" + day for day in days]
-        names += ["WOM-" + week + day for week in ("1", "2", "3", "4") for day in days]
+        names += [
+            "WOM-" + week + day
+            for week in ("1", "2", "3", "4")
+            for day in days
+        ]
         _offset_map.clear()
         for name in names:
             offset = get_offset(name)
@@ -3703,7 +3813,9 @@ class TestDST:
     # test both basic names and dateutil timezones
     timezone_utc_offsets = {
         "US/Eastern": dict(utc_offset_daylight=-4, utc_offset_standard=-5),
-        "dateutil/US/Pacific": dict(utc_offset_daylight=-7, utc_offset_standard=-8),
+        "dateutil/US/Pacific": dict(
+            utc_offset_daylight=-7, utc_offset_standard=-8
+        ),
     }
     valid_date_offsets_singular = [
         "weekday",
@@ -3742,7 +3854,10 @@ class TestDST:
 
         if offset_name == "weeks":
             # dates should match
-            assert t.date() == timedelta(days=7 * offset.kwds["weeks"]) + tstart.date()
+            assert (
+                t.date()
+                == timedelta(days=7 * offset.kwds["weeks"]) + tstart.date()
+            )
             # expect the same day of week, hour of day, minute, second, ...
             assert (
                 t.dayofweek == tstart.dayofweek
@@ -3767,7 +3882,9 @@ class TestDST:
             assert datepart_offset == offset.kwds[offset_name]
         else:
             # the offset should be the same as if it was done in UTC
-            assert t == (tstart.tz_convert("UTC") + offset).tz_convert("US/Pacific")
+            assert t == (tstart.tz_convert("UTC") + offset).tz_convert(
+                "US/Pacific"
+            )
 
     def _make_timestamp(self, string, hrs_offset, tz):
         if hrs_offset >= 0:
@@ -3790,7 +3907,9 @@ class TestDST:
                 # https://github.com/dateutil/dateutil/issues/321
                 self._test_all_offsets(
                     n=3,
-                    tstart=self._make_timestamp(self.ts_pre_fallback, hrs_pre, tz),
+                    tstart=self._make_timestamp(
+                        self.ts_pre_fallback, hrs_pre, tz
+                    ),
                     expected_utc_offset=hrs_post,
                 )
             elif LooseVersion(dateutil.__version__) > LooseVersion("2.6.0"):
@@ -3804,7 +3923,9 @@ class TestDST:
             hrs_post = utc_offsets["utc_offset_daylight"]
             self._test_all_offsets(
                 n=3,
-                tstart=self._make_timestamp(self.ts_pre_springfwd, hrs_pre, tz),
+                tstart=self._make_timestamp(
+                    self.ts_pre_springfwd, hrs_pre, tz
+                ),
                 expected_utc_offset=hrs_post,
             )
 
@@ -3825,7 +3946,9 @@ class TestDST:
             hrs_pre = utc_offsets["utc_offset_standard"]
             self._test_all_offsets(
                 n=1,
-                tstart=self._make_timestamp(self.ts_pre_springfwd, hrs_pre, tz),
+                tstart=self._make_timestamp(
+                    self.ts_pre_springfwd, hrs_pre, tz
+                ),
                 expected_utc_offset=None,
             )
 
@@ -3969,7 +4092,9 @@ def test_last_week_of_month_on_offset():
 
     # negative n
     offset = LastWeekOfMonth(n=-4, weekday=5)
-    ts = Timestamp("2005-08-27 05:01:42.799392561-0500", tz="America/Rainy_River")
+    ts = Timestamp(
+        "2005-08-27 05:01:42.799392561-0500", tz="America/Rainy_River"
+    )
     slow = (ts + offset) - offset == ts
     fast = offset.onOffset(ts)
     assert fast == slow

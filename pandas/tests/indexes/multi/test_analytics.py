@@ -89,7 +89,9 @@ def test_numpy_repeat():
     names = np.array(["foo", "bar"])
 
     m = MultiIndex.from_product([numbers, names], names=names)
-    expected = MultiIndex.from_product([numbers, names.repeat(reps)], names=names)
+    expected = MultiIndex.from_product(
+        [numbers, names.repeat(reps)], names=names
+    )
     tm.assert_index_equal(np.repeat(m, reps), expected)
 
     msg = "the 'axis' parameter is not supported"
@@ -180,7 +182,10 @@ def test_take_invalid_kwargs(idx):
 
 def test_take_fill_value():
     # GH 12631
-    vals = [["A", "B"], [pd.Timestamp("2011-01-01"), pd.Timestamp("2011-01-02")]]
+    vals = [
+        ["A", "B"],
+        [pd.Timestamp("2011-01-01"), pd.Timestamp("2011-01-02")],
+    ]
     idx = pd.MultiIndex.from_product(vals, names=["str", "dt"])
 
     result = idx.take(np.array([1, 0, -1]))
@@ -213,7 +218,8 @@ def test_take_fill_value():
     tm.assert_index_equal(result, expected)
 
     msg = (
-        "When allow_fill=True and fill_value is not None, " "all indices must be >= -1"
+        "When allow_fill=True and fill_value is not None, "
+        "all indices must be >= -1"
     )
     with pytest.raises(ValueError, match=msg):
         idx.take(np.array([1, 0, -2]), fill_value=True)

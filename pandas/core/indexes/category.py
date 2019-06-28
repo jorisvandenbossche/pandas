@@ -183,7 +183,9 @@ class CategoricalIndex(Index, accessor.PandasDelegate):
             if fastpath:
                 return cls._simple_new(data, name=name, dtype=dtype)
 
-        dtype = CategoricalDtype._from_values_or_dtype(data, categories, ordered, dtype)
+        dtype = CategoricalDtype._from_values_or_dtype(
+            data, categories, ordered, dtype
+        )
 
         if name is None and hasattr(data, "name"):
             name = data.name
@@ -290,16 +292,20 @@ class CategoricalIndex(Index, accessor.PandasDelegate):
                 other = other._values
             if not other.is_dtype_equal(self):
                 raise TypeError(
-                    "categories must match existing categories " "when appending"
+                    "categories must match existing categories "
+                    "when appending"
                 )
         else:
             values = other
             if not is_list_like(values):
                 values = [values]
-            other = CategoricalIndex(self._create_categorical(other, dtype=self.dtype))
+            other = CategoricalIndex(
+                self._create_categorical(other, dtype=self.dtype)
+            )
             if not other.isin(values).all():
                 raise TypeError(
-                    "cannot append a non-category item to a " "CategoricalIndex"
+                    "cannot append a non-category item to a "
+                    "CategoricalIndex"
                 )
 
         return other
@@ -349,7 +355,9 @@ class CategoricalIndex(Index, accessor.PandasDelegate):
         attrs = [
             (
                 "categories",
-                ibase.default_pprint(self.categories, max_seq_items=max_categories),
+                ibase.default_pprint(
+                    self.categories, max_seq_items=max_categories
+                ),
             ),
             ("ordered", self.ordered),
         ]
@@ -569,7 +577,9 @@ class CategoricalIndex(Index, accessor.PandasDelegate):
         cat = Categorical(values, dtype=self.dtype)
         return self._shallow_copy(cat, **self._get_attributes_dict())
 
-    def reindex(self, target, method=None, level=None, limit=None, tolerance=None):
+    def reindex(
+        self, target, method=None, level=None, limit=None, tolerance=None
+    ):
         """
         Create index with target's values (move/add/delete values as necessary)
 
@@ -584,15 +594,18 @@ class CategoricalIndex(Index, accessor.PandasDelegate):
 
         if method is not None:
             raise NotImplementedError(
-                "argument method is not implemented for " "CategoricalIndex.reindex"
+                "argument method is not implemented for "
+                "CategoricalIndex.reindex"
             )
         if level is not None:
             raise NotImplementedError(
-                "argument level is not implemented for " "CategoricalIndex.reindex"
+                "argument level is not implemented for "
+                "CategoricalIndex.reindex"
             )
         if limit is not None:
             raise NotImplementedError(
-                "argument limit is not implemented for " "CategoricalIndex.reindex"
+                "argument limit is not implemented for "
+                "CategoricalIndex.reindex"
             )
 
         target = ibase.ensure_index(target)
@@ -618,7 +631,9 @@ class CategoricalIndex(Index, accessor.PandasDelegate):
             if (cats == -1).any():
                 # coerce to a regular index here!
                 result = Index(np.array(self), name=self.name)
-                new_target, indexer, _ = result._reindex_non_unique(np.array(target))
+                new_target, indexer, _ = result._reindex_non_unique(
+                    np.array(target)
+                )
             else:
 
                 codes = new_target.codes.copy()
@@ -678,7 +693,9 @@ class CategoricalIndex(Index, accessor.PandasDelegate):
                 "method='nearest' not implemented yet " "for CategoricalIndex"
             )
 
-        if isinstance(target, CategoricalIndex) and self.values.is_dtype_equal(target):
+        if isinstance(target, CategoricalIndex) and self.values.is_dtype_equal(
+            target
+        ):
             if self.values.equals(target.values):
                 # we have the same codes
                 codes = target.codes
@@ -752,7 +769,9 @@ class CategoricalIndex(Index, accessor.PandasDelegate):
         return self._shallow_copy(keyarr)
 
     @Appender(_index_shared_docs["take"] % _index_doc_kwargs)
-    def take(self, indices, axis=0, allow_fill=True, fill_value=None, **kwargs):
+    def take(
+        self, indices, axis=0, allow_fill=True, fill_value=None, **kwargs
+    ):
         nv.validate_take(tuple(), kwargs)
         indices = ensure_platform_int(indices)
         taken = self._assert_take_fillable(
@@ -887,7 +906,9 @@ class CategoricalIndex(Index, accessor.PandasDelegate):
         Concatenate to_concat which has the same class
         ValueError if other is not in the categories
         """
-        codes = np.concatenate([self._is_dtype_compat(c).codes for c in to_concat])
+        codes = np.concatenate(
+            [self._is_dtype_compat(c).codes for c in to_concat]
+        )
         result = self._create_from_codes(codes, name=name)
         # if name is None, _create_from_codes sets self.name
         result.name = name
@@ -911,7 +932,9 @@ class CategoricalIndex(Index, accessor.PandasDelegate):
                 if isinstance(other, CategoricalIndex):
                     other = other._values
                 elif isinstance(other, Index):
-                    other = self._create_categorical(other._values, dtype=self.dtype)
+                    other = self._create_categorical(
+                        other._values, dtype=self.dtype
+                    )
 
                 if isinstance(other, (ABCCategorical, np.ndarray, ABCSeries)):
                     if len(self.values) != len(other):

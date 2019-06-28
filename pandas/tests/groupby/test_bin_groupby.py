@@ -103,10 +103,14 @@ def test_group_ohlc():
                 return np.repeat(nan, 4)
             return [group[0], group.max(), group.min(), group[-1]]
 
-        expected = np.array([_ohlc(obj[:6]), _ohlc(obj[6:12]), _ohlc(obj[12:])])
+        expected = np.array(
+            [_ohlc(obj[:6]), _ohlc(obj[6:12]), _ohlc(obj[12:])]
+        )
 
         assert_almost_equal(out, expected)
-        tm.assert_numpy_array_equal(counts, np.array([6, 6, 8], dtype=np.int64))
+        tm.assert_numpy_array_equal(
+            counts, np.array([6, 6, 8], dtype=np.int64)
+        )
 
         obj[:6] = nan
         func(out, counts, obj[:, None], labels)
@@ -130,12 +134,16 @@ class TestReducer:
         expected = arr.sum(0)
         assert_almost_equal(result, expected)
 
-        result = reduction.reduce(arr, np.sum, axis=1, labels=Index(np.arange(100)))
+        result = reduction.reduce(
+            arr, np.sum, axis=1, labels=Index(np.arange(100))
+        )
         expected = arr.sum(1)
         assert_almost_equal(result, expected)
 
         dummy = Series(0.0, index=np.arange(100))
-        result = reduction.reduce(arr, np.sum, dummy=dummy, labels=Index(np.arange(4)))
+        result = reduction.reduce(
+            arr, np.sum, dummy=dummy, labels=Index(np.arange(4))
+        )
         expected = arr.sum(0)
         assert_almost_equal(result, expected)
 

@@ -11,7 +11,10 @@ class BaseGroupbyTests(BaseExtensionTests):
 
     def test_grouping_grouper(self, data_for_grouping):
         df = pd.DataFrame(
-            {"A": ["B", "B", None, None, "A", "A", "B", "C"], "B": data_for_grouping}
+            {
+                "A": ["B", "B", None, None, "A", "A", "B", "C"],
+                "B": data_for_grouping,
+            }
         )
         gr1 = df.groupby("A").grouper.groupings[0]
         gr2 = df.groupby("B").grouper.groupings[0]
@@ -21,7 +24,9 @@ class BaseGroupbyTests(BaseExtensionTests):
 
     @pytest.mark.parametrize("as_index", [True, False])
     def test_groupby_extension_agg(self, as_index, data_for_grouping):
-        df = pd.DataFrame({"A": [1, 1, 2, 2, 3, 3, 1, 4], "B": data_for_grouping})
+        df = pd.DataFrame(
+            {"A": [1, 1, 2, 2, 3, 3, 1, 4], "B": data_for_grouping}
+        )
         result = df.groupby("B", as_index=as_index).A.mean()
         _, index = pd.factorize(data_for_grouping, sort=True)
 
@@ -34,7 +39,9 @@ class BaseGroupbyTests(BaseExtensionTests):
             self.assert_frame_equal(result, expected)
 
     def test_groupby_extension_no_sort(self, data_for_grouping):
-        df = pd.DataFrame({"A": [1, 1, 2, 2, 3, 3, 1, 4], "B": data_for_grouping})
+        df = pd.DataFrame(
+            {"A": [1, 1, 2, 2, 3, 3, 1, 4], "B": data_for_grouping}
+        )
         result = df.groupby("B", sort=False).A.mean()
         _, index = pd.factorize(data_for_grouping, sort=False)
 
@@ -51,8 +58,12 @@ class BaseGroupbyTests(BaseExtensionTests):
 
         self.assert_series_equal(result, expected)
 
-    def test_groupby_extension_apply(self, data_for_grouping, groupby_apply_op):
-        df = pd.DataFrame({"A": [1, 1, 2, 2, 3, 3, 1, 4], "B": data_for_grouping})
+    def test_groupby_extension_apply(
+        self, data_for_grouping, groupby_apply_op
+    ):
+        df = pd.DataFrame(
+            {"A": [1, 1, 2, 2, 3, 3, 1, 4], "B": data_for_grouping}
+        )
         df.groupby("B").apply(groupby_apply_op)
         df.groupby("B").A.apply(groupby_apply_op)
         df.groupby("A").apply(groupby_apply_op)

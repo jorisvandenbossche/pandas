@@ -26,7 +26,12 @@ from pandas.core.dtypes.missing import notna
 import pandas.core.common as com
 from pandas.core.frame import DataFrame
 from pandas.core.generic import NDFrame, _shared_docs
-from pandas.core.index import Index, MultiIndex, _get_objs_combined_axis, ensure_index
+from pandas.core.index import (
+    Index,
+    MultiIndex,
+    _get_objs_combined_axis,
+    ensure_index,
+)
 import pandas.core.indexes.base as ibase
 from pandas.core.indexing import maybe_droplevels
 from pandas.core.internals import (
@@ -200,7 +205,8 @@ class Panel(NDFrame):
         if isinstance(data, BlockManager):
             if com._any_not_none(*passed_axes):
                 axes = [
-                    x if x is not None else y for x, y in zip(passed_axes, data.axes)
+                    x if x is not None else y
+                    for x, y in zip(passed_axes, data.axes)
                 ]
             mgr = data
         elif isinstance(data, dict):
@@ -215,7 +221,9 @@ class Panel(NDFrame):
             values = cast_scalar_to_array(
                 [len(x) for x in passed_axes], data, dtype=dtype
             )
-            mgr = self._init_matrix(values, passed_axes, dtype=values.dtype, copy=False)
+            mgr = self._init_matrix(
+                values, passed_axes, dtype=values.dtype, copy=False
+            )
             copy = False
         else:  # pragma: no cover
             raise ValueError("Panel constructor not properly called!")
@@ -361,9 +369,13 @@ class Panel(NDFrame):
 
     def _compare_constructor(self, other, func):
         if not self._indexed_same(other):
-            raise Exception("Can only compare identically-labeled " "same type objects")
+            raise Exception(
+                "Can only compare identically-labeled " "same type objects"
+            )
 
-        new_data = {col: func(self[col], other[col]) for col in self._info_axis}
+        new_data = {
+            col: func(self[col], other[col]) for col in self._info_axis
+        }
 
         d = self._construct_axes_dict(copy=False)
         return self._constructor(data=new_data, **d)
@@ -391,7 +403,9 @@ class Panel(NDFrame):
             v = getattr(self, a)
             if len(v) > 0:
                 return "{ax} axis: {x} to {y}".format(
-                    ax=a.capitalize(), x=pprint_thing(v[0]), y=pprint_thing(v[-1])
+                    ax=a.capitalize(),
+                    x=pprint_thing(v[0]),
+                    y=pprint_thing(v[-1]),
                 )
             else:
                 return "{ax} axis: None".format(ax=a.capitalize())
@@ -427,7 +441,9 @@ class Panel(NDFrame):
         (as compared with higher level planes),
         as we are returning a DataFrame axes.
         """
-        return [self._get_axis(axi) for axi in self._get_plane_axes_index(axis)]
+        return [
+            self._get_axis(axi) for axi in self._get_plane_axes_index(axis)
+        ]
 
     fromDict = from_dict
 
@@ -438,7 +454,9 @@ class Panel(NDFrame):
 
         Convert to SparsePanel.
         """
-        raise NotImplementedError("sparsifying is not supported " "for Panel objects")
+        raise NotImplementedError(
+            "sparsifying is not supported " "for Panel objects"
+        )
 
     def to_excel(self, path, na_rep="", engine=None, **kwargs):
         """
@@ -651,14 +669,17 @@ class Panel(NDFrame):
             if value.shape != shape[1:]:
                 raise ValueError(
                     "shape of value must be {0}, shape of given "
-                    "object was {1}".format(shape[1:], tuple(map(int, value.shape)))
+                    "object was {1}".format(
+                        shape[1:], tuple(map(int, value.shape))
+                    )
                 )
             mat = np.asarray(value)
         elif is_scalar(value):
             mat = cast_scalar_to_array(shape[1:], value)
         else:
             raise TypeError(
-                "Cannot set item of " "type: {dtype!s}".format(dtype=type(value))
+                "Cannot set item of "
+                "type: {dtype!s}".format(dtype=type(value))
             )
 
         mat = mat.reshape(tuple([1]) + shape[1:])
@@ -987,7 +1008,9 @@ class Panel(NDFrame):
             # size = N * K
             selector = slice(None, None)
 
-        data = {item: self[item].values.ravel()[selector] for item in self.items}
+        data = {
+            item: self[item].values.ravel()[selector] for item in self.items
+        }
 
         def construct_multi_parts(idx, n_repeat, n_shuffle=1):
             # Replicates and shuffles MultiIndex, returns individual attributes
@@ -1190,7 +1213,14 @@ class Panel(NDFrame):
         return self._construct_return_type(dict(results))
 
     def _reduce(
-        self, op, name, axis=0, skipna=True, numeric_only=None, filter_type=None, **kwds
+        self,
+        op,
+        name,
+        axis=0,
+        skipna=True,
+        numeric_only=None,
+        filter_type=None,
+        **kwds
     ):
         if numeric_only:
             raise NotImplementedError(
@@ -1285,7 +1315,9 @@ class Panel(NDFrame):
                 raise TypeError("Cannot specify both 'minor' and 'minor_axis'")
 
             kwargs["minor_axis"] = minor
-        axes = validate_axis_style_args(self, args, kwargs, "labels", "reindex")
+        axes = validate_axis_style_args(
+            self, args, kwargs, "labels", "reindex"
+        )
         kwargs.update(axes)
         kwargs.pop("axis", None)
         kwargs.pop("labels", None)
@@ -1299,8 +1331,12 @@ class Panel(NDFrame):
     @Substitution(**_shared_doc_kwargs)
     @Appender(NDFrame.rename.__doc__)
     def rename(self, items=None, major_axis=None, minor_axis=None, **kwargs):
-        major_axis = major_axis if major_axis is not None else kwargs.pop("major", None)
-        minor_axis = minor_axis if minor_axis is not None else kwargs.pop("minor", None)
+        major_axis = (
+            major_axis if major_axis is not None else kwargs.pop("major", None)
+        )
+        minor_axis = (
+            minor_axis if minor_axis is not None else kwargs.pop("minor", None)
+        )
         return super().rename(
             items=items, major_axis=major_axis, minor_axis=minor_axis, **kwargs
         )
@@ -1342,7 +1378,8 @@ class Panel(NDFrame):
 
         if "axes" in kwargs and axes:
             raise TypeError(
-                "transpose() got multiple values for " "keyword argument 'axes'"
+                "transpose() got multiple values for "
+                "keyword argument 'axes'"
             )
         elif not axes:
             axes = kwargs.pop("axes", ())
@@ -1460,7 +1497,9 @@ class Panel(NDFrame):
                 how = "outer"
                 join_axes = [self.major_axis, self.minor_axis]
             elif how == "right":
-                raise ValueError("Right join not supported with multiple " "panels")
+                raise ValueError(
+                    "Right join not supported with multiple " "panels"
+                )
             else:
                 join_axes = None
 
@@ -1478,7 +1517,12 @@ class Panel(NDFrame):
         mapping={False: "ignore", True: "raise"},
     )
     def update(
-        self, other, join="left", overwrite=True, filter_func=None, errors="ignore"
+        self,
+        other,
+        join="left",
+        overwrite=True,
+        filter_func=None,
+        errors="ignore",
     ):
         """
         Modify Panel in place using non-NA values from other Panel.
@@ -1545,7 +1589,8 @@ class Panel(NDFrame):
         Return a list of the axis indices.
         """
         return [
-            self._extract_axis(self, data, axis=i, **kwargs) for i, a in enumerate(axes)
+            self._extract_axis(self, data, axis=i, **kwargs)
+            for i, a in enumerate(axes)
         ]
 
     @staticmethod
@@ -1555,7 +1600,9 @@ class Panel(NDFrame):
         """
         return {
             self._AXIS_SLICEMAP[i]: a
-            for i, a in zip(self._AXIS_ORDERS[self._AXIS_LEN - len(axes) :], axes)
+            for i, a in zip(
+                self._AXIS_ORDERS[self._AXIS_LEN - len(axes) :], axes
+            )
         }
 
     @staticmethod
@@ -1608,7 +1655,10 @@ class Panel(NDFrame):
         axes_dict = {
             a: ax
             for a, ax in zip(
-                axes, self._extract_axes(self, adj_frames, axes, intersect=intersect)
+                axes,
+                self._extract_axes(
+                    self, adj_frames, axes, intersect=intersect
+                ),
             )
         }
 

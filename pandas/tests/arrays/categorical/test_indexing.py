@@ -14,10 +14,14 @@ class TestCategoricalIndexingWithFactor(TestCategorical):
         assert self.factor[-1] == "c"
 
         subf = self.factor[[0, 1, 2]]
-        tm.assert_numpy_array_equal(subf._codes, np.array([0, 1, 1], dtype=np.int8))
+        tm.assert_numpy_array_equal(
+            subf._codes, np.array([0, 1, 1], dtype=np.int8)
+        )
 
         subf = self.factor[np.asarray(self.factor) == "c"]
-        tm.assert_numpy_array_equal(subf._codes, np.array([2, 2, 2], dtype=np.int8))
+        tm.assert_numpy_array_equal(
+            subf._codes, np.array([2, 2, 2], dtype=np.int8)
+        )
 
     def test_setitem(self):
 
@@ -34,13 +38,18 @@ class TestCategoricalIndexingWithFactor(TestCategorical):
         indexer[0] = True
         indexer[-1] = True
         c[indexer] = "c"
-        expected = Categorical(["c", "b", "b", "a", "a", "c", "c", "c"], ordered=True)
+        expected = Categorical(
+            ["c", "b", "b", "a", "a", "c", "c", "c"], ordered=True
+        )
 
         tm.assert_categorical_equal(c, expected)
 
     @pytest.mark.parametrize(
         "other",
-        [pd.Categorical(["b", "a"]), pd.Categorical(["b", "a"], categories=["b", "a"])],
+        [
+            pd.Categorical(["b", "a"]),
+            pd.Categorical(["b", "a"], categories=["b", "a"]),
+        ],
     )
     def test_setitem_same_but_unordered(self, other):
         # GH-24142
@@ -71,12 +80,16 @@ class TestCategoricalIndexingWithFactor(TestCategorical):
         [
             pd.Categorical(["b", "a"]),
             pd.Categorical(["b", "a"], categories=["b", "a"], ordered=True),
-            pd.Categorical(["b", "a"], categories=["a", "b", "c"], ordered=True),
+            pd.Categorical(
+                ["b", "a"], categories=["a", "b", "c"], ordered=True
+            ),
         ],
     )
     def test_setitem_same_ordered_rasies(self, other):
         # Gh-24142
-        target = pd.Categorical(["a", "b"], categories=["a", "b"], ordered=True)
+        target = pd.Categorical(
+            ["a", "b"], categories=["a", "b"], ordered=True
+        )
         mask = np.array([True, False])
 
         with pytest.raises(ValueError):
@@ -96,7 +109,8 @@ class TestCategoricalIndexing:
 
     def test_periodindex(self):
         idx1 = PeriodIndex(
-            ["2014-01", "2014-01", "2014-02", "2014-02", "2014-03", "2014-03"], freq="M"
+            ["2014-01", "2014-01", "2014-02", "2014-02", "2014-03", "2014-03"],
+            freq="M",
         )
 
         cat1 = Categorical(idx1)
@@ -107,7 +121,8 @@ class TestCategoricalIndexing:
         tm.assert_index_equal(cat1.categories, exp_idx)
 
         idx2 = PeriodIndex(
-            ["2014-03", "2014-03", "2014-02", "2014-01", "2014-03", "2014-01"], freq="M"
+            ["2014-03", "2014-03", "2014-02", "2014-01", "2014-03", "2014-01"],
+            freq="M",
         )
         cat2 = Categorical(idx2, ordered=True)
         str(cat2)
@@ -182,17 +197,23 @@ class TestCategoricalIndexing:
     def test_where_unobserved_nan(self):
         ser = pd.Series(pd.Categorical(["a", "b"]))
         result = ser.where([True, False])
-        expected = pd.Series(pd.Categorical(["a", None], categories=["a", "b"]))
+        expected = pd.Series(
+            pd.Categorical(["a", None], categories=["a", "b"])
+        )
         tm.assert_series_equal(result, expected)
 
         # all NA
         ser = pd.Series(pd.Categorical(["a", "b"]))
         result = ser.where([False, False])
-        expected = pd.Series(pd.Categorical([None, None], categories=["a", "b"]))
+        expected = pd.Series(
+            pd.Categorical([None, None], categories=["a", "b"])
+        )
         tm.assert_series_equal(result, expected)
 
     def test_where_unobserved_categories(self):
-        ser = pd.Series(Categorical(["a", "b", "c"], categories=["d", "c", "b", "a"]))
+        ser = pd.Series(
+            Categorical(["a", "b", "c"], categories=["d", "c", "b", "a"])
+        )
         result = ser.where([True, True, False], other="b")
         expected = pd.Series(
             Categorical(["a", "b", "b"], categories=ser.cat.categories)
@@ -200,7 +221,9 @@ class TestCategoricalIndexing:
         tm.assert_series_equal(result, expected)
 
     def test_where_other_categorical(self):
-        ser = pd.Series(Categorical(["a", "b", "c"], categories=["d", "c", "b", "a"]))
+        ser = pd.Series(
+            Categorical(["a", "b", "c"], categories=["d", "c", "b", "a"])
+        )
         other = Categorical(["b", "c", "a"], categories=["a", "c", "b", "d"])
         result = ser.where([True, False, True], other)
         expected = pd.Series(Categorical(["a", "c", "c"], dtype=ser.dtype))
@@ -216,7 +239,9 @@ class TestCategoricalIndexing:
 
     def test_where_ordered_differs_rasies(self):
         ser = pd.Series(
-            Categorical(["a", "b", "c"], categories=["d", "c", "b", "a"], ordered=True)
+            Categorical(
+                ["a", "b", "c"], categories=["d", "c", "b", "a"], ordered=True
+            )
         )
         other = Categorical(
             ["b", "c", "a"], categories=["a", "c", "b", "d"], ordered=True

@@ -6,7 +6,11 @@ import struct
 import subprocess
 import sys
 
-from pandas.compat._optional import VERSIONS, _get_version, import_optional_dependency
+from pandas.compat._optional import (
+    VERSIONS,
+    _get_version,
+    import_optional_dependency,
+)
 
 
 def get_sys_info():
@@ -38,7 +42,14 @@ def get_sys_info():
     blob.append(("commit", commit))
 
     try:
-        (sysname, nodename, release, version, machine, processor) = platform.uname()
+        (
+            sysname,
+            nodename,
+            release,
+            version,
+            machine,
+            processor,
+        ) = platform.uname()
         blob.extend(
             [
                 ("python", ".".join(map(str, sys.version_info))),
@@ -139,7 +150,8 @@ def main():
         "--json",
         metavar="FILE",
         nargs=1,
-        help="Save output as JSON into file, pass in " "'-' to output to stdout",
+        help="Save output as JSON into file, pass in "
+        "'-' to output to stdout",
     )
 
     (options, args) = parser.parse_args()

@@ -34,7 +34,9 @@ def test_unpack_ext_type():
     check(b"\xd7\x42ABCDEFGH", ExtType(0x42, b"ABCDEFGH"))  # fixext 8
     check(b"\xd8\x42" + b"A" * 16, ExtType(0x42, b"A" * 16))  # fixext 16
     check(b"\xc7\x03\x42ABC", ExtType(0x42, b"ABC"))  # ext 8
-    check(b"\xc8\x01\x23\x42" + b"A" * 0x0123, ExtType(0x42, b"A" * 0x0123))  # ext 16
+    check(
+        b"\xc8\x01\x23\x42" + b"A" * 0x0123, ExtType(0x42, b"A" * 0x0123)
+    )  # ext 16
     check(
         b"\xc9\x00\x01\x23\x45\x42" + b"A" * 0x00012345,
         ExtType(0x42, b"A" * 0x00012345),

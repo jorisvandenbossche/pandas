@@ -284,7 +284,8 @@ class _Concatenator:
             self.intersect = True
         else:  # pragma: no cover
             raise ValueError(
-                "Only can inner (intersect) or outer (union) " "join the other axis"
+                "Only can inner (intersect) or outer (union) "
+                "join the other axis"
             )
 
         if isinstance(objs, dict):
@@ -321,7 +322,9 @@ class _Concatenator:
             if not isinstance(obj, (Series, DataFrame)):
                 msg = (
                     "cannot concatenate object of type '{}';"
-                    " only Series and DataFrame objs are valid".format(type(obj))
+                    " only Series and DataFrame objs are valid".format(
+                        type(obj)
+                    )
                 )
                 raise TypeError(msg)
 
@@ -344,7 +347,9 @@ class _Concatenator:
             # filter out the empties if we have not multi-index possibilities
             # note to keep empty Series as it affect to result columns / name
             non_empties = [
-                obj for obj in objs if sum(obj.shape) > 0 or isinstance(obj, Series)
+                obj
+                for obj in objs
+                if sum(obj.shape) > 0 or isinstance(obj, Series)
             ]
 
             if len(non_empties) and (
@@ -468,7 +473,10 @@ class _Concatenator:
                 mgrs_indexers.append((obj._data, indexers))
 
             new_data = concatenate_block_managers(
-                mgrs_indexers, self.new_axes, concat_axis=self.axis, copy=self.copy
+                mgrs_indexers,
+                self.new_axes,
+                concat_axis=self.axis,
+                copy=self.copy,
             )
             if not self.copy:
                 new_data._consolidate_inplace()
@@ -514,11 +522,16 @@ class _Concatenator:
         data_axis = self.objs[0]._get_block_manager_axis(i)
         try:
             return _get_objs_combined_axis(
-                self.objs, axis=data_axis, intersect=self.intersect, sort=self.sort
+                self.objs,
+                axis=data_axis,
+                intersect=self.intersect,
+                sort=self.sort,
             )
         except IndexError:
             types = [type(x).__name__ for x in self.objs]
-            raise TypeError("Cannot concatenate list of {types}".format(types=types))
+            raise TypeError(
+                "Cannot concatenate list of {types}".format(types=types)
+            )
 
     def _get_concat_axis(self):
         """
@@ -538,7 +551,9 @@ class _Concatenator:
                     if not isinstance(x, Series):
                         raise TypeError(
                             "Cannot concatenate type 'Series' "
-                            "with object of type {type!r}".format(type=type(x).__name__)
+                            "with object of type {type!r}".format(
+                                type=type(x).__name__
+                            )
                         )
                     if x.name is not None:
                         names[i] = x.name
@@ -653,7 +668,10 @@ def _make_concat_multiindex(indexes, keys, levels=None, names=None):
             names = names + _get_consensus_names(indexes)
 
         return MultiIndex(
-            levels=levels, codes=codes_list, names=names, verify_integrity=False
+            levels=levels,
+            codes=codes_list,
+            names=names,
+            verify_integrity=False,
         )
 
     new_index = indexes[0]
@@ -694,5 +712,8 @@ def _make_concat_multiindex(indexes, keys, levels=None, names=None):
         new_names.extend(new_index.names)
 
     return MultiIndex(
-        levels=new_levels, codes=new_codes, names=new_names, verify_integrity=False
+        levels=new_levels,
+        codes=new_codes,
+        names=new_names,
+        verify_integrity=False,
     )

@@ -42,7 +42,9 @@ def test_multiindex_get_loc():  # GH7724, GH2646
                     right.set_index(cols[:-1], inplace=True)
                     if len(right) == 1:  # single hit
                         right = Series(
-                            right["jolia"].values, name=right.index[0], index=["jolia"]
+                            right["jolia"].values,
+                            name=right.index[0],
+                            index=["jolia"],
                         )
                         tm.assert_series_equal(mi.loc[key[: i + 1]], right)
                     else:  # multi hit

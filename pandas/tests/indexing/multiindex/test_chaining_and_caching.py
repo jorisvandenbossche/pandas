@@ -13,7 +13,12 @@ def test_detect_chained_assignment():
     b = [123, None]
     c = [1234, 2345]
     d = [12345, 23456]
-    tuples = [("eyes", "left"), ("eyes", "right"), ("ears", "left"), ("ears", "right")]
+    tuples = [
+        ("eyes", "left"),
+        ("eyes", "right"),
+        ("ears", "left"),
+        ("ears", "right"),
+    ]
     events = {
         ("eyes", "left"): a,
         ("eyes", "right"): b,

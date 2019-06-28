@@ -92,7 +92,9 @@ def _ensure_data(values, dtype=None):
             return np.asarray(values).astype("uint64"), "bool", "uint64"
         elif is_signed_integer_dtype(values) or is_signed_integer_dtype(dtype):
             return ensure_int64(values), "int64", "int64"
-        elif is_unsigned_integer_dtype(values) or is_unsigned_integer_dtype(dtype):
+        elif is_unsigned_integer_dtype(values) or is_unsigned_integer_dtype(
+            dtype
+        ):
             return ensure_uint64(values), "uint64", "uint64"
         elif is_float_dtype(values) or is_float_dtype(dtype):
             return ensure_float64(values), "float64", "float64"
@@ -668,14 +670,21 @@ def factorize(values, sort=False, order=None, na_sentinel=-1, size_hint=None):
             na_value = None
 
         labels, uniques = _factorize_array(
-            values, na_sentinel=na_sentinel, size_hint=size_hint, na_value=na_value
+            values,
+            na_sentinel=na_sentinel,
+            size_hint=size_hint,
+            na_value=na_value,
         )
 
     if sort and len(uniques) > 0:
         from pandas.core.sorting import safe_sort
 
         uniques, labels = safe_sort(
-            uniques, labels, na_sentinel=na_sentinel, assume_unique=True, verify=False
+            uniques,
+            labels,
+            na_sentinel=na_sentinel,
+            assume_unique=True,
+            verify=False,
         )
 
     uniques = _reconstruct_data(uniques, dtype, original)
@@ -883,7 +892,14 @@ def mode(values, dropna=True):
     return Series(result)
 
 
-def rank(values, axis=0, method="average", na_option="keep", ascending=True, pct=False):
+def rank(
+    values,
+    axis=0,
+    method="average",
+    na_option="keep",
+    ascending=True,
+    pct=False,
+):
     """
     Rank the values along a given axis.
 
@@ -997,9 +1013,13 @@ def checked_add_with_arr(arr, b, arr_mask=None, b_mask=None):
         to_raise = ((np.iinfo(np.int64).max - b2 < arr) & not_nan).any()
     else:
         to_raise = (
-            ((np.iinfo(np.int64).max - b2[mask1] < arr[mask1]) & not_nan[mask1]).any()
+            (
+                (np.iinfo(np.int64).max - b2[mask1] < arr[mask1])
+                & not_nan[mask1]
+            ).any()
             or (
-                (np.iinfo(np.int64).min - b2[mask2] > arr[mask2]) & not_nan[mask2]
+                (np.iinfo(np.int64).min - b2[mask2] > arr[mask2])
+                & not_nan[mask2]
             ).any()
         )
 
@@ -1084,7 +1104,9 @@ def quantile(x, q, interpolation_method="fraction"):
             score = values[int(idx)]
         else:
             if interpolation_method == "fraction":
-                score = _interpolate(values[int(idx)], values[int(idx) + 1], idx % 1)
+                score = _interpolate(
+                    values[int(idx)], values[int(idx) + 1], idx % 1
+                )
             elif interpolation_method == "lower":
                 score = values[np.floor(idx)]
             elif interpolation_method == "higher":
@@ -1308,7 +1330,9 @@ class SelectNFrame(SelectN):
 
         ascending = method == "nsmallest"
 
-        return frame.sort_values(columns, ascending=ascending, kind="mergesort")
+        return frame.sort_values(
+            columns, ascending=ascending, kind="mergesort"
+        )
 
 
 # ------- ## ---- #
@@ -1394,8 +1418,12 @@ _take_1d_dict = {
     ("float32", "float64"): algos.take_1d_float32_float64,
     ("float64", "float64"): algos.take_1d_float64_float64,
     ("object", "object"): algos.take_1d_object_object,
-    ("bool", "bool"): _view_wrapper(algos.take_1d_bool_bool, np.uint8, np.uint8),
-    ("bool", "object"): _view_wrapper(algos.take_1d_bool_object, np.uint8, None),
+    ("bool", "bool"): _view_wrapper(
+        algos.take_1d_bool_bool, np.uint8, np.uint8
+    ),
+    ("bool", "object"): _view_wrapper(
+        algos.take_1d_bool_object, np.uint8, None
+    ),
     ("datetime64[ns]", "datetime64[ns]"): _view_wrapper(
         algos.take_1d_int64_int64, np.int64, np.int64, np.int64
     ),
@@ -1419,8 +1447,12 @@ _take_2d_axis0_dict = {
     ("float32", "float64"): algos.take_2d_axis0_float32_float64,
     ("float64", "float64"): algos.take_2d_axis0_float64_float64,
     ("object", "object"): algos.take_2d_axis0_object_object,
-    ("bool", "bool"): _view_wrapper(algos.take_2d_axis0_bool_bool, np.uint8, np.uint8),
-    ("bool", "object"): _view_wrapper(algos.take_2d_axis0_bool_object, np.uint8, None),
+    ("bool", "bool"): _view_wrapper(
+        algos.take_2d_axis0_bool_bool, np.uint8, np.uint8
+    ),
+    ("bool", "object"): _view_wrapper(
+        algos.take_2d_axis0_bool_object, np.uint8, None
+    ),
     ("datetime64[ns]", "datetime64[ns]"): _view_wrapper(
         algos.take_2d_axis0_int64_int64, np.int64, np.int64, fill_wrap=np.int64
     ),
@@ -1444,8 +1476,12 @@ _take_2d_axis1_dict = {
     ("float32", "float64"): algos.take_2d_axis1_float32_float64,
     ("float64", "float64"): algos.take_2d_axis1_float64_float64,
     ("object", "object"): algos.take_2d_axis1_object_object,
-    ("bool", "bool"): _view_wrapper(algos.take_2d_axis1_bool_bool, np.uint8, np.uint8),
-    ("bool", "object"): _view_wrapper(algos.take_2d_axis1_bool_object, np.uint8, None),
+    ("bool", "bool"): _view_wrapper(
+        algos.take_2d_axis1_bool_bool, np.uint8, np.uint8
+    ),
+    ("bool", "object"): _view_wrapper(
+        algos.take_2d_axis1_bool_object, np.uint8, None
+    ),
     ("datetime64[ns]", "datetime64[ns]"): _view_wrapper(
         algos.take_2d_axis1_int64_int64, np.int64, np.int64, fill_wrap=np.int64
     ),
@@ -1469,8 +1505,12 @@ _take_2d_multi_dict = {
     ("float32", "float64"): algos.take_2d_multi_float32_float64,
     ("float64", "float64"): algos.take_2d_multi_float64_float64,
     ("object", "object"): algos.take_2d_multi_object_object,
-    ("bool", "bool"): _view_wrapper(algos.take_2d_multi_bool_bool, np.uint8, np.uint8),
-    ("bool", "object"): _view_wrapper(algos.take_2d_multi_bool_object, np.uint8, None),
+    ("bool", "bool"): _view_wrapper(
+        algos.take_2d_multi_bool_bool, np.uint8, np.uint8
+    ),
+    ("bool", "object"): _view_wrapper(
+        algos.take_2d_multi_bool_object, np.uint8, None
+    ),
     ("datetime64[ns]", "datetime64[ns]"): _view_wrapper(
         algos.take_2d_multi_int64_int64, np.int64, np.int64, fill_wrap=np.int64
     ),
@@ -1505,7 +1545,12 @@ def _get_take_nd_function(ndim, arr_dtype, out_dtype, axis=0, mask_info=None):
     def func(arr, indexer, out, fill_value=np.nan):
         indexer = ensure_int64(indexer)
         _take_nd_object(
-            arr, indexer, out, axis=axis, fill_value=fill_value, mask_info=mask_info
+            arr,
+            indexer,
+            out,
+            axis=axis,
+            fill_value=fill_value,
+            mask_info=mask_info,
         )
 
     return func
@@ -1607,7 +1652,13 @@ def take(arr, indices, axis=0, allow_fill=False, fill_value=None):
 
 
 def take_nd(
-    arr, indexer, axis=0, out=None, fill_value=np.nan, mask_info=None, allow_fill=True
+    arr,
+    indexer,
+    axis=0,
+    out=None,
+    fill_value=np.nan,
+    mask_info=None,
+    allow_fill=True,
 ):
     """
     Specialized Cython take which sets NaN values in one pass
@@ -1876,7 +1927,9 @@ def searchsorted(arr, value, side="left", sorter=None):
         else:
             value = array(value, dtype=dtype)
     elif not (
-        is_object_dtype(arr) or is_numeric_dtype(arr) or is_categorical_dtype(arr)
+        is_object_dtype(arr)
+        or is_numeric_dtype(arr)
+        or is_categorical_dtype(arr)
     ):
         from pandas.core.series import Series
 

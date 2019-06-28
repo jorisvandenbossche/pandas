@@ -20,7 +20,12 @@ import pandas.core.computation as compu
 
 
 def _ensure_scope(
-    level, global_dict=None, local_dict=None, resolvers=(), target=None, **kwargs
+    level,
+    global_dict=None,
+    local_dict=None,
+    resolvers=(),
+    target=None,
+    **kwargs
 ):
     """Ensure that we are grabbing the correct scope."""
     return Scope(
@@ -108,7 +113,12 @@ class Scope(StringMixin):
     __slots__ = "level", "scope", "target", "temps"
 
     def __init__(
-        self, level, global_dict=None, local_dict=None, resolvers=(), target=None
+        self,
+        level,
+        global_dict=None,
+        local_dict=None,
+        resolvers=(),
+        target=None,
     ):
         self.level = level + 1
 
@@ -129,9 +139,13 @@ class Scope(StringMixin):
             # shallow copy here because we don't want to replace what's in
             # scope when we align terms (alignment accesses the underlying
             # numpy array of pandas objects)
-            self.scope = self.scope.new_child((global_dict or frame.f_globals).copy())
+            self.scope = self.scope.new_child(
+                (global_dict or frame.f_globals).copy()
+            )
             if not isinstance(local_dict, Scope):
-                self.scope = self.scope.new_child((local_dict or frame.f_locals).copy())
+                self.scope = self.scope.new_child(
+                    (local_dict or frame.f_locals).copy()
+                )
         finally:
             del frame
 
@@ -279,7 +293,9 @@ class Scope(StringMixin):
             The name of the temporary variable created.
         """
         name = "{name}_{num}_{hex_id}".format(
-            name=type(value).__name__, num=self.ntemps, hex_id=_raw_hex_id(self)
+            name=type(value).__name__,
+            num=self.ntemps,
+            hex_id=_raw_hex_id(self),
         )
 
         # add to inner most scope

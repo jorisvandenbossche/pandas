@@ -15,7 +15,9 @@ def dtype(request):
 
 @pytest.fixture
 def data(dtype):
-    data = DatetimeArray(pd.date_range("2000", periods=100, tz=dtype.tz), dtype=dtype)
+    data = DatetimeArray(
+        pd.date_range("2000", periods=100, tz=dtype.tz), dtype=dtype
+    )
     return data
 
 
@@ -31,14 +33,18 @@ def data_for_sorting(dtype):
     a = pd.Timestamp("2000-01-01")
     b = pd.Timestamp("2000-01-02")
     c = pd.Timestamp("2000-01-03")
-    return DatetimeArray(np.array([b, c, a], dtype="datetime64[ns]"), dtype=dtype)
+    return DatetimeArray(
+        np.array([b, c, a], dtype="datetime64[ns]"), dtype=dtype
+    )
 
 
 @pytest.fixture
 def data_missing_for_sorting(dtype):
     a = pd.Timestamp("2000-01-01")
     b = pd.Timestamp("2000-01-02")
-    return DatetimeArray(np.array([b, "NaT", a], dtype="datetime64[ns]"), dtype=dtype)
+    return DatetimeArray(
+        np.array([b, "NaT", a], dtype="datetime64[ns]"), dtype=dtype
+    )
 
 
 @pytest.fixture
@@ -53,7 +59,8 @@ def data_for_grouping(dtype):
     c = pd.Timestamp("2000-01-03")
     na = "NaT"
     return DatetimeArray(
-        np.array([b, b, na, na, a, a, b, c], dtype="datetime64[ns]"), dtype=dtype
+        np.array([b, b, na, na, a, a, b, c], dtype="datetime64[ns]"),
+        dtype=dtype,
     )
 
 
@@ -117,7 +124,9 @@ class TestArithmeticOps(BaseDatetimeTests, base.BaseArithmeticOpsTests):
             self.check_opname(s, all_arithmetic_operators, s.iloc[0], exc=None)
         else:
             # ... but not the rest.
-            super().test_arith_series_with_scalar(data, all_arithmetic_operators)
+            super().test_arith_series_with_scalar(
+                data, all_arithmetic_operators
+            )
 
     def test_add_series_with_extension_array(self, data):
         # Datetime + Datetime not implemented
@@ -132,7 +141,9 @@ class TestArithmeticOps(BaseDatetimeTests, base.BaseArithmeticOpsTests):
             self.check_opname(s, all_arithmetic_operators, s.iloc[0], exc=None)
         else:
             # ... but not the rest.
-            super().test_arith_series_with_scalar(data, all_arithmetic_operators)
+            super().test_arith_series_with_scalar(
+                data, all_arithmetic_operators
+            )
 
     def test_error(self, data, all_arithmetic_operators):
         pass
@@ -191,7 +202,9 @@ class TestReshaping(BaseDatetimeTests, base.BaseReshapingTests):
         data = DatetimeArray._from_sequence(
             ["2000", "2001", "2002", "2003"], tz="US/Central"
         )
-        index = pd.MultiIndex.from_product(([["A", "B"], ["a", "b"]]), names=["a", "b"])
+        index = pd.MultiIndex.from_product(
+            ([["A", "B"], ["a", "b"]]), names=["a", "b"]
+        )
 
         if obj == "series":
             ser = pd.Series(data, index=index)

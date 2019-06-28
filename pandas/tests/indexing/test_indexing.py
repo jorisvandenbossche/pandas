@@ -39,7 +39,9 @@ class TestFancy(Base):
 
         # invalid
         with pytest.raises(ValueError):
-            df.loc[df.index[2:5], "bar"] = np.array([2.33j, 1.23 + 0.1j, 2.2, 1.0])
+            df.loc[df.index[2:5], "bar"] = np.array(
+                [2.33j, 1.23 + 0.1j, 2.2, 1.0]
+            )
 
         # valid
         df.loc[df.index[2:6], "bar"] = np.array([2.33j, 1.23 + 0.1j, 2.2, 1.0])
@@ -65,7 +67,9 @@ class TestFancy(Base):
         "obj",
         [
             lambda i: Series(np.arange(len(i)), index=i),
-            lambda i: DataFrame(np.random.randn(len(i), len(i)), index=i, columns=i),
+            lambda i: DataFrame(
+                np.random.randn(len(i), len(i)), index=i, columns=i
+            ),
         ],
         ids=["Series", "DataFrame"],
     )
@@ -128,7 +132,9 @@ class TestFancy(Base):
         "obj",
         [
             lambda i: Series(np.arange(len(i)), index=i),
-            lambda i: DataFrame(np.random.randn(len(i), len(i)), index=i, columns=i),
+            lambda i: DataFrame(
+                np.random.randn(len(i), len(i)), index=i, columns=i
+            ),
         ],
         ids=["Series", "DataFrame"],
     )
@@ -179,13 +185,19 @@ class TestFancy(Base):
             )
             or (
                 idxr_id == "ix"
-                and index.inferred_type in ["string", "datetime64", "period", "boolean"]
+                and index.inferred_type
+                in ["string", "datetime64", "period", "boolean"]
             )
         ):
             idxr[nd3] = 0
         else:
             with pytest.raises(
-                (ValueError, AttributeError, TypeError, pd.core.indexing.IndexingError),
+                (
+                    ValueError,
+                    AttributeError,
+                    TypeError,
+                    pd.core.indexing.IndexingError,
+                ),
                 match=msg,
             ):
                 idxr[nd3] = 0
@@ -226,7 +238,9 @@ class TestFancy(Base):
         assert df["c"].dtype == np.float64
 
         df.loc[0, "c"] = "foo"
-        expected = DataFrame([{"a": 1, "c": "foo"}, {"a": 3, "b": 2, "c": np.nan}])
+        expected = DataFrame(
+            [{"a": 1, "c": "foo"}, {"a": 3, "b": 2, "c": np.nan}]
+        )
         tm.assert_frame_equal(df, expected)
 
         # GH10280
@@ -278,7 +292,9 @@ class TestFancy(Base):
         tm.assert_index_equal(result, expected)
 
         # across dtypes
-        df = DataFrame([[1, 2, 1.0, 2.0, 3.0, "foo", "bar"]], columns=list("aaaaaaa"))
+        df = DataFrame(
+            [[1, 2, 1.0, 2.0, 3.0, "foo", "bar"]], columns=list("aaaaaaa")
+        )
         df.head()
         str(df)
         result = DataFrame([[1, 2, 1.0, 2.0, 3.0, "foo", "bar"]])
@@ -292,12 +308,17 @@ class TestFancy(Base):
 
         # GH 3561, dups not in selected order
         df = DataFrame(
-            {"test": [5, 7, 9, 11], "test1": [4.0, 5, 6, 7], "other": list("abcd")},
+            {
+                "test": [5, 7, 9, 11],
+                "test1": [4.0, 5, 6, 7],
+                "other": list("abcd"),
+            },
             index=["A", "A", "B", "C"],
         )
         rows = ["C", "B"]
         expected = DataFrame(
-            {"test": [11, 9], "test1": [7.0, 6], "other": ["d", "c"]}, index=rows
+            {"test": [11, 9], "test1": [7.0, 6], "other": ["d", "c"]},
+            index=rows,
         )
         result = df.loc[rows]
         tm.assert_frame_equal(result, expected)
@@ -365,10 +386,15 @@ class TestFancy(Base):
     def test_dups_fancy_indexing2(self):
         # GH 5835
         # dups on index and missing values
-        df = DataFrame(np.random.randn(5, 5), columns=["A", "B", "B", "B", "A"])
+        df = DataFrame(
+            np.random.randn(5, 5), columns=["A", "B", "B", "B", "A"]
+        )
 
         expected = pd.concat(
-            [df.loc[:, ["A", "B"]], DataFrame(np.nan, columns=["C"], index=df.index)],
+            [
+                df.loc[:, ["A", "B"]],
+                DataFrame(np.nan, columns=["C"], index=df.index),
+            ],
             axis=1,
         )
         with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
@@ -377,7 +403,9 @@ class TestFancy(Base):
 
         # GH 6504, multi-axis indexing
         df = DataFrame(
-            np.random.randn(9, 2), index=[1, 1, 1, 2, 2, 2, 3, 3, 3], columns=["a", "b"]
+            np.random.randn(9, 2),
+            index=[1, 1, 1, 2, 2, 2, 3, 3, 3],
+            columns=["a", "b"],
         )
 
         expected = df.iloc[0:6]
@@ -404,7 +432,10 @@ class TestFancy(Base):
 
         # GH3492
         df = DataFrame(
-            {"a": {1: "aaa", 2: "bbb", 3: "ccc"}, "b": {1: 111, 2: 222, 3: 333}}
+            {
+                "a": {1: "aaa", 2: "bbb", 3: "ccc"},
+                "b": {1: 111, 2: 222, 3: 333},
+            }
         )
 
         # this works, new column is created correctly
@@ -422,7 +453,9 @@ class TestFancy(Base):
 
     def test_multitype_list_index_access(self):
         # GH 10610
-        df = DataFrame(np.random.random((10, 5)), columns=["a"] + [20, 21, 22, 23])
+        df = DataFrame(
+            np.random.random((10, 5)), columns=["a"] + [20, 21, 22, 23]
+        )
 
         with pytest.raises(KeyError):
             df[[22, 26, -8]]
@@ -926,7 +959,11 @@ class TestMisc(Base):
                 tm.assert_series_equal(s[l_slc], s.iloc[i_slc])
                 tm.assert_series_equal(s.loc[l_slc], s.iloc[i_slc])
 
-        for idx in [_mklbl("A", 20), np.arange(20) + 100, np.linspace(100, 150, 20)]:
+        for idx in [
+            _mklbl("A", 20),
+            np.arange(20) + 100,
+            np.linspace(100, 150, 20),
+        ]:
             idx = Index(idx)
             s = Series(np.arange(20), index=idx)
             assert_slices_equivalent(SLC[idx[9] :: -1], SLC[9::-1])
@@ -946,7 +983,9 @@ class TestMisc(Base):
                 s.ix[::0]
 
     def test_indexing_assignment_dict_already_exists(self):
-        df = DataFrame({"x": [1, 2, 6], "y": [2, 2, 8], "z": [-5, 0, 5]}).set_index("z")
+        df = DataFrame(
+            {"x": [1, 2, 6], "y": [2, 2, 8], "z": [-5, 0, 5]}
+        ).set_index("z")
         expected = df.copy()
         rhs = dict(x=9, y=99)
         df.loc[5] = rhs
@@ -1022,7 +1061,9 @@ class TestMisc(Base):
     def test_partial_boolean_frame_indexing(self):
         # GH 17170
         df = DataFrame(
-            np.arange(9.0).reshape(3, 3), index=list("abc"), columns=list("ABC")
+            np.arange(9.0).reshape(3, 3),
+            index=list("abc"),
+            columns=list("ABC"),
         )
         index_df = DataFrame(1, index=list("ab"), columns=list("AB"))
         result = df[index_df.notnull()]
@@ -1117,7 +1158,9 @@ class TestDataframeNoneCoercion:
     def test_coercion_with_setitem_and_dataframe(self):
         for start_data, expected_result in self.EXPECTED_SINGLE_ROW_RESULTS:
             start_dataframe = DataFrame({"foo": start_data})
-            start_dataframe[start_dataframe["foo"] == start_dataframe["foo"][0]] = None
+            start_dataframe[
+                start_dataframe["foo"] == start_dataframe["foo"][0]
+            ] = None
 
             expected_dataframe = DataFrame({"foo": expected_result})
             tm.assert_frame_equal(start_dataframe, expected_dataframe)
@@ -1137,7 +1180,11 @@ class TestDataframeNoneCoercion:
             {
                 "a": [1, 2, 3],
                 "b": [1.0, 2.0, 3.0],
-                "c": [datetime(2000, 1, 1), datetime(2000, 1, 2), datetime(2000, 1, 3)],
+                "c": [
+                    datetime(2000, 1, 1),
+                    datetime(2000, 1, 2),
+                    datetime(2000, 1, 3),
+                ],
                 "d": ["a", "b", "c"],
             }
         )
@@ -1213,7 +1260,11 @@ def test_extension_array_cross_section_converts():
 @pytest.mark.parametrize(
     "idxr, error, error_message",
     [
-        (lambda x: x, AttributeError, "'numpy.ndarray' object has no attribute 'get'"),
+        (
+            lambda x: x,
+            AttributeError,
+            "'numpy.ndarray' object has no attribute 'get'",
+        ),
         (
             lambda x: x.loc,
             AttributeError,

@@ -68,7 +68,20 @@ def test_groupby_aggregation_mixed_dtype():
         {
             "v1": [1, 3, 5, 7, 8, 3, 5, np.nan, 4, 5, 7, 9],
             "v2": [11, 33, 55, 77, 88, 33, 55, np.nan, 44, 55, 77, 99],
-            "by1": ["red", "blue", 1, 2, np.nan, "big", 1, 2, "red", 1, np.nan, 12],
+            "by1": [
+                "red",
+                "blue",
+                1,
+                2,
+                np.nan,
+                "big",
+                1,
+                2,
+                "red",
+                1,
+                np.nan,
+                12,
+            ],
             "by2": [
                 "wet",
                 "dry",
@@ -105,11 +118,15 @@ def test_agg_apply_corner(ts, tsframe):
     # DataFrame
     grouped = tsframe.groupby(tsframe["A"] * np.nan)
     exp_df = DataFrame(
-        columns=tsframe.columns, dtype=float, index=pd.Index([], dtype=np.float64)
+        columns=tsframe.columns,
+        dtype=float,
+        index=pd.Index([], dtype=np.float64),
     )
     tm.assert_frame_equal(grouped.sum(), exp_df, check_names=False)
     tm.assert_frame_equal(grouped.agg(np.sum), exp_df, check_names=False)
-    tm.assert_frame_equal(grouped.apply(np.sum), exp_df.iloc[:, :0], check_names=False)
+    tm.assert_frame_equal(
+        grouped.apply(np.sum), exp_df.iloc[:, :0], check_names=False
+    )
 
 
 def test_agg_grouping_is_list_tuple(ts):
@@ -139,7 +156,8 @@ def test_agg_python_multiindex(mframe):
 
 
 @pytest.mark.parametrize(
-    "groupbyfunc", [lambda x: x.weekday(), [lambda x: x.month, lambda x: x.weekday()]]
+    "groupbyfunc",
+    [lambda x: x.weekday(), [lambda x: x.month, lambda x: x.weekday()]],
 )
 def test_aggregate_str_func(tsframe, groupbyfunc):
     grouped = tsframe.groupby(groupbyfunc)
@@ -262,7 +280,9 @@ def test_more_flexible_frame_multi_function(df):
     tm.assert_frame_equal(result, expected)
 
     # be careful
-    result = grouped.aggregate(OrderedDict([["C", np.mean], ["D", [np.mean, np.std]]]))
+    result = grouped.aggregate(
+        OrderedDict([["C", np.mean], ["D", [np.mean, np.std]]])
+    )
     expected = grouped.aggregate(
         OrderedDict([["C", np.mean], ["D", [np.mean, np.std]]])
     )
@@ -277,7 +297,10 @@ def test_more_flexible_frame_multi_function(df):
     # this uses column selection & renaming
     with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
         d = OrderedDict(
-            [["C", np.mean], ["D", OrderedDict([["foo", np.mean], ["bar", np.std]])]]
+            [
+                ["C", np.mean],
+                ["D", OrderedDict([["foo", np.mean], ["bar", np.std]])],
+            ]
         )
         result = grouped.aggregate(d)
 
@@ -293,7 +316,10 @@ def test_multi_function_flexible_mix(df):
 
     # Expected
     d = OrderedDict(
-        [["C", OrderedDict([["foo", "mean"], ["bar", "std"]])], ["D", {"sum": "sum"}]]
+        [
+            ["C", OrderedDict([["foo", "mean"], ["bar", "std"]])],
+            ["D", {"sum": "sum"}],
+        ]
     )
     # this uses column selection & renaming
     with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
@@ -320,7 +346,9 @@ def test_multi_function_flexible_mix(df):
 
 def test_groupby_agg_coercing_bools():
     # issue 14873
-    dat = pd.DataFrame({"a": [1, 1, 2, 2], "b": [0, 1, 2, 3], "c": [None, None, 1, 1]})
+    dat = pd.DataFrame(
+        {"a": [1, 1, 2, 2], "b": [0, 1, 2, 3], "c": [None, None, 1, 1]}
+    )
     gp = dat.groupby("a")
 
     index = Index([1, 2], name="a")
@@ -347,7 +375,9 @@ def test_order_aggregate_multiple_funcs():
 
 
 @pytest.mark.parametrize("dtype", [np.int64, np.uint64])
-@pytest.mark.parametrize("how", ["first", "last", "min", "max", "mean", "median"])
+@pytest.mark.parametrize(
+    "how", ["first", "last", "min", "max", "mean", "median"]
+)
 def test_uint64_type_handling(dtype, how):
     # GH 26310
     df = pd.DataFrame({"x": 6903052872240755750, "y": [1, 2]})
@@ -395,9 +425,15 @@ class TestNamedAggregationSeries:
 class TestNamedAggregationDataFrame:
     def test_agg_relabel(self):
         df = pd.DataFrame(
-            {"group": ["a", "a", "b", "b"], "A": [0, 1, 2, 3], "B": [5, 6, 7, 8]}
+            {
+                "group": ["a", "a", "b", "b"],
+                "A": [0, 1, 2, 3],
+                "B": [5, 6, 7, 8],
+            }
         )
-        result = df.groupby("group").agg(a_max=("A", "max"), b_max=("B", "max"))
+        result = df.groupby("group").agg(
+            a_max=("A", "max"), b_max=("B", "max")
+        )
         expected = pd.DataFrame(
             {"a_max": [1, 3], "b_max": [6, 8]},
             index=pd.Index(["a", "b"], name="group"),
@@ -428,12 +464,18 @@ class TestNamedAggregationDataFrame:
             columns=["b_min", "a_min", "a_mean", "a_max", "b_max", "a_98"],
         )
         if not compat.PY36:
-            expected = expected[["a_98", "a_max", "a_mean", "a_min", "b_max", "b_min"]]
+            expected = expected[
+                ["a_98", "a_max", "a_mean", "a_min", "b_max", "b_min"]
+            ]
         tm.assert_frame_equal(result, expected)
 
     def test_agg_relabel_non_identifier(self):
         df = pd.DataFrame(
-            {"group": ["a", "a", "b", "b"], "A": [0, 1, 2, 3], "B": [5, 6, 7, 8]}
+            {
+                "group": ["a", "a", "b", "b"],
+                "A": [0, 1, 2, 3],
+                "B": [5, 6, 7, 8],
+            }
         )
 
         result = df.groupby("group").agg(**{"my col": ("A", "max")})
@@ -483,7 +525,8 @@ class TestNamedAggregationDataFrame:
     def test_agg_namedtuple(self):
         df = pd.DataFrame({"A": [0, 1], "B": [1, 2]})
         result = df.groupby("A").agg(
-            b=pd.NamedAgg("B", "sum"), c=pd.NamedAgg(column="B", aggfunc="count")
+            b=pd.NamedAgg("B", "sum"),
+            c=pd.NamedAgg(column="B", aggfunc="count"),
         )
         expected = df.groupby("A").agg(b=("B", "sum"), c=("B", "count"))
         tm.assert_frame_equal(result, expected)

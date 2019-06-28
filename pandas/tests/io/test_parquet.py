@@ -352,7 +352,9 @@ class TestBasic(Base):
     def test_multiindex_with_columns(self, pa):
         engine = pa
         dates = pd.date_range("01-Jan-2018", "01-Dec-2018", freq="MS")
-        df = pd.DataFrame(np.random.randn(2 * len(dates), 3), columns=list("ABC"))
+        df = pd.DataFrame(
+            np.random.randn(2 * len(dates), 3), columns=list("ABC")
+        )
         index1 = pd.MultiIndex.from_product(
             [["Level1", "Level2"], dates], names=["level", "date"]
         )
@@ -362,7 +364,10 @@ class TestBasic(Base):
 
             check_round_trip(df, engine)
             check_round_trip(
-                df, engine, read_kwargs={"columns": ["A", "B"]}, expected=df[["A", "B"]]
+                df,
+                engine,
+                read_kwargs={"columns": ["A", "B"]},
+                expected=df[["A", "B"]],
             )
 
     def test_write_ignoring_index(self, engine):
@@ -376,14 +381,18 @@ class TestBasic(Base):
         # have the default integer index.
         expected = df.reset_index(drop=True)
 
-        check_round_trip(df, engine, write_kwargs=write_kwargs, expected=expected)
+        check_round_trip(
+            df, engine, write_kwargs=write_kwargs, expected=expected
+        )
 
         # Ignore custom index
         df = pd.DataFrame(
             {"a": [1, 2, 3], "b": ["q", "r", "s"]}, index=["zyx", "wvu", "tsr"]
         )
 
-        check_round_trip(df, engine, write_kwargs=write_kwargs, expected=expected)
+        check_round_trip(
+            df, engine, write_kwargs=write_kwargs, expected=expected
+        )
 
         # Ignore multi-indexes as well.
         arrays = [
@@ -391,11 +400,14 @@ class TestBasic(Base):
             ["one", "two", "one", "two", "one", "two", "one", "two"],
         ]
         df = pd.DataFrame(
-            {"one": [i for i in range(8)], "two": [-i for i in range(8)]}, index=arrays
+            {"one": [i for i in range(8)], "two": [-i for i in range(8)]},
+            index=arrays,
         )
 
         expected = df.reset_index(drop=True)
-        check_round_trip(df, engine, write_kwargs=write_kwargs, expected=expected)
+        check_round_trip(
+            df, engine, write_kwargs=write_kwargs, expected=expected
+        )
 
 
 class TestParquetPyArrow(Base):
@@ -404,19 +416,25 @@ class TestParquetPyArrow(Base):
         df = df_full
 
         # additional supported types for pyarrow
-        df["datetime_tz"] = pd.date_range("20130101", periods=3, tz="Europe/Brussels")
+        df["datetime_tz"] = pd.date_range(
+            "20130101", periods=3, tz="Europe/Brussels"
+        )
         df["bool_with_none"] = [True, None, True]
 
         check_round_trip(df, pa)
 
     # TODO: This doesn't fail on all systems; track down which
-    @pytest.mark.xfail(reason="pyarrow fails on this (ARROW-1883)", strict=False)
+    @pytest.mark.xfail(
+        reason="pyarrow fails on this (ARROW-1883)", strict=False
+    )
     def test_basic_subset_columns(self, pa, df_full):
         # GH18628
 
         df = df_full
         # additional supported types for pyarrow
-        df["datetime_tz"] = pd.date_range("20130101", periods=3, tz="Europe/Brussels")
+        df["datetime_tz"] = pd.date_range(
+            "20130101", periods=3, tz="Europe/Brussels"
+        )
 
         check_round_trip(
             df,
@@ -427,7 +445,9 @@ class TestParquetPyArrow(Base):
 
     def test_duplicate_columns(self, pa):
         # not currently able to handle duplicate columns
-        df = pd.DataFrame(np.arange(12).reshape(4, 3), columns=list("aaa")).copy()
+        df = pd.DataFrame(
+            np.arange(12).reshape(4, 3), columns=list("aaa")
+        ).copy()
         self.check_error_on_write(df, pa, ValueError)
 
     def test_unsupported(self, pa):
@@ -458,14 +478,18 @@ class TestParquetPyArrow(Base):
 
     def test_s3_roundtrip(self, df_compat, s3_resource, pa):
         # GH #19134
-        check_round_trip(df_compat, pa, path="s3://pandas-test/pyarrow.parquet")
+        check_round_trip(
+            df_compat, pa, path="s3://pandas-test/pyarrow.parquet"
+        )
 
     def test_partition_cols_supported(self, pa, df_full):
         # GH #23283
         partition_cols = ["bool", "int"]
         df = df_full
         with tm.ensure_clean_dir() as path:
-            df.to_parquet(path, partition_cols=partition_cols, compression=None)
+            df.to_parquet(
+                path, partition_cols=partition_cols, compression=None
+            )
             import pyarrow.parquet as pq
 
             dataset = pq.ParquetDataset(path, validate_schema=False)
@@ -480,7 +504,9 @@ class TestParquetFastParquet(Base):
 
         # additional supported types for fastparquet
         if LooseVersion(fastparquet.__version__) >= LooseVersion("0.1.4"):
-            df["datetime_tz"] = pd.date_range("20130101", periods=3, tz="US/Eastern")
+            df["datetime_tz"] = pd.date_range(
+                "20130101", periods=3, tz="US/Eastern"
+            )
         df["timedelta"] = pd.timedelta_range("1 day", periods=3)
         check_round_trip(df, fp)
 
@@ -488,7 +514,9 @@ class TestParquetFastParquet(Base):
     def test_duplicate_columns(self, fp):
 
         # not currently able to handle duplicate columns
-        df = pd.DataFrame(np.arange(12).reshape(4, 3), columns=list("aaa")).copy()
+        df = pd.DataFrame(
+            np.arange(12).reshape(4, 3), columns=list("aaa")
+        ).copy()
         self.check_error_on_write(df, fp, ValueError)
 
     def test_bool_with_none(self, fp):
@@ -522,7 +550,9 @@ class TestParquetFastParquet(Base):
 
     def test_s3_roundtrip(self, df_compat, s3_resource, fp):
         # GH #19134
-        check_round_trip(df_compat, fp, path="s3://pandas-test/fastparquet.parquet")
+        check_round_trip(
+            df_compat, fp, path="s3://pandas-test/fastparquet.parquet"
+        )
 
     def test_partition_cols_supported(self, fp, df_full):
         # GH #23283

@@ -52,7 +52,9 @@ class TestTimedeltaIndexing:
 
     def test_string_indexing(self):
         # GH 16896
-        df = pd.DataFrame({"x": range(3)}, index=pd.to_timedelta(range(3), unit="days"))
+        df = pd.DataFrame(
+            {"x": range(3)}, index=pd.to_timedelta(range(3), unit="days")
+        )
         expected = df.iloc[0]
         sliced = df.loc["0 days"]
         tm.assert_series_equal(sliced, expected)
@@ -81,7 +83,9 @@ class TestTimedeltaIndexing:
             [None, np.timedelta64(4, "D"), slice(0, 5)],
         ],
     )
-    def test_numpy_timedelta_scalar_indexing(self, start, stop, expected_slice):
+    def test_numpy_timedelta_scalar_indexing(
+        self, start, stop, expected_slice
+    ):
         # GH 20393
         s = pd.Series(range(11), pd.timedelta_range("0 days", "10 days"))
         result = s.loc[slice(start, stop)]

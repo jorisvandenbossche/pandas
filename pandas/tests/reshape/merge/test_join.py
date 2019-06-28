@@ -54,8 +54,12 @@ class TestJoin:
         exp_ls = left.argsort(kind="mergesort")
         exp_rs = right.argsort(kind="mergesort")
 
-        exp_li = a_([0, 1, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 7, 7, 8, 8, 9, 10])
-        exp_ri = a_([0, 0, 0, 1, 2, 3, 1, 2, 3, 1, 2, 3, 4, 5, 4, 5, 4, 5, -1, -1])
+        exp_li = a_(
+            [0, 1, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 7, 7, 8, 8, 9, 10]
+        )
+        exp_ri = a_(
+            [0, 0, 0, 1, 2, 3, 1, 2, 3, 1, 2, 3, 4, 5, 4, 5, 4, 5, -1, -1]
+        )
 
         exp_ls = exp_ls.take(exp_li)
         exp_ls[exp_li == -1] = -1
@@ -139,28 +143,36 @@ class TestJoin:
         _check_join(self.df, self.df2, joined_key2, ["key2"], how="left")
 
         joined_both = merge(self.df, self.df2)
-        _check_join(self.df, self.df2, joined_both, ["key1", "key2"], how="left")
+        _check_join(
+            self.df, self.df2, joined_both, ["key1", "key2"], how="left"
+        )
 
     def test_right_outer_join(self):
         joined_key2 = merge(self.df, self.df2, on="key2", how="right")
         _check_join(self.df, self.df2, joined_key2, ["key2"], how="right")
 
         joined_both = merge(self.df, self.df2, how="right")
-        _check_join(self.df, self.df2, joined_both, ["key1", "key2"], how="right")
+        _check_join(
+            self.df, self.df2, joined_both, ["key1", "key2"], how="right"
+        )
 
     def test_full_outer_join(self):
         joined_key2 = merge(self.df, self.df2, on="key2", how="outer")
         _check_join(self.df, self.df2, joined_key2, ["key2"], how="outer")
 
         joined_both = merge(self.df, self.df2, how="outer")
-        _check_join(self.df, self.df2, joined_both, ["key1", "key2"], how="outer")
+        _check_join(
+            self.df, self.df2, joined_both, ["key1", "key2"], how="outer"
+        )
 
     def test_inner_join(self):
         joined_key2 = merge(self.df, self.df2, on="key2", how="inner")
         _check_join(self.df, self.df2, joined_key2, ["key2"], how="inner")
 
         joined_both = merge(self.df, self.df2, how="inner")
-        _check_join(self.df, self.df2, joined_both, ["key1", "key2"], how="inner")
+        _check_join(
+            self.df, self.df2, joined_both, ["key1", "key2"], how="inner"
+        )
 
     def test_handle_overlap(self):
         joined = merge(self.df, self.df2, on="key2", suffixes=[".foo", ".bar"])
@@ -184,8 +196,12 @@ class TestJoin:
         source = self.source
 
         merged = target.join(source, on="C")
-        tm.assert_series_equal(merged["MergedA"], target["A"], check_names=False)
-        tm.assert_series_equal(merged["MergedD"], target["D"], check_names=False)
+        tm.assert_series_equal(
+            merged["MergedA"], target["A"], check_names=False
+        )
+        tm.assert_series_equal(
+            merged["MergedD"], target["D"], check_names=False
+        )
 
         # join with duplicates (fix regression from DataFrame/Matrix merge)
         df = DataFrame({"key": ["a", "a", "b", "b", "c"]})
@@ -197,7 +213,9 @@ class TestJoin:
         assert_frame_equal(joined, expected)
 
         # Test when some are missing
-        df_a = DataFrame([[1], [2], [3]], index=["a", "b", "c"], columns=["one"])
+        df_a = DataFrame(
+            [[1], [2], [3]], index=["a", "b", "c"], columns=["one"]
+        )
         df_b = DataFrame([["foo"], ["bar"]], index=[1, 2], columns=["two"])
         df_c = DataFrame([[1], [2]], index=[1, 2], columns=["three"])
         joined = df_a.join(df_b, on="one")
@@ -221,38 +239,58 @@ class TestJoin:
 
     def test_join_on_fails_with_different_right_index(self):
         df = DataFrame(
-            {"a": np.random.choice(["m", "f"], size=3), "b": np.random.randn(3)}
+            {
+                "a": np.random.choice(["m", "f"], size=3),
+                "b": np.random.randn(3),
+            }
         )
         df2 = DataFrame(
-            {"a": np.random.choice(["m", "f"], size=10), "b": np.random.randn(10)},
+            {
+                "a": np.random.choice(["m", "f"], size=10),
+                "b": np.random.randn(10),
+            },
             index=tm.makeCustomIndex(10, 2),
         )
         msg = (
-            r"len\(left_on\) must equal the number of levels in the index" ' of "right"'
+            r"len\(left_on\) must equal the number of levels in the index"
+            ' of "right"'
         )
         with pytest.raises(ValueError, match=msg):
             merge(df, df2, left_on="a", right_index=True)
 
     def test_join_on_fails_with_different_left_index(self):
         df = DataFrame(
-            {"a": np.random.choice(["m", "f"], size=3), "b": np.random.randn(3)},
+            {
+                "a": np.random.choice(["m", "f"], size=3),
+                "b": np.random.randn(3),
+            },
             index=tm.makeCustomIndex(3, 2),
         )
         df2 = DataFrame(
-            {"a": np.random.choice(["m", "f"], size=10), "b": np.random.randn(10)}
+            {
+                "a": np.random.choice(["m", "f"], size=10),
+                "b": np.random.randn(10),
+            }
         )
         msg = (
-            r"len\(right_on\) must equal the number of levels in the index" ' of "left"'
+            r"len\(right_on\) must equal the number of levels in the index"
+            ' of "left"'
         )
         with pytest.raises(ValueError, match=msg):
             merge(df, df2, right_on="b", left_index=True)
 
     def test_join_on_fails_with_different_column_counts(self):
         df = DataFrame(
-            {"a": np.random.choice(["m", "f"], size=3), "b": np.random.randn(3)}
+            {
+                "a": np.random.choice(["m", "f"], size=3),
+                "b": np.random.randn(3),
+            }
         )
         df2 = DataFrame(
-            {"a": np.random.choice(["m", "f"], size=10), "b": np.random.randn(10)},
+            {
+                "a": np.random.choice(["m", "f"], size=10),
+                "b": np.random.randn(10),
+            },
             index=tm.makeCustomIndex(10, 2),
         )
         msg = r"len\(right_on\) must equal len\(left_on\)"
@@ -290,7 +328,9 @@ class TestJoin:
             assert col in merged
             assert merged[col].isna().all()
 
-        merged2 = self.target.join(self.source.reindex([]), on="C", how="inner")
+        merged2 = self.target.join(
+            self.source.reindex([]), on="C", how="inner"
+        )
         tm.assert_index_equal(merged2.columns, merged.columns)
         assert len(merged2) == 0
 
@@ -302,8 +342,12 @@ class TestJoin:
 
         expected = df.join(df2, on="key")
         expected = expected[expected["value"].notna()]
-        tm.assert_series_equal(joined["key"], expected["key"], check_dtype=False)
-        tm.assert_series_equal(joined["value"], expected["value"], check_dtype=False)
+        tm.assert_series_equal(
+            joined["key"], expected["key"], check_dtype=False
+        )
+        tm.assert_series_equal(
+            joined["value"], expected["value"], check_dtype=False
+        )
         tm.assert_index_equal(joined.index, expected.index)
 
     def test_join_on_singlekey_list(self):
@@ -406,8 +450,12 @@ class TestJoin:
             names=["first", "second"],
         )
 
-        df1 = DataFrame(data=np.random.randn(6), index=index1, columns=["var X"])
-        df2 = DataFrame(data=np.random.randn(6), index=index2, columns=["var Y"])
+        df1 = DataFrame(
+            data=np.random.randn(6), index=index1, columns=["var X"]
+        )
+        df2 = DataFrame(
+            data=np.random.randn(6), index=index2, columns=["var Y"]
+        )
 
         df1 = df1.sort_index(level=0)
         df2 = df2.sort_index(level=0)
@@ -431,7 +479,18 @@ class TestJoin:
         assert joined.index.names == index1.names
 
     def test_join_inner_multiindex(self):
-        key1 = ["bar", "bar", "bar", "foo", "foo", "baz", "baz", "qux", "qux", "snap"]
+        key1 = [
+            "bar",
+            "bar",
+            "bar",
+            "foo",
+            "foo",
+            "baz",
+            "baz",
+            "qux",
+            "qux",
+            "snap",
+        ]
         key2 = [
             "two",
             "one",
@@ -450,11 +509,16 @@ class TestJoin:
 
         index = MultiIndex(
             levels=[["foo", "bar", "baz", "qux"], ["one", "two", "three"]],
-            codes=[[0, 0, 0, 1, 1, 2, 2, 3, 3, 3], [0, 1, 2, 0, 1, 1, 2, 0, 1, 2]],
+            codes=[
+                [0, 0, 0, 1, 1, 2, 2, 3, 3, 3],
+                [0, 1, 2, 0, 1, 1, 2, 0, 1, 2],
+            ],
             names=["first", "second"],
         )
         to_join = DataFrame(
-            np.random.randn(10, 3), index=index, columns=["j_one", "j_two", "j_three"]
+            np.random.randn(10, 3),
+            index=index,
+            columns=["j_one", "j_two", "j_three"],
         )
 
         joined = data.join(to_join, on=["key1", "key2"], how="inner")
@@ -551,7 +615,9 @@ class TestJoin:
 
         df1 = DataFrame({"a": [1, 1, 1], "b": [1, 1, 1], "c": [10, 20, 30]})
         df2 = DataFrame({"a": [1, 1, 1], "b": [1, 1, 2], "d": [100, 200, 300]})
-        df3 = DataFrame({"a": [1, 1, 1], "b": [1, 1, 2], "e": [1000, 2000, 3000]})
+        df3 = DataFrame(
+            {"a": [1, 1, 1], "b": [1, 1, 2], "e": [1000, 2000, 3000]}
+        )
         idf1 = df1.set_index(["a", "b"])
         idf2 = df2.set_index(["a", "b"])
         idf3 = df3.set_index(["a", "b"])
@@ -568,13 +634,24 @@ class TestJoin:
         df = DataFrame(
             {
                 "A": ["foo", "bar", "foo", "bar", "foo", "bar", "foo", "foo"],
-                "B": ["one", "one", "two", "three", "two", "two", "one", "three"],
+                "B": [
+                    "one",
+                    "one",
+                    "two",
+                    "three",
+                    "two",
+                    "two",
+                    "one",
+                    "three",
+                ],
                 "C": np.random.randn(8),
                 "D": np.random.randn(8),
             }
         )
         s = Series(
-            np.repeat(np.arange(8), 2), index=np.repeat(np.arange(8), 2), name="TEST"
+            np.repeat(np.arange(8), 2),
+            index=np.repeat(np.arange(8), 2),
+            name="TEST",
         )
         inner = df.join(s, how="inner")
         outer = df.join(s, how="outer")
@@ -585,8 +662,12 @@ class TestJoin:
         assert_frame_equal(inner, right)
 
     def test_join_sort(self):
-        left = DataFrame({"key": ["foo", "bar", "baz", "foo"], "value": [1, 2, 3, 4]})
-        right = DataFrame({"value2": ["a", "b", "c"]}, index=["bar", "baz", "foo"])
+        left = DataFrame(
+            {"key": ["foo", "bar", "baz", "foo"], "value": [1, 2, 3, 4]}
+        )
+        right = DataFrame(
+            {"value2": ["a", "b", "c"]}, index=["bar", "baz", "foo"]
+        )
 
         joined = left.join(right, on="key", sort=True)
         expected = DataFrame(
@@ -625,7 +706,9 @@ class TestJoin:
     def test_join_non_unique_period_index(self):
         # GH #16871
         index = pd.period_range("2016-01-01", periods=16, freq="M")
-        df = DataFrame([i for i in range(len(index))], index=index, columns=["pnum"])
+        df = DataFrame(
+            [i for i in range(len(index))], index=index, columns=["pnum"]
+        )
         df2 = concat([df, df])
         result = df.join(df2, how="inner", rsuffix="_df2")
         expected = DataFrame(
@@ -637,7 +720,9 @@ class TestJoin:
 
     def test_mixed_type_join_with_suffix(self):
         # GH #916
-        df = DataFrame(np.random.randn(20, 6), columns=["a", "b", "c", "d", "e", "f"])
+        df = DataFrame(
+            np.random.randn(20, 6), columns=["a", "b", "c", "d", "e", "f"]
+        )
         df.insert(0, "id", 0)
         df.insert(5, "dt", "foo")
 
@@ -655,7 +740,11 @@ class TestJoin:
         joined = df_list[0].join(df_list[1:])
         tm.assert_frame_equal(joined, df)
 
-        df_list = [df[["a", "b"]][:-2], df[["c", "d"]][2:], df[["e", "f"]][1:9]]
+        df_list = [
+            df[["a", "b"]][:-2],
+            df[["c", "d"]][2:],
+            df[["e", "f"]][1:9],
+        ]
 
         def _check_diff_index(df_list, result, exp_index):
             reindexed = [x.reindex(exp_index) for x in df_list]
@@ -691,9 +780,12 @@ class TestJoin:
         # joining dups
         df = concat(
             [
-                DataFrame(np.random.randn(10, 4), columns=["A", "A", "B", "B"]),
                 DataFrame(
-                    np.random.randint(0, 10, size=20).reshape(10, 2), columns=["A", "C"]
+                    np.random.randn(10, 4), columns=["A", "A", "B", "B"]
+                ),
+                DataFrame(
+                    np.random.randint(0, 10, size=20).reshape(10, 2),
+                    columns=["A", "C"],
                 ),
             ],
             axis=1,
@@ -715,7 +807,16 @@ class TestJoin:
         )
         dta = dta.merge(w, left_index=True, right_index=True)
         expected = concat([x, y, z, w], axis=1)
-        expected.columns = ["x_x", "y_x", "x_y", "y_y", "x_x", "y_x", "x_y", "y_y"]
+        expected.columns = [
+            "x_x",
+            "y_x",
+            "x_y",
+            "y_y",
+            "x_x",
+            "y_x",
+            "x_y",
+            "y_y",
+        ]
         assert_frame_equal(dta, expected)
 
     def test_join_multi_to_multi(self, join_type):
@@ -728,7 +829,9 @@ class TestJoin:
         rightindex = MultiIndex.from_product(
             [list("abc"), list("xy")], names=["abc", "xy"]
         )
-        right = DataFrame({"v2": [100 * i for i in range(1, 7)]}, index=rightindex)
+        right = DataFrame(
+            {"v2": [100 * i for i in range(1, 7)]}, index=rightindex
+        )
 
         result = left.join(right, on=["abc", "xy"], how=join_type)
         expected = (
@@ -739,7 +842,8 @@ class TestJoin:
         assert_frame_equal(expected, result)
 
         msg = (
-            r"len\(left_on\) must equal the number of levels in the index" ' of "right"'
+            r"len\(left_on\) must equal the number of levels in the index"
+            ' of "right"'
         )
         with pytest.raises(ValueError, match=msg):
             left.join(right, on="xy", how=join_type)
@@ -768,11 +872,15 @@ class TestJoin:
         )
         result = df1.join(df2.set_index("date"), on="date")
         expected = df1.copy()
-        expected["vals_2"] = pd.Series([np.nan] * 2 + list("tuv"), dtype=object)
+        expected["vals_2"] = pd.Series(
+            [np.nan] * 2 + list("tuv"), dtype=object
+        )
         assert_frame_equal(result, expected)
 
 
-def _check_join(left, right, result, join_col, how="left", lsuffix="_x", rsuffix="_y"):
+def _check_join(
+    left, right, result, join_col, how="left", lsuffix="_x", rsuffix="_y"
+):
 
     # some smoke tests
     for c in join_col:
@@ -812,7 +920,9 @@ def _check_join(left, right, result, join_col, how="left", lsuffix="_x", rsuffix
 
 def _restrict_to_columns(group, columns, suffix):
     found = [
-        c for c in group.columns if c in columns or c.replace(suffix, "") in columns
+        c
+        for c in group.columns
+        if c in columns or c.replace(suffix, "") in columns
     ]
 
     # filter

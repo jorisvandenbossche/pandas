@@ -14,7 +14,9 @@ class TestVectorizedTimedelta:
     def test_tdi_total_seconds(self):
         # GH#10939
         # test index
-        rng = timedelta_range("1 days, 10:11:12.100123456", periods=2, freq="s")
+        rng = timedelta_range(
+            "1 days, 10:11:12.100123456", periods=2, freq="s"
+        )
         expt = [
             1 * 86400 + 10 * 3600 + 11 * 60 + 12 + 100123456.0 / 1e9,
             1 * 86400 + 10 * 3600 + 11 * 60 + 13 + 100123456.0 / 1e9,

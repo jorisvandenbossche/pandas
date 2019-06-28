@@ -23,7 +23,8 @@ def test_duplicated_do_not_fail_on_wide_dataframes():
     # Given the wide dataframe with a lot of columns
     # with different (important!) values
     data = {
-        "col_{0:02d}".format(i): np.random.randint(0, 1000, 30000) for i in range(100)
+        "col_{0:02d}".format(i): np.random.randint(0, 1000, 30000)
+        for i in range(100)
     }
     df = DataFrame(data).T
     result = df.duplicated()
@@ -247,7 +248,16 @@ def test_drop_duplicates_for_take_all():
 def test_drop_duplicates_tuple():
     df = DataFrame(
         {
-            ("AA", "AB"): ["foo", "bar", "foo", "bar", "foo", "bar", "bar", "foo"],
+            ("AA", "AB"): [
+                "foo",
+                "bar",
+                "foo",
+                "bar",
+                "foo",
+                "bar",
+                "bar",
+                "foo",
+            ],
             "B": ["one", "one", "two", "two", "two", "two", "one", "two"],
             "C": [1, 1, 2, 2, 2, 2, 1, 2],
             "D": range(8),

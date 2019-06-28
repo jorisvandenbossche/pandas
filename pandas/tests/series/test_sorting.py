@@ -72,7 +72,9 @@ class TestSeriesSorting(TestData):
         ts = self.ts.copy()
         ts.sort_values(ascending=False, inplace=True)
         tm.assert_series_equal(ts, self.ts.sort_values(ascending=False))
-        tm.assert_index_equal(ts.index, self.ts.sort_values(ascending=False).index)
+        tm.assert_index_equal(
+            ts.index, self.ts.sort_values(ascending=False).index
+        )
 
         # GH 5856/5853
         # Series.sort_values operating on a view
@@ -96,7 +98,9 @@ class TestSeriesSorting(TestData):
 
         # descending
         sorted_series = random_order.sort_index(ascending=False)
-        assert_series_equal(sorted_series, self.ts.reindex(self.ts.index[::-1]))
+        assert_series_equal(
+            sorted_series, self.ts.reindex(self.ts.index[::-1])
+        )
 
         # compat on level
         sorted_series = random_order.sort_index(level=0)
@@ -106,7 +110,10 @@ class TestSeriesSorting(TestData):
         sorted_series = random_order.sort_index(axis=0)
         assert_series_equal(sorted_series, self.ts)
 
-        msg = "No axis named 1 for object type" " <class 'pandas.core.series.Series'>"
+        msg = (
+            "No axis named 1 for object type"
+            " <class 'pandas.core.series.Series'>"
+        )
         with pytest.raises(ValueError, match=msg):
             random_order.sort_values(axis=1)
 
@@ -127,7 +134,9 @@ class TestSeriesSorting(TestData):
         result = random_order.sort_index(ascending=False, inplace=True)
 
         assert result is None
-        tm.assert_series_equal(random_order, self.ts.reindex(self.ts.index[::-1]))
+        tm.assert_series_equal(
+            random_order, self.ts.reindex(self.ts.index[::-1])
+        )
 
         # ascending
         random_order = self.ts.reindex(rindex)
@@ -179,7 +188,8 @@ class TestSeriesSorting(TestData):
 
     def test_sort_index_intervals(self):
         s = Series(
-            [np.nan, 1, 2, 3], IntervalIndex.from_arrays([0, 1, 2, 3], [1, 2, 3, 4])
+            [np.nan, 1, 2, 3],
+            IntervalIndex.from_arrays([0, 1, 2, 3], [1, 2, 3, 4]),
         )
 
         result = s.sort_index()
@@ -188,7 +198,8 @@ class TestSeriesSorting(TestData):
 
         result = s.sort_index(ascending=False)
         expected = Series(
-            [3, 2, 1, np.nan], IntervalIndex.from_arrays([3, 2, 1, 0], [4, 3, 2, 1])
+            [3, 2, 1, np.nan],
+            IntervalIndex.from_arrays([3, 2, 1, 0], [4, 3, 2, 1]),
         )
         assert_series_equal(result, expected)
 
@@ -199,7 +210,8 @@ class TestSeriesSorting(TestData):
 
         # sort in the categories order
         expected = Series(
-            Categorical(["a", "a", "b", "b"], ordered=False), index=[0, 3, 1, 2]
+            Categorical(["a", "a", "b", "b"], ordered=False),
+            index=[0, 3, 1, 2],
         )
         result = cat.sort_values()
         tm.assert_series_equal(result, expected)
@@ -211,7 +223,9 @@ class TestSeriesSorting(TestData):
 
         cat = Series(
             Categorical(
-                ["a", "c", "b", "d"], categories=["a", "b", "c", "d"], ordered=True
+                ["a", "c", "b", "d"],
+                categories=["a", "b", "c", "d"],
+                ordered=True,
             )
         )
         res = cat.sort_values()
@@ -223,14 +237,21 @@ class TestSeriesSorting(TestData):
         tm.assert_numpy_array_equal(res.__array__(), exp)
 
         raw_cat1 = Categorical(
-            ["a", "b", "c", "d"], categories=["a", "b", "c", "d"], ordered=False
+            ["a", "b", "c", "d"],
+            categories=["a", "b", "c", "d"],
+            ordered=False,
         )
         raw_cat2 = Categorical(
             ["a", "b", "c", "d"], categories=["d", "c", "b", "a"], ordered=True
         )
         s = ["a", "b", "c", "d"]
         df = DataFrame(
-            {"unsort": raw_cat1, "sort": raw_cat2, "string": s, "values": [1, 2, 3, 4]}
+            {
+                "unsort": raw_cat1,
+                "sort": raw_cat2,
+                "string": s,
+                "values": [1, 2, 3, 4],
+            }
         )
 
         # Cats must be sorted in a dataframe
@@ -251,7 +272,10 @@ class TestSeriesSorting(TestData):
         # multi-columns sort
         # GH 7848
         df = DataFrame(
-            {"id": [6, 5, 4, 3, 2, 1], "raw_grade": ["a", "b", "b", "a", "a", "e"]}
+            {
+                "id": [6, 5, 4, 3, 2, 1],
+                "raw_grade": ["a", "b", "b", "a", "a", "e"],
+            }
         )
         df["grade"] = Categorical(df["raw_grade"], ordered=True)
         df["grade"] = df["grade"].cat.set_categories(["b", "e", "a"])

@@ -36,7 +36,9 @@ def _importers():
         return
 
     global _HAS_BS4, _HAS_LXML, _HAS_HTML5LIB
-    bs4 = import_optional_dependency("bs4", raise_on_missing=False, on_version="ignore")
+    bs4 = import_optional_dependency(
+        "bs4", raise_on_missing=False, on_version="ignore"
+    )
     _HAS_BS4 = bs4 is not None
 
     lxml = import_optional_dependency(
@@ -451,7 +453,9 @@ class _HtmlFrameParser:
                     prev_i, prev_text, prev_rowspan = remainder.pop(0)
                     texts.append(prev_text)
                     if prev_rowspan > 1:
-                        next_remainder.append((prev_i, prev_text, prev_rowspan - 1))
+                        next_remainder.append(
+                            (prev_i, prev_text, prev_rowspan - 1)
+                        )
                     index += 1
 
                 # Append the text from this <td>, colspan times
@@ -469,7 +473,9 @@ class _HtmlFrameParser:
             for prev_i, prev_text, prev_rowspan in remainder:
                 texts.append(prev_text)
                 if prev_rowspan > 1:
-                    next_remainder.append((prev_i, prev_text, prev_rowspan - 1))
+                    next_remainder.append(
+                        (prev_i, prev_text, prev_rowspan - 1)
+                    )
 
             all_texts.append(texts)
             remainder = next_remainder
@@ -482,7 +488,9 @@ class _HtmlFrameParser:
             for prev_i, prev_text, prev_rowspan in remainder:
                 texts.append(prev_text)
                 if prev_rowspan > 1:
-                    next_remainder.append((prev_i, prev_text, prev_rowspan - 1))
+                    next_remainder.append(
+                        (prev_i, prev_text, prev_rowspan - 1)
+                    )
             all_texts.append(texts)
             remainder = next_remainder
 
@@ -548,16 +556,23 @@ class _BeautifulSoupHtml5LibFrameParser(_HtmlFrameParser):
 
         for table in tables:
             if self.displayed_only:
-                for elem in table.find_all(style=re.compile(r"display:\s*none")):
+                for elem in table.find_all(
+                    style=re.compile(r"display:\s*none")
+                ):
                     elem.decompose()
 
-            if table not in unique_tables and table.find(text=match) is not None:
+            if (
+                table not in unique_tables
+                and table.find(text=match) is not None
+            ):
                 result.append(table)
             unique_tables.add(table)
 
         if not result:
             raise ValueError(
-                "No tables found matching pattern {patt!r}".format(patt=match.pattern)
+                "No tables found matching pattern {patt!r}".format(
+                    patt=match.pattern
+                )
             )
         return result
 
@@ -585,14 +600,18 @@ class _BeautifulSoupHtml5LibFrameParser(_HtmlFrameParser):
     def _setup_build_doc(self):
         raw_text = _read(self.io)
         if not raw_text:
-            raise ValueError("No text parsed from document: {doc}".format(doc=self.io))
+            raise ValueError(
+                "No text parsed from document: {doc}".format(doc=self.io)
+            )
         return raw_text
 
     def _build_doc(self):
         from bs4 import BeautifulSoup
 
         return BeautifulSoup(
-            self._setup_build_doc(), features="html5lib", from_encoding=self.encoding
+            self._setup_build_doc(),
+            features="html5lib",
+            from_encoding=self.encoding,
         )
 
 
@@ -673,7 +692,9 @@ class _LxmlFrameParser(_HtmlFrameParser):
                 # support. As a result, we find all elements with a style
                 # attribute and iterate them to check for display:none
                 for elem in table.xpath(".//*[@style]"):
-                    if "display:none" in elem.attrib.get("style", "").replace(" ", ""):
+                    if "display:none" in elem.attrib.get("style", "").replace(
+                        " ", ""
+                    ):
                         elem.getparent().remove(elem)
 
         if not tables:
@@ -784,7 +805,11 @@ def _data_to_frame(**kwargs):
                 header = 0
             else:
                 # ignore all-empty-text rows
-                header = [i for i, row in enumerate(head) if any(text for text in row)]
+                header = [
+                    i
+                    for i, row in enumerate(head)
+                    if any(text for text in row)
+                ]
 
     if foot:
         body += foot
@@ -835,11 +860,15 @@ def _parser_dispatch(flavor):
         if not _HAS_HTML5LIB:
             raise ImportError("html5lib not found, please install it")
         if not _HAS_BS4:
-            raise ImportError("BeautifulSoup4 (bs4) not found, please install it")
+            raise ImportError(
+                "BeautifulSoup4 (bs4) not found, please install it"
+            )
         import bs4
 
         if LooseVersion(bs4.__version__) <= LooseVersion("4.2.0"):
-            raise ValueError("A minimum version of BeautifulSoup 4.2.1 " "is required")
+            raise ValueError(
+                "A minimum version of BeautifulSoup 4.2.1 " "is required"
+            )
 
     else:
         if not _HAS_LXML:
@@ -848,7 +877,9 @@ def _parser_dispatch(flavor):
 
 
 def _print_as_set(s):
-    return "{" + "{arg}".format(arg=", ".join(pprint_thing(el) for el in s)) + "}"
+    return (
+        "{" + "{arg}".format(arg=", ".join(pprint_thing(el) for el in s)) + "}"
+    )
 
 
 def _validate_flavor(flavor):
@@ -875,7 +906,8 @@ def _validate_flavor(flavor):
         raise ValueError(
             "{invalid} is not a valid set of flavors, valid "
             "flavors are {valid}".format(
-                invalid=_print_as_set(flavor_set), valid=_print_as_set(valid_flavors)
+                invalid=_print_as_set(flavor_set),
+                valid=_print_as_set(valid_flavors),
             )
         )
     return flavor

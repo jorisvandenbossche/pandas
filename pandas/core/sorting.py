@@ -169,7 +169,11 @@ def decons_obs_group_ids(comp_ids, obs_ids, shape, labels, xnull):
     if not is_int64_overflow_possible(shape):
         # obs ids are deconstructable! take the fast route!
         out = decons_group_index(obs_ids, shape)
-        return out if xnull or not lift.any() else [x - y for x, y in zip(out, lift)]
+        return (
+            out
+            if xnull or not lift.any()
+            else [x - y for x, y in zip(out, lift)]
+        )
 
     i = unique_label_indices(comp_ids)
     i8copy = lambda a: a.astype("i8", subok=False, copy=True)
@@ -297,7 +301,9 @@ class _KeyMapper:
         self.comp_ids = comp_ids.astype(np.int64)
 
         self.k = len(labels)
-        self.tables = [hashtable.Int64HashTable(ngroups) for _ in range(self.k)]
+        self.tables = [
+            hashtable.Int64HashTable(ngroups) for _ in range(self.k)
+        ]
 
         self._populate_tables()
 
@@ -358,7 +364,9 @@ def get_group_index_sorter(group_index, ngroups):
     count = len(group_index)
     alpha = 0.0  # taking complexities literally; there may be
     beta = 1.0  # some room for fine-tuning these parameters
-    do_groupsort = count > 0 and ((alpha + beta * ngroups) < (count * np.log(count)))
+    do_groupsort = count > 0 and (
+        (alpha + beta * ngroups) < (count * np.log(count))
+    )
     if do_groupsort:
         sorter, _ = algos.groupsort_indexer(ensure_int64(group_index), ngroups)
         return ensure_platform_int(sorter)
@@ -407,7 +415,9 @@ def _reorder_by_uniques(uniques, labels):
     return uniques, labels
 
 
-def safe_sort(values, labels=None, na_sentinel=-1, assume_unique=False, verify=True):
+def safe_sort(
+    values, labels=None, na_sentinel=-1, assume_unique=False, verify=True
+):
     """
     Sort ``values`` and reorder corresponding ``labels``.
     ``values`` should be unique if ``labels`` is not None.
@@ -453,10 +463,13 @@ def safe_sort(values, labels=None, na_sentinel=-1, assume_unique=False, verify=T
     """
     if not is_list_like(values):
         raise TypeError(
-            "Only list-like objects are allowed to be passed to" "safe_sort as values"
+            "Only list-like objects are allowed to be passed to"
+            "safe_sort as values"
         )
 
-    if not isinstance(values, np.ndarray) and not is_extension_array_dtype(values):
+    if not isinstance(values, np.ndarray) and not is_extension_array_dtype(
+        values
+    ):
         # don't convert to string types
         dtype, _ = infer_dtype_from_array(values)
         values = np.asarray(values, dtype=dtype)

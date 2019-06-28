@@ -364,7 +364,10 @@ def test_where_setitem_invalid():
     # GH 2702
     # make sure correct exceptions are raised on invalid list assignment
 
-    msg = "cannot set using a {} indexer with a different length than" " the value"
+    msg = (
+        "cannot set using a {} indexer with a different length than"
+        " the value"
+    )
 
     # slice
     s = Series(list("abc"))
@@ -557,7 +560,10 @@ def test_where_datetime_conversion():
     assert_series_equal(rs, expected)
 
     # GH 15701
-    timestamps = ["2016-12-31 12:00:04+00:00", "2016-12-31 12:00:04.010000+00:00"]
+    timestamps = [
+        "2016-12-31 12:00:04+00:00",
+        "2016-12-31 12:00:04.010000+00:00",
+    ]
     s = Series([pd.Timestamp(t) for t in timestamps])
     rs = s.where(Series([False, True]))
     expected = Series([pd.NaT, s[1]])
@@ -566,15 +572,21 @@ def test_where_datetime_conversion():
 
 def test_where_dt_tz_values(tz_naive_fixture):
     ser1 = pd.Series(
-        pd.DatetimeIndex(["20150101", "20150102", "20150103"], tz=tz_naive_fixture)
+        pd.DatetimeIndex(
+            ["20150101", "20150102", "20150103"], tz=tz_naive_fixture
+        )
     )
     ser2 = pd.Series(
-        pd.DatetimeIndex(["20160514", "20160515", "20160516"], tz=tz_naive_fixture)
+        pd.DatetimeIndex(
+            ["20160514", "20160515", "20160516"], tz=tz_naive_fixture
+        )
     )
     mask = pd.Series([True, True, False])
     result = ser1.where(mask, ser2)
     exp = pd.Series(
-        pd.DatetimeIndex(["20150101", "20150102", "20160516"], tz=tz_naive_fixture)
+        pd.DatetimeIndex(
+            ["20150101", "20150102", "20160516"], tz=tz_naive_fixture
+        )
     )
     assert_series_equal(exp, result)
 

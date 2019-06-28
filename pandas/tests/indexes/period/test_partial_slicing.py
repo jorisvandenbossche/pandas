@@ -11,7 +11,9 @@ class TestPeriodIndex:
         pass
 
     def test_slice_with_negative_step(self):
-        ts = Series(np.arange(20), period_range("2014-01", periods=20, freq="M"))
+        ts = Series(
+            np.arange(20), period_range("2014-01", periods=20, freq="M")
+        )
         SLC = pd.IndexSlice
 
         def assert_slices_equivalent(l_slc, i_slc):
@@ -29,13 +31,19 @@ class TestPeriodIndex:
         assert_slices_equivalent(
             SLC[Period("2015-02") : Period("2014-10") : -1], SLC[13:8:-1]
         )
-        assert_slices_equivalent(SLC["2015-02" : Period("2014-10") : -1], SLC[13:8:-1])
-        assert_slices_equivalent(SLC[Period("2015-02") : "2014-10" : -1], SLC[13:8:-1])
+        assert_slices_equivalent(
+            SLC["2015-02" : Period("2014-10") : -1], SLC[13:8:-1]
+        )
+        assert_slices_equivalent(
+            SLC[Period("2015-02") : "2014-10" : -1], SLC[13:8:-1]
+        )
 
         assert_slices_equivalent(SLC["2014-10":"2015-02":-1], SLC[:0])
 
     def test_slice_with_zero_step_raises(self):
-        ts = Series(np.arange(20), period_range("2014-01", periods=20, freq="M"))
+        ts = Series(
+            np.arange(20), period_range("2014-01", periods=20, freq="M")
+        )
         with pytest.raises(ValueError, match="slice step cannot be zero"):
             ts[::0]
         with pytest.raises(ValueError, match="slice step cannot be zero"):
@@ -89,8 +97,12 @@ class TestPeriodIndex:
 
     def test_range_slice_seconds(self):
         # GH#6716
-        didx = pd.date_range(start="2013/01/01 09:00:00", freq="S", periods=4000)
-        pidx = period_range(start="2013/01/01 09:00:00", freq="S", periods=4000)
+        didx = pd.date_range(
+            start="2013/01/01 09:00:00", freq="S", periods=4000
+        )
+        pidx = period_range(
+            start="2013/01/01 09:00:00", freq="S", periods=4000
+        )
 
         for idx in [didx, pidx]:
             # slices against index should raise IndexError
@@ -107,7 +119,9 @@ class TestPeriodIndex:
 
             s = Series(np.random.rand(len(idx)), index=idx)
 
-            tm.assert_series_equal(s["2013/01/01 09:05":"2013/01/01 09:10"], s[300:660])
+            tm.assert_series_equal(
+                s["2013/01/01 09:05":"2013/01/01 09:10"], s[300:660]
+            )
             tm.assert_series_equal(
                 s["2013/01/01 10:00":"2013/01/01 10:05"], s[3600:3960]
             )
@@ -123,7 +137,9 @@ class TestPeriodIndex:
 
         for idx in [didx, pidx]:
             df = DataFrame(dict(units=[100 + i for i in range(10)]), index=idx)
-            empty = DataFrame(index=idx.__class__([], freq="D"), columns=["units"])
+            empty = DataFrame(
+                index=idx.__class__([], freq="D"), columns=["units"]
+            )
             empty["units"] = empty["units"].astype("int64")
 
             tm.assert_frame_equal(df["2013/09/01":"2013/09/30"], empty)

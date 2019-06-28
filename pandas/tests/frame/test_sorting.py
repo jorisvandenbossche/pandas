@@ -23,7 +23,9 @@ from pandas.util.testing import assert_frame_equal, assert_series_equal
 class TestDataFrameSorting(TestData):
     def test_sort_values(self):
         frame = DataFrame(
-            [[1, 1, 2], [3, 1, 0], [4, 5, 6]], index=[1, 2, 3], columns=list("ABC")
+            [[1, 1, 2], [3, 1, 0], [4, 5, 6]],
+            index=[1, 2, 3],
+            columns=list("ABC"),
         )
 
         # by column (axis=0)
@@ -55,7 +57,10 @@ class TestDataFrameSorting(TestData):
         sorted_df = frame.sort_values(by=["B", "A"], ascending=[True, False])
         assert_frame_equal(sorted_df, expected)
 
-        msg = "No axis named 2 for object type" " <class 'pandas.core.frame.DataFrame'>"
+        msg = (
+            "No axis named 2 for object type"
+            " <class 'pandas.core.frame.DataFrame'>"
+        )
         with pytest.raises(ValueError, match=msg):
             frame.sort_values(by=["A", "B"], axis=2, inplace=True)
 
@@ -72,7 +77,9 @@ class TestDataFrameSorting(TestData):
         expected = frame.reindex(columns=["B", "A", "C"])
         assert_frame_equal(sorted_df, expected)
 
-        sorted_df = frame.sort_values(by=[1, 3], axis=1, ascending=[True, False])
+        sorted_df = frame.sort_values(
+            by=[1, 3], axis=1, ascending=[True, False]
+        )
         assert_frame_equal(sorted_df, expected)
 
         sorted_df = frame.sort_values(by=[1, 3], axis=1, ascending=False)
@@ -85,7 +92,9 @@ class TestDataFrameSorting(TestData):
 
     def test_sort_values_inplace(self):
         frame = DataFrame(
-            np.random.randn(4, 4), index=[1, 2, 3, 4], columns=["A", "B", "C", "D"]
+            np.random.randn(4, 4),
+            index=[1, 2, 3, 4],
+            columns=["A", "B", "C", "D"],
         )
 
         sorted_df = frame.copy()
@@ -111,7 +120,9 @@ class TestDataFrameSorting(TestData):
     def test_sort_nan(self):
         # GH3917
         nan = np.nan
-        df = DataFrame({"A": [1, 2, nan, 1, 6, 8, 4], "B": [9, nan, 5, 2, 5, 4, 5]})
+        df = DataFrame(
+            {"A": [1, 2, nan, 1, 6, 8, 4], "B": [9, nan, 5, 2, 5, 4, 5]}
+        )
 
         # sort one column only
         expected = DataFrame(
@@ -153,7 +164,9 @@ class TestDataFrameSorting(TestData):
             {"A": [nan, 1, 1, 2, 4, 6, 8], "B": [5, 9, 2, nan, 5, 5, 4]},
             index=[2, 0, 3, 1, 6, 4, 5],
         )
-        sorted_df = df.sort_values(["A", "B"], ascending=[1, 0], na_position="first")
+        sorted_df = df.sort_values(
+            ["A", "B"], ascending=[1, 0], na_position="first"
+        )
         assert_frame_equal(sorted_df, expected)
 
         # na_position='last', not order
@@ -161,7 +174,9 @@ class TestDataFrameSorting(TestData):
             {"A": [8, 6, 4, 2, 1, 1, nan], "B": [4, 5, 5, nan, 2, 9, 5]},
             index=[5, 4, 6, 1, 3, 0, 2],
         )
-        sorted_df = df.sort_values(["A", "B"], ascending=[0, 1], na_position="last")
+        sorted_df = df.sort_values(
+            ["A", "B"], ascending=[0, 1], na_position="last"
+        )
         assert_frame_equal(sorted_df, expected)
 
         # Test DataFrame with nan label
@@ -171,7 +186,9 @@ class TestDataFrameSorting(TestData):
         )
 
         # NaN label, ascending=True, na_position='last'
-        sorted_df = df.sort_index(kind="quicksort", ascending=True, na_position="last")
+        sorted_df = df.sort_index(
+            kind="quicksort", ascending=True, na_position="last"
+        )
         expected = DataFrame(
             {"A": [1, 2, nan, 1, 6, 8, 4], "B": [9, nan, 5, 2, 5, 4, 5]},
             index=[1, 2, 3, 4, 5, 6, nan],
@@ -210,12 +227,16 @@ class TestDataFrameSorting(TestData):
             [[2, "first"], [2, "second"], [1, "a"], [1, "b"]],
             columns=["sort_col", "order"],
         )
-        sorted_df = df.sort_values(by="sort_col", kind="mergesort", ascending=False)
+        sorted_df = df.sort_values(
+            by="sort_col", kind="mergesort", ascending=False
+        )
         assert_frame_equal(df, sorted_df)
 
     def test_stable_descending_multicolumn_sort(self):
         nan = np.nan
-        df = DataFrame({"A": [1, 2, nan, 1, 6, 8, 4], "B": [9, nan, 5, 2, 5, 4, 5]})
+        df = DataFrame(
+            {"A": [1, 2, nan, 1, 6, 8, 4], "B": [9, nan, 5, 2, 5, 4, 5]}
+        )
         # test stable mergesort
         expected = DataFrame(
             {"A": [nan, 8, 6, 4, 2, 1, 1], "B": [5, 4, 5, 5, nan, 2, 9]},
@@ -251,7 +272,9 @@ class TestDataFrameSorting(TestData):
 
     def test_stable_categorial(self):
         # GH 16793
-        df = DataFrame({"x": pd.Categorical(np.repeat([1, 2, 3, 4], 5), ordered=True)})
+        df = DataFrame(
+            {"x": pd.Categorical(np.repeat([1, 2, 3, 4], 5), ordered=True)}
+        )
         expected = df.copy()
         sorted_df = df.sort_values("x", kind="mergesort")
         assert_frame_equal(sorted_df, expected)
@@ -343,7 +366,10 @@ class TestDataFrameSorting(TestData):
         )
 
         df_reversed = DataFrame(
-            dict(datetime=[NaT, Timestamp("2016-01-01")], float=float_values[::-1]),
+            dict(
+                datetime=[NaT, Timestamp("2016-01-01")],
+                float=float_values[::-1],
+            ),
             columns=["datetime", "float"],
             index=[1, 0],
         )
@@ -362,14 +388,20 @@ class TestDataFrameSorting(TestData):
 
         # GH 16836
 
-        d1 = [Timestamp(x) for x in ["2016-01-01", "2015-01-01", np.nan, "2016-01-01"]]
+        d1 = [
+            Timestamp(x)
+            for x in ["2016-01-01", "2015-01-01", np.nan, "2016-01-01"]
+        ]
         d2 = [
             Timestamp(x)
             for x in ["2017-01-01", "2014-01-01", "2016-01-01", "2015-01-01"]
         ]
         df = pd.DataFrame({"a": d1, "b": d2}, index=[0, 1, 2, 3])
 
-        d3 = [Timestamp(x) for x in ["2015-01-01", "2016-01-01", "2016-01-01", np.nan]]
+        d3 = [
+            Timestamp(x)
+            for x in ["2015-01-01", "2016-01-01", "2016-01-01", np.nan]
+        ]
         d4 = [
             Timestamp(x)
             for x in ["2014-01-01", "2015-01-01", "2017-01-01", "2016-01-01"]
@@ -400,7 +432,10 @@ class TestDataFrameSortIndexKinds(TestData):
             frame.sort_index(by=["A", "B"], ascending=False)
         result = frame.sort_values(by=["A", "B"], ascending=False)
         indexer = np.lexsort(
-            (frame["B"].rank(ascending=False), frame["A"].rank(ascending=False))
+            (
+                frame["B"].rank(ascending=False),
+                frame["A"].rank(ascending=False),
+            )
         )
         expected = frame.take(indexer)
         assert_frame_equal(result, expected)
@@ -415,7 +450,9 @@ class TestDataFrameSortIndexKinds(TestData):
 
     def test_sort_index_inplace(self):
         frame = DataFrame(
-            np.random.randn(4, 4), index=[1, 2, 3, 4], columns=["A", "B", "C", "D"]
+            np.random.randn(4, 4),
+            index=[1, 2, 3, 4],
+            columns=["A", "B", "C", "D"],
         )
 
         # axis=0
@@ -506,7 +543,8 @@ class TestDataFrameSortIndexKinds(TestData):
         # with multi-index
         # GH4370
         df = DataFrame(
-            np.random.randn(4, 2), columns=MultiIndex.from_tuples([("a", 0), ("a", 1)])
+            np.random.randn(4, 2),
+            columns=MultiIndex.from_tuples([("a", 0), ("a", 1)]),
         )
         with pytest.raises(ValueError, match="level"):
             # use .sort_values #9816
@@ -558,7 +596,9 @@ class TestDataFrameSortIndexKinds(TestData):
         df = DataFrame(
             {
                 "A": np.arange(6, dtype="int64"),
-                "B": Series(list("aabbca")).astype(CategoricalDtype(list("cab"))),
+                "B": Series(list("aabbca")).astype(
+                    CategoricalDtype(list("cab"))
+                ),
             }
         ).set_index("B")
 
@@ -656,7 +696,9 @@ class TestDataFrameSortIndexKinds(TestData):
         df = pd.DataFrame(
             {
                 column_name: pd.Categorical(
-                    ["A", np.nan, "B", np.nan, "C"], categories=categories, ordered=True
+                    ["A", np.nan, "B", np.nan, "C"],
+                    categories=categories,
+                    ordered=True,
                 )
             }
         )
@@ -667,7 +709,9 @@ class TestDataFrameSortIndexKinds(TestData):
         expected = DataFrame(
             {
                 column_name: Categorical(
-                    list_of_nans + categories, categories=categories, ordered=True
+                    list_of_nans + categories,
+                    categories=categories,
+                    ordered=True,
                 )
             },
             index=na_indices + category_indices,
@@ -682,7 +726,9 @@ class TestDataFrameSortIndexKinds(TestData):
         expected = DataFrame(
             {
                 column_name: Categorical(
-                    categories + list_of_nans, categories=categories, ordered=True
+                    categories + list_of_nans,
+                    categories=categories,
+                    ordered=True,
                 )
             },
             index=category_indices + na_indices,

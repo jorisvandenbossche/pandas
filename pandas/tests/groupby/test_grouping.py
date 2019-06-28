@@ -40,7 +40,8 @@ class TestSelection:
     def test_groupby_duplicated_column_errormsg(self):
         # GH7511
         df = DataFrame(
-            columns=["A", "B", "A", "C"], data=[range(4), range(2, 6), range(0, 8, 2)]
+            columns=["A", "B", "A", "C"],
+            data=[range(4), range(2, 6), range(0, 8, 2)],
         )
 
         msg = "Grouper for 'A' not 1-dimensional"
@@ -68,7 +69,16 @@ class TestSelection:
         df = DataFrame(
             {
                 "A": ["foo", "bar", "foo", "bar", "foo", "bar", "foo", "foo"],
-                "B": ["one", "one", "two", "three", "two", "two", "one", "three"],
+                "B": [
+                    "one",
+                    "one",
+                    "two",
+                    "three",
+                    "two",
+                    "two",
+                    "one",
+                    "three",
+                ],
                 "C": np.random.randn(8),
                 "D": np.random.randn(8),
                 "E": np.random.randn(8),
@@ -138,20 +148,30 @@ class TestGrouping:
 
         d0 = date.today() - timedelta(days=14)
         dates = date_range(d0, date.today())
-        date_index = pd.MultiIndex.from_product([dates, dates], names=["foo", "bar"])
+        date_index = pd.MultiIndex.from_product(
+            [dates, dates], names=["foo", "bar"]
+        )
         df = pd.DataFrame(np.random.randint(0, 100, 225), index=date_index)
 
         # Check string level
         expected = (
             df.reset_index()
-            .groupby([pd.Grouper(key="foo", freq="W"), pd.Grouper(key="bar", freq="W")])
+            .groupby(
+                [
+                    pd.Grouper(key="foo", freq="W"),
+                    pd.Grouper(key="bar", freq="W"),
+                ]
+            )
             .sum()
         )
         # reset index changes columns dtype to object
         expected.columns = pd.Index([0], dtype="int64")
 
         result = df.groupby(
-            [pd.Grouper(level="foo", freq="W"), pd.Grouper(level="bar", freq="W")]
+            [
+                pd.Grouper(level="foo", freq="W"),
+                pd.Grouper(level="bar", freq="W"),
+            ]
         ).sum()
         assert_frame_equal(result, expected)
 
@@ -182,7 +202,11 @@ class TestGrouping:
         # GH14334
         # pd.Grouper(key=...) may be passed in a list
         df = DataFrame(
-            {"A": [0, 0, 0, 1, 1, 1], "B": [1, 1, 2, 2, 3, 3], "C": [1, 2, 3, 4, 5, 6]}
+            {
+                "A": [0, 0, 0, 1, 1, 1],
+                "B": [1, 1, 2, 2, 3, 3],
+                "C": [1, 2, 3, 4, 5, 6],
+            }
         )
         # Group by single column
         expected = df.groupby("A").sum()
@@ -219,7 +243,8 @@ class TestGrouping:
         )
         result = s.groupby(pd.Grouper(level="three", freq="M")).sum()
         expected = Series(
-            [28], index=Index([Timestamp("2013-01-31")], freq="M", name="three")
+            [28],
+            index=Index([Timestamp("2013-01-31")], freq="M", name="three"),
         )
         assert_series_equal(result, expected)
 
@@ -238,7 +263,10 @@ class TestGrouping:
         )
         idx.names = ["outer", "inner"]
         df_multi = pd.DataFrame(
-            {"A": np.arange(6), "B": ["one", "one", "two", "two", "one", "one"]},
+            {
+                "A": np.arange(6),
+                "B": ["one", "one", "two", "two", "one", "one"],
+            },
             index=idx,
         )
         result = df_multi.groupby(["B", pd.Grouper(level="inner")]).mean()
@@ -284,9 +312,18 @@ class TestGrouping:
         columns = ["A", "B", "A", "B"]
         categories = ["B", "A"]
         data = np.array(
-            [[1, 2, 1, 2], [1, 2, 1, 2], [1, 2, 1, 2], [1, 2, 1, 2], [1, 2, 1, 2]], int
+            [
+                [1, 2, 1, 2],
+                [1, 2, 1, 2],
+                [1, 2, 1, 2],
+                [1, 2, 1, 2],
+                [1, 2, 1, 2],
+            ],
+            int,
         )
-        cat_columns = CategoricalIndex(columns, categories=categories, ordered=True)
+        cat_columns = CategoricalIndex(
+            columns, categories=categories, ordered=True
+        )
         df = DataFrame(data=data, columns=cat_columns)
         result = df.groupby(axis=1, level=0, observed=observed).sum()
         expected_data = np.array([[4, 2], [4, 2], [4, 2], [4, 2], [4, 2]], int)
@@ -310,7 +347,8 @@ class TestGrouping:
         df = DataFrame(
             {"A": 1},
             index=pd.MultiIndex.from_product(
-                [list("ab"), date_range("20130101", periods=80)], names=["one", "two"]
+                [list("ab"), date_range("20130101", periods=80)],
+                names=["one", "two"],
             ),
         )
         result = df.groupby(
@@ -378,7 +416,10 @@ class TestGrouping:
             ts.groupby(lambda key: key[0:6])
 
     def test_grouping_error_on_multidim_input(self, df):
-        msg = "Grouper for '<class 'pandas.core.frame.DataFrame'>'" " not 1-dimensional"
+        msg = (
+            "Grouper for '<class 'pandas.core.frame.DataFrame'>'"
+            " not 1-dimensional"
+        )
         with pytest.raises(ValueError, match=msg):
             Grouping(df.index, df[["A", "A"]])
 
@@ -444,7 +485,9 @@ class TestGrouping:
         # GH 17979
         df = pd.DataFrame(
             [[1, 2, 3, 4], [3, 4, 5, 6], [1, 4, 2, 3]],
-            columns=pd.MultiIndex.from_arrays([["a", "b", "b", "c"], [1, 1, 2, 2]]),
+            columns=pd.MultiIndex.from_arrays(
+                [["a", "b", "b", "c"], [1, 1, 2, 2]]
+            ),
         )
         expected = df.groupby([("b", 1)]).groups
         result = df.groupby(("b", 1)).groups
@@ -460,7 +503,9 @@ class TestGrouping:
         result = df.groupby(("b", 1)).groups
         tm.assert_dict_equal(expected, result)
 
-        df3 = pd.DataFrame(df.values, columns=[("a", "d"), ("b", "d"), ("b", "e"), "c"])
+        df3 = pd.DataFrame(
+            df.values, columns=[("a", "d"), ("b", "d"), ("b", "e"), "c"]
+        )
         expected = df3.groupby([("b", "d")]).groups
         result = df.groupby(("b", 1)).groups
         tm.assert_dict_equal(expected, result)
@@ -508,9 +553,9 @@ class TestGrouping:
 
     def test_groupby_level_index_names(self):
         # GH4014 this used to raise ValueError since 'exp'>1 (in py2)
-        df = DataFrame({"exp": ["A"] * 3 + ["B"] * 3, "var1": range(6)}).set_index(
-            "exp"
-        )
+        df = DataFrame(
+            {"exp": ["A"] * 3 + ["B"] * 3, "var1": range(6)}
+        ).set_index("exp")
         df.groupby(level="exp")
         msg = "level name foo is not the name of the index"
         with pytest.raises(ValueError, match=msg):
@@ -573,7 +618,9 @@ class TestGrouping:
 
     def test_list_grouper_with_nat(self):
         # GH 14715
-        df = pd.DataFrame({"date": pd.date_range("1/1/2011", periods=365, freq="D")})
+        df = pd.DataFrame(
+            {"date": pd.date_range("1/1/2011", periods=365, freq="D")}
+        )
         df.iloc[-1] = pd.NaT
         grouper = pd.Grouper(key="date", freq="AS")
 
@@ -685,7 +732,9 @@ class TestGetGroup:
         result = gr.get_group((1,))
         assert_frame_equal(result, expected)
 
-        dt = pd.to_datetime(["2010-01-01", "2010-01-02", "2010-01-01", "2010-01-02"])
+        dt = pd.to_datetime(
+            ["2010-01-01", "2010-01-02", "2010-01-01", "2010-01-02"]
+        )
         df = DataFrame({"ids": [(x,) for x in dt]})
         gr = df.groupby("ids")
         result = gr.get_group(("2010-01-01",))
@@ -714,7 +763,11 @@ class TestGetGroup:
         # test ensures that index and column keys are recognized correctly
         # when number of keys equals axis length of groupby
         df = pd.DataFrame(
-            [["foo", "bar", "B", 1], ["foo", "bar", "B", 2], ["foo", "baz", "C", 3]],
+            [
+                ["foo", "bar", "B", 1],
+                ["foo", "bar", "B", 2],
+                ["foo", "baz", "C", 3],
+            ],
             columns=["first", "second", "third", "one"],
         )
         df = df.set_index(["first", "second"])
@@ -777,7 +830,12 @@ class TestIteration:
         k1 = np.array(["b", "b", "b", "a", "a", "a"])
         k2 = np.array(["1", "2", "1", "2", "1", "2"])
         df = DataFrame(
-            {"v1": np.random.randn(6), "v2": np.random.randn(6), "k1": k1, "k2": k2},
+            {
+                "v1": np.random.randn(6),
+                "v2": np.random.randn(6),
+                "k1": k1,
+                "k2": k2,
+            },
             index=["one", "two", "three", "four", "five", "six"],
         )
 
@@ -838,7 +896,10 @@ class TestIteration:
         tm.assert_frame_equal(res, df.iloc[[1], :])
 
         df = pd.DataFrame(
-            {"event": ["start", "start", "start"], "change": [1234, 5678, 9123]},
+            {
+                "event": ["start", "start", "start"],
+                "change": [1234, 5678, 9123],
+            },
             index=pd.DatetimeIndex(["2014-09-10", "2013-10-10", "2014-09-15"]),
         )
         grouped = df.groupby([pd.Grouper(freq="M"), "event"])
@@ -854,7 +915,10 @@ class TestIteration:
 
         # length=3
         df = pd.DataFrame(
-            {"event": ["start", "start", "start"], "change": [1234, 5678, 9123]},
+            {
+                "event": ["start", "start", "start"],
+                "change": [1234, 5678, 9123],
+            },
             index=pd.DatetimeIndex(["2014-09-10", "2013-10-10", "2014-08-05"]),
         )
         grouped = df.groupby([pd.Grouper(freq="M"), "event"])

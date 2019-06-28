@@ -50,7 +50,9 @@ def get_writer(engine_name):
     try:
         return _writers[engine_name]
     except KeyError:
-        raise ValueError("No Excel writer '{engine}'".format(engine=engine_name))
+        raise ValueError(
+            "No Excel writer '{engine}'".format(engine=engine_name)
+        )
 
 
 def _excel2num(x):

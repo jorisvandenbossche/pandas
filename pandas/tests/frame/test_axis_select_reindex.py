@@ -6,7 +6,15 @@ import pytest
 from pandas.errors import PerformanceWarning
 
 import pandas as pd
-from pandas import Categorical, DataFrame, Index, MultiIndex, Series, date_range, isna
+from pandas import (
+    Categorical,
+    DataFrame,
+    Index,
+    MultiIndex,
+    Series,
+    date_range,
+    isna,
+)
 from pandas.tests.frame.common import TestData
 import pandas.util.testing as tm
 from pandas.util.testing import assert_frame_equal
@@ -62,7 +70,11 @@ class TestDataFrameSelectReindex(TestData):
         tm.assert_index_equal(dropped.index, expected)
 
     def test_drop_col_still_multiindex(self):
-        arrays = [["a", "b", "c", "top"], ["", "", "", "OD"], ["", "", "", "wx"]]
+        arrays = [
+            ["a", "b", "c", "top"],
+            ["", "", "", "OD"],
+            ["", "", "", "wx"],
+        ]
 
         tuples = sorted(zip(*arrays))
         index = MultiIndex.from_tuples(tuples)
@@ -76,7 +88,9 @@ class TestDataFrameSelectReindex(TestData):
         assert_frame_equal(simple.drop("A", axis=1), simple[["B"]])
         assert_frame_equal(simple.drop(["A", "B"], axis="columns"), simple[[]])
         assert_frame_equal(simple.drop([0, 1, 3], axis=0), simple.loc[[2], :])
-        assert_frame_equal(simple.drop([0, 3], axis="index"), simple.loc[[1, 2], :])
+        assert_frame_equal(
+            simple.drop([0, 3], axis="index"), simple.loc[[1, 2], :]
+        )
 
         with pytest.raises(KeyError, match=r"\[5\] not found in axis"):
             simple.drop(5)
@@ -99,7 +113,8 @@ class TestDataFrameSelectReindex(TestData):
 
         # non-unique - wheee!
         nu_df = DataFrame(
-            list(zip(range(3), range(-3, 1), list("abc"))), columns=["a", "a", "b"]
+            list(zip(range(3), range(-3, 1), list("abc"))),
+            columns=["a", "a", "b"],
         )
         assert_frame_equal(nu_df.drop("a", axis=1), nu_df[["b"]])
         assert_frame_equal(nu_df.drop("b", axis="columns"), nu_df["a"])
@@ -129,7 +144,8 @@ class TestDataFrameSelectReindex(TestData):
 
         # define the non-lexsorted version
         not_lexsorted_df = DataFrame(
-            columns=["a", "b", "c", "d"], data=[[1, "b1", "c1", 3], [1, "b2", "c2", 4]]
+            columns=["a", "b", "c", "d"],
+            data=[[1, "b1", "c1", 3], [1, "b2", "c2", 4]],
         )
         not_lexsorted_df = not_lexsorted_df.pivot_table(
             index="a", columns=["b", "c"], values="d"
@@ -202,7 +218,9 @@ class TestDataFrameSelectReindex(TestData):
 
         # join, see discussion in GH 12219
         columns = ["a", "b", ("a", ""), ("c", "c1")]
-        expected = DataFrame(columns=columns, data=[[1, 11, 0, 44], [0, 22, 1, 33]])
+        expected = DataFrame(
+            columns=columns, data=[[1, 11, 0, 44], [0, 22, 1, 33]]
+        )
         with tm.assert_produces_warning(UserWarning):
             result = df1.join(df2, on="a")
         tm.assert_frame_equal(result, expected)
@@ -325,7 +343,9 @@ class TestDataFrameSelectReindex(TestData):
         assert smaller["A"].dtype == np.int64
 
     def test_reindex_like(self):
-        other = self.frame.reindex(index=self.frame.index[:10], columns=["C", "B"])
+        other = self.frame.reindex(
+            index=self.frame.index[:10], columns=["C", "B"]
+        )
 
         assert_frame_equal(other, self.frame.reindex_like(other))
 
@@ -396,7 +416,11 @@ class TestDataFrameSelectReindex(TestData):
         # GH 3317, reindexing by both axes loses freq of the index
         df = DataFrame(
             np.ones((3, 3)),
-            index=[datetime(2012, 1, 1), datetime(2012, 1, 2), datetime(2012, 1, 3)],
+            index=[
+                datetime(2012, 1, 1),
+                datetime(2012, 1, 2),
+                datetime(2012, 1, 3),
+            ],
             columns=["a", "b", "c"],
         )
         time_freq = date_range("2012-01-01", "2012-01-03", freq="d")
@@ -404,7 +428,9 @@ class TestDataFrameSelectReindex(TestData):
 
         index_freq = df.reindex(index=time_freq).index.freq
         both_freq = df.reindex(index=time_freq, columns=some_cols).index.freq
-        seq_freq = df.reindex(index=time_freq).reindex(columns=some_cols).index.freq
+        seq_freq = (
+            df.reindex(index=time_freq).reindex(columns=some_cols).index.freq
+        )
         assert index_freq == both_freq
         assert index_freq == seq_freq
 
@@ -487,7 +513,9 @@ class TestDataFrameSelectReindex(TestData):
     def test_reindex_positional_warns(self):
         # https://github.com/pandas-dev/pandas/issues/12392
         df = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]})
-        expected = pd.DataFrame({"A": [1.0, 2], "B": [4.0, 5], "C": [np.nan, np.nan]})
+        expected = pd.DataFrame(
+            {"A": [1.0, 2], "B": [4.0, 5], "C": [np.nan, np.nan]}
+        )
         with tm.assert_produces_warning(FutureWarning):
             result = df.reindex([0, 1], ["A", "B", "C"])
 
@@ -562,7 +590,9 @@ class TestDataFrameSelectReindex(TestData):
             res1 = df.reindex(["b", "a"], ["e", "d"])
         assert "reindex" in str(m[0].message)
         res2 = df.reindex(columns=["e", "d"], index=["b", "a"])
-        res3 = df.reindex(labels=["b", "a"], axis=0).reindex(labels=["e", "d"], axis=1)
+        res3 = df.reindex(labels=["b", "a"], axis=0).reindex(
+            labels=["e", "d"], axis=1
+        )
         for res in [res2, res3]:
             tm.assert_frame_equal(res1, res)
 
@@ -625,7 +655,11 @@ class TestDataFrameSelectReindex(TestData):
         tm.assert_index_equal(bf.columns, self.mixed_frame.columns)
 
         af, bf = self.frame.align(
-            other.iloc[:, 0], join="inner", axis=1, method=None, fill_value=None
+            other.iloc[:, 0],
+            join="inner",
+            axis=1,
+            method=None,
+            fill_value=None,
         )
         tm.assert_index_equal(bf.index, Index([]))
 
@@ -678,7 +712,12 @@ class TestDataFrameSelectReindex(TestData):
 
     def _check_align(self, a, b, axis, fill_axis, how, method, limit=None):
         aa, ab = a.align(
-            b, axis=axis, join=how, method=method, limit=limit, fill_axis=fill_axis
+            b,
+            axis=axis,
+            join=how,
+            method=method,
+            limit=limit,
+            fill_axis=fill_axis,
         )
 
         join_index, join_columns = None, None
@@ -712,27 +751,47 @@ class TestDataFrameSelectReindex(TestData):
         right = self.frame.iloc[2:, 6:]
         empty = self.frame.iloc[:0, :0]
 
-        self._check_align(left, right, axis=ax, fill_axis=fax, how=kind, method=meth)
+        self._check_align(
+            left, right, axis=ax, fill_axis=fax, how=kind, method=meth
+        )
         self._check_align(
             left, right, axis=ax, fill_axis=fax, how=kind, method=meth, limit=1
         )
 
         # empty left
-        self._check_align(empty, right, axis=ax, fill_axis=fax, how=kind, method=meth)
         self._check_align(
-            empty, right, axis=ax, fill_axis=fax, how=kind, method=meth, limit=1
+            empty, right, axis=ax, fill_axis=fax, how=kind, method=meth
+        )
+        self._check_align(
+            empty,
+            right,
+            axis=ax,
+            fill_axis=fax,
+            how=kind,
+            method=meth,
+            limit=1,
         )
 
         # empty right
-        self._check_align(left, empty, axis=ax, fill_axis=fax, how=kind, method=meth)
+        self._check_align(
+            left, empty, axis=ax, fill_axis=fax, how=kind, method=meth
+        )
         self._check_align(
             left, empty, axis=ax, fill_axis=fax, how=kind, method=meth, limit=1
         )
 
         # both empty
-        self._check_align(empty, empty, axis=ax, fill_axis=fax, how=kind, method=meth)
         self._check_align(
-            empty, empty, axis=ax, fill_axis=fax, how=kind, method=meth, limit=1
+            empty, empty, axis=ax, fill_axis=fax, how=kind, method=meth
+        )
+        self._check_align(
+            empty,
+            empty,
+            axis=ax,
+            fill_axis=fax,
+            how=kind,
+            method=meth,
+            limit=1,
         )
 
     def test_align_int_fill_bug(self):
@@ -794,7 +853,9 @@ class TestDataFrameSelectReindex(TestData):
             {"a": [1, np.nan, 3, np.nan, 5], "b": [1, np.nan, 3, np.nan, 5]},
             index=list("ABCDE"),
         )
-        exp2 = pd.Series([1, 2, np.nan, 4, np.nan], index=list("ABCDE"), name="x")
+        exp2 = pd.Series(
+            [1, 2, np.nan, 4, np.nan], index=list("ABCDE"), name="x"
+        )
 
         tm.assert_frame_equal(res1, exp1)
         tm.assert_series_equal(res2, exp2)
@@ -1014,7 +1075,9 @@ class TestDataFrameSelectReindex(TestData):
 
     def test_reindex_boolean(self):
         frame = DataFrame(
-            np.ones((10, 2), dtype=bool), index=np.arange(0, 20, 2), columns=[0, 2]
+            np.ones((10, 2), dtype=bool),
+            index=np.arange(0, 20, 2),
+            columns=[0, 2],
         )
 
         reindexed = frame.reindex(np.arange(10))
@@ -1057,7 +1120,10 @@ class TestDataFrameSelectReindex(TestData):
         reindexed2 = self.intframe.reindex(index=rows)
         assert_frame_equal(reindexed1, reindexed2)
 
-        msg = "No axis named 2 for object type" " <class 'pandas.core.frame.DataFrame'>"
+        msg = (
+            "No axis named 2 for object type"
+            " <class 'pandas.core.frame.DataFrame'>"
+        )
         with pytest.raises(ValueError, match=msg):
             self.intframe.reindex_axis(rows, axis=2)
 
@@ -1128,7 +1194,9 @@ class TestDataFrameSelectReindex(TestData):
         df2 = df.iloc[[0, 1, 2, 3, 4, 5, 6, 8]]
 
         result = df2.reindex(midx)
-        expected = pd.DataFrame({"a": [0, 1, 2, 3, 4, 5, 6, np.nan, 8]}, index=midx)
+        expected = pd.DataFrame(
+            {"a": [0, 1, 2, 3, 4, 5, 6, np.nan, 8]}, index=midx
+        )
         assert_frame_equal(result, expected)
 
     data = [[1, 2, 3], [1, 2, 3]]
@@ -1150,9 +1218,13 @@ class TestDataFrameSelectReindex(TestData):
             actual.drop("c", level=level, axis=0)
         with pytest.raises(KeyError):
             actual.T.drop("c", level=level, axis=1)
-        expected_no_err = actual.drop("c", axis=0, level=level, errors="ignore")
+        expected_no_err = actual.drop(
+            "c", axis=0, level=level, errors="ignore"
+        )
         assert_frame_equal(expected_no_err, actual)
-        expected_no_err = actual.T.drop("c", axis=1, level=level, errors="ignore")
+        expected_no_err = actual.T.drop(
+            "c", axis=1, level=level, errors="ignore"
+        )
         assert_frame_equal(expected_no_err.T, actual)
 
     @pytest.mark.parametrize("index", [[1, 2, 3], [1, 1, 2]])

@@ -22,7 +22,9 @@ def test_rank_apply():
 
     result = df.groupby(["key1", "key2"]).value.rank()
 
-    expected = [piece.value.rank() for key, piece in df.groupby(["key1", "key2"])]
+    expected = [
+        piece.value.rank() for key, piece in df.groupby(["key1", "key2"])
+    ]
     expected = concat(expected, axis=0)
     expected = expected.reindex(result.index)
     tm.assert_series_equal(result, expected)
@@ -30,7 +32,8 @@ def test_rank_apply():
     result = df.groupby(["key1", "key2"]).value.rank(pct=True)
 
     expected = [
-        piece.value.rank(pct=True) for key, piece in df.groupby(["key1", "key2"])
+        piece.value.rank(pct=True)
+        for key, piece in df.groupby(["key1", "key2"])
     ]
     expected = concat(expected, axis=0)
     expected = expected.reindex(result.index)
@@ -71,16 +74,28 @@ def test_rank_apply():
         ("first", False, False, [3.0, 4.0, 1.0, 5.0, 2.0]),
         ("first", False, True, [0.6, 0.8, 0.2, 1.0, 0.4]),
         ("dense", True, False, [1.0, 1.0, 3.0, 1.0, 2.0]),
-        ("dense", True, True, [1.0 / 3.0, 1.0 / 3.0, 3.0 / 3.0, 1.0 / 3.0, 2.0 / 3.0]),
+        (
+            "dense",
+            True,
+            True,
+            [1.0 / 3.0, 1.0 / 3.0, 3.0 / 3.0, 1.0 / 3.0, 2.0 / 3.0],
+        ),
         ("dense", False, False, [3.0, 3.0, 1.0, 3.0, 2.0]),
-        ("dense", False, True, [3.0 / 3.0, 3.0 / 3.0, 1.0 / 3.0, 3.0 / 3.0, 2.0 / 3.0]),
+        (
+            "dense",
+            False,
+            True,
+            [3.0 / 3.0, 3.0 / 3.0, 1.0 / 3.0, 3.0 / 3.0, 2.0 / 3.0],
+        ),
     ],
 )
 def test_rank_args(grps, vals, ties_method, ascending, pct, exp):
     key = np.repeat(grps, len(vals))
     vals = vals * len(grps)
     df = DataFrame({"key": key, "val": vals})
-    result = df.groupby("key").rank(method=ties_method, ascending=ascending, pct=pct)
+    result = df.groupby("key").rank(
+        method=ties_method, ascending=ascending, pct=pct
+    )
 
     exp_df = DataFrame(exp * len(grps), columns=["val"])
     tm.assert_frame_equal(result, exp_df)
@@ -185,8 +200,20 @@ def test_infs_n_nans(grps, vals, ties_method, ascending, na_option, exp):
             True,
             [0.8, 0.8, np.nan, 0.2, 0.8, 0.4, np.nan, np.nan],
         ),
-        ("min", True, "keep", False, [1.0, 1.0, np.nan, 5.0, 1.0, 4.0, np.nan, np.nan]),
-        ("min", True, "keep", True, [0.2, 0.2, np.nan, 1.0, 0.2, 0.8, np.nan, np.nan]),
+        (
+            "min",
+            True,
+            "keep",
+            False,
+            [1.0, 1.0, np.nan, 5.0, 1.0, 4.0, np.nan, np.nan],
+        ),
+        (
+            "min",
+            True,
+            "keep",
+            True,
+            [0.2, 0.2, np.nan, 1.0, 0.2, 0.8, np.nan, np.nan],
+        ),
         (
             "min",
             False,
@@ -194,9 +221,27 @@ def test_infs_n_nans(grps, vals, ties_method, ascending, na_option, exp):
             False,
             [3.0, 3.0, np.nan, 1.0, 3.0, 2.0, np.nan, np.nan],
         ),
-        ("min", False, "keep", True, [0.6, 0.6, np.nan, 0.2, 0.6, 0.4, np.nan, np.nan]),
-        ("max", True, "keep", False, [3.0, 3.0, np.nan, 5.0, 3.0, 4.0, np.nan, np.nan]),
-        ("max", True, "keep", True, [0.6, 0.6, np.nan, 1.0, 0.6, 0.8, np.nan, np.nan]),
+        (
+            "min",
+            False,
+            "keep",
+            True,
+            [0.6, 0.6, np.nan, 0.2, 0.6, 0.4, np.nan, np.nan],
+        ),
+        (
+            "max",
+            True,
+            "keep",
+            False,
+            [3.0, 3.0, np.nan, 5.0, 3.0, 4.0, np.nan, np.nan],
+        ),
+        (
+            "max",
+            True,
+            "keep",
+            True,
+            [0.6, 0.6, np.nan, 1.0, 0.6, 0.8, np.nan, np.nan],
+        ),
         (
             "max",
             False,
@@ -204,7 +249,13 @@ def test_infs_n_nans(grps, vals, ties_method, ascending, na_option, exp):
             False,
             [5.0, 5.0, np.nan, 1.0, 5.0, 2.0, np.nan, np.nan],
         ),
-        ("max", False, "keep", True, [1.0, 1.0, np.nan, 0.2, 1.0, 0.4, np.nan, np.nan]),
+        (
+            "max",
+            False,
+            "keep",
+            True,
+            [1.0, 1.0, np.nan, 0.2, 1.0, 0.4, np.nan, np.nan],
+        ),
         (
             "first",
             True,
@@ -279,7 +330,13 @@ def test_infs_n_nans(grps, vals, ties_method, ascending, na_option, exp):
                 np.nan,
             ],
         ),
-        ("average", True, "bottom", False, [2.0, 2.0, 7.0, 5.0, 2.0, 4.0, 7.0, 7.0]),
+        (
+            "average",
+            True,
+            "bottom",
+            False,
+            [2.0, 2.0, 7.0, 5.0, 2.0, 4.0, 7.0, 7.0],
+        ),
         (
             "average",
             True,
@@ -287,7 +344,13 @@ def test_infs_n_nans(grps, vals, ties_method, ascending, na_option, exp):
             True,
             [0.25, 0.25, 0.875, 0.625, 0.25, 0.5, 0.875, 0.875],
         ),
-        ("average", False, "bottom", False, [4.0, 4.0, 7.0, 1.0, 4.0, 2.0, 7.0, 7.0]),
+        (
+            "average",
+            False,
+            "bottom",
+            False,
+            [4.0, 4.0, 7.0, 1.0, 4.0, 2.0, 7.0, 7.0],
+        ),
         (
             "average",
             False,
@@ -295,7 +358,13 @@ def test_infs_n_nans(grps, vals, ties_method, ascending, na_option, exp):
             True,
             [0.5, 0.5, 0.875, 0.125, 0.5, 0.25, 0.875, 0.875],
         ),
-        ("min", True, "bottom", False, [1.0, 1.0, 6.0, 5.0, 1.0, 4.0, 6.0, 6.0]),
+        (
+            "min",
+            True,
+            "bottom",
+            False,
+            [1.0, 1.0, 6.0, 5.0, 1.0, 4.0, 6.0, 6.0],
+        ),
         (
             "min",
             True,
@@ -303,7 +372,13 @@ def test_infs_n_nans(grps, vals, ties_method, ascending, na_option, exp):
             True,
             [0.125, 0.125, 0.75, 0.625, 0.125, 0.5, 0.75, 0.75],
         ),
-        ("min", False, "bottom", False, [3.0, 3.0, 6.0, 1.0, 3.0, 2.0, 6.0, 6.0]),
+        (
+            "min",
+            False,
+            "bottom",
+            False,
+            [3.0, 3.0, 6.0, 1.0, 3.0, 2.0, 6.0, 6.0],
+        ),
         (
             "min",
             False,
@@ -311,9 +386,27 @@ def test_infs_n_nans(grps, vals, ties_method, ascending, na_option, exp):
             True,
             [0.375, 0.375, 0.75, 0.125, 0.375, 0.25, 0.75, 0.75],
         ),
-        ("max", True, "bottom", False, [3.0, 3.0, 8.0, 5.0, 3.0, 4.0, 8.0, 8.0]),
-        ("max", True, "bottom", True, [0.375, 0.375, 1.0, 0.625, 0.375, 0.5, 1.0, 1.0]),
-        ("max", False, "bottom", False, [5.0, 5.0, 8.0, 1.0, 5.0, 2.0, 8.0, 8.0]),
+        (
+            "max",
+            True,
+            "bottom",
+            False,
+            [3.0, 3.0, 8.0, 5.0, 3.0, 4.0, 8.0, 8.0],
+        ),
+        (
+            "max",
+            True,
+            "bottom",
+            True,
+            [0.375, 0.375, 1.0, 0.625, 0.375, 0.5, 1.0, 1.0],
+        ),
+        (
+            "max",
+            False,
+            "bottom",
+            False,
+            [5.0, 5.0, 8.0, 1.0, 5.0, 2.0, 8.0, 8.0],
+        ),
         (
             "max",
             False,
@@ -321,7 +414,13 @@ def test_infs_n_nans(grps, vals, ties_method, ascending, na_option, exp):
             True,
             [0.625, 0.625, 1.0, 0.125, 0.625, 0.25, 1.0, 1.0],
         ),
-        ("first", True, "bottom", False, [1.0, 2.0, 6.0, 5.0, 3.0, 4.0, 7.0, 8.0]),
+        (
+            "first",
+            True,
+            "bottom",
+            False,
+            [1.0, 2.0, 6.0, 5.0, 3.0, 4.0, 7.0, 8.0],
+        ),
         (
             "first",
             True,
@@ -329,7 +428,13 @@ def test_infs_n_nans(grps, vals, ties_method, ascending, na_option, exp):
             True,
             [0.125, 0.25, 0.75, 0.625, 0.375, 0.5, 0.875, 1.0],
         ),
-        ("first", False, "bottom", False, [3.0, 4.0, 6.0, 1.0, 5.0, 2.0, 7.0, 8.0]),
+        (
+            "first",
+            False,
+            "bottom",
+            False,
+            [3.0, 4.0, 6.0, 1.0, 5.0, 2.0, 7.0, 8.0],
+        ),
         (
             "first",
             False,
@@ -337,13 +442,39 @@ def test_infs_n_nans(grps, vals, ties_method, ascending, na_option, exp):
             True,
             [0.375, 0.5, 0.75, 0.125, 0.625, 0.25, 0.875, 1.0],
         ),
-        ("dense", True, "bottom", False, [1.0, 1.0, 4.0, 3.0, 1.0, 2.0, 4.0, 4.0]),
-        ("dense", True, "bottom", True, [0.25, 0.25, 1.0, 0.75, 0.25, 0.5, 1.0, 1.0]),
-        ("dense", False, "bottom", False, [3.0, 3.0, 4.0, 1.0, 3.0, 2.0, 4.0, 4.0]),
-        ("dense", False, "bottom", True, [0.75, 0.75, 1.0, 0.25, 0.75, 0.5, 1.0, 1.0]),
+        (
+            "dense",
+            True,
+            "bottom",
+            False,
+            [1.0, 1.0, 4.0, 3.0, 1.0, 2.0, 4.0, 4.0],
+        ),
+        (
+            "dense",
+            True,
+            "bottom",
+            True,
+            [0.25, 0.25, 1.0, 0.75, 0.25, 0.5, 1.0, 1.0],
+        ),
+        (
+            "dense",
+            False,
+            "bottom",
+            False,
+            [3.0, 3.0, 4.0, 1.0, 3.0, 2.0, 4.0, 4.0],
+        ),
+        (
+            "dense",
+            False,
+            "bottom",
+            True,
+            [0.75, 0.75, 1.0, 0.25, 0.75, 0.5, 1.0, 1.0],
+        ),
     ],
 )
-def test_rank_args_missing(grps, vals, ties_method, ascending, na_option, pct, exp):
+def test_rank_args_missing(
+    grps, vals, ties_method, ascending, na_option, pct, exp
+):
     key = np.repeat(grps, len(vals))
     vals = vals * len(grps)
     df = DataFrame({"key": key, "val": vals})
@@ -356,11 +487,15 @@ def test_rank_args_missing(grps, vals, ties_method, ascending, na_option, pct, e
 
 
 @pytest.mark.parametrize(
-    "pct,exp", [(False, [3.0, 3.0, 3.0, 3.0, 3.0]), (True, [0.6, 0.6, 0.6, 0.6, 0.6])]
+    "pct,exp",
+    [(False, [3.0, 3.0, 3.0, 3.0, 3.0]), (True, [0.6, 0.6, 0.6, 0.6, 0.6])],
 )
 def test_rank_resets_each_group(pct, exp):
     df = DataFrame(
-        {"key": ["a", "a", "a", "a", "a", "b", "b", "b", "b", "b"], "val": [1] * 10}
+        {
+            "key": ["a", "a", "a", "a", "a", "b", "b", "b", "b", "b"],
+            "val": [1] * 10,
+        }
     )
     result = df.groupby("key").rank(pct=pct)
     exp_df = DataFrame(exp * 2, columns=["val"])
@@ -374,24 +509,35 @@ def test_rank_avg_even_vals():
     tm.assert_frame_equal(result, exp_df)
 
 
-@pytest.mark.parametrize("ties_method", ["average", "min", "max", "first", "dense"])
+@pytest.mark.parametrize(
+    "ties_method", ["average", "min", "max", "first", "dense"]
+)
 @pytest.mark.parametrize("ascending", [True, False])
 @pytest.mark.parametrize("na_option", ["keep", "top", "bottom"])
 @pytest.mark.parametrize("pct", [True, False])
 @pytest.mark.parametrize(
-    "vals", [["bar", "bar", "foo", "bar", "baz"], ["bar", np.nan, "foo", np.nan, "baz"]]
+    "vals",
+    [
+        ["bar", "bar", "foo", "bar", "baz"],
+        ["bar", np.nan, "foo", np.nan, "baz"],
+    ],
 )
 def test_rank_object_raises(ties_method, ascending, na_option, pct, vals):
     df = DataFrame({"key": ["foo"] * 5, "val": vals})
 
     with pytest.raises(TypeError, match="not callable"):
         df.groupby("key").rank(
-            method=ties_method, ascending=ascending, na_option=na_option, pct=pct
+            method=ties_method,
+            ascending=ascending,
+            na_option=na_option,
+            pct=pct,
         )
 
 
 @pytest.mark.parametrize("na_option", [True, "bad", 1])
-@pytest.mark.parametrize("ties_method", ["average", "min", "max", "first", "dense"])
+@pytest.mark.parametrize(
+    "ties_method", ["average", "min", "max", "first", "dense"]
+)
 @pytest.mark.parametrize("ascending", [True, False])
 @pytest.mark.parametrize("pct", [True, False])
 @pytest.mark.parametrize(
@@ -408,7 +554,10 @@ def test_rank_naoption_raises(ties_method, ascending, na_option, pct, vals):
 
     with pytest.raises(ValueError, match=msg):
         df.groupby("key").rank(
-            method=ties_method, ascending=ascending, na_option=na_option, pct=pct
+            method=ties_method,
+            ascending=ascending,
+            na_option=na_option,
+            pct=pct,
         )
 
 

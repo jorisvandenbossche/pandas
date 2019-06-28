@@ -84,7 +84,10 @@ def test_ext():
     check(ExtType(0x42, b"Z" * 256), b"\xc8\x01\x00\x42" + b"Z" * 256)
     check(ExtType(0x42, b"Z" * 0xFFFF), b"\xc8\xff\xff\x42" + b"Z" * 0xFFFF)
     # ext 32
-    check(ExtType(0x42, b"Z" * 0x10000), b"\xc9\x00\x01\x00\x00\x42" + b"Z" * 0x10000)
+    check(
+        ExtType(0x42, b"Z" * 0x10000),
+        b"\xc9\x00\x01\x00\x00\x42" + b"Z" * 0x10000,
+    )
     # needs large memory
     # check(ExtType(0x42, b'Z'*0xffffffff),
     #              b'\xc9\xff\xff\xff\xff\x42' + b'Z'*0xffffffff)

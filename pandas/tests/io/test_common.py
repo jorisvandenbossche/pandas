@@ -94,7 +94,13 @@ bar2,12,13,14,15
 
     @pytest.mark.parametrize(
         "extension,expected",
-        [("", None), (".gz", "gzip"), (".bz2", "bz2"), (".zip", "zip"), (".xz", "xz")],
+        [
+            ("", None),
+            (".gz", "gzip"),
+            (".bz2", "bz2"),
+            (".zip", "zip"),
+            (".xz", "xz"),
+        ],
     )
     @pytest.mark.parametrize("path_type", path_types)
     def test_infer_compression_from_path(self, extension, expected, path_type):
@@ -104,7 +110,9 @@ bar2,12,13,14,15
 
     def test_get_filepath_or_buffer_with_path(self):
         filename = "~/sometest"
-        filepath_or_buffer, _, _, should_close = icom.get_filepath_or_buffer(filename)
+        filepath_or_buffer, _, _, should_close = icom.get_filepath_or_buffer(
+            filename
+        )
         assert filepath_or_buffer != filename
         assert os.path.isabs(filepath_or_buffer)
         assert os.path.expanduser(filename) == filepath_or_buffer
@@ -149,9 +157,12 @@ bar2,12,13,14,15
         pytest.importorskip(module)
 
         path = os.path.join(HERE, "data", "does_not_exist." + fn_ext)
-        msg1 = r"File (b')?.+does_not_exist\.{}'? does not exist".format(fn_ext)
+        msg1 = r"File (b')?.+does_not_exist\.{}'? does not exist".format(
+            fn_ext
+        )
         msg2 = (
-            r"\[Errno 2\] No such file or directory: '.+does_not_exist" r"\.{}'"
+            r"\[Errno 2\] No such file or directory: '.+does_not_exist"
+            r"\.{}'"
         ).format(fn_ext)
         msg3 = "Expected object or value"
         msg4 = "path_or_buf needs to be a string file path or file-like"
@@ -160,7 +171,8 @@ bar2,12,13,14,15
             r" '.+does_not_exist\.{}'"
         ).format(fn_ext, fn_ext)
         with pytest.raises(
-            error_class, match=r"({}|{}|{}|{}|{})".format(msg1, msg2, msg3, msg4, msg5)
+            error_class,
+            match=r"({}|{}|{}|{}|{})".format(msg1, msg2, msg3, msg4, msg5),
         ):
             reader(path)
 
@@ -185,11 +197,16 @@ bar2,12,13,14,15
         pytest.importorskip(module)
 
         path = os.path.join("~", "does_not_exist." + fn_ext)
-        monkeypatch.setattr(icom, "_expand_user", lambda x: os.path.join("foo", x))
+        monkeypatch.setattr(
+            icom, "_expand_user", lambda x: os.path.join("foo", x)
+        )
 
-        msg1 = r"File (b')?.+does_not_exist\.{}'? does not exist".format(fn_ext)
+        msg1 = r"File (b')?.+does_not_exist\.{}'? does not exist".format(
+            fn_ext
+        )
         msg2 = (
-            r"\[Errno 2\] No such file or directory:" r" '.+does_not_exist\.{}'"
+            r"\[Errno 2\] No such file or directory:"
+            r" '.+does_not_exist\.{}'"
         ).format(fn_ext)
         msg3 = "Unexpected character found when decoding 'false'"
         msg4 = "path_or_buf needs to be a string file path or file-like"
@@ -199,7 +216,8 @@ bar2,12,13,14,15
         ).format(fn_ext, fn_ext)
 
         with pytest.raises(
-            error_class, match=r"({}|{}|{}|{}|{})".format(msg1, msg2, msg3, msg4, msg5)
+            error_class,
+            match=r"({}|{}|{}|{}|{})".format(msg1, msg2, msg3, msg4, msg5),
         ):
             reader(path)
 
@@ -210,7 +228,9 @@ bar2,12,13,14,15
             r"\[Errno 2\] File .+does_not_exist\.csv does not exist:"
             r" '.+does_not_exist\.csv'"
         )
-        with pytest.raises(FileNotFoundError, match=r"({}|{})".format(msg1, msg2)):
+        with pytest.raises(
+            FileNotFoundError, match=r"({}|{})".format(msg1, msg2)
+        ):
             with tm.assert_produces_warning(FutureWarning):
                 pd.read_table(path)
 
@@ -220,7 +240,11 @@ bar2,12,13,14,15
             (pd.read_csv, "os", ("io", "data", "iris.csv")),
             (pd.read_fwf, "os", ("io", "data", "fixed_width_format.txt")),
             (pd.read_excel, "xlrd", ("io", "data", "test1.xlsx")),
-            (pd.read_feather, "feather", ("io", "data", "feather-0_3_1.feather")),
+            (
+                pd.read_feather,
+                "feather",
+                ("io", "data", "feather-0_3_1.feather"),
+            ),
             (
                 pd.read_hdf,
                 "tables",
@@ -230,7 +254,11 @@ bar2,12,13,14,15
             (pd.read_sas, "os", ("io", "sas", "data", "test1.sas7bdat")),
             (pd.read_json, "os", ("io", "json", "data", "tsframe_v012.json")),
             (pd.read_msgpack, "os", ("io", "msgpack", "data", "frame.mp")),
-            (pd.read_pickle, "os", ("io", "data", "categorical_0_14_1.pickle")),
+            (
+                pd.read_pickle,
+                "os",
+                ("io", "data", "categorical_0_14_1.pickle"),
+            ),
         ],
     )
     def test_read_fspath_all(self, reader, module, path, datapath):
@@ -273,7 +301,11 @@ bar2,12,13,14,15
             ("to_latex", {}, "os"),
             ("to_msgpack", {}, "os"),
             ("to_pickle", {}, "os"),
-            ("to_stata", {"time_stamp": pd.to_datetime("2019-01-01 00:00")}, "os"),
+            (
+                "to_stata",
+                {"time_stamp": pd.to_datetime("2019-01-01 00:00")},
+                "os",
+            ),
         ],
     )
     def test_write_fspath_all(self, writer_name, writer_kwargs, module):

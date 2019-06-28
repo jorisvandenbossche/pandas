@@ -54,7 +54,9 @@ class TestRangeIndex(Numeric):
     )
     def test_constructor(self, args, kwargs, start, stop, step, name):
         result = RangeIndex(*args, name=name, **kwargs)
-        expected = Index(np.arange(start, stop, step, dtype=np.int64), name=name)
+        expected = Index(
+            np.arange(start, stop, step, dtype=np.int64), name=name
+        )
         assert isinstance(result, RangeIndex)
         assert result.name is name
         assert result._range == range(start, stop, step)
@@ -416,12 +418,34 @@ class TestRangeIndex(Numeric):
         # join with Int64Index
         other = Int64Index(np.arange(25, 14, -1))
 
-        res, lidx, ridx = self.index.join(other, how="outer", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other, how="outer", return_indexers=True
+        )
         noidx_res = self.index.join(other, how="outer")
         tm.assert_index_equal(res, noidx_res)
 
         eres = Int64Index(
-            [0, 2, 4, 6, 8, 10, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
+            [
+                0,
+                2,
+                4,
+                6,
+                8,
+                10,
+                12,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+            ]
         )
         elidx = np.array(
             [0, 1, 2, 3, 4, 5, 6, 7, -1, 8, -1, 9, -1, -1, -1, -1, -1, -1, -1],
@@ -441,7 +465,9 @@ class TestRangeIndex(Numeric):
         # join with RangeIndex
         other = RangeIndex(25, 14, -1)
 
-        res, lidx, ridx = self.index.join(other, how="outer", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other, how="outer", return_indexers=True
+        )
         noidx_res = self.index.join(other, how="outer")
         tm.assert_index_equal(res, noidx_res)
 
@@ -455,7 +481,9 @@ class TestRangeIndex(Numeric):
         # Join with non-RangeIndex
         other = Int64Index(np.arange(25, 14, -1))
 
-        res, lidx, ridx = self.index.join(other, how="inner", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other, how="inner", return_indexers=True
+        )
 
         # no guarantee of sortedness, so sort for comparison purposes
         ind = res.argsort()
@@ -475,7 +503,9 @@ class TestRangeIndex(Numeric):
         # Join two RangeIndex
         other = RangeIndex(25, 14, -1)
 
-        res, lidx, ridx = self.index.join(other, how="inner", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other, how="inner", return_indexers=True
+        )
 
         assert isinstance(res, RangeIndex)
         tm.assert_index_equal(res, eres)
@@ -486,7 +516,9 @@ class TestRangeIndex(Numeric):
         # Join with Int64Index
         other = Int64Index(np.arange(25, 14, -1))
 
-        res, lidx, ridx = self.index.join(other, how="left", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other, how="left", return_indexers=True
+        )
         eres = self.index
         eridx = np.array([-1, -1, -1, -1, -1, -1, -1, -1, 9, 7], dtype=np.intp)
 
@@ -498,7 +530,9 @@ class TestRangeIndex(Numeric):
         # Join withRangeIndex
         other = Int64Index(np.arange(25, 14, -1))
 
-        res, lidx, ridx = self.index.join(other, how="left", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other, how="left", return_indexers=True
+        )
 
         assert isinstance(res, RangeIndex)
         tm.assert_index_equal(res, eres)
@@ -509,9 +543,13 @@ class TestRangeIndex(Numeric):
         # Join with Int64Index
         other = Int64Index(np.arange(25, 14, -1))
 
-        res, lidx, ridx = self.index.join(other, how="right", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other, how="right", return_indexers=True
+        )
         eres = other
-        elidx = np.array([-1, -1, -1, -1, -1, -1, -1, 9, -1, 8, -1], dtype=np.intp)
+        elidx = np.array(
+            [-1, -1, -1, -1, -1, -1, -1, 9, -1, 8, -1], dtype=np.intp
+        )
 
         assert isinstance(other, Int64Index)
         tm.assert_index_equal(res, eres)
@@ -521,7 +559,9 @@ class TestRangeIndex(Numeric):
         # Join withRangeIndex
         other = RangeIndex(25, 14, -1)
 
-        res, lidx, ridx = self.index.join(other, how="right", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other, how="right", return_indexers=True
+        )
         eres = other
 
         assert isinstance(other, RangeIndex)
@@ -563,7 +603,9 @@ class TestRangeIndex(Numeric):
 
         eres = Int64Index([0, 2, 4, 4, 6, 8, 10, 12, 14, 16, 18])
         elidx = np.array([0, 1, 2, 2, 3, 4, 5, 6, 7, 8, 9], dtype=np.intp)
-        eridx = np.array([-1, -1, 0, 1, -1, -1, -1, -1, -1, -1, -1], dtype=np.intp)
+        eridx = np.array(
+            [-1, -1, 0, 1, -1, -1, -1, -1, -1, -1, -1], dtype=np.intp
+        )
 
         tm.assert_index_equal(res, eres)
         tm.assert_numpy_array_equal(lidx, elidx)
@@ -580,25 +622,33 @@ class TestRangeIndex(Numeric):
         # intersect with Int64Index
         other = Index(np.arange(1, 6))
         result = self.index.intersection(other, sort=sort)
-        expected = Index(np.sort(np.intersect1d(self.index.values, other.values)))
+        expected = Index(
+            np.sort(np.intersect1d(self.index.values, other.values))
+        )
         tm.assert_index_equal(result, expected)
 
         result = other.intersection(self.index, sort=sort)
         expected = Index(
-            np.sort(np.asarray(np.intersect1d(self.index.values, other.values)))
+            np.sort(
+                np.asarray(np.intersect1d(self.index.values, other.values))
+            )
         )
         tm.assert_index_equal(result, expected)
 
         # intersect with increasing RangeIndex
         other = RangeIndex(1, 6)
         result = self.index.intersection(other, sort=sort)
-        expected = Index(np.sort(np.intersect1d(self.index.values, other.values)))
+        expected = Index(
+            np.sort(np.intersect1d(self.index.values, other.values))
+        )
         tm.assert_index_equal(result, expected)
 
         # intersect with decreasing RangeIndex
         other = RangeIndex(5, 0, -1)
         result = self.index.intersection(other, sort=sort)
-        expected = Index(np.sort(np.intersect1d(self.index.values, other.values)))
+        expected = Index(
+            np.sort(np.intersect1d(self.index.values, other.values))
+        )
         tm.assert_index_equal(result, expected)
 
         # reversed (GH 17296)
@@ -666,7 +716,12 @@ class TestRangeIndex(Numeric):
             (RI(0, 10, 1), RI(5, 20, 1), RI(0, 20, 1), I64(range(20))),
             (RI(0, 10, 1), RI(10, 20, 1), RI(0, 20, 1), I64(range(20))),
             (RI(0, -10, -1), RI(0, -10, -1), RI(0, -10, -1), RI(0, -10, -1)),
-            (RI(0, -10, -1), RI(-10, -20, -1), RI(-19, 1, 1), I64(range(0, -20, -1))),
+            (
+                RI(0, -10, -1),
+                RI(-10, -20, -1),
+                RI(-19, 1, 1),
+                I64(range(0, -20, -1)),
+            ),
             (
                 RI(0, 10, 2),
                 RI(1, 10, 2),
@@ -691,7 +746,12 @@ class TestRangeIndex(Numeric):
                 RI(-19, 1, 1),
                 I64(list(range(0, -20, -2)) + list(range(-1, -21, -2))),
             ),
-            (RI(0, 100, 5), RI(0, 100, 20), RI(0, 100, 5), I64(range(0, 100, 5))),
+            (
+                RI(0, 100, 5),
+                RI(0, 100, 20),
+                RI(0, 100, 5),
+                I64(range(0, 100, 5)),
+            ),
             (
                 RI(0, -100, -5),
                 RI(5, -100, -20),
@@ -706,7 +766,12 @@ class TestRangeIndex(Numeric):
             ),
             (RI(0), RI(0), RI(0), RI(0)),
             (RI(0, -10, -2), RI(0), RI(0, -10, -2), RI(0, -10, -2)),
-            (RI(0, 100, 2), RI(100, 150, 200), RI(0, 102, 2), I64(range(0, 102, 2))),
+            (
+                RI(0, 100, 2),
+                RI(100, 150, 200),
+                RI(0, 102, 2),
+                I64(range(0, 102, 2)),
+            ),
             (
                 RI(0, -100, -2),
                 RI(-100, 50, 102),
@@ -790,7 +855,9 @@ class TestRangeIndex(Numeric):
             idx.take(np.array([1, 0, -1]), fill_value=True)
 
         # allow_fill=False
-        result = idx.take(np.array([1, 0, -1]), allow_fill=False, fill_value=True)
+        result = idx.take(
+            np.array([1, 0, -1]), allow_fill=False, fill_value=True
+        )
         expected = pd.Int64Index([2, 1, 3], name="xxx")
         tm.assert_index_equal(result, expected)
 
@@ -804,7 +871,9 @@ class TestRangeIndex(Numeric):
             idx.take(np.array([1, -5]))
 
     def test_print_unicode_columns(self):
-        df = pd.DataFrame({"\u05d0": [1, 2, 3], "\u05d1": [4, 5, 6], "c": [7, 8, 9]})
+        df = pd.DataFrame(
+            {"\u05d0": [1, 2, 3], "\u05d1": [4, 5, 6], "c": [7, 8, 9]}
+        )
         repr(df.columns)  # should not raise UnicodeDecodeError
 
     def test_repr_roundtrip(self):

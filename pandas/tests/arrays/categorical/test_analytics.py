@@ -36,7 +36,9 @@ class TestCategoricalAnalytics:
         assert _max == "a"
 
         cat = Categorical(
-            [np.nan, "b", "c", np.nan], categories=["d", "c", "b", "a"], ordered=True
+            [np.nan, "b", "c", np.nan],
+            categories=["d", "c", "b", "a"],
+            ordered=True,
         )
         _min = cat.min()
         _max = cat.max()
@@ -151,7 +153,9 @@ class TestCategoricalAnalytics:
         tm.assert_index_equal(res.categories, exp)
         tm.assert_categorical_equal(res, Categorical(exp))
 
-        cat = Categorical(["c", "a", "b", "a", "a"], categories=["a", "b", "c"])
+        cat = Categorical(
+            ["c", "a", "b", "a", "a"], categories=["a", "b", "c"]
+        )
         exp = Index(["c", "a", "b"])
         res = cat.unique()
         tm.assert_index_equal(res.categories, exp)
@@ -159,7 +163,9 @@ class TestCategoricalAnalytics:
         tm.assert_categorical_equal(res, exp_cat)
 
         # nan must be removed
-        cat = Categorical(["b", np.nan, "b", np.nan, "a"], categories=["a", "b", "c"])
+        cat = Categorical(
+            ["b", np.nan, "b", np.nan, "a"], categories=["a", "b", "c"]
+        )
         res = cat.unique()
         exp = Index(["b", "a"])
         tm.assert_index_equal(res.categories, exp)
@@ -177,10 +183,14 @@ class TestCategoricalAnalytics:
             ["c", "b", "a", "a"], categories=["a", "b", "c"], ordered=True
         )
         res = cat.unique()
-        exp_cat = Categorical(["c", "b", "a"], categories=["a", "b", "c"], ordered=True)
+        exp_cat = Categorical(
+            ["c", "b", "a"], categories=["a", "b", "c"], ordered=True
+        )
         tm.assert_categorical_equal(res, exp_cat)
 
-        cat = Categorical(["b", "a", "a"], categories=["a", "b", "c"], ordered=True)
+        cat = Categorical(
+            ["b", "a", "a"], categories=["a", "b", "c"], ordered=True
+        )
         res = cat.unique()
         exp_cat = Categorical(["b", "a"], categories=["a", "b"], ordered=True)
         tm.assert_categorical_equal(res, exp_cat)
@@ -189,7 +199,9 @@ class TestCategoricalAnalytics:
             ["b", "b", np.nan, "a"], categories=["a", "b", "c"], ordered=True
         )
         res = cat.unique()
-        exp_cat = Categorical(["b", np.nan, "a"], categories=["a", "b"], ordered=True)
+        exp_cat = Categorical(
+            ["b", np.nan, "a"], categories=["a", "b"], ordered=True
+        )
         tm.assert_categorical_equal(res, exp_cat)
 
     def test_unique_index_series(self):
@@ -294,10 +306,14 @@ class TestCategoricalAnalytics:
                 cat.rename_categories(["X", "Y", "Z"], inplace=value)
 
             with pytest.raises(ValueError):
-                cat.reorder_categories(["X", "Y", "Z"], ordered=True, inplace=value)
+                cat.reorder_categories(
+                    ["X", "Y", "Z"], ordered=True, inplace=value
+                )
 
             with pytest.raises(ValueError):
-                cat.add_categories(new_categories=["D", "E", "F"], inplace=value)
+                cat.add_categories(
+                    new_categories=["D", "E", "F"], inplace=value
+                )
 
             with pytest.raises(ValueError):
                 cat.remove_categories(removals=["D", "E", "F"], inplace=value)

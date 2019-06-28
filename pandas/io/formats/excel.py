@@ -24,7 +24,9 @@ class ExcelCell:
     __fields__ = ("row", "col", "val", "style", "mergestart", "mergeend")
     __slots__ = __fields__
 
-    def __init__(self, row, col, val, style=None, mergestart=None, mergeend=None):
+    def __init__(
+        self, row, col, val, style=None, mergestart=None, mergeend=None
+    ):
         self.row = row
         self.col = col
         self.val = val
@@ -195,7 +197,10 @@ class CSSToExcelConverter:
         #       -excel-pattern-bgcolor and -excel-pattern-type
         fill_color = props.get("background-color")
         if fill_color not in (None, "transparent", "none"):
-            return {"fgColor": self.color_to_excel(fill_color), "patternType": "solid"}
+            return {
+                "fgColor": self.color_to_excel(fill_color),
+                "patternType": "solid",
+            }
 
     BOLD_MAP = {
         "bold": True,
@@ -319,7 +324,9 @@ class CSSToExcelConverter:
         try:
             return self.NAMED_COLORS[val]
         except KeyError:
-            warnings.warn("Unhandled color format: {val!r}".format(val=val), CSSWarning)
+            warnings.warn(
+                "Unhandled color format: {val!r}".format(val=val), CSSWarning
+            )
 
     def build_number_format(self, props):
         return {"format_code": props.get("number-format")}
@@ -481,7 +488,10 @@ class ExcelFormatter:
                         )
                     else:
                         yield ExcelCell(
-                            lnum, coloffset + i + 1, values[i], self.header_style
+                            lnum,
+                            coloffset + i + 1,
+                            values[i],
+                            self.header_style,
                         )
         else:
             # Format in legacy format with dots to indicate levels.
@@ -506,14 +516,19 @@ class ExcelFormatter:
                 if len(self.header) != len(self.columns):
                     raise ValueError(
                         "Writing {cols} cols but got {alias} "
-                        "aliases".format(cols=len(self.columns), alias=len(self.header))
+                        "aliases".format(
+                            cols=len(self.columns), alias=len(self.header)
+                        )
                     )
                 else:
                     colnames = self.header
 
             for colindex, colname in enumerate(colnames):
                 yield ExcelCell(
-                    self.rowcounter, colindex + coloffset, colname, self.header_style
+                    self.rowcounter,
+                    colindex + coloffset,
+                    colname,
+                    self.header_style,
                 )
 
     def _format_header(self):
@@ -529,7 +544,9 @@ class ExcelFormatter:
             ] * len(self.columns)
             if reduce(lambda x, y: x and y, map(lambda x: x != "", row)):
                 gen2 = (
-                    ExcelCell(self.rowcounter, colindex, val, self.header_style)
+                    ExcelCell(
+                        self.rowcounter, colindex, val, self.header_style
+                    )
                     for colindex, val in enumerate(row)
                 )
                 self.rowcounter += 1
@@ -565,7 +582,9 @@ class ExcelFormatter:
                 self.rowcounter += 1
 
             if index_label and self.header is not False:
-                yield ExcelCell(self.rowcounter - 1, 0, index_label, self.header_style)
+                yield ExcelCell(
+                    self.rowcounter - 1, 0, index_label, self.header_style
+                )
 
             # write index_values
             index_values = self.df.index
@@ -573,7 +592,9 @@ class ExcelFormatter:
                 index_values = self.df.index.to_timestamp()
 
             for idx, idxval in enumerate(index_values):
-                yield ExcelCell(self.rowcounter + idx, 0, idxval, self.header_style)
+                yield ExcelCell(
+                    self.rowcounter + idx, 0, idxval, self.header_style
+                )
 
             coloffset = 1
         else:
@@ -608,7 +629,9 @@ class ExcelFormatter:
             if com._any_not_none(*index_labels) and self.header is not False:
 
                 for cidx, name in enumerate(index_labels):
-                    yield ExcelCell(self.rowcounter - 1, cidx, name, self.header_style)
+                    yield ExcelCell(
+                        self.rowcounter - 1, cidx, name, self.header_style
+                    )
 
             if self.merge_cells:
                 # Format hierarchical rows as merged cells.
@@ -622,7 +645,9 @@ class ExcelFormatter:
                 ):
 
                     values = levels.take(
-                        level_codes, allow_fill=levels._can_hold_na, fill_value=True
+                        level_codes,
+                        allow_fill=levels._can_hold_na,
+                        fill_value=True,
                     )
 
                     for i in spans:
@@ -674,10 +699,14 @@ class ExcelFormatter:
             for i, val in enumerate(series):
                 if styles is not None:
                     xlstyle = self.style_converter(";".join(styles[i, colidx]))
-                yield ExcelCell(self.rowcounter + i, colidx + coloffset, val, xlstyle)
+                yield ExcelCell(
+                    self.rowcounter + i, colidx + coloffset, val, xlstyle
+                )
 
     def get_formatted_cells(self):
-        for cell in itertools.chain(self._format_header(), self._format_body()):
+        for cell in itertools.chain(
+            self._format_header(), self._format_body()
+        ):
             cell.val = self._format_value(cell.val)
             yield cell
 
@@ -715,7 +744,9 @@ class ExcelFormatter:
             raise ValueError(
                 "This sheet is too large! Your sheet size is: "
                 + "{}, {} ".format(num_rows, num_cols)
-                + "Max sheet size is: {}, {}".format(self.max_rows, self.max_cols)
+                + "Max sheet size is: {}, {}".format(
+                    self.max_rows, self.max_cols
+                )
             )
 
         if isinstance(writer, ExcelWriter):

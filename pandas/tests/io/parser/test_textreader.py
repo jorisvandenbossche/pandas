@@ -101,7 +101,9 @@ class TestTextReader:
     def test_euro_decimal(self):
         data = "12345,67\n345,678"
 
-        reader = TextReader(StringIO(data), delimiter=":", decimal=",", header=None)
+        reader = TextReader(
+            StringIO(data), delimiter=":", decimal=",", header=None
+        )
         result = reader.read()
 
         expected = np.array([12345.67, 345.678])
@@ -110,7 +112,9 @@ class TestTextReader:
     def test_integer_thousands(self):
         data = "123,456\n12,500"
 
-        reader = TextReader(StringIO(data), delimiter=":", thousands=",", header=None)
+        reader = TextReader(
+            StringIO(data), delimiter=":", thousands=",", header=None
+        )
         result = reader.read()
 
         expected = np.array([123456, 12500], dtype=np.int64)
@@ -132,7 +136,10 @@ class TestTextReader:
         data = "a:b:c\n" "d:e:f\n" "g:h:i\n" "j:k:l:m\n" "l:m:n\n" "o:p:q:r"
 
         reader = TextReader(StringIO(data), delimiter=":", header=None)
-        msg = r"Error tokenizing data\. C error: Expected 3 fields in" " line 4, saw 4"
+        msg = (
+            r"Error tokenizing data\. C error: Expected 3 fields in"
+            " line 4, saw 4"
+        )
         with pytest.raises(parser.ParserError, match=msg):
             reader.read()
 
@@ -183,7 +190,9 @@ class TestTextReader:
     def test_escapechar(self):
         data = '\\"hello world"\n' '\\"hello world"\n' '\\"hello world"'
 
-        reader = TextReader(StringIO(data), delimiter=",", header=None, escapechar="\\")
+        reader = TextReader(
+            StringIO(data), delimiter=",", header=None, escapechar="\\"
+        )
         result = reader.read()
         expected = {0: np.array(['"hello world"'] * 3, dtype=object)}
         assert_array_dicts_equal(result, expected)
@@ -204,7 +213,9 @@ aaaa,4
 aaaaa,5"""
 
         def _make_reader(**kwds):
-            return TextReader(StringIO(data), delimiter=",", header=None, **kwds)
+            return TextReader(
+                StringIO(data), delimiter=",", header=None, **kwds
+            )
 
         reader = _make_reader(dtype="S5,i4")
         result = reader.read()
@@ -310,19 +321,30 @@ a,b,c
 
         # GH5664
         a = DataFrame([["b"], [nan]], columns=["a"], index=["a", "c"])
-        b = DataFrame([[1, 1, 1, 0], [1, 1, 1, 0]], columns=list("abcd"), index=[1, 1])
+        b = DataFrame(
+            [[1, 1, 1, 0], [1, 1, 1, 0]], columns=list("abcd"), index=[1, 1]
+        )
         c = DataFrame(
-            [[1, 2, 3, 4], [6, nan, nan, nan], [8, 9, 10, 11], [13, 14, nan, nan]],
+            [
+                [1, 2, 3, 4],
+                [6, nan, nan, nan],
+                [8, 9, 10, 11],
+                [13, 14, nan, nan],
+            ],
             columns=list("abcd"),
             index=[0, 5, 7, 12],
         )
 
         for _ in range(100):
-            df = read_csv(StringIO("a,b\nc\n"), skiprows=0, names=["a"], engine="c")
+            df = read_csv(
+                StringIO("a,b\nc\n"), skiprows=0, names=["a"], engine="c"
+            )
             assert_frame_equal(df, a)
 
             df = read_csv(
-                StringIO("1,1,1,1,0\n" * 2 + "\n" * 2), names=list("abcd"), engine="c"
+                StringIO("1,1,1,1,0\n" * 2 + "\n" * 2),
+                names=list("abcd"),
+                engine="c",
             )
             assert_frame_equal(df, b)
 
@@ -335,7 +357,9 @@ a,b,c
 
     def test_empty_csv_input(self):
         # GH14867
-        df = read_csv(StringIO(), chunksize=20, header=None, names=["a", "b", "c"])
+        df = read_csv(
+            StringIO(), chunksize=20, header=None, names=["a", "b", "c"]
+        )
         assert isinstance(df, TextFileReader)
 
 

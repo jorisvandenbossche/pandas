@@ -40,7 +40,9 @@ def test_invalid_numexpr_version(engine, parser):
         except ImportError:
             pytest.skip("no numexpr")
         else:
-            if LooseVersion(ne.__version__) < LooseVersion(VERSIONS["numexpr"]):
+            if LooseVersion(ne.__version__) < LooseVersion(
+                VERSIONS["numexpr"]
+            ):
                 with pytest.raises(ImportError):
                     testit()
             else:

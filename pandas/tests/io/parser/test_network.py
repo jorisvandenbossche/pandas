@@ -23,12 +23,18 @@ from pandas.io.parsers import read_csv
 )
 @pytest.mark.parametrize("mode", ["explicit", "infer"])
 @pytest.mark.parametrize("engine", ["python", "c"])
-def test_compressed_urls(salaries_table, compress_type, extension, mode, engine):
-    check_compressed_urls(salaries_table, compress_type, extension, mode, engine)
+def test_compressed_urls(
+    salaries_table, compress_type, extension, mode, engine
+):
+    check_compressed_urls(
+        salaries_table, compress_type, extension, mode, engine
+    )
 
 
 @tm.network
-def check_compressed_urls(salaries_table, compression, extension, mode, engine):
+def check_compressed_urls(
+    salaries_table, compression, extension, mode, engine
+):
     # test reading compressed urls with various engines and
     # extension inference
     base_url = (
@@ -88,7 +94,9 @@ class TestS3:
 
     def test_parse_public_s3_bucket_nrows(self, tips_df):
         for ext, comp in [("", None), (".gz", "gzip"), (".bz2", "bz2")]:
-            df = read_csv("s3://pandas-test/tips.csv" + ext, nrows=10, compression=comp)
+            df = read_csv(
+                "s3://pandas-test/tips.csv" + ext, nrows=10, compression=comp
+            )
             assert isinstance(df, DataFrame)
             assert not df.empty
             tm.assert_frame_equal(tips_df.iloc[:10], df)
@@ -98,7 +106,9 @@ class TestS3:
         chunksize = 5
         for ext, comp in [("", None), (".gz", "gzip"), (".bz2", "bz2")]:
             df_reader = read_csv(
-                "s3://pandas-test/tips.csv" + ext, chunksize=chunksize, compression=comp
+                "s3://pandas-test/tips.csv" + ext,
+                chunksize=chunksize,
+                compression=comp,
             )
             assert df_reader.chunksize == chunksize
             for i_chunk in [0, 1, 2]:
@@ -107,7 +117,9 @@ class TestS3:
                 df = df_reader.get_chunk()
                 assert isinstance(df, DataFrame)
                 assert not df.empty
-                true_df = tips_df.iloc[chunksize * i_chunk : chunksize * (i_chunk + 1)]
+                true_df = tips_df.iloc[
+                    chunksize * i_chunk : chunksize * (i_chunk + 1)
+                ]
                 tm.assert_frame_equal(true_df, df)
 
     def test_parse_public_s3_bucket_chunked_python(self, tips_df):
@@ -126,13 +138,17 @@ class TestS3:
                 df = df_reader.get_chunk()
                 assert isinstance(df, DataFrame)
                 assert not df.empty
-                true_df = tips_df.iloc[chunksize * i_chunk : chunksize * (i_chunk + 1)]
+                true_df = tips_df.iloc[
+                    chunksize * i_chunk : chunksize * (i_chunk + 1)
+                ]
                 tm.assert_frame_equal(true_df, df)
 
     def test_parse_public_s3_bucket_python(self, tips_df):
         for ext, comp in [("", None), (".gz", "gzip"), (".bz2", "bz2")]:
             df = read_csv(
-                "s3://pandas-test/tips.csv" + ext, engine="python", compression=comp
+                "s3://pandas-test/tips.csv" + ext,
+                engine="python",
+                compression=comp,
             )
             assert isinstance(df, DataFrame)
             assert not df.empty
@@ -141,7 +157,9 @@ class TestS3:
     def test_infer_s3_compression(self, tips_df):
         for ext in ["", ".gz", ".bz2"]:
             df = read_csv(
-                "s3://pandas-test/tips.csv" + ext, engine="python", compression="infer"
+                "s3://pandas-test/tips.csv" + ext,
+                engine="python",
+                compression="infer",
             )
             assert isinstance(df, DataFrame)
             assert not df.empty
@@ -192,7 +210,9 @@ class TestS3:
 
         buf = BytesIO(str_buf.getvalue().encode("utf-8"))
 
-        s3_resource.Bucket("pandas-test").put_object(Key="large-file.csv", Body=buf)
+        s3_resource.Bucket("pandas-test").put_object(
+            Key="large-file.csv", Body=buf
+        )
 
         with caplog.at_level(logging.DEBUG, logger="s3fs.core"):
             read_csv("s3://pandas-test/large-file.csv", nrows=5)

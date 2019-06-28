@@ -228,7 +228,9 @@ class TestDivisionByZero:
     def test_div_zero(self, zero, numeric_idx):
         idx = numeric_idx
 
-        expected = pd.Index([np.nan, np.inf, np.inf, np.inf, np.inf], dtype=np.float64)
+        expected = pd.Index(
+            [np.nan, np.inf, np.inf, np.inf, np.inf], dtype=np.float64
+        )
         result = idx / zero
         tm.assert_index_equal(result, expected)
         ser_compat = Series(idx).astype("i8") / np.array(zero).astype("i8")
@@ -237,7 +239,9 @@ class TestDivisionByZero:
     def test_floordiv_zero(self, zero, numeric_idx):
         idx = numeric_idx
 
-        expected = pd.Index([np.nan, np.inf, np.inf, np.inf, np.inf], dtype=np.float64)
+        expected = pd.Index(
+            [np.nan, np.inf, np.inf, np.inf, np.inf], dtype=np.float64
+        )
 
         result = idx // zero
         tm.assert_index_equal(result, expected)
@@ -247,7 +251,9 @@ class TestDivisionByZero:
     def test_mod_zero(self, zero, numeric_idx):
         idx = numeric_idx
 
-        expected = pd.Index([np.nan, np.nan, np.nan, np.nan, np.nan], dtype=np.float64)
+        expected = pd.Index(
+            [np.nan, np.nan, np.nan, np.nan, np.nan], dtype=np.float64
+        )
         result = idx % zero
         tm.assert_index_equal(result, expected)
         ser_compat = Series(idx).astype("i8") % np.array(zero).astype("i8")
@@ -256,8 +262,12 @@ class TestDivisionByZero:
     def test_divmod_zero(self, zero, numeric_idx):
         idx = numeric_idx
 
-        exleft = pd.Index([np.nan, np.inf, np.inf, np.inf, np.inf], dtype=np.float64)
-        exright = pd.Index([np.nan, np.nan, np.nan, np.nan, np.nan], dtype=np.float64)
+        exleft = pd.Index(
+            [np.nan, np.inf, np.inf, np.inf, np.inf], dtype=np.float64
+        )
+        exright = pd.Index(
+            [np.nan, np.nan, np.nan, np.nan, np.nan], dtype=np.float64
+        )
 
         result = divmod(idx, zero)
         tm.assert_index_equal(result[0], exleft)
@@ -412,7 +422,9 @@ class TestDivisionByZero:
         # numpy has a slightly different (wrong) treatment
         with np.errstate(all="ignore"):
             arr = df.values % df.values
-        result2 = pd.DataFrame(arr, index=df.index, columns=df.columns, dtype="float64")
+        result2 = pd.DataFrame(
+            arr, index=df.index, columns=df.columns, dtype="float64"
+        )
         result2.iloc[0:3, 1] = np.nan
         tm.assert_frame_equal(result2, expected)
 
@@ -644,7 +656,9 @@ class TestMultiplicationDivision:
             # GH#3590, modulo as ints
             p = pd.DataFrame({"first": [3, 4, 5, 8], "second": [0, 0, 0, 3]})
             result = p["first"] % p["second"]
-            expected = Series(p["first"].values % p["second"].values, dtype="float64")
+            expected = Series(
+                p["first"].values % p["second"].values, dtype="float64"
+            )
             expected.iloc[0:3] = np.nan
             tm.assert_series_equal(result, expected)
 
@@ -684,11 +698,15 @@ class TestAdditionSubtraction:
         s1 = pd.Series([1, 2, 3], index=list("ABC"), name="x")
         s2 = pd.Series([2, 2, 2], index=list("ABD"), name="x")
 
-        exp = pd.Series([3.0, 4.0, np.nan, np.nan], index=list("ABCD"), name="x")
+        exp = pd.Series(
+            [3.0, 4.0, np.nan, np.nan], index=list("ABCD"), name="x"
+        )
         tm.assert_series_equal(s1 + s2, exp)
         tm.assert_series_equal(s2 + s1, exp)
 
-        exp = pd.DataFrame({"x": [3.0, 4.0, np.nan, np.nan]}, index=list("ABCD"))
+        exp = pd.DataFrame(
+            {"x": [3.0, 4.0, np.nan, np.nan]}, index=list("ABCD")
+        )
         tm.assert_frame_equal(s1.to_frame() + s2.to_frame(), exp)
         tm.assert_frame_equal(s2.to_frame() + s1.to_frame(), exp)
 
@@ -790,7 +808,9 @@ class TestAdditionSubtraction:
         tm.assert_frame_equal(added, expected)
 
         df = pd.DataFrame({"a": ["a", None, "b"]})
-        tm.assert_frame_equal(df + df, pd.DataFrame({"a": ["aa", np.nan, "bb"]}))
+        tm.assert_frame_equal(
+            df + df, pd.DataFrame({"a": ["aa", np.nan, "bb"]})
+        )
 
         # Test for issue #10181
         for dtype in ("float", "int64"):
@@ -811,7 +831,9 @@ class TestAdditionSubtraction:
 
             cython_or_numpy = op(left, right)
             python = left.combine(right, op)
-            tm.assert_series_equal(cython_or_numpy, python, check_dtype=check_dtype)
+            tm.assert_series_equal(
+                cython_or_numpy, python, check_dtype=check_dtype
+            )
 
         def check(series, other):
             simple_ops = ["add", "sub", "mul", "truediv", "floordiv", "mod"]
@@ -826,7 +848,9 @@ class TestAdditionSubtraction:
             _check_op(series, other, lambda x, y: operator.truediv(y, x))
             _check_op(series, other, lambda x, y: operator.floordiv(y, x))
             _check_op(series, other, lambda x, y: operator.mul(y, x))
-            _check_op(series, other, lambda x, y: operator.pow(y, x), pos_only=True)
+            _check_op(
+                series, other, lambda x, y: operator.pow(y, x), pos_only=True
+            )
             _check_op(series, other, lambda x, y: operator.mod(y, x))
 
         tser = tm.makeTimeSeries().rename("ts")
@@ -879,7 +903,13 @@ class TestAdditionSubtraction:
 class TestUFuncCompat:
     @pytest.mark.parametrize(
         "holder",
-        [pd.Int64Index, pd.UInt64Index, pd.Float64Index, pd.RangeIndex, pd.Series],
+        [
+            pd.Int64Index,
+            pd.UInt64Index,
+            pd.Float64Index,
+            pd.RangeIndex,
+            pd.Series,
+        ],
     )
     def test_ufunc_compat(self, holder):
         box = pd.Series if holder is pd.Series else pd.Index
@@ -971,7 +1001,13 @@ class TestObjectDtypeEquivalence:
     # TODO: moved from tests.series.test_operators; needs cleanup
     @pytest.mark.parametrize(
         "op",
-        [operator.add, operator.sub, operator.mul, operator.truediv, operator.floordiv],
+        [
+            operator.add,
+            operator.sub,
+            operator.mul,
+            operator.truediv,
+            operator.floordiv,
+        ],
     )
     def test_operators_reverse_object(self, op):
         # GH#56
@@ -1095,7 +1131,11 @@ class TestNumericArithmeticUnsorted:
         cases_exact = [
             (pd.RangeIndex(0, 1000, 2), 2, pd.RangeIndex(0, 500, 1)),
             (pd.RangeIndex(-99, -201, -3), -3, pd.RangeIndex(33, 67, 1)),
-            (pd.RangeIndex(0, 1000, 1), 2, pd.RangeIndex(0, 1000, 1)._int64index // 2),
+            (
+                pd.RangeIndex(0, 1000, 1),
+                2,
+                pd.RangeIndex(0, 1000, 1)._int64index // 2,
+            ),
             (
                 pd.RangeIndex(0, 100, 1),
                 2.0,

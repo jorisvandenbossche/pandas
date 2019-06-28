@@ -41,7 +41,9 @@ def test_bins():
     expected = Categorical(intervals, ordered=True)
 
     tm.assert_categorical_equal(result, expected)
-    tm.assert_almost_equal(bins, np.array([0.1905, 3.36666667, 6.53333333, 9.7]))
+    tm.assert_almost_equal(
+        bins, np.array([0.1905, 3.36666667, 6.53333333, 9.7])
+    )
 
 
 def test_right():
@@ -77,7 +79,9 @@ def test_array_like():
     expected = Categorical(intervals, ordered=True)
 
     tm.assert_categorical_equal(result, expected)
-    tm.assert_almost_equal(bins, np.array([0.1905, 3.36666667, 6.53333333, 9.7]))
+    tm.assert_almost_equal(
+        bins, np.array([0.1905, 3.36666667, 6.53333333, 9.7])
+    )
 
 
 def test_bins_from_interval_index():
@@ -102,7 +106,9 @@ def test_bins_from_interval_index_doc_example():
 
     result = cut([25, 20, 50], bins=c.categories)
     tm.assert_index_equal(result.categories, expected)
-    tm.assert_numpy_array_equal(result.codes, np.array([1, 1, 2], dtype="int8"))
+    tm.assert_numpy_array_equal(
+        result.codes, np.array([1, 1, 2], dtype="int8")
+    )
 
 
 def test_bins_not_overlapping_from_interval_index():
@@ -138,7 +144,8 @@ def test_bins_not_monotonic():
         (
             [-1, 0, 1],
             np.array(
-                [np.iinfo(np.int64).min, 0, np.iinfo(np.int64).max], dtype="int64"
+                [np.iinfo(np.int64).min, 0, np.iinfo(np.int64).max],
+                dtype="int64",
             ),
             IntervalIndex.from_tuples(
                 [(np.iinfo(np.int64).min, 0), (0, np.iinfo(np.int64).max)]
@@ -155,8 +162,14 @@ def test_bins_not_monotonic():
             ),
             IntervalIndex.from_tuples(
                 [
-                    (np.timedelta64(-np.iinfo(np.int64).max), np.timedelta64(0)),
-                    (np.timedelta64(0), np.timedelta64(np.iinfo(np.int64).max)),
+                    (
+                        np.timedelta64(-np.iinfo(np.int64).max),
+                        np.timedelta64(0),
+                    ),
+                    (
+                        np.timedelta64(0),
+                        np.timedelta64(np.iinfo(np.int64).max),
+                    ),
                 ]
             ),
         ),
@@ -304,7 +317,9 @@ def test_cut_out_of_bounds():
         ),
         (
             lambda labels: Categorical.from_codes([0, 1, 2], labels),
-            lambda labels: Categorical.from_codes([1] + 4 * [0] + [1, 2], labels),
+            lambda labels: Categorical.from_codes(
+                [1] + 4 * [0] + [1, 2], labels
+            ),
         ),
     ],
 )
@@ -323,7 +338,9 @@ def test_cut_pass_labels_compat():
     labels = ["Good", "Medium", "Bad"]
 
     result = cut(arr, 3, labels=labels)
-    exp = cut(arr, 3, labels=Categorical(labels, categories=labels, ordered=True))
+    exp = cut(
+        arr, 3, labels=Categorical(labels, categories=labels, ordered=True)
+    )
     tm.assert_categorical_equal(result, exp)
 
 
@@ -409,7 +426,8 @@ def test_single_bin(data, length):
 
 
 @pytest.mark.parametrize(
-    "array_1_writeable,array_2_writeable", [(True, True), (True, False), (False, False)]
+    "array_1_writeable,array_2_writeable",
+    [(True, True), (True, False), (False, False)],
 )
 def test_cut_read_only(array_1_writeable, array_2_writeable):
     # issue 18773
@@ -484,10 +502,12 @@ def test_datetime_cut(data):
                     Timestamp("2013-01-01 16:00:00"),
                 ),
                 Interval(
-                    Timestamp("2013-01-01 16:00:00"), Timestamp("2013-01-02 08:00:00")
+                    Timestamp("2013-01-01 16:00:00"),
+                    Timestamp("2013-01-02 08:00:00"),
                 ),
                 Interval(
-                    Timestamp("2013-01-02 08:00:00"), Timestamp("2013-01-03 00:00:00")
+                    Timestamp("2013-01-02 08:00:00"),
+                    Timestamp("2013-01-03 00:00:00"),
                 ),
             ]
         )
@@ -547,14 +567,17 @@ def test_datetime_nan_error():
 
 def test_datetime_nan_mask():
     result = cut(
-        date_range("20130102", periods=5), bins=date_range("20130101", periods=2)
+        date_range("20130102", periods=5),
+        bins=date_range("20130101", periods=2),
     )
 
     mask = result.categories.isna()
     tm.assert_numpy_array_equal(mask, np.array([False]))
 
     mask = result.isna()
-    tm.assert_numpy_array_equal(mask, np.array([False, True, True, True, True]))
+    tm.assert_numpy_array_equal(
+        mask, np.array([False, True, True, True, True])
+    )
 
 
 @pytest.mark.parametrize("tz", [None, "UTC", "US/Pacific"])
@@ -567,7 +590,11 @@ def test_datetime_cut_roundtrip(tz):
     tm.assert_series_equal(result, expected)
 
     expected_bins = DatetimeIndex(
-        ["2017-12-31 23:57:07.200000", "2018-01-02 00:00:00", "2018-01-03 00:00:00"]
+        [
+            "2017-12-31 23:57:07.200000",
+            "2018-01-02 00:00:00",
+            "2018-01-03 00:00:00",
+        ]
     )
     expected_bins = expected_bins.tz_localize(tz)
     tm.assert_index_equal(result_bins, expected_bins)

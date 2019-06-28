@@ -21,7 +21,12 @@ import pandas.core.algorithms as algos
 from pandas.core.generic import _shared_docs
 from pandas.core.groupby.base import GroupByMixin
 from pandas.core.groupby.generic import SeriesGroupBy
-from pandas.core.groupby.groupby import GroupBy, _GroupBy, _pipe_template, groupby
+from pandas.core.groupby.groupby import (
+    GroupBy,
+    _GroupBy,
+    _pipe_template,
+    groupby,
+)
 from pandas.core.groupby.grouper import Grouper
 from pandas.core.groupby.ops import BinGrouper
 from pandas.core.indexes.datetimes import DatetimeIndex, date_range
@@ -310,7 +315,9 @@ class Resampler(_GroupBy):
         --------
         >>> resampled.transform(lambda x: (x - x.mean()) / x.std())
         """
-        return self._selected_obj.groupby(self.groupby).transform(arg, *args, **kwargs)
+        return self._selected_obj.groupby(self.groupby).transform(
+            arg, *args, **kwargs
+        )
 
     def _downsample(self, f):
         raise AbstractMethodError(self)
@@ -1067,7 +1074,9 @@ class DatetimeIndexResampler(Resampler):
 
         # we are downsampling
         # we want to call the actual grouper method here
-        result = obj.groupby(self.grouper, axis=self.axis).aggregate(how, **kwargs)
+        result = obj.groupby(self.grouper, axis=self.axis).aggregate(
+            how, **kwargs
+        )
 
         result = self._apply_loffset(result)
         return self._wrap_result(result)
@@ -1202,7 +1211,9 @@ class PeriodIndexResampler(DatetimeIndexResampler):
 
         if is_subperiod(ax.freq, self.freq):
             # Downsampling
-            return self._groupby_and_aggregate(how, grouper=self.grouper, **kwargs)
+            return self._groupby_and_aggregate(
+                how, grouper=self.grouper, **kwargs
+            )
         elif is_superperiod(ax.freq, self.freq):
             if how == "ohlc":
                 # GH #13083
@@ -1239,7 +1250,9 @@ class PeriodIndexResampler(DatetimeIndexResampler):
 
         # we may need to actually resample as if we are timestamps
         if self.kind == "timestamp":
-            return super()._upsample(method, limit=limit, fill_value=fill_value)
+            return super()._upsample(
+                method, limit=limit, fill_value=fill_value
+            )
 
         self._set_binner()
         ax = self.ax
@@ -1322,7 +1335,9 @@ def get_resampler_for_grouping(
     tg = TimeGrouper(freq=rule, **kwargs)
     resampler = tg._get_resampler(groupby.obj, kind=kind)
     r = resampler._get_resampler_for_grouping(groupby=groupby)
-    return _maybe_process_deprecations(r, how=how, fill_method=fill_method, limit=limit)
+    return _maybe_process_deprecations(
+        r, how=how, fill_method=fill_method, limit=limit
+    )
 
 
 class TimeGrouper(Grouper):
@@ -1368,15 +1383,21 @@ class TimeGrouper(Grouper):
         if label not in {None, "left", "right"}:
             raise ValueError("Unsupported value {} for `label`".format(label))
         if closed not in {None, "left", "right"}:
-            raise ValueError("Unsupported value {} for `closed`".format(closed))
+            raise ValueError(
+                "Unsupported value {} for `closed`".format(closed)
+            )
         if convention not in {None, "start", "end", "e", "s"}:
-            raise ValueError("Unsupported value {} for `convention`".format(convention))
+            raise ValueError(
+                "Unsupported value {} for `convention`".format(convention)
+            )
 
         freq = to_offset(freq)
 
         end_types = {"M", "A", "Q", "BM", "BA", "BQ", "W"}
         rule = freq.rule_code
-        if rule in end_types or ("-" in rule and rule[: rule.find("-")] in end_types):
+        if rule in end_types or (
+            "-" in rule and rule[: rule.find("-")] in end_types
+        ):
             if closed is None:
                 closed = "right"
             if label is None:
@@ -1431,9 +1452,13 @@ class TimeGrouper(Grouper):
 
         ax = self.ax
         if isinstance(ax, DatetimeIndex):
-            return DatetimeIndexResampler(obj, groupby=self, kind=kind, axis=self.axis)
+            return DatetimeIndexResampler(
+                obj, groupby=self, kind=kind, axis=self.axis
+            )
         elif isinstance(ax, PeriodIndex) or kind == "period":
-            return PeriodIndexResampler(obj, groupby=self, kind=kind, axis=self.axis)
+            return PeriodIndexResampler(
+                obj, groupby=self, kind=kind, axis=self.axis
+            )
         elif isinstance(ax, TimedeltaIndex):
             return TimedeltaIndexResampler(obj, groupby=self, axis=self.axis)
 
@@ -1457,7 +1482,9 @@ class TimeGrouper(Grouper):
             )
 
         if len(ax) == 0:
-            binner = labels = DatetimeIndex(data=[], freq=self.freq, name=ax.name)
+            binner = labels = DatetimeIndex(
+                data=[], freq=self.freq, name=ax.name
+            )
             return binner, [], labels
 
         first, last = _get_timestamp_range_edges(
@@ -1533,7 +1560,9 @@ class TimeGrouper(Grouper):
             )
 
         if not len(ax):
-            binner = labels = TimedeltaIndex(data=[], freq=self.freq, name=ax.name)
+            binner = labels = TimedeltaIndex(
+                data=[], freq=self.freq, name=ax.name
+            )
             return binner, [], labels
 
         start, end = ax.min(), ax.max()
@@ -1591,7 +1620,9 @@ class TimeGrouper(Grouper):
 
         # if index contains no valid (non-NaT) values, return empty index
         if not len(memb):
-            binner = labels = PeriodIndex(data=[], freq=self.freq, name=ax.name)
+            binner = labels = PeriodIndex(
+                data=[], freq=self.freq, name=ax.name
+            )
             return binner, [], labels
 
         freq_mult = self.freq.n
@@ -1608,7 +1639,9 @@ class TimeGrouper(Grouper):
             )
 
             # Get offset for bin edge (not label edge) adjustment
-            start_offset = pd.Period(start, self.freq) - pd.Period(p_start, self.freq)
+            start_offset = pd.Period(start, self.freq) - pd.Period(
+                p_start, self.freq
+            )
             bin_shift = start_offset.n % freq_mult
             start = p_start
 
@@ -1648,7 +1681,9 @@ def _take_new_index(obj, indexer, new_index, axis=0):
         if axis == 1:
             raise NotImplementedError("axis 1 is not supported")
         return DataFrame(
-            obj._data.reindex_indexer(new_axis=new_index, indexer=indexer, axis=1)
+            obj._data.reindex_indexer(
+                new_axis=new_index, indexer=indexer, axis=1
+            )
         )
     else:
         raise ValueError("'obj' should be either a Series or a DataFrame")

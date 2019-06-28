@@ -123,7 +123,9 @@ class TestTimedeltaIndex(DatetimeLike):
         )
 
     def test_factorize(self):
-        idx1 = TimedeltaIndex(["1 day", "1 day", "2 day", "2 day", "3 day", "3 day"])
+        idx1 = TimedeltaIndex(
+            ["1 day", "1 day", "2 day", "2 day", "3 day", "3 day"]
+        )
 
         exp_arr = np.array([0, 0, 1, 1, 2, 2], dtype=np.intp)
         exp_idx = TimedeltaIndex(["1 day", "2 day", "3 day"])
@@ -177,15 +179,21 @@ class TestTimedeltaIndex(DatetimeLike):
         ordered, dexer = idx.sort_values(return_indexer=True)
         assert ordered.is_monotonic
 
-        tm.assert_numpy_array_equal(dexer, np.array([1, 2, 0]), check_dtype=False)
+        tm.assert_numpy_array_equal(
+            dexer, np.array([1, 2, 0]), check_dtype=False
+        )
 
         ordered, dexer = idx.sort_values(return_indexer=True, ascending=False)
         assert ordered[::-1].is_monotonic
 
-        tm.assert_numpy_array_equal(dexer, np.array([0, 2, 1]), check_dtype=False)
+        tm.assert_numpy_array_equal(
+            dexer, np.array([0, 2, 1]), check_dtype=False
+        )
 
     def test_get_duplicates(self):
-        idx = TimedeltaIndex(["1 day", "2 day", "2 day", "3 day", "3day", "4day"])
+        idx = TimedeltaIndex(
+            ["1 day", "2 day", "2 day", "3 day", "3day", "4day"]
+        )
 
         with tm.assert_produces_warning(FutureWarning):
             # Deprecated - see GH20239
@@ -195,7 +203,9 @@ class TestTimedeltaIndex(DatetimeLike):
         tm.assert_index_equal(result, ex)
 
     def test_argmin_argmax(self):
-        idx = TimedeltaIndex(["1 day 00:00:05", "1 day 00:00:01", "1 day 00:00:02"])
+        idx = TimedeltaIndex(
+            ["1 day 00:00:05", "1 day 00:00:01", "1 day 00:00:02"]
+        )
         assert idx.argmin() == 1
         assert idx.argmax() == 0
 
@@ -264,16 +274,24 @@ class TestTimedeltaIndex(DatetimeLike):
         assert (result["B"] == td).all()
 
     def test_fields(self):
-        rng = timedelta_range("1 days, 10:11:12.100123456", periods=2, freq="s")
+        rng = timedelta_range(
+            "1 days, 10:11:12.100123456", periods=2, freq="s"
+        )
         tm.assert_index_equal(rng.days, Index([1, 1], dtype="int64"))
         tm.assert_index_equal(
             rng.seconds,
-            Index([10 * 3600 + 11 * 60 + 12, 10 * 3600 + 11 * 60 + 13], dtype="int64"),
+            Index(
+                [10 * 3600 + 11 * 60 + 12, 10 * 3600 + 11 * 60 + 13],
+                dtype="int64",
+            ),
         )
         tm.assert_index_equal(
-            rng.microseconds, Index([100 * 1000 + 123, 100 * 1000 + 123], dtype="int64")
+            rng.microseconds,
+            Index([100 * 1000 + 123, 100 * 1000 + 123], dtype="int64"),
         )
-        tm.assert_index_equal(rng.nanoseconds, Index([456, 456], dtype="int64"))
+        tm.assert_index_equal(
+            rng.nanoseconds, Index([456, 456], dtype="int64")
+        )
 
         msg = "'TimedeltaIndex' object has no attribute '{}'"
         with pytest.raises(AttributeError, match=msg.format("hours")):
@@ -289,7 +307,8 @@ class TestTimedeltaIndex(DatetimeLike):
 
         tm.assert_series_equal(s.dt.days, Series([1, np.nan], index=[0, 1]))
         tm.assert_series_equal(
-            s.dt.seconds, Series([10 * 3600 + 11 * 60 + 12, np.nan], index=[0, 1])
+            s.dt.seconds,
+            Series([10 * 3600 + 11 * 60 + 12, np.nan], index=[0, 1]),
         )
 
         # preserve name (GH15589)
@@ -308,7 +327,9 @@ class TestTimedeltaIndex(DatetimeLike):
         td[3] = np.nan
 
         result = td / np.timedelta64(1, "D")
-        expected = Series([31, 31, (31 * 86400 + 5 * 60 + 3) / 86400.0, np.nan])
+        expected = Series(
+            [31, 31, (31 * 86400 + 5 * 60 + 3) / 86400.0, np.nan]
+        )
         assert_series_equal(result, expected)
 
         result = td.astype("timedelta64[D]")
@@ -316,7 +337,9 @@ class TestTimedeltaIndex(DatetimeLike):
         assert_series_equal(result, expected)
 
         result = td / np.timedelta64(1, "s")
-        expected = Series([31 * 86400, 31 * 86400, 31 * 86400 + 5 * 60 + 3, np.nan])
+        expected = Series(
+            [31 * 86400, 31 * 86400, 31 * 86400 + 5 * 60 + 3, np.nan]
+        )
         assert_series_equal(result, expected)
 
         result = td.astype("timedelta64[s]")
@@ -334,7 +357,9 @@ class TestTimedeltaIndex(DatetimeLike):
         assert_index_equal(result, expected)
 
         result = td / np.timedelta64(1, "s")
-        expected = Index([31 * 86400, 31 * 86400, 31 * 86400 + 5 * 60 + 3, np.nan])
+        expected = Index(
+            [31 * 86400, 31 * 86400, 31 * 86400 + 5 * 60 + 3, np.nan]
+        )
         assert_index_equal(result, expected)
 
         result = td.astype("timedelta64[s]")

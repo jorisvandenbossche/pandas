@@ -27,27 +27,43 @@ def right():
 @pytest.mark.parametrize(
     "how, sort, expected",
     [
-        ("inner", False, DataFrame({"a": [20, 10], "b": [200, 100]}, index=[2, 1])),
-        ("inner", True, DataFrame({"a": [10, 20], "b": [100, 200]}, index=[1, 2])),
+        (
+            "inner",
+            False,
+            DataFrame({"a": [20, 10], "b": [200, 100]}, index=[2, 1]),
+        ),
+        (
+            "inner",
+            True,
+            DataFrame({"a": [10, 20], "b": [100, 200]}, index=[1, 2]),
+        ),
         (
             "left",
             False,
-            DataFrame({"a": [20, 10, 0], "b": [200, 100, np.nan]}, index=[2, 1, 0]),
+            DataFrame(
+                {"a": [20, 10, 0], "b": [200, 100, np.nan]}, index=[2, 1, 0]
+            ),
         ),
         (
             "left",
             True,
-            DataFrame({"a": [0, 10, 20], "b": [np.nan, 100, 200]}, index=[0, 1, 2]),
+            DataFrame(
+                {"a": [0, 10, 20], "b": [np.nan, 100, 200]}, index=[0, 1, 2]
+            ),
         ),
         (
             "right",
             False,
-            DataFrame({"a": [np.nan, 10, 20], "b": [300, 100, 200]}, index=[3, 1, 2]),
+            DataFrame(
+                {"a": [np.nan, 10, 20], "b": [300, 100, 200]}, index=[3, 1, 2]
+            ),
         ),
         (
             "right",
             True,
-            DataFrame({"a": [10, 20, np.nan], "b": [100, 200, 300]}, index=[1, 2, 3]),
+            DataFrame(
+                {"a": [10, 20, np.nan], "b": [100, 200, 300]}, index=[1, 2, 3]
+            ),
         ),
         (
             "outer",
@@ -161,15 +177,21 @@ def test_join_overlap(float_frame):
 
 
 def test_join_period_index(frame_with_period_index):
-    other = frame_with_period_index.rename(columns=lambda x: "{key}{key}".format(key=x))
+    other = frame_with_period_index.rename(
+        columns=lambda x: "{key}{key}".format(key=x)
+    )
 
-    joined_values = np.concatenate([frame_with_period_index.values] * 2, axis=1)
+    joined_values = np.concatenate(
+        [frame_with_period_index.values] * 2, axis=1
+    )
 
     joined_cols = frame_with_period_index.columns.append(other.columns)
 
     joined = frame_with_period_index.join(other)
     expected = DataFrame(
-        data=joined_values, columns=joined_cols, index=frame_with_period_index.index
+        data=joined_values,
+        columns=joined_cols,
+        index=frame_with_period_index.index,
     )
 
     tm.assert_frame_equal(joined, expected)

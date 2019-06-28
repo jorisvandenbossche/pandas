@@ -204,14 +204,20 @@ def get_filepath_or_buffer(
         from pandas.io import s3
 
         return s3.get_filepath_or_buffer(
-            filepath_or_buffer, encoding=encoding, compression=compression, mode=mode
+            filepath_or_buffer,
+            encoding=encoding,
+            compression=compression,
+            mode=mode,
         )
 
     if is_gcs_url(filepath_or_buffer):
         from pandas.io import gcs
 
         return gcs.get_filepath_or_buffer(
-            filepath_or_buffer, encoding=encoding, compression=compression, mode=mode
+            filepath_or_buffer,
+            encoding=encoding,
+            compression=compression,
+            mode=mode,
         )
 
     if isinstance(filepath_or_buffer, (str, bytes, mmap.mmap)):
@@ -239,7 +245,12 @@ def file_path_to_url(path):
     return urljoin("file:", pathname2url(path))
 
 
-_compression_to_extension = {"gzip": ".gz", "bz2": ".bz2", "zip": ".zip", "xz": ".xz"}
+_compression_to_extension = {
+    "gzip": ".gz",
+    "bz2": ".bz2",
+    "zip": ".zip",
+    "xz": ".xz",
+}
 
 
 def _infer_compression(filepath_or_buffer, compression):
@@ -297,7 +308,12 @@ def _infer_compression(filepath_or_buffer, compression):
 
 
 def _get_handle(
-    path_or_buf, mode, encoding=None, compression=None, memory_map=False, is_text=True
+    path_or_buf,
+    mode,
+    encoding=None,
+    compression=None,
+    memory_map=False,
+    is_text=True,
 ):
     """
     Get file handle for given path/buffer and mode.

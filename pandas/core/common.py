@@ -328,7 +328,10 @@ def is_full_slice(obj, l):
     We have a full length slice.
     """
     return (
-        isinstance(obj, slice) and obj.start == 0 and obj.stop == l and obj.step is None
+        isinstance(obj, slice)
+        and obj.start == 0
+        and obj.stop == l
+        and obj.step is None
     )
 
 

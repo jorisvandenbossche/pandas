@@ -241,7 +241,9 @@ class TestCommon:
         assert idx_nan.dtype == indices.dtype
         assert idx_unique_nan.dtype == indices.dtype
 
-        for dropna, expected in zip([False, True], [idx_unique_nan, idx_unique]):
+        for dropna, expected in zip(
+            [False, True], [idx_unique_nan, idx_unique]
+        ):
             for i in [idx_nan, idx_unique_nan]:
                 result = i._get_unique_index(dropna=dropna)
                 tm.assert_index_equal(result, expected)
@@ -347,7 +349,9 @@ class TestCommon:
             # MultiIndex tested separately in:
             #   tests/indexes/multi/test_unique_and_duplicates.
             # RangeIndex is unique by definition.
-            pytest.skip("Skip check for empty Index, MultiIndex, " "and RangeIndex")
+            pytest.skip(
+                "Skip check for empty Index, MultiIndex, " "and RangeIndex"
+            )
 
         idx = holder([indices[0]] * 5)
         assert idx.is_unique is False

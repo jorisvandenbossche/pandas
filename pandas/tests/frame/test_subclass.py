@@ -86,7 +86,8 @@ class TestDataFrameSubclassing(TestData):
     def test_indexing_sliced(self):
         # GH 11559
         df = tm.SubclassedDataFrame(
-            {"X": [1, 2, 3], "Y": [4, 5, 6], "Z": [7, 8, 9]}, index=["a", "b", "c"]
+            {"X": [1, 2, 3], "Y": [4, 5, 6], "Z": [7, 8, 9]},
+            index=["a", "b", "c"],
         )
         res = df.loc[:, "X"]
         exp = tm.SubclassedSeries([1, 2, 3], index=list("abc"), name="X")
@@ -159,7 +160,9 @@ class TestDataFrameSubclassing(TestData):
 
     def test_subclass_align_combinations(self):
         # GH 12983
-        df = tm.SubclassedDataFrame({"a": [1, 3, 5], "b": [1, 3, 5]}, index=list("ACE"))
+        df = tm.SubclassedDataFrame(
+            {"a": [1, 3, 5], "b": [1, 3, 5]}, index=list("ACE")
+        )
         s = tm.SubclassedSeries([1, 2, 4], index=list("ABD"), name="x")
 
         # frame + series
@@ -169,7 +172,9 @@ class TestDataFrameSubclassing(TestData):
             index=list("ABCDE"),
         )
         # name is lost when
-        exp2 = pd.Series([1, 2, np.nan, 4, np.nan], index=list("ABCDE"), name="x")
+        exp2 = pd.Series(
+            [1, 2, np.nan, 4, np.nan], index=list("ABCDE"), name="x"
+        )
 
         assert isinstance(res1, tm.SubclassedDataFrame)
         tm.assert_frame_equal(res1, exp1)
@@ -196,9 +201,15 @@ class TestDataFrameSubclassing(TestData):
         ssdf = tm.SubclassedSparseDataFrame(rows)
         ssdf.testattr = "testattr"
 
-        tm.assert_sp_frame_equal(ssdf.loc[:2], tm.SubclassedSparseDataFrame(rows[:3]))
-        tm.assert_sp_frame_equal(ssdf.iloc[:2], tm.SubclassedSparseDataFrame(rows[:2]))
-        tm.assert_sp_frame_equal(ssdf[:2], tm.SubclassedSparseDataFrame(rows[:2]))
+        tm.assert_sp_frame_equal(
+            ssdf.loc[:2], tm.SubclassedSparseDataFrame(rows[:3])
+        )
+        tm.assert_sp_frame_equal(
+            ssdf.iloc[:2], tm.SubclassedSparseDataFrame(rows[:2])
+        )
+        tm.assert_sp_frame_equal(
+            ssdf[:2], tm.SubclassedSparseDataFrame(rows[:2])
+        )
         assert ssdf.loc[:2].testattr == "testattr"
         assert ssdf.iloc[:2].testattr == "testattr"
         assert ssdf[:2].testattr == "testattr"
@@ -232,7 +243,8 @@ class TestDataFrameSubclassing(TestData):
 
         res = df.stack()
         exp = tm.SubclassedSeries(
-            [1, 2, 3, 4, 5, 6, 7, 8, 9], index=[list("aaabbbccc"), list("XYZXYZXYZ")]
+            [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            index=[list("aaabbbccc"), list("XYZXYZXYZ")],
         )
 
         tm.assert_series_equal(res, exp)
@@ -240,7 +252,12 @@ class TestDataFrameSubclassing(TestData):
     def test_subclass_stack_multi(self):
         # GH 15564
         df = tm.SubclassedDataFrame(
-            [[10, 11, 12, 13], [20, 21, 22, 23], [30, 31, 32, 33], [40, 41, 42, 43]],
+            [
+                [10, 11, 12, 13],
+                [20, 21, 22, 23],
+                [30, 31, 32, 33],
+                [40, 41, 42, 43],
+            ],
             index=MultiIndex.from_tuples(
                 list(zip(list("AABB"), list("cdcd"))), names=["aaa", "ccc"]
             ),
@@ -261,7 +278,9 @@ class TestDataFrameSubclassing(TestData):
                 [41, 43],
             ],
             index=MultiIndex.from_tuples(
-                list(zip(list("AAAABBBB"), list("ccddccdd"), list("yzyzyzyz"))),
+                list(
+                    zip(list("AAAABBBB"), list("ccddccdd"), list("yzyzyzyz"))
+                ),
                 names=["aaa", "ccc", "yyy"],
             ),
             columns=Index(["W", "X"], name="www"),
@@ -285,7 +304,9 @@ class TestDataFrameSubclassing(TestData):
                 [42, 43],
             ],
             index=MultiIndex.from_tuples(
-                list(zip(list("AAAABBBB"), list("ccddccdd"), list("WXWXWXWX"))),
+                list(
+                    zip(list("AAAABBBB"), list("ccddccdd"), list("WXWXWXWX"))
+                ),
                 names=["aaa", "ccc", "www"],
             ),
             columns=Index(["y", "z"], name="yyy"),
@@ -323,7 +344,9 @@ class TestDataFrameSubclassing(TestData):
                 [41, 43.0],
             ],
             index=MultiIndex.from_tuples(
-                list(zip(list("AAAABBBB"), list("ccddccdd"), list("yzyzyzyz"))),
+                list(
+                    zip(list("AAAABBBB"), list("ccddccdd"), list("yzyzyzyz"))
+                ),
                 names=["aaa", "ccc", "yyy"],
             ),
             columns=Index(["W", "X"], name="www"),
@@ -347,7 +370,9 @@ class TestDataFrameSubclassing(TestData):
                 [42.0, 43.0],
             ],
             index=MultiIndex.from_tuples(
-                list(zip(list("AAAABBBB"), list("ccddccdd"), list("WXWXWXWX"))),
+                list(
+                    zip(list("AAAABBBB"), list("ccddccdd"), list("WXWXWXWX"))
+                ),
                 names=["aaa", "ccc", "www"],
             ),
             columns=Index(["y", "z"], name="yyy"),
@@ -366,7 +391,8 @@ class TestDataFrameSubclassing(TestData):
 
         res = df.unstack()
         exp = tm.SubclassedSeries(
-            [1, 4, 7, 2, 5, 8, 3, 6, 9], index=[list("XXXYYYZZZ"), list("abcabcabc")]
+            [1, 4, 7, 2, 5, 8, 3, 6, 9],
+            index=[list("XXXYYYZZZ"), list("abcabcabc")],
         )
 
         tm.assert_series_equal(res, exp)
@@ -374,7 +400,12 @@ class TestDataFrameSubclassing(TestData):
     def test_subclass_unstack_multi(self):
         # GH 15564
         df = tm.SubclassedDataFrame(
-            [[10, 11, 12, 13], [20, 21, 22, 23], [30, 31, 32, 33], [40, 41, 42, 43]],
+            [
+                [10, 11, 12, 13],
+                [20, 21, 22, 23],
+                [30, 31, 32, 33],
+                [40, 41, 42, 43],
+            ],
             index=MultiIndex.from_tuples(
                 list(zip(list("AABB"), list("cdcd"))), names=["aaa", "ccc"]
             ),
@@ -384,10 +415,15 @@ class TestDataFrameSubclassing(TestData):
         )
 
         exp = tm.SubclassedDataFrame(
-            [[10, 20, 11, 21, 12, 22, 13, 23], [30, 40, 31, 41, 32, 42, 33, 43]],
+            [
+                [10, 20, 11, 21, 12, 22, 13, 23],
+                [30, 40, 31, 41, 32, 42, 33, 43],
+            ],
             index=Index(["A", "B"], name="aaa"),
             columns=MultiIndex.from_tuples(
-                list(zip(list("WWWWXXXX"), list("yyzzyyzz"), list("cdcdcdcd"))),
+                list(
+                    zip(list("WWWWXXXX"), list("yyzzyyzz"), list("cdcdcdcd"))
+                ),
                 names=["www", "yyy", "ccc"],
             ),
         )
@@ -399,10 +435,15 @@ class TestDataFrameSubclassing(TestData):
         tm.assert_frame_equal(res, exp)
 
         exp = tm.SubclassedDataFrame(
-            [[10, 30, 11, 31, 12, 32, 13, 33], [20, 40, 21, 41, 22, 42, 23, 43]],
+            [
+                [10, 30, 11, 31, 12, 32, 13, 33],
+                [20, 40, 21, 41, 22, 42, 23, 43],
+            ],
             index=Index(["c", "d"], name="ccc"),
             columns=MultiIndex.from_tuples(
-                list(zip(list("WWWWXXXX"), list("yyzzyyzz"), list("ABABABAB"))),
+                list(
+                    zip(list("WWWWXXXX"), list("yyzzyyzz"), list("ABABABAB"))
+                ),
                 names=["www", "yyy", "aaa"],
             ),
         )
@@ -434,7 +475,9 @@ class TestDataFrameSubclassing(TestData):
             ],
             index=Index(["A", "B"], name="aaa"),
             columns=MultiIndex.from_tuples(
-                list(zip(list("WWWWXXXX"), list("yyzzyyzz"), list("cdcdcdcd"))),
+                list(
+                    zip(list("WWWWXXXX"), list("yyzzyyzz"), list("cdcdcdcd"))
+                ),
                 names=["www", "yyy", "ccc"],
             ),
         )
@@ -452,7 +495,9 @@ class TestDataFrameSubclassing(TestData):
             ],
             index=Index(["c", "d"], name="ccc"),
             columns=MultiIndex.from_tuples(
-                list(zip(list("WWWWXXXX"), list("yyzzyyzz"), list("ABABABAB"))),
+                list(
+                    zip(list("WWWWXXXX"), list("yyzzyyzz"), list("ABABABAB"))
+                ),
                 names=["www", "yyy", "aaa"],
             ),
         )
@@ -575,7 +620,9 @@ class TestDataFrameSubclassing(TestData):
         assert isinstance(result, tm.SubclassedDataFrame)
         tm.assert_frame_equal(result, expected)
 
-        expected = tm.SubclassedDataFrame([[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3]])
+        expected = tm.SubclassedDataFrame(
+            [[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3]]
+        )
 
         result = df.apply(lambda x: tm.SubclassedSeries([1, 2, 3]), axis=1)
         assert isinstance(result, tm.SubclassedDataFrame)
@@ -585,7 +632,9 @@ class TestDataFrameSubclassing(TestData):
         assert isinstance(result, tm.SubclassedDataFrame)
         tm.assert_frame_equal(result, expected)
 
-        expected = tm.SubclassedSeries([[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3]])
+        expected = tm.SubclassedSeries(
+            [[1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3]]
+        )
 
         result = df.apply(lambda x: [1, 2, 3], axis=1)
         assert not isinstance(result, tm.SubclassedDataFrame)

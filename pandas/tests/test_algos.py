@@ -7,7 +7,11 @@ from numpy import nan
 from numpy.random import RandomState
 import pytest
 
-from pandas._libs import algos as libalgos, groupby as libgroupby, hashtable as ht
+from pandas._libs import (
+    algos as libalgos,
+    groupby as libgroupby,
+    hashtable as ht,
+)
 from pandas.compat.numpy import np_array_datetime64_compat
 import pandas.util._test_decorators as td
 
@@ -70,8 +74,12 @@ class TestMatch:
 class TestFactorize:
     def test_basic(self):
 
-        labels, uniques = algos.factorize(["a", "b", "b", "a", "a", "c", "c", "c"])
-        tm.assert_numpy_array_equal(uniques, np.array(["a", "b", "c"], dtype=object))
+        labels, uniques = algos.factorize(
+            ["a", "b", "b", "a", "a", "c", "c", "c"]
+        )
+        tm.assert_numpy_array_equal(
+            uniques, np.array(["a", "b", "c"], dtype=object)
+        )
 
         labels, uniques = algos.factorize(
             ["a", "b", "b", "a", "a", "c", "c", "c"], sort=True
@@ -100,7 +108,9 @@ class TestFactorize:
         exp = np.array([4.0, 3.0, 2.0, 1.0, 0.0], dtype=np.float64)
         tm.assert_numpy_array_equal(uniques, exp)
 
-        labels, uniques = algos.factorize(list(reversed(np.arange(5.0))), sort=True)
+        labels, uniques = algos.factorize(
+            list(reversed(np.arange(5.0))), sort=True
+        )
         exp = np.array([4, 3, 2, 1, 0], dtype=np.intp)
         tm.assert_numpy_array_equal(labels, exp)
         exp = np.array([0.0, 1.0, 2.0, 3.0, 4.0], dtype=np.float64)
@@ -208,16 +218,24 @@ class TestFactorize:
                 [0, 1, 2, 1, 3],
                 [(1, 1), (1, 2), (0, 0), (1, 2, 3)],
             ),
-            ([(1, 1), (1, 2), (0, 0), (1, 2)], [0, 1, 2, 1], [(1, 1), (1, 2), (0, 0)]),
+            (
+                [(1, 1), (1, 2), (0, 0), (1, 2)],
+                [0, 1, 2, 1],
+                [(1, 1), (1, 2), (0, 0)],
+            ),
         ],
     )
     def test_factorize_tuple_list(self, data, expected_label, expected_level):
         # GH9454
         result = pd.factorize(data)
 
-        tm.assert_numpy_array_equal(result[0], np.array(expected_label, dtype=np.intp))
+        tm.assert_numpy_array_equal(
+            result[0], np.array(expected_label, dtype=np.intp)
+        )
 
-        expected_level_array = com.asarray_tuplesafe(expected_level, dtype=object)
+        expected_level_array = com.asarray_tuplesafe(
+            expected_level, dtype=object
+        )
         tm.assert_numpy_array_equal(result[1], expected_level_array)
 
     def test_complex_sorting(self):
@@ -273,7 +291,9 @@ class TestFactorize:
         tm.assert_numpy_array_equal(uniques, exp_uniques)
 
     def test_object_factorize(self, writable):
-        data = np.array(["a", "c", None, np.nan, "a", "b", pd.NaT, "c"], dtype=object)
+        data = np.array(
+            ["a", "c", None, np.nan, "a", "b", pd.NaT, "c"], dtype=object
+        )
         data.setflags(write=writable)
         exp_labels = np.array([0, 1, -1, -1, 0, 2, -1, 1], dtype=np.intp)
         exp_uniques = np.array(["a", "c", "b"], dtype=object)
@@ -316,7 +336,10 @@ class TestFactorize:
             (np.array([1, -2 ** 63, 1, 0], dtype="i8"), 1),
             (np.array(["a", "", "a", "b"], dtype=object), "a"),
             (np.array([(), ("a", 1), (), ("a", 2)], dtype=object), ()),
-            (np.array([("a", 1), (), ("a", 1), ("a", 2)], dtype=object), ("a", 1)),
+            (
+                np.array([("a", 1), (), ("a", 1), ("a", 2)], dtype=object),
+                ("a", 1),
+            ),
         ],
     )
     def test_parametrized_factorize_na_value(self, data, na_value):
@@ -343,7 +366,9 @@ class TestFactorize:
         ids=["numpy_array", "extension_array"],
     )
     def test_factorize_na_sentinel(self, sort, na_sentinel, data, uniques):
-        labels, uniques = algos.factorize(data, sort=sort, na_sentinel=na_sentinel)
+        labels, uniques = algos.factorize(
+            data, sort=sort, na_sentinel=na_sentinel
+        )
         if sort:
             expected_labels = np.array([1, 0, na_sentinel, 1], dtype=np.intp)
             expected_uniques = safe_sort(uniques)
@@ -459,7 +484,9 @@ class TestUnique:
 
         # we are expecting to return in the order
         # of the categories
-        expected_o = Categorical(list("bac"), categories=list("abc"), ordered=True)
+        expected_o = Categorical(
+            list("bac"), categories=list("abc"), ordered=True
+        )
 
         # GH 15939
         c = Categorical(list("baabc"))
@@ -485,7 +512,9 @@ class TestUnique:
         tm.assert_categorical_equal(result, expected)
 
         # CI -> return CI
-        ci = CategoricalIndex(Categorical(list("baabc"), categories=list("bac")))
+        ci = CategoricalIndex(
+            Categorical(list("baabc"), categories=list("bac"))
+        )
         expected = CategoricalIndex(expected)
         result = ci.unique()
         tm.assert_index_equal(result, expected)
@@ -516,7 +545,9 @@ class TestUnique:
             ]
         ).unique()
         expected = DatetimeIndex(
-            ["2016-01-01 00:00:00"], dtype="datetime64[ns, US/Eastern]", freq=None
+            ["2016-01-01 00:00:00"],
+            dtype="datetime64[ns, US/Eastern]",
+            freq=None,
         )
         tm.assert_index_equal(result, expected)
 
@@ -544,7 +575,9 @@ class TestUnique:
             )
         )
         expected = DatetimeIndex(
-            ["2016-01-01 00:00:00"], dtype="datetime64[ns, US/Eastern]", freq=None
+            ["2016-01-01 00:00:00"],
+            dtype="datetime64[ns, US/Eastern]",
+            freq=None,
         )
         tm.assert_index_equal(result, expected)
 
@@ -558,8 +591,12 @@ class TestUnique:
         result = pd.unique(Series([2] + [1] * 5))
         tm.assert_numpy_array_equal(result, np.array([2, 1], dtype="int64"))
 
-        result = pd.unique(Series([Timestamp("20160101"), Timestamp("20160101")]))
-        expected = np.array(["2016-01-01T00:00:00.000000000"], dtype="datetime64[ns]")
+        result = pd.unique(
+            Series([Timestamp("20160101"), Timestamp("20160101")])
+        )
+        expected = np.array(
+            ["2016-01-01T00:00:00.000000000"], dtype="datetime64[ns]"
+        )
         tm.assert_numpy_array_equal(result, expected)
 
         result = pd.unique(
@@ -571,7 +608,9 @@ class TestUnique:
             )
         )
         expected = DatetimeIndex(
-            ["2016-01-01 00:00:00"], dtype="datetime64[ns, US/Eastern]", freq=None
+            ["2016-01-01 00:00:00"],
+            dtype="datetime64[ns, US/Eastern]",
+            freq=None,
         )
         tm.assert_index_equal(result, expected)
 
@@ -636,14 +675,20 @@ class TestUnique:
             result = pd.unique(a)
             assert result.size == 1
             # use bit patterns to identify which nan was kept:
-            result_nan_bits = struct.unpack("=Q", struct.pack("d", result[0]))[0]
+            result_nan_bits = struct.unpack("=Q", struct.pack("d", result[0]))[
+                0
+            ]
             assert result_nan_bits == bits_for_nan1
 
-    def test_do_not_mangle_na_values(self, unique_nulls_fixture, unique_nulls_fixture2):
+    def test_do_not_mangle_na_values(
+        self, unique_nulls_fixture, unique_nulls_fixture2
+    ):
         # GH 22295
         if unique_nulls_fixture is unique_nulls_fixture2:
             return  # skip it, values not unique
-        a = np.array([unique_nulls_fixture, unique_nulls_fixture2], dtype=np.object)
+        a = np.array(
+            [unique_nulls_fixture, unique_nulls_fixture2], dtype=np.object
+        )
         result = pd.unique(a)
         assert result.size == 2
         assert a[0] is unique_nulls_fixture
@@ -794,13 +839,15 @@ class TestIsin:
 
         # as object-array:
         result = algos.isin(
-            np.asarray(comps, dtype=np.object), np.asarray(values, dtype=np.object)
+            np.asarray(comps, dtype=np.object),
+            np.asarray(values, dtype=np.object),
         )
         tm.assert_numpy_array_equal(np.array([True]), result)
 
         # as float64-array:
         result = algos.isin(
-            np.asarray(comps, dtype=np.float64), np.asarray(values, dtype=np.float64)
+            np.asarray(comps, dtype=np.float64),
+            np.asarray(values, dtype=np.float64),
         )
         tm.assert_numpy_array_equal(np.array([True]), result)
 
@@ -953,16 +1000,22 @@ class TestValueCounts:
         result = s.value_counts()
         expected = Series(
             [4, 3, 2],
-            index=CategoricalIndex(["a", "b", "c"], categories=["a", "b", "c"]),
+            index=CategoricalIndex(
+                ["a", "b", "c"], categories=["a", "b", "c"]
+            ),
         )
         tm.assert_series_equal(result, expected, check_index_type=True)
         result = s.value_counts(dropna=False)
-        expected = Series([4, 3, 2, 1], index=CategoricalIndex(["a", "b", "c", np.nan]))
+        expected = Series(
+            [4, 3, 2, 1], index=CategoricalIndex(["a", "b", "c", np.nan])
+        )
         tm.assert_series_equal(result, expected, check_index_type=True)
 
         # out of order
         s = Series(
-            Categorical(list("aaaaabbbcc"), ordered=True, categories=["b", "a", "c"])
+            Categorical(
+                list("aaaaabbbcc"), ordered=True, categories=["b", "a", "c"]
+            )
         )
         s.iloc[1] = np.nan
         result = s.value_counts()
@@ -978,14 +1031,18 @@ class TestValueCounts:
         expected = Series(
             [4, 3, 2, 1],
             index=CategoricalIndex(
-                ["a", "b", "c", np.nan], categories=["b", "a", "c"], ordered=True
+                ["a", "b", "c", np.nan],
+                categories=["b", "a", "c"],
+                ordered=True,
             ),
         )
         tm.assert_series_equal(result, expected, check_index_type=True)
 
     def test_categorical_zeroes(self):
         # keep the `d` category with 0
-        s = Series(Categorical(list("bbbaac"), categories=list("abcd"), ordered=True))
+        s = Series(
+            Categorical(list("bbbaac"), categories=list("abcd"), ordered=True)
+        )
         result = s.value_counts()
         expected = Series(
             [3, 2, 1, 0],
@@ -1126,9 +1183,13 @@ class TestDuplicated:
                     6 + 6j,
                 ]
             ),
-            np.array(["a", "b", "a", "e", "c", "b", "d", "a", "e", "f"], dtype=object),
             np.array(
-                [1, 2 ** 63, 1, 3 ** 5, 10, 2 ** 63, 39, 1, 3 ** 5, 7], dtype=np.uint64
+                ["a", "b", "a", "e", "c", "b", "d", "a", "e", "f"],
+                dtype=object,
+            ),
+            np.array(
+                [1, 2 ** 63, 1, 3 ** 5, 10, 2 ** 63, 39, 1, 3 ** 5, 7],
+                dtype=np.uint64,
             ),
         ],
     )
@@ -1267,14 +1328,26 @@ class TestDuplicated:
         "arr, unique",
         [
             (
-                [(0, 0), (0, 1), (1, 0), (1, 1), (0, 0), (0, 1), (1, 0), (1, 1)],
+                [
+                    (0, 0),
+                    (0, 1),
+                    (1, 0),
+                    (1, 1),
+                    (0, 0),
+                    (0, 1),
+                    (1, 0),
+                    (1, 1),
+                ],
                 [(0, 0), (0, 1), (1, 0), (1, 1)],
             ),
             (
                 [("b", "c"), ("a", "b"), ("a", "b"), ("b", "c")],
                 [("b", "c"), ("a", "b")],
             ),
-            ([("a", 1), ("b", 2), ("a", 3), ("a", 1)], [("a", 1), ("b", 2), ("a", 3)]),
+            (
+                [("a", 1), ("b", 2), ("a", 3), ("a", 1)],
+                [("a", 1), ("b", 2), ("a", 3)],
+            ),
         ],
     )
     def test_unique_tuples(self, arr, unique):
@@ -1296,7 +1369,8 @@ class GroupVarTestMixin:
         labels = np.tile(np.arange(5), (3,)).astype("int64")
 
         expected_out = (
-            np.squeeze(values).reshape((5, 3), order="F").std(axis=1, ddof=1) ** 2
+            np.squeeze(values).reshape((5, 3), order="F").std(axis=1, ddof=1)
+            ** 2
         )[:, np.newaxis]
         expected_counts = counts + 3
 
@@ -1409,7 +1483,9 @@ class TestHashTable:
         xs.setflags(write=writable)
         m = ht.Float64HashTable()
         m.map_locations(xs)
-        tm.assert_numpy_array_equal(m.lookup(xs), np.arange(len(xs), dtype=np.int64))
+        tm.assert_numpy_array_equal(
+            m.lookup(xs), np.arange(len(xs), dtype=np.int64)
+        )
 
     def test_add_signed_zeros(self):
         # GH 21866 inconsistent hash-function for float64
@@ -1442,7 +1518,9 @@ class TestHashTable:
         xs.setflags(write=writable)
         m = ht.UInt64HashTable()
         m.map_locations(xs)
-        tm.assert_numpy_array_equal(m.lookup(xs), np.arange(len(xs), dtype=np.int64))
+        tm.assert_numpy_array_equal(
+            m.lookup(xs), np.arange(len(xs), dtype=np.int64)
+        )
 
     def test_get_unique(self):
         s = Series([1, 2, 2 ** 63, 2 ** 63], dtype=np.uint64)
@@ -1654,7 +1732,10 @@ class TestRank:
     @pytest.mark.high_memory
     @pytest.mark.parametrize(
         "values",
-        [np.arange(2 ** 24 + 1), np.arange(2 ** 25 + 2).reshape(2 ** 24 + 1, 2)],
+        [
+            np.arange(2 ** 24 + 1),
+            np.arange(2 ** 25 + 2).reshape(2 ** 24 + 1, 2),
+        ],
         ids=["1d", "2d"],
     )
     def test_pct_max_many_rows(self, values):
@@ -1713,7 +1794,9 @@ class TestTseriesUtil:
 
         filler = libalgos.backfill["int64_t"](old.values, new.values)
 
-        expect_filler = np.array([0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, -1], dtype=np.int64)
+        expect_filler = np.array(
+            [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, -1], dtype=np.int64
+        )
         tm.assert_numpy_array_equal(filler, expect_filler)
 
         # corner case
@@ -1730,7 +1813,9 @@ class TestTseriesUtil:
 
         filler = libalgos.pad["int64_t"](old.values, new.values)
 
-        expect_filler = np.array([-1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2], dtype=np.int64)
+        expect_filler = np.array(
+            [-1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2], dtype=np.int64
+        )
         tm.assert_numpy_array_equal(filler, expect_filler)
 
         # corner case
@@ -2108,7 +2193,9 @@ def test_int64_add_overflow():
         algos.checked_add_with_arr(np.array([m, n]), np.array([n, n]))
     with pytest.raises(OverflowError, match=msg):
         algos.checked_add_with_arr(
-            np.array([m, m]), np.array([m, m]), arr_mask=np.array([False, True])
+            np.array([m, m]),
+            np.array([m, m]),
+            arr_mask=np.array([False, True]),
         )
     with pytest.raises(OverflowError, match=msg):
         algos.checked_add_with_arr(
@@ -2203,13 +2290,21 @@ class TestMode:
             tm.assert_series_equal(algos.mode(s), exp)
 
     def test_datelike_mode(self):
-        exp = Series(["1900-05-03", "2011-01-03", "2013-01-02"], dtype="M8[ns]")
+        exp = Series(
+            ["1900-05-03", "2011-01-03", "2013-01-02"], dtype="M8[ns]"
+        )
         s = Series(["2011-01-03", "2013-01-02", "1900-05-03"], dtype="M8[ns]")
         tm.assert_series_equal(algos.mode(s), exp)
 
         exp = Series(["2011-01-03", "2013-01-02"], dtype="M8[ns]")
         s = Series(
-            ["2011-01-03", "2013-01-02", "1900-05-03", "2011-01-03", "2013-01-02"],
+            [
+                "2011-01-03",
+                "2013-01-02",
+                "1900-05-03",
+                "2011-01-03",
+                "2013-01-02",
+            ],
             dtype="M8[ns]",
         )
         tm.assert_series_equal(algos.mode(s), exp)

@@ -41,7 +41,8 @@ class TestTimedeltaArrayConstructor:
     def test_incorrect_dtype_raises(self):
         # TODO: why TypeError for 'category' but ValueError for i8?
         with pytest.raises(
-            ValueError, match=r"category cannot be converted " r"to timedelta64\[ns\]"
+            ValueError,
+            match=r"category cannot be converted " r"to timedelta64\[ns\]",
         ):
             TimedeltaArray(np.array([1, 2, 3], dtype="i8"), dtype="category")
 
@@ -49,7 +50,9 @@ class TestTimedeltaArrayConstructor:
             ValueError,
             match=r"dtype int64 cannot be converted " r"to timedelta64\[ns\]",
         ):
-            TimedeltaArray(np.array([1, 2, 3], dtype="i8"), dtype=np.dtype("int64"))
+            TimedeltaArray(
+                np.array([1, 2, 3], dtype="i8"), dtype=np.dtype("int64")
+            )
 
     def test_copy(self):
         data = np.array([1, 2, 3], dtype="m8[ns]")
@@ -78,20 +81,28 @@ class TestTimedeltaArray:
             TimedeltaArray._from_sequence([], dtype=object)
 
     def test_abs(self):
-        vals = np.array([-3600 * 10 ** 9, "NaT", 7200 * 10 ** 9], dtype="m8[ns]")
+        vals = np.array(
+            [-3600 * 10 ** 9, "NaT", 7200 * 10 ** 9], dtype="m8[ns]"
+        )
         arr = TimedeltaArray(vals)
 
-        evals = np.array([3600 * 10 ** 9, "NaT", 7200 * 10 ** 9], dtype="m8[ns]")
+        evals = np.array(
+            [3600 * 10 ** 9, "NaT", 7200 * 10 ** 9], dtype="m8[ns]"
+        )
         expected = TimedeltaArray(evals)
 
         result = abs(arr)
         tm.assert_timedelta_array_equal(result, expected)
 
     def test_neg(self):
-        vals = np.array([-3600 * 10 ** 9, "NaT", 7200 * 10 ** 9], dtype="m8[ns]")
+        vals = np.array(
+            [-3600 * 10 ** 9, "NaT", 7200 * 10 ** 9], dtype="m8[ns]"
+        )
         arr = TimedeltaArray(vals)
 
-        evals = np.array([3600 * 10 ** 9, "NaT", -7200 * 10 ** 9], dtype="m8[ns]")
+        evals = np.array(
+            [3600 * 10 ** 9, "NaT", -7200 * 10 ** 9], dtype="m8[ns]"
+        )
         expected = TimedeltaArray(evals)
 
         result = -arr
@@ -106,9 +117,13 @@ class TestTimedeltaArray:
         result = -arr
         tm.assert_timedelta_array_equal(result, expected)
 
-    @pytest.mark.parametrize("dtype", [int, np.int32, np.int64, "uint32", "uint64"])
+    @pytest.mark.parametrize(
+        "dtype", [int, np.int32, np.int64, "uint32", "uint64"]
+    )
     def test_astype_int(self, dtype):
-        arr = TimedeltaArray._from_sequence([pd.Timedelta("1H"), pd.Timedelta("2H")])
+        arr = TimedeltaArray._from_sequence(
+            [pd.Timedelta("1H"), pd.Timedelta("2H")]
+        )
         result = arr.astype(dtype)
 
         if np.dtype(dtype).kind == "u":
@@ -128,7 +143,9 @@ class TestTimedeltaArray:
 
 class TestReductions:
     def test_min_max(self):
-        arr = TimedeltaArray._from_sequence(["3H", "3H", "NaT", "2H", "5H", "4H"])
+        arr = TimedeltaArray._from_sequence(
+            ["3H", "3H", "NaT", "2H", "5H", "4H"]
+        )
 
         result = arr.min()
         expected = pd.Timedelta("2H")

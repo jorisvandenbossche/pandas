@@ -12,7 +12,9 @@ def testSimpleValue():
 
 
 def testFixnum():
-    check(b"\x92\x93\x00\x40\x7f\x93\xe0\xf0\xff", ((0, 64, 127), (-32, -16, -1)))
+    check(
+        b"\x92\x93\x00\x40\x7f\x93\xe0\xf0\xff", ((0, 64, 127), (-32, -16, -1))
+    )
 
 
 def testFixArray():
@@ -25,7 +27,8 @@ def testFixRaw():
 
 def testFixMap():
     check(
-        b"\x82\xc2\x81\xc0\xc0\xc3\x81\xc0\x80", {False: {None: None}, True: {None: {}}}
+        b"\x82\xc2\x81\xc0\xc0\xc3\x81\xc0\x80",
+        {False: {None: None}, True: {None: {}}},
     )
 
 

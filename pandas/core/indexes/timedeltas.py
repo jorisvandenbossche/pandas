@@ -4,7 +4,13 @@ import warnings
 
 import numpy as np
 
-from pandas._libs import NaT, Timedelta, index as libindex, join as libjoin, lib
+from pandas._libs import (
+    NaT,
+    Timedelta,
+    index as libindex,
+    join as libjoin,
+    lib,
+)
 from pandas.util._decorators import Appender, Substitution
 
 from pandas.core.dtypes.common import (
@@ -64,7 +70,9 @@ class TimedeltaDelegateMixin(DatetimelikeDelegateMixin):
 
 
 @delegate_names(
-    TimedeltaArray, TimedeltaDelegateMixin._delegated_properties, typ="property"
+    TimedeltaArray,
+    TimedeltaDelegateMixin._delegated_properties,
+    typ="property",
 )
 @delegate_names(
     TimedeltaArray,
@@ -158,7 +166,9 @@ class TimedeltaIndex(
     _join_precedence = 10
 
     def _join_i8_wrapper(joinf, **kwargs):
-        return DatetimeIndexOpsMixin._join_i8_wrapper(joinf, dtype="m8[ns]", **kwargs)
+        return DatetimeIndexOpsMixin._join_i8_wrapper(
+            joinf, dtype="m8[ns]", **kwargs
+        )
 
     _inner_indexer = _join_i8_wrapper(libjoin.inner_join_indexer_int64)
     _outer_indexer = _join_i8_wrapper(libjoin.outer_join_indexer_int64)
@@ -382,7 +392,9 @@ class TimedeltaIndex(
                     result.freq = to_offset(result.inferred_freq)
             return result
 
-    def join(self, other, how="left", level=None, return_indexers=False, sort=False):
+    def join(
+        self, other, how="left", level=None, return_indexers=False, sort=False
+    ):
         """
         See Index.join
         """
@@ -509,7 +521,9 @@ class TimedeltaIndex(
             return self.get_value_maybe_box(series, key)
 
         try:
-            return com.maybe_box(self, Index.get_value(self, series, key), series, key)
+            return com.maybe_box(
+                self, Index.get_value(self, series, key), series, key
+            )
         except KeyError:
             try:
                 loc = self._get_string_slice(key)
@@ -593,8 +607,14 @@ class TimedeltaIndex(
             if side == "left":
                 return lbound
             else:
-                return lbound + to_offset(parsed.resolution_string) - Timedelta(1, "ns")
-        elif (is_integer(label) or is_float(label)) and not is_timedelta64_dtype(label):
+                return (
+                    lbound
+                    + to_offset(parsed.resolution_string)
+                    - Timedelta(1, "ns")
+                )
+        elif (
+            is_integer(label) or is_float(label)
+        ) and not is_timedelta64_dtype(label):
             self._invalid_indexer("slice", label)
 
         return label
@@ -664,7 +684,9 @@ class TimedeltaIndex(
 
             # check freq can be preserved on edge cases
             if self.freq is not None:
-                if (loc == 0 or loc == -len(self)) and item + self.freq == self[0]:
+                if (
+                    loc == 0 or loc == -len(self)
+                ) and item + self.freq == self[0]:
                     freq = self.freq
                 elif (loc == len(self)) and item - self.freq == self[-1]:
                     freq = self.freq
@@ -681,7 +703,9 @@ class TimedeltaIndex(
             # fall back to object index
             if isinstance(item, str):
                 return self.astype(object).insert(loc, item)
-            raise TypeError("cannot insert TimedeltaIndex with incompatible label")
+            raise TypeError(
+                "cannot insert TimedeltaIndex with incompatible label"
+            )
 
     def delete(self, loc):
         """
@@ -704,7 +728,9 @@ class TimedeltaIndex(
                 freq = self.freq
         else:
             if is_list_like(loc):
-                loc = lib.maybe_indices_to_slice(ensure_int64(np.array(loc)), len(self))
+                loc = lib.maybe_indices_to_slice(
+                    ensure_int64(np.array(loc)), len(self)
+                )
             if isinstance(loc, slice) and loc.step in (1, None):
                 if loc.start in (0, None) or loc.stop in (len(self), None):
                     freq = self.freq
@@ -807,5 +833,7 @@ def timedelta_range(
         freq = "D"
 
     freq, freq_infer = dtl.maybe_infer_freq(freq)
-    tdarr = TimedeltaArray._generate_range(start, end, periods, freq, closed=closed)
+    tdarr = TimedeltaArray._generate_range(
+        start, end, periods, freq, closed=closed
+    )
     return TimedeltaIndex._simple_new(tdarr._data, freq=tdarr.freq, name=name)

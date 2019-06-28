@@ -37,7 +37,8 @@ def test_resample_as_freq_with_subperiod():
     result = df.resample("2T").asfreq()
     expected_data = {"value": [1, np.nan, np.nan, np.nan, np.nan, 10]}
     expected = DataFrame(
-        data=expected_data, index=timedelta_range("00:00:00", "00:10:00", freq="2T")
+        data=expected_data,
+        index=timedelta_range("00:00:00", "00:10:00", freq="2T"),
     )
     tm.assert_frame_equal(result, expected)
 
@@ -49,7 +50,8 @@ def test_resample_with_timedeltas():
     expected.index = pd.timedelta_range("0 days", freq="30T", periods=50)
 
     df = DataFrame(
-        {"A": np.arange(1480)}, index=pd.to_timedelta(np.arange(1480), unit="T")
+        {"A": np.arange(1480)},
+        index=pd.to_timedelta(np.arange(1480), unit="T"),
     )
     result = df.resample("30T").sum()
 
@@ -62,7 +64,9 @@ def test_resample_with_timedeltas():
 
 def test_resample_single_period_timedelta():
 
-    s = Series(list(range(5)), index=pd.timedelta_range("1 day", freq="s", periods=5))
+    s = Series(
+        list(range(5)), index=pd.timedelta_range("1 day", freq="s", periods=5)
+    )
     result = s.resample("2s").sum()
     expected = Series(
         [1, 5, 4], index=pd.timedelta_range("1 day", freq="2s", periods=3)
@@ -98,7 +102,9 @@ def test_resample_base_with_timedeltaindex():
 
 def test_resample_categorical_data_with_timedeltaindex():
     # GH #12169
-    df = DataFrame({"Group_obj": "A"}, index=pd.to_timedelta(list(range(20)), unit="s"))
+    df = DataFrame(
+        {"Group_obj": "A"}, index=pd.to_timedelta(list(range(20)), unit="s")
+    )
     df["Group"] = df["Group_obj"].astype("category")
     result = df.resample("10s").agg(lambda x: (x.value_counts().index[0]))
     expected = DataFrame(

@@ -56,7 +56,9 @@ else:
 @pytest.fixture(scope="module")
 def current_packers_data():
     # our current version packers data
-    from pandas.tests.io.generate_legacy_storage_files import create_msgpack_data
+    from pandas.tests.io.generate_legacy_storage_files import (
+        create_msgpack_data,
+    )
 
     return create_msgpack_data()
 
@@ -215,7 +217,8 @@ class TestNumpy(TestPackers):
             pytest.skip("numpy can not handle complex128")
 
         x = [np.float32(np.random.rand()) for i in range(5)] + [
-            np.complex128(np.random.rand() + 1j * np.random.rand()) for i in range(5)
+            np.complex128(np.random.rand() + 1j * np.random.rand())
+            for i in range(5)
         ]
         x_rec = self.encode_decode(x)
         assert np.allclose(x, x_rec)
@@ -255,7 +258,10 @@ class TestNumpy(TestPackers):
         tm.assert_almost_equal(x, x_rec)
 
     def test_dict_numpy_complex(self):
-        x = {"foo": np.complex128(1.0 + 1.0j), "bar": np.complex128(2.0 + 2.0j)}
+        x = {
+            "foo": np.complex128(1.0 + 1.0j),
+            "bar": np.complex128(2.0 + 2.0j),
+        }
         x_rec = self.encode_decode(x)
         tm.assert_dict_equal(x, x_rec)
 
@@ -275,7 +281,9 @@ class TestNumpy(TestPackers):
     def test_numpy_array_complex(self):
         x = (np.random.rand(5) + 1j * np.random.rand(5)).astype(np.complex128)
         x_rec = self.encode_decode(x)
-        assert all(map(lambda x, y: x == y, x, x_rec)) and x.dtype == x_rec.dtype
+        assert (
+            all(map(lambda x, y: x == y, x, x_rec)) and x.dtype == x_rec.dtype
+        )
 
     def test_list_mixed(self):
         x = [1.0, np.float32(3.5), np.complex128(4.25), "foo", np.bool_(1)]
@@ -331,7 +339,11 @@ class TestBasic(TestPackers):
 
     def test_intervals(self):
         # 19967
-        for i in [Interval(0, 1), Interval(0, 1, "left"), Interval(10, 25.0, "right")]:
+        for i in [
+            Interval(0, 1),
+            Interval(0, 1, "left"),
+            Interval(10, 25.0, "right"),
+        ]:
             i_rec = self.encode_decode(i)
             assert i == i_rec
 
@@ -514,7 +526,12 @@ class TestNDFrame(TestPackers):
             assert_frame_equal(self.frame[k], i_rec[k])
 
         packed_items = tuple(
-            [self.frame["float"], self.frame["float"].A, self.frame["float"].B, None]
+            [
+                self.frame["float"],
+                self.frame["float"].A,
+                self.frame["float"].B,
+                None,
+            ]
         )
         l_rec = self.encode_decode(packed_items)
         check_arbitrary(packed_items, l_rec)
@@ -592,13 +609,19 @@ class TestSparse(TestPackers):
         s = tm.makeStringSeries()
         s[3:5] = np.nan
         ss = s.to_sparse()
-        self._check_roundtrip(ss, tm.assert_series_equal, check_series_type=True)
+        self._check_roundtrip(
+            ss, tm.assert_series_equal, check_series_type=True
+        )
 
         ss2 = s.to_sparse(kind="integer")
-        self._check_roundtrip(ss2, tm.assert_series_equal, check_series_type=True)
+        self._check_roundtrip(
+            ss2, tm.assert_series_equal, check_series_type=True
+        )
 
         ss3 = s.to_sparse(fill_value=0)
-        self._check_roundtrip(ss3, tm.assert_series_equal, check_series_type=True)
+        self._check_roundtrip(
+            ss3, tm.assert_series_equal, check_series_type=True
+        )
 
     def test_sparse_frame(self):
 
@@ -610,10 +633,14 @@ class TestSparse(TestPackers):
         self._check_roundtrip(ss, tm.assert_frame_equal, check_frame_type=True)
 
         ss2 = s.to_sparse(kind="integer")
-        self._check_roundtrip(ss2, tm.assert_frame_equal, check_frame_type=True)
+        self._check_roundtrip(
+            ss2, tm.assert_frame_equal, check_frame_type=True
+        )
 
         ss3 = s.to_sparse(fill_value=0)
-        self._check_roundtrip(ss3, tm.assert_frame_equal, check_frame_type=True)
+        self._check_roundtrip(
+            ss3, tm.assert_frame_equal, check_frame_type=True
+        )
 
 
 class TestCompression(TestPackers):
@@ -669,7 +696,9 @@ class TestCompression(TestPackers):
             pytest.skip("no blosc")
         self._test_compression("blosc")
 
-    def _test_compression_warns_when_decompress_caches(self, monkeypatch, compress):
+    def _test_compression_warns_when_decompress_caches(
+        self, monkeypatch, compress
+    ):
         not_garbage = []
         control = []  # copied data
 
@@ -727,12 +756,16 @@ class TestCompression(TestPackers):
     def test_compression_warns_when_decompress_caches_zlib(self, monkeypatch):
         if not _ZLIB_INSTALLED:
             pytest.skip("no zlib")
-        self._test_compression_warns_when_decompress_caches(monkeypatch, "zlib")
+        self._test_compression_warns_when_decompress_caches(
+            monkeypatch, "zlib"
+        )
 
     def test_compression_warns_when_decompress_caches_blosc(self, monkeypatch):
         if not _BLOSC_INSTALLED:
             pytest.skip("no blosc")
-        self._test_compression_warns_when_decompress_caches(monkeypatch, "blosc")
+        self._test_compression_warns_when_decompress_caches(
+            monkeypatch, "blosc"
+        )
 
     def _test_small_strings_no_warn(self, compress):
         empty = np.array([], dtype="uint8")
@@ -756,7 +789,9 @@ class TestCompression(TestPackers):
         # always be the same (unless we were able to mutate the shared
         # character singleton in which case ord(b'a') == ord(b'b').
         assert ord(b"a") == ord("a")
-        tm.assert_numpy_array_equal(char_unpacked, np.array([ord(b"b")], dtype="uint8"))
+        tm.assert_numpy_array_equal(
+            char_unpacked, np.array([ord(b"b")], dtype="uint8")
+        )
 
     def test_small_strings_no_warn_zlib(self):
         if not _ZLIB_INSTALLED:
@@ -848,7 +883,9 @@ class TestEncoding(TestPackers):
 
 
 files = glob.glob(
-    os.path.join(os.path.dirname(__file__), "data", "legacy_msgpack", "*", "*.msgpack")
+    os.path.join(
+        os.path.dirname(__file__), "data", "legacy_msgpack", "*", "*.msgpack"
+    )
 )
 
 
@@ -889,9 +926,9 @@ class TestMsgpack:
 
         self.check_min_structure(data, version)
         for typ, dv in data.items():
-            assert typ in all_data, "unpacked data contains " 'extra key "{0}"'.format(
-                typ
-            )
+            assert (
+                typ in all_data
+            ), "unpacked data contains " 'extra key "{0}"'.format(typ)
             for dt, result in dv.items():
                 assert (
                     dt in current_data[typ]
@@ -927,7 +964,10 @@ class TestMsgpack:
         try:
             with catch_warnings(record=True):
                 self.compare(
-                    current_packers_data, all_packers_data, legacy_packer, version
+                    current_packers_data,
+                    all_packers_data,
+                    legacy_packer,
+                    version,
                 )
         except ImportError:
             # blosc not installed

@@ -177,7 +177,9 @@ class MPLPlot:
             for kw, err in zip(["xerr", "yerr"], [xerr, yerr])
         }
 
-        if not isinstance(secondary_y, (bool, tuple, list, np.ndarray, ABCIndexClass)):
+        if not isinstance(
+            secondary_y, (bool, tuple, list, np.ndarray, ABCIndexClass)
+        ):
             secondary_y = [secondary_y]
         self.secondary_y = secondary_y
 
@@ -228,7 +230,8 @@ class MPLPlot:
             "color" in self.kwds or "colors" in self.kwds
         ) and self.colormap is not None:
             warnings.warn(
-                "'color' and 'colormap' cannot be used " "simultaneously. Using 'color'"
+                "'color' and 'colormap' cannot be used "
+                "simultaneously. Using 'color'"
             )
 
         if "color" in self.kwds and self.style is not None:
@@ -292,7 +295,11 @@ class MPLPlot:
 
     def _has_plotted_object(self, ax):
         """check whether ax has data"""
-        return len(ax.lines) != 0 or len(ax.artists) != 0 or len(ax.containers) != 0
+        return (
+            len(ax.lines) != 0
+            or len(ax.artists) != 0
+            or len(ax.containers) != 0
+        )
 
     def _maybe_right_yaxis(self, ax, axes_num):
         if not self.on_right(axes_num):
@@ -380,7 +387,8 @@ class MPLPlot:
         else:
             sec_true = isinstance(self.secondary_y, bool) and self.secondary_y
             all_sec = (
-                is_list_like(self.secondary_y) and len(self.secondary_y) == self.nseries
+                is_list_like(self.secondary_y)
+                and len(self.secondary_y) == self.nseries
             )
             if sec_true or all_sec:
                 # if all data is plotted on secondary, return right axes
@@ -438,18 +446,26 @@ class MPLPlot:
         """Common post process for each axes"""
 
         if self.orientation == "vertical" or self.orientation is None:
-            self._apply_axis_properties(ax.xaxis, rot=self.rot, fontsize=self.fontsize)
+            self._apply_axis_properties(
+                ax.xaxis, rot=self.rot, fontsize=self.fontsize
+            )
             self._apply_axis_properties(ax.yaxis, fontsize=self.fontsize)
 
             if hasattr(ax, "right_ax"):
-                self._apply_axis_properties(ax.right_ax.yaxis, fontsize=self.fontsize)
+                self._apply_axis_properties(
+                    ax.right_ax.yaxis, fontsize=self.fontsize
+                )
 
         elif self.orientation == "horizontal":
-            self._apply_axis_properties(ax.yaxis, rot=self.rot, fontsize=self.fontsize)
+            self._apply_axis_properties(
+                ax.yaxis, rot=self.rot, fontsize=self.fontsize
+            )
             self._apply_axis_properties(ax.xaxis, fontsize=self.fontsize)
 
             if hasattr(ax, "right_ax"):
-                self._apply_axis_properties(ax.right_ax.yaxis, fontsize=self.fontsize)
+                self._apply_axis_properties(
+                    ax.right_ax.yaxis, fontsize=self.fontsize
+                )
         else:  # pragma no cover
             raise ValueError
 
@@ -581,7 +597,9 @@ class MPLPlot:
 
     def _get_ax_legend(self, ax):
         leg = ax.get_legend()
-        other_ax = getattr(ax, "left_ax", None) or getattr(ax, "right_ax", None)
+        other_ax = getattr(ax, "left_ax", None) or getattr(
+            ax, "right_ax", None
+        )
         other_leg = None
         if other_ax is not None:
             other_leg = other_ax.get_legend()
@@ -600,7 +618,12 @@ class MPLPlot:
 
     def _get_xticks(self, convert_period=False):
         index = self.data.index
-        is_datetype = index.inferred_type in ("datetime", "date", "datetime64", "time")
+        is_datetype = index.inferred_type in (
+            "datetime",
+            "date",
+            "datetime64",
+            "time",
+        )
 
         if self.use_index:
             if convert_period and isinstance(index, ABCPeriodIndex):
@@ -699,7 +722,9 @@ class MPLPlot:
         if isinstance(self.secondary_y, bool):
             return self.secondary_y
 
-        if isinstance(self.secondary_y, (tuple, list, np.ndarray, ABCIndexClass)):
+        if isinstance(
+            self.secondary_y, (tuple, list, np.ndarray, ABCIndexClass)
+        ):
             return self.data.columns[i] in self.secondary_y
 
     def _apply_style_colors(self, colors, kwds, col_num, label):
@@ -796,7 +821,8 @@ class MPLPlot:
                 ):
                     msg = (
                         "Asymmetrical error bars should be provided "
-                        + "with the shape (%u, 2, %u)" % (self.nseries, len(self.data))
+                        + "with the shape (%u, 2, %u)"
+                        % (self.nseries, len(self.data))
                     )
                     raise ValueError(msg)
 
@@ -836,7 +862,9 @@ class MPLPlot:
         from matplotlib.axes import Subplot
 
         return [
-            ax for ax in self.axes[0].get_figure().get_axes() if isinstance(ax, Subplot)
+            ax
+            for ax in self.axes[0].get_figure().get_axes()
+            if isinstance(ax, Subplot)
         ]
 
     def _get_axes_layout(self):
@@ -982,7 +1010,9 @@ class ScatterPlot(PlanePlot):
         if len(errors_x) > 0 or len(errors_y) > 0:
             err_kwds = dict(errors_x, **errors_y)
             err_kwds["ecolor"] = scatter.get_facecolor()[0]
-            ax.errorbar(data[x].values, data[y].values, linestyle="none", **err_kwds)
+            ax.errorbar(
+                data[x].values, data[y].values, linestyle="none", **err_kwds
+            )
 
 
 class HexBinPlot(PlanePlot):
@@ -1007,7 +1037,9 @@ class HexBinPlot(PlanePlot):
         else:
             c_values = data[C].values
 
-        ax.hexbin(data[x].values, data[y].values, C=c_values, cmap=cmap, **self.kwds)
+        ax.hexbin(
+            data[x].values, data[y].values, C=c_values, cmap=cmap, **self.kwds
+        )
         if cb:
             self._plot_colorbar(ax)
 
@@ -1041,7 +1073,9 @@ class LinePlot(MPLPlot):
 
     def _make_plot(self):
         if self._is_ts_plot():
-            from pandas.plotting._matplotlib.timeseries import _maybe_convert_index
+            from pandas.plotting._matplotlib.timeseries import (
+                _maybe_convert_index,
+            )
 
             data = _maybe_convert_index(self._get_ax(0), self.data)
 
@@ -1085,7 +1119,9 @@ class LinePlot(MPLPlot):
             ax.set_xlim(left, right)
 
     @classmethod
-    def _plot(cls, ax, x, y, style=None, column_num=None, stacking_id=None, **kwds):
+    def _plot(
+        cls, ax, x, y, style=None, column_num=None, stacking_id=None, **kwds
+    ):
         # column_num is used to get the target column from protf in line and
         # area plots
         if column_num == 0:
@@ -1345,7 +1381,9 @@ class BarPlot(MPLPlot):
 
             label = pprint_thing(label)
 
-            if (("yerr" in kwds) or ("xerr" in kwds)) and (kwds.get("ecolor") is None):
+            if (("yerr" in kwds) or ("xerr" in kwds)) and (
+                kwds.get("ecolor") is None
+            ):
                 kwds["ecolor"] = mpl.rcParams["xtick.color"]
 
             start = 0
@@ -1458,7 +1496,9 @@ class PiePlot(MPLPlot):
         pass
 
     def _make_plot(self):
-        colors = self._get_colors(num_colors=len(self.data), color_kwds="colors")
+        colors = self._get_colors(
+            num_colors=len(self.data), color_kwds="colors"
+        )
         self.kwds.setdefault("colors", colors)
 
         for i, (label, y) in enumerate(self._iter_data()):
@@ -1481,7 +1521,9 @@ class PiePlot(MPLPlot):
             # Blank out labels for values of 0 so they don't overlap
             # with nonzero wedges
             if labels is not None:
-                blabels = [blank_labeler(l, value) for l, value in zip(labels, y)]
+                blabels = [
+                    blank_labeler(l, value) for l, value in zip(labels, y)
+                ]
             else:
                 blabels = None
             results = ax.pie(y, labels=blabels, **kwds)

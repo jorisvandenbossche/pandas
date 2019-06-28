@@ -7,7 +7,9 @@ from pandas import Series
 from pandas.util import testing as tm
 
 
-@pytest.mark.parametrize("result", [Series([10, 11, 12]), [10, 11, 12], (10, 11, 12)])
+@pytest.mark.parametrize(
+    "result", [Series([10, 11, 12]), [10, 11, 12], (10, 11, 12)]
+)
 def test_upcast_error(result):
     # GH23823
     mask = np.array([False, True, False])
@@ -19,15 +21,30 @@ def test_upcast_error(result):
 @pytest.mark.parametrize(
     "arr, other, exp_changed, expected",
     [
-        (np.arange(1, 6), np.array([61, 62, 63]), False, np.array([1, 61, 3, 62, 63])),
+        (
+            np.arange(1, 6),
+            np.array([61, 62, 63]),
+            False,
+            np.array([1, 61, 3, 62, 63]),
+        ),
         (
             np.arange(1, 6),
             np.array([61.1, 62.2, 63.3]),
             True,
             np.array([1, 61.1, 3, 62.2, 63.3]),
         ),
-        (np.arange(1, 6), np.nan, True, np.array([1, np.nan, 3, np.nan, np.nan])),
-        (np.arange(10, 15), np.array([61, 62]), False, np.array([10, 61, 12, 62, 61])),
+        (
+            np.arange(1, 6),
+            np.nan,
+            True,
+            np.array([1, np.nan, 3, np.nan, np.nan]),
+        ),
+        (
+            np.arange(10, 15),
+            np.array([61, 62]),
+            False,
+            np.array([10, 61, 12, 62, 61]),
+        ),
         (
             np.arange(10, 15),
             np.array([61, np.nan]),
@@ -53,7 +70,13 @@ def test_upcast(arr, other, exp_changed, expected):
             np.arange("2018-01-01", "2018-01-04", dtype="datetime64[D]"),
             False,
             np.array(
-                ["2019-01-01", "2018-01-01", "2019-01-03", "2018-01-02", "2018-01-03"],
+                [
+                    "2019-01-01",
+                    "2018-01-01",
+                    "2019-01-03",
+                    "2018-01-02",
+                    "2018-01-03",
+                ],
                 dtype="datetime64[D]",
             ),
         ),
@@ -77,7 +100,13 @@ def test_upcast(arr, other, exp_changed, expected):
             np.arange("2018-01-01", "2018-01-03", dtype="datetime64[D]"),
             False,
             np.array(
-                ["2019-01-01", "2018-01-01", "2019-01-03", "2018-01-02", "2018-01-01"],
+                [
+                    "2019-01-01",
+                    "2018-01-01",
+                    "2019-01-03",
+                    "2018-01-02",
+                    "2018-01-01",
+                ],
                 dtype="datetime64[D]",
             ),
         ),

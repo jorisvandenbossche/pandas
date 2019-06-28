@@ -60,7 +60,9 @@ class BaseImpl:
 
         # index level names must be strings
         valid_names = all(
-            isinstance(name, str) for name in df.index.names if name is not None
+            isinstance(name, str)
+            for name in df.index.names
+            if name is not None
         )
         if not valid_names:
             raise ValueError("Index level names must be strings")
@@ -143,7 +145,13 @@ class FastParquetImpl(BaseImpl):
         self.api = fastparquet
 
     def write(
-        self, df, path, compression="snappy", index=None, partition_cols=None, **kwargs
+        self,
+        df,
+        path,
+        compression="snappy",
+        index=None,
+        partition_cols=None,
+        **kwargs
     ):
         self.validate_dataframe(df)
         # thriftpy/protocol/compact.py:339:

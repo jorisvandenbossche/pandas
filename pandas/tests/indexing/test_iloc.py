@@ -124,10 +124,14 @@ class TestiLoc(Base):
             ([pd.datetime(2019, 1, 1)], slice(None)),
         ],
     )
-    def test_iloc_non_integer_raises(self, index, columns, index_vals, column_vals):
+    def test_iloc_non_integer_raises(
+        self, index, columns, index_vals, column_vals
+    ):
         # GH 25753
         df = DataFrame(
-            np.random.randn(len(index), len(columns)), index=index, columns=columns
+            np.random.randn(len(index), len(columns)),
+            index=index,
+            columns=columns,
         )
         msg = ".iloc requires numeric indexers, got"
         with pytest.raises(IndexError, match=msg):
@@ -137,7 +141,12 @@ class TestiLoc(Base):
 
         # integer
         self.check_result(
-            "integer", "iloc", 2, "ix", {0: 4, 1: 6, 2: 8}, typs=["ints", "uints"]
+            "integer",
+            "iloc",
+            2,
+            "ix",
+            {0: 4, 1: 6, 2: 8},
+            typs=["ints", "uints"],
         )
         self.check_result(
             "integer",
@@ -153,7 +162,12 @@ class TestiLoc(Base):
 
         # neg integer
         self.check_result(
-            "neg int", "iloc", -1, "ix", {0: 6, 1: 9, 2: 12}, typs=["ints", "uints"]
+            "neg int",
+            "iloc",
+            -1,
+            "ix",
+            {0: 6, 1: 9, 2: 12},
+            typs=["ints", "uints"],
         )
         self.check_result(
             "neg int",
@@ -297,7 +311,9 @@ class TestiLoc(Base):
         assert isna(result)
 
         result = df.iloc[0, :]
-        expected = Series([np.nan, 1, 3, 3], index=["A", "B", "A", "B"], name=0)
+        expected = Series(
+            [np.nan, 1, 3, 3], index=["A", "B", "A", "B"], name=0
+        )
         tm.assert_series_equal(result, expected)
 
     def test_iloc_getitem_array(self):
@@ -328,13 +344,19 @@ class TestiLoc(Base):
             fails=IndexError,
         )
 
-    @pytest.mark.parametrize("index", [[True, False], [True, False, True, False]])
+    @pytest.mark.parametrize(
+        "index", [[True, False], [True, False, True, False]]
+    )
     def test_iloc_getitem_bool_diff_len(self, index):
         # GH26658
         s = Series([1, 2, 3])
         with pytest.raises(
             IndexError,
-            match=("Item wrong length {} instead of {}.".format(len(index), len(s))),
+            match=(
+                "Item wrong length {} instead of {}.".format(
+                    len(index), len(s)
+                )
+            ),
         ):
             _ = s.iloc[index]
 
@@ -363,7 +385,8 @@ class TestiLoc(Base):
 
         df1 = DataFrame(np.random.randn(10, 4), columns=["A", "A", "B", "B"])
         df2 = DataFrame(
-            np.random.randint(0, 10, size=20).reshape(10, 2), columns=["A", "C"]
+            np.random.randint(0, 10, size=20).reshape(10, 2),
+            columns=["A", "C"],
         )
 
         # axis=1
@@ -407,7 +430,9 @@ class TestiLoc(Base):
 
         # setitem with an iloc list
         df = DataFrame(
-            np.arange(9).reshape((3, 3)), index=["A", "B", "C"], columns=["A", "B", "C"]
+            np.arange(9).reshape((3, 3)),
+            index=["A", "B", "C"],
+            columns=["A", "B", "C"],
         )
         df.iloc[[0, 1], [1, 2]]
         df.iloc[[0, 1], [1, 2]] += 100
@@ -458,13 +483,19 @@ class TestiLoc(Base):
         tm.assert_frame_equal(df, expected)
 
         # reversed x 2
-        df.iloc[[1, 0], [0, 1]] = df.iloc[[1, 0], [0, 1]].reset_index(drop=True)
-        df.iloc[[1, 0], [0, 1]] = df.iloc[[1, 0], [0, 1]].reset_index(drop=True)
+        df.iloc[[1, 0], [0, 1]] = df.iloc[[1, 0], [0, 1]].reset_index(
+            drop=True
+        )
+        df.iloc[[1, 0], [0, 1]] = df.iloc[[1, 0], [0, 1]].reset_index(
+            drop=True
+        )
         tm.assert_frame_equal(df, expected)
 
     def test_iloc_getitem_frame(self):
         df = DataFrame(
-            np.random.randn(10, 4), index=range(0, 20, 2), columns=range(0, 8, 2)
+            np.random.randn(10, 4),
+            index=range(0, 20, 2),
+            columns=range(0, 8, 2),
         )
 
         result = df.iloc[2]
@@ -530,7 +561,9 @@ class TestiLoc(Base):
     def test_iloc_getitem_labelled_frame(self):
         # try with labelled frame
         df = DataFrame(
-            np.random.randn(10, 4), index=list("abcdefghij"), columns=list("ABCD")
+            np.random.randn(10, 4),
+            index=list("abcdefghij"),
+            columns=list("ABCD"),
         )
 
         result = df.iloc[1, 1]
@@ -577,7 +610,9 @@ class TestiLoc(Base):
         str(result)
         result.dtypes
 
-        expected = DataFrame(arr[3:5, 0:2], index=index[3:5], columns=columns[0:2])
+        expected = DataFrame(
+            arr[3:5, 0:2], index=index[3:5], columns=columns[0:2]
+        )
         tm.assert_frame_equal(result, expected)
 
         # for dups
@@ -586,7 +621,9 @@ class TestiLoc(Base):
         str(result)
         result.dtypes
 
-        expected = DataFrame(arr[3:5, 0:2], index=index[3:5], columns=list("aa"))
+        expected = DataFrame(
+            arr[3:5, 0:2], index=index[3:5], columns=list("aa")
+        )
         tm.assert_frame_equal(result, expected)
 
         # related
@@ -599,12 +636,16 @@ class TestiLoc(Base):
         result = df.iloc[1:5, 2:4]
         str(result)
         result.dtypes
-        expected = DataFrame(arr[1:5, 2:4], index=index[1:5], columns=columns[2:4])
+        expected = DataFrame(
+            arr[1:5, 2:4], index=index[1:5], columns=columns[2:4]
+        )
         tm.assert_frame_equal(result, expected)
 
     def test_iloc_setitem_series(self):
         df = DataFrame(
-            np.random.randn(10, 4), index=list("abcdefghij"), columns=list("ABCD")
+            np.random.randn(10, 4),
+            index=list("abcdefghij"),
+            columns=list("ABCD"),
         )
 
         df.iloc[1, 1] = 1
@@ -639,18 +680,27 @@ class TestiLoc(Base):
         # GH 7551
         # list-of-list is set incorrectly in mixed vs. single dtyped frames
         df = DataFrame(
-            dict(A=np.arange(5, dtype="int64"), B=np.arange(5, 10, dtype="int64"))
+            dict(
+                A=np.arange(5, dtype="int64"),
+                B=np.arange(5, 10, dtype="int64"),
+            )
         )
         df.iloc[2:4] = [[10, 11], [12, 13]]
         expected = DataFrame(dict(A=[0, 1, 10, 12, 4], B=[5, 6, 11, 13, 9]))
         tm.assert_frame_equal(df, expected)
 
-        df = DataFrame(dict(A=list("abcde"), B=np.arange(5, 10, dtype="int64")))
+        df = DataFrame(
+            dict(A=list("abcde"), B=np.arange(5, 10, dtype="int64"))
+        )
         df.iloc[2:4] = [["x", 11], ["y", 13]]
-        expected = DataFrame(dict(A=["a", "b", "x", "y", "e"], B=[5, 6, 11, 13, 9]))
+        expected = DataFrame(
+            dict(A=["a", "b", "x", "y", "e"], B=[5, 6, 11, 13, 9])
+        )
         tm.assert_frame_equal(df, expected)
 
-    @pytest.mark.parametrize("indexer", [[0], slice(None, 1, None), np.array([0])])
+    @pytest.mark.parametrize(
+        "indexer", [[0], slice(None, 1, None), np.array([0])]
+    )
     @pytest.mark.parametrize("value", [["Z"], np.array(["Z"])])
     def test_iloc_setitem_with_scalar_index(self, indexer, value):
         # GH #19474
@@ -668,11 +718,17 @@ class TestiLoc(Base):
         # GH 3631, iloc with a mask (of a series) should raise
         df = DataFrame(list(range(5)), index=list("ABCDE"), columns=["a"])
         mask = df.a % 2 == 0
-        msg = "iLocation based boolean indexing cannot use an indexable as" " a mask"
+        msg = (
+            "iLocation based boolean indexing cannot use an indexable as"
+            " a mask"
+        )
         with pytest.raises(ValueError, match=msg):
             df.iloc[mask]
         mask.index = range(len(mask))
-        msg = "iLocation based boolean indexing on an integer type is not" " available"
+        msg = (
+            "iLocation based boolean indexing on an integer type is not"
+            " available"
+        )
         with pytest.raises(NotImplementedError, match=msg):
             df.iloc[mask]
 
@@ -693,7 +749,8 @@ class TestiLoc(Base):
             ("index", ""): "0b11",
             ("index", ".loc"): "0b11",
             ("index", ".iloc"): (
-                "iLocation based boolean indexing " "cannot use an indexable as a mask"
+                "iLocation based boolean indexing "
+                "cannot use an indexable as a mask"
             ),
             ("locs", ""): "Unalignable boolean Series provided as indexer "
             "(index of the boolean Series and of the indexed "
@@ -729,7 +786,8 @@ class TestiLoc(Base):
                     r = expected.get(key)
                     if r != ans:
                         raise AssertionError(
-                            "[%s] does not match [%s], received [%s]" % (key, ans, r)
+                            "[%s] does not match [%s], received [%s]"
+                            % (key, ans, r)
                         )
 
     def test_iloc_non_unique_indexing(self):
@@ -757,7 +815,9 @@ class TestiLoc(Base):
             new_list.append(s * 3)
 
         expected = DataFrame(new_list)
-        expected = concat([expected, DataFrame(index=idx[idx > sidx.max()])], sort=True)
+        expected = concat(
+            [expected, DataFrame(index=idx[idx > sidx.max()])], sort=True
+        )
         with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
             result = df2.loc[idx]
         tm.assert_frame_equal(result, expected, check_index_type=False)
@@ -782,7 +842,10 @@ class TestiLoc(Base):
         )
         # horizontal empty
         tm.assert_frame_equal(
-            df.iloc[[]], df.iloc[:0, :], check_index_type=True, check_column_type=True
+            df.iloc[[]],
+            df.iloc[:0, :],
+            check_index_type=True,
+            check_column_type=True,
         )
 
     def test_identity_slice_returns_new_object(self):

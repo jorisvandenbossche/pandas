@@ -44,7 +44,9 @@ class JSONDtype(ExtensionDtype):
         if string == cls.name:
             return cls()
         else:
-            raise TypeError("Cannot construct a '{}' from " "'{}'".format(cls, string))
+            raise TypeError(
+                "Cannot construct a '{}' from " "'{}'".format(cls, string)
+            )
 
 
 class JSONArray(ExtensionArray):
@@ -54,7 +56,9 @@ class JSONArray(ExtensionArray):
     def __init__(self, values, dtype=None, copy=False):
         for val in values:
             if not isinstance(val, self.dtype.type):
-                raise TypeError("All values must be of type " + str(self.dtype.type))
+                raise TypeError(
+                    "All values must be of type " + str(self.dtype.type)
+                )
         self.data = values
 
         # Some aliases for common attribute names to ensure pandas supports
@@ -111,7 +115,9 @@ class JSONArray(ExtensionArray):
         return sys.getsizeof(self.data)
 
     def isna(self):
-        return np.array([x == self.dtype.na_value for x in self.data], dtype=bool)
+        return np.array(
+            [x == self.dtype.na_value for x in self.data], dtype=bool
+        )
 
     def take(self, indexer, allow_fill=False, fill_value=None):
         # re-implement here, since NumPy has trouble setting
@@ -131,7 +137,8 @@ class JSONArray(ExtensionArray):
                 raise ValueError
             try:
                 output = [
-                    self.data[loc] if loc != -1 else fill_value for loc in indexer
+                    self.data[loc] if loc != -1 else fill_value
+                    for loc in indexer
                 ]
             except IndexError:
                 raise IndexError(msg)

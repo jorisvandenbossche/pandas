@@ -34,7 +34,13 @@ class TestScalar(Base):
                         self.check_values(f, "iat")
 
             # at
-            for f in [d["ints"], d["uints"], d["labels"], d["ts"], d["floats"]]:
+            for f in [
+                d["ints"],
+                d["uints"],
+                d["labels"],
+                d["ts"],
+                d["floats"],
+            ]:
                 _check(f, "at")
 
     def test_at_and_iat_set(self):
@@ -62,14 +68,22 @@ class TestScalar(Base):
                         _check(f, "iat")
 
             # at
-            for f in [d["ints"], d["uints"], d["labels"], d["ts"], d["floats"]]:
+            for f in [
+                d["ints"],
+                d["uints"],
+                d["labels"],
+                d["ts"],
+                d["floats"],
+            ]:
                 _check(f, "at")
 
     def test_at_iat_coercion(self):
 
         # as timestamp is not a tuple!
         dates = date_range("1/1/2000", periods=8)
-        df = DataFrame(np.random.randn(8, 4), index=dates, columns=["A", "B", "C", "D"])
+        df = DataFrame(
+            np.random.randn(8, 4), index=dates, columns=["A", "B", "C", "D"]
+        )
         s = df["A"]
 
         result = s.at[dates[5]]
@@ -147,7 +161,10 @@ class TestScalar(Base):
         s = Series([1, 2, 3], index=[3, 2, 1])
         result = s.at[1]
         assert result == 3
-        msg = "At based indexing on an integer index can only have integer" " indexers"
+        msg = (
+            "At based indexing on an integer index can only have integer"
+            " indexers"
+        )
         with pytest.raises(ValueError, match=msg):
             s.at["a"]
 

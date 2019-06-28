@@ -19,7 +19,9 @@ class BaseGetitemTests(BaseExtensionTests):
         self.assert_series_equal(result, expected)
 
     def test_iloc_frame(self, data):
-        df = pd.DataFrame({"A": data, "B": np.arange(len(data), dtype="int64")})
+        df = pd.DataFrame(
+            {"A": data, "B": np.arange(len(data), dtype="int64")}
+        )
         expected = pd.DataFrame({"A": data[:4]})
 
         # slice -> frame
@@ -50,7 +52,9 @@ class BaseGetitemTests(BaseExtensionTests):
         self.assert_series_equal(result, expected)
 
     def test_loc_frame(self, data):
-        df = pd.DataFrame({"A": data, "B": np.arange(len(data), dtype="int64")})
+        df = pd.DataFrame(
+            {"A": data, "B": np.arange(len(data), dtype="int64")}
+        )
         expected = pd.DataFrame({"A": data[:4]})
 
         # slice -> frame
@@ -231,7 +235,8 @@ class BaseGetitemTests(BaseExtensionTests):
 
         result = s.reindex([n, n + 1])
         expected = pd.Series(
-            data._from_sequence([na_value, na_value], dtype=s.dtype), index=[n, n + 1]
+            data._from_sequence([na_value, na_value], dtype=s.dtype),
+            index=[n, n + 1],
         )
         self.assert_series_equal(result, expected)
 

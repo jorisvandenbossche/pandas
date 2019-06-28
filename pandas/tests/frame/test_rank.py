@@ -13,7 +13,9 @@ class TestRank:
     df = DataFrame({"A": s, "B": s})
 
     results = {
-        "average": np.array([1.5, 5.5, 7.0, 3.5, np.nan, 3.5, 1.5, 8.0, np.nan, 5.5]),
+        "average": np.array(
+            [1.5, 5.5, 7.0, 3.5, np.nan, 3.5, 1.5, 8.0, np.nan, 5.5]
+        ),
         "min": np.array([1, 5, 7, 3, np.nan, 3, 1, 8, np.nan, 5]),
         "max": np.array([2, 6, 7, 4, np.nan, 4, 2, 8, np.nan, 6]),
         "first": np.array([1, 5, 7, 3, np.nan, 4, 2, 8, np.nan, 6]),
@@ -106,7 +108,9 @@ class TestRank:
         result = df.rank(1, numeric_only=False, ascending=False)
         tm.assert_frame_equal(result, expected)
 
-        df = DataFrame({"a": [1e-20, -5, 1e-20 + 1e-40, 10, 1e60, 1e80, 1e-30]})
+        df = DataFrame(
+            {"a": [1e-20, -5, 1e-20 + 1e-40, 10, 1e60, 1e80, 1e-30]}
+        )
         exp = DataFrame({"a": [3.5, 1.0, 3.5, 5.0, 6.0, 7.0, 2.0]})
         tm.assert_frame_equal(df.rank(), exp)
 
@@ -218,7 +222,9 @@ class TestRank:
                         rankdata, ax, vals, m if m != "first" else "ordinal"
                     )
                     sprank = sprank.astype(np.float64)
-                    expected = DataFrame(sprank, columns=cols).astype("float64")
+                    expected = DataFrame(sprank, columns=cols).astype(
+                        "float64"
+                    )
                     tm.assert_frame_equal(result, expected)
 
     @pytest.mark.parametrize("dtype", ["O", "f8", "i8"])
@@ -269,7 +275,10 @@ class TestRank:
     @pytest.mark.parametrize(
         "method,exp",
         [
-            ("dense", [[1.0, 1.0, 1.0], [1.0, 0.5, 2.0 / 3], [1.0, 0.5, 1.0 / 3]]),
+            (
+                "dense",
+                [[1.0, 1.0, 1.0], [1.0, 0.5, 2.0 / 3], [1.0, 0.5, 1.0 / 3]],
+            ),
             (
                 "min",
                 [
@@ -280,11 +289,19 @@ class TestRank:
             ),
             (
                 "max",
-                [[1.0, 1.0, 1.0], [1.0, 2.0 / 3, 2.0 / 3], [1.0, 2.0 / 3, 1.0 / 3]],
+                [
+                    [1.0, 1.0, 1.0],
+                    [1.0, 2.0 / 3, 2.0 / 3],
+                    [1.0, 2.0 / 3, 1.0 / 3],
+                ],
             ),
             (
                 "average",
-                [[2.0 / 3, 1.0, 1.0], [2.0 / 3, 0.5, 2.0 / 3], [2.0 / 3, 0.5, 1.0 / 3]],
+                [
+                    [2.0 / 3, 1.0, 1.0],
+                    [2.0 / 3, 0.5, 2.0 / 3],
+                    [2.0 / 3, 0.5, 1.0 / 3],
+                ],
             ),
             (
                 "first",

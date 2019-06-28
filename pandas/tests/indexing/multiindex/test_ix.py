@@ -51,7 +51,9 @@ class TestMultiIndexIx:
         res = df.loc[key]
 
         # col has float dtype, result should be Float64Index
-        index = MultiIndex.from_arrays([[4.0] * 3, [2012] * 3], names=["col", "year"])
+        index = MultiIndex.from_arrays(
+            [[4.0] * 3, [2012] * 3], names=["col", "year"]
+        )
         expected = DataFrame({"amount": [222, 333, 444]}, index=index)
         tm.assert_frame_equal(res, expected)
 

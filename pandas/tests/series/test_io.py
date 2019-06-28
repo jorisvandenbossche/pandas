@@ -36,7 +36,9 @@ class TestSeriesToCSV:
         with ensure_clean() as path:
             datetime_series.to_csv(path, header=False)
 
-            with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
+            with tm.assert_produces_warning(
+                FutureWarning, check_stacklevel=False
+            ):
                 ts = self.read_csv(path)
                 depr_ts = Series.from_csv(path)
                 assert_series_equal(depr_ts, ts)
@@ -69,7 +71,9 @@ class TestSeriesToCSV:
             assert ts.name is None
             assert ts.index.name is None
 
-            with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
+            with tm.assert_produces_warning(
+                FutureWarning, check_stacklevel=False
+            ):
                 depr_ts = Series.from_csv(path)
                 assert_series_equal(depr_ts, ts)
 
@@ -156,7 +160,11 @@ class TestSeriesToCSV:
         "s,encoding",
         [
             (
-                Series([0.123456, 0.234567, 0.567567], index=["A", "B", "C"], name="X"),
+                Series(
+                    [0.123456, 0.234567, 0.567567],
+                    index=["A", "B", "C"],
+                    name="X",
+                ),
                 None,
             ),
             # GH 21241, 21118
@@ -169,7 +177,12 @@ class TestSeriesToCSV:
 
         with ensure_clean() as filename:
 
-            s.to_csv(filename, compression=compression, encoding=encoding, header=True)
+            s.to_csv(
+                filename,
+                compression=compression,
+                encoding=encoding,
+                header=True,
+            )
             # test the round trip - to_csv -> read_csv
             result = pd.read_csv(
                 filename,
@@ -202,7 +215,10 @@ class TestSeriesToCSV:
 
             with tm.decompress_file(filename, compression) as fh:
                 assert_series_equal(
-                    s, pd.read_csv(fh, index_col=0, squeeze=True, encoding=encoding)
+                    s,
+                    pd.read_csv(
+                        fh, index_col=0, squeeze=True, encoding=encoding
+                    ),
                 )
 
 
@@ -222,7 +238,8 @@ class TestSeriesIO:
 
         rs = datetime_series.to_frame(name="testdifferent")
         xp = pd.DataFrame(
-            dict(testdifferent=datetime_series.values), index=datetime_series.index
+            dict(testdifferent=datetime_series.values),
+            index=datetime_series.index,
         )
         assert_frame_equal(rs, xp)
 
@@ -265,13 +282,17 @@ class TestSeriesIO:
         assert_frame_equal(result, expected)
 
     @pytest.mark.parametrize(
-        "mapping", (dict, collections.defaultdict(list), collections.OrderedDict)
+        "mapping",
+        (dict, collections.defaultdict(list), collections.OrderedDict),
     )
     def test_to_dict(self, mapping, datetime_series):
         # GH16122
         tm.assert_series_equal(
-            Series(datetime_series.to_dict(mapping), name="ts"), datetime_series
+            Series(datetime_series.to_dict(mapping), name="ts"),
+            datetime_series,
         )
         from_method = Series(datetime_series.to_dict(collections.Counter))
-        from_constructor = Series(collections.Counter(datetime_series.iteritems()))
+        from_constructor = Series(
+            collections.Counter(datetime_series.iteritems())
+        )
         tm.assert_series_equal(from_method, from_constructor)

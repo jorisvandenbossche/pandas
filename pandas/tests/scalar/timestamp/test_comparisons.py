@@ -120,7 +120,14 @@ class TestTimestampComparison:
         rhs = Timestamp("now")
         nat = Timestamp("nat")
 
-        ops = {"gt": "lt", "lt": "gt", "ge": "le", "le": "ge", "eq": "eq", "ne": "ne"}
+        ops = {
+            "gt": "lt",
+            "lt": "gt",
+            "ge": "le",
+            "le": "ge",
+            "eq": "eq",
+            "ne": "ne",
+        }
 
         for left, right in ops.items():
             left_f = getattr(operator, left)

@@ -144,7 +144,9 @@ class TestCategoricalDtypes:
         # standard categories
         dtype = CategoricalDtype(ordered=dtype_ordered)
         result = cat.astype(dtype)
-        expected = Categorical(data, categories=cat.categories, ordered=dtype_ordered)
+        expected = Categorical(
+            data, categories=cat.categories, ordered=dtype_ordered
+        )
         tm.assert_categorical_equal(result, expected)
 
         # non-standard categories

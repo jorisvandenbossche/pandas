@@ -51,7 +51,9 @@ class TestDatetimeIndexSetOps:
 
         # GH 10149
         expected = (
-            first.astype("O").union(pd.Index(second.values, dtype="O")).astype("O")
+            first.astype("O")
+            .union(pd.Index(second.values, dtype="O"))
+            .astype("O")
         )
         case = box(second.values)
         result = first.union(case, sort=sort)
@@ -233,20 +235,28 @@ class TestDatetimeIndexSetOps:
 
         # non-monotonic
         base = DatetimeIndex(
-            ["2011-01-05", "2011-01-04", "2011-01-02", "2011-01-03"], tz=tz, name="idx"
+            ["2011-01-05", "2011-01-04", "2011-01-02", "2011-01-03"],
+            tz=tz,
+            name="idx",
         )
 
         rng2 = DatetimeIndex(
-            ["2011-01-04", "2011-01-02", "2011-02-02", "2011-02-03"], tz=tz, name="idx"
+            ["2011-01-04", "2011-01-02", "2011-02-02", "2011-02-03"],
+            tz=tz,
+            name="idx",
         )
-        expected2 = DatetimeIndex(["2011-01-04", "2011-01-02"], tz=tz, name="idx")
+        expected2 = DatetimeIndex(
+            ["2011-01-04", "2011-01-02"], tz=tz, name="idx"
+        )
 
         rng3 = DatetimeIndex(
             ["2011-01-04", "2011-01-02", "2011-02-02", "2011-02-03"],
             tz=tz,
             name="other",
         )
-        expected3 = DatetimeIndex(["2011-01-04", "2011-01-02"], tz=tz, name=None)
+        expected3 = DatetimeIndex(
+            ["2011-01-04", "2011-01-02"], tz=tz, name=None
+        )
 
         # GH 7880
         rng4 = date_range("7/1/2000", "7/31/2000", freq="D", tz=tz, name="idx")
@@ -286,7 +296,13 @@ class TestDatetimeIndexSetOps:
     @pytest.mark.parametrize("tz", tz)
     @pytest.mark.parametrize("sort", [None, False])
     def test_difference(self, tz, sort):
-        rng_dates = ["1/2/2000", "1/3/2000", "1/1/2000", "1/4/2000", "1/5/2000"]
+        rng_dates = [
+            "1/2/2000",
+            "1/3/2000",
+            "1/1/2000",
+            "1/4/2000",
+            "1/5/2000",
+        ]
 
         rng1 = pd.DatetimeIndex(rng_dates, tz=tz)
         other1 = pd.date_range("1/6/2000", freq="D", periods=5, tz=tz)
@@ -329,8 +345,12 @@ class TestDatetimeIndexSetOps:
 
     @pytest.mark.parametrize("sort", [None, False])
     def test_datetimeindex_diff(self, sort):
-        dti1 = date_range(freq="Q-JAN", start=datetime(1997, 12, 31), periods=100)
-        dti2 = date_range(freq="Q-JAN", start=datetime(1997, 12, 31), periods=98)
+        dti1 = date_range(
+            freq="Q-JAN", start=datetime(1997, 12, 31), periods=100
+        )
+        dti2 = date_range(
+            freq="Q-JAN", start=datetime(1997, 12, 31), periods=98
+        )
         assert len(dti1.difference(dti2, sort)) == 2
 
     @pytest.mark.parametrize("sort", [None, False])
@@ -347,8 +367,12 @@ class TestDatetimeIndexSetOps:
         tm.assert_index_equal(result, dti)
 
     def test_join_nonunique(self):
-        idx1 = to_datetime(["2012-11-06 16:00:11.477563", "2012-11-06 16:00:11.477563"])
-        idx2 = to_datetime(["2012-11-06 15:11:09.006507", "2012-11-06 15:11:09.006507"])
+        idx1 = to_datetime(
+            ["2012-11-06 16:00:11.477563", "2012-11-06 16:00:11.477563"]
+        )
+        idx2 = to_datetime(
+            ["2012-11-06 15:11:09.006507", "2012-11-06 15:11:09.006507"]
+        )
         rs = idx1.join(idx2, how="outer")
         assert rs.is_monotonic
 
@@ -480,8 +504,12 @@ class TestBusinessDatetimeIndex:
         late_start = datetime(2011, 3, 1)
         late_end = datetime(2011, 5, 1)
 
-        early_dr = date_range(start=early_start, end=early_end, tz=tz, freq=MonthEnd())
-        late_dr = date_range(start=late_start, end=late_end, tz=tz, freq=MonthEnd())
+        early_dr = date_range(
+            start=early_start, end=early_end, tz=tz, freq=MonthEnd()
+        )
+        late_dr = date_range(
+            start=late_start, end=late_end, tz=tz, freq=MonthEnd()
+        )
 
         early_dr.union(late_dr, sort=sort)
 
@@ -498,8 +526,12 @@ class TestBusinessDatetimeIndex:
         late_start = datetime(2011, 3, 1)
         late_end = datetime(2011, 5, 1)
 
-        early_dr = date_range(start=early_start, end=early_end, tz=tz, freq=MonthEnd())
-        late_dr = date_range(start=late_start, end=late_end, tz=tz, freq=MonthEnd())
+        early_dr = date_range(
+            start=early_start, end=early_end, tz=tz, freq=MonthEnd()
+        )
+        late_dr = date_range(
+            start=late_start, end=late_end, tz=tz, freq=MonthEnd()
+        )
 
         early_dr.union(late_dr, sort=sort)
 

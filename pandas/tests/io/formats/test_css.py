@@ -27,7 +27,11 @@ def assert_same_resolution(css1, css2, inherited=None):
             " \t hello \t :\n  world \n  ;  \n foo: \tbar\n\n",
         ),
         ("case", "hello: world; foo: bar", "Hello: WORLD; foO: bar"),
-        ("empty-decl", "hello: world; foo: bar", "; hello: world;; foo: bar;\n; ;"),
+        (
+            "empty-decl",
+            "hello: world; foo: bar",
+            "; hello: world;; foo: bar;\n; ;",
+        ),
         ("empty-list", "", ";"),
     ],
 )
@@ -66,8 +70,14 @@ def test_css_parse_invalid(invalid_css, remainder):
 @pytest.mark.parametrize(
     "shorthand,expansions",
     [
-        ("margin", ["margin-top", "margin-right", "margin-bottom", "margin-left"]),
-        ("padding", ["padding-top", "padding-right", "padding-bottom", "padding-left"]),
+        (
+            "margin",
+            ["margin-top", "margin-right", "margin-bottom", "margin-left"],
+        ),
+        (
+            "padding",
+            ["padding-top", "padding-right", "padding-bottom", "padding-left"],
+        ),
         (
             "border-width",
             [
@@ -189,7 +199,9 @@ def test_css_none_absent(style, equiv):
         ("101.6q", "72pt"),
     ],
 )
-@pytest.mark.parametrize("relative_to", [None, "16pt"])  # invariant to inherited size
+@pytest.mark.parametrize(
+    "relative_to", [None, "16pt"]
+)  # invariant to inherited size
 def test_css_absolute_font_size(size, relative_to, resolved):
     if relative_to is None:
         inherited = None

@@ -124,7 +124,9 @@ class JoinUnit:
 
     def __repr__(self):
         return "{name}({block!r}, {indexers})".format(
-            name=self.__class__.__name__, block=self.block, indexers=self.indexers
+            name=self.__class__.__name__,
+            block=self.block,
+            indexers=self.indexers,
         )
 
     @cache_readonly
@@ -144,7 +146,9 @@ class JoinUnit:
         if not self.needs_filling:
             return self.block.dtype
         else:
-            return _get_dtype(maybe_promote(self.block.dtype, self.block.fill_value)[0])
+            return _get_dtype(
+                maybe_promote(self.block.dtype, self.block.fill_value)[0]
+            )
 
     @cache_readonly
     def is_na(self):
@@ -191,13 +195,14 @@ class JoinUnit:
                     if len(values) and values[0] is None:
                         fill_value = None
 
-                if getattr(self.block, "is_datetimetz", False) or is_datetime64tz_dtype(
-                    empty_dtype
-                ):
+                if getattr(
+                    self.block, "is_datetimetz", False
+                ) or is_datetime64tz_dtype(empty_dtype):
                     if self.block is None:
                         array = empty_dtype.construct_array_type()
                         return array(
-                            np.full(self.shape[1], fill_value.value), dtype=empty_dtype
+                            np.full(self.shape[1], fill_value.value),
+                            dtype=empty_dtype,
                         )
                     pass
                 elif getattr(self.block, "is_categorical", False):
@@ -233,7 +238,9 @@ class JoinUnit:
 
         else:
             for ax, indexer in self.indexers.items():
-                values = algos.take_nd(values, indexer, axis=ax, fill_value=fill_value)
+                values = algos.take_nd(
+                    values, indexer, axis=ax, fill_value=fill_value
+                )
 
         return values
 
@@ -249,7 +256,9 @@ def concatenate_join_units(join_units, concat_axis, copy):
     empty_dtype, upcasted_na = get_empty_dtype_and_na(join_units)
 
     to_concat = [
-        ju.get_reindexed_values(empty_dtype=empty_dtype, upcasted_na=upcasted_na)
+        ju.get_reindexed_values(
+            empty_dtype=empty_dtype, upcasted_na=upcasted_na
+        )
         for ju in join_units
     ]
 
@@ -435,7 +444,9 @@ def trim_join_unit(join_unit, length):
     extra_shape = (join_unit.shape[0] - length,) + join_unit.shape[1:]
     join_unit.shape = (length,) + join_unit.shape[1:]
 
-    return JoinUnit(block=extra_block, indexers=extra_indexers, shape=extra_shape)
+    return JoinUnit(
+        block=extra_block, indexers=extra_indexers, shape=extra_shape
+    )
 
 
 def combine_concat_plans(plans, concat_axis):
@@ -492,7 +503,10 @@ def combine_concat_plans(plans, concat_axis):
                     if len(plc) > min_len:
                         # trim_join_unit updates unit in place, so only
                         # placement needs to be sliced to skip min_len.
-                        next_items[i] = (plc[min_len:], trim_join_unit(unit, min_len))
+                        next_items[i] = (
+                            plc[min_len:],
+                            trim_join_unit(unit, min_len),
+                        )
                     else:
                         yielded_placement = plc
                         next_items[i] = _next_or_none(plans[i])

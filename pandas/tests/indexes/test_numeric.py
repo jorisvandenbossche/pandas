@@ -172,7 +172,10 @@ class TestFloat64Index(Numeric):
         )
         with pytest.raises(TypeError, match=msg):
             Float64Index(["a", "b", 0.0])
-        msg = r"float\(\) argument must be a string or a number, not" " 'Timestamp'"
+        msg = (
+            r"float\(\) argument must be a string or a number, not"
+            " 'Timestamp'"
+        )
         with pytest.raises(TypeError, match=msg):
             Float64Index([Timestamp("20130101")])
 
@@ -180,16 +183,22 @@ class TestFloat64Index(Numeric):
 
         self.check_coerce(self.mixed, Index([1.5, 2, 3, 4, 5]))
         self.check_coerce(self.float, Index(np.arange(5) * 2.5))
-        self.check_coerce(self.float, Index(np.array(np.arange(5) * 2.5, dtype=object)))
+        self.check_coerce(
+            self.float, Index(np.array(np.arange(5) * 2.5, dtype=object))
+        )
 
     def test_constructor_explicit(self):
 
         # these don't auto convert
         self.check_coerce(
-            self.float, Index((np.arange(5) * 2.5), dtype=object), is_float_index=False
+            self.float,
+            Index((np.arange(5) * 2.5), dtype=object),
+            is_float_index=False,
         )
         self.check_coerce(
-            self.mixed, Index([1.5, 2, 3, 4, 5], dtype=object), is_float_index=False
+            self.mixed,
+            Index([1.5, 2, 3, 4, 5], dtype=object),
+            is_float_index=False,
         )
 
     def test_astype(self):
@@ -285,10 +294,12 @@ class TestFloat64Index(Numeric):
             idx.get_indexer(target, "pad"), np.array([-1, 0, 1], dtype=np.intp)
         )
         tm.assert_numpy_array_equal(
-            idx.get_indexer(target, "backfill"), np.array([0, 1, 2], dtype=np.intp)
+            idx.get_indexer(target, "backfill"),
+            np.array([0, 1, 2], dtype=np.intp),
         )
         tm.assert_numpy_array_equal(
-            idx.get_indexer(target, "nearest"), np.array([0, 1, 1], dtype=np.intp)
+            idx.get_indexer(target, "nearest"),
+            np.array([0, 1, 1], dtype=np.intp),
         )
 
     def test_get_loc(self):
@@ -373,9 +384,13 @@ class TestFloat64Index(Numeric):
     def test_nan_multiple_containment(self):
         i = Float64Index([1.0, np.nan])
         tm.assert_numpy_array_equal(i.isin([1.0]), np.array([True, False]))
-        tm.assert_numpy_array_equal(i.isin([2.0, np.pi]), np.array([False, False]))
+        tm.assert_numpy_array_equal(
+            i.isin([2.0, np.pi]), np.array([False, False])
+        )
         tm.assert_numpy_array_equal(i.isin([np.nan]), np.array([False, True]))
-        tm.assert_numpy_array_equal(i.isin([1.0, np.nan]), np.array([True, True]))
+        tm.assert_numpy_array_equal(
+            i.isin([1.0, np.nan]), np.array([True, True])
+        )
         i = Float64Index([1.0, 2.0])
         tm.assert_numpy_array_equal(i.isin([np.nan]), np.array([False, False]))
 
@@ -414,7 +429,9 @@ class TestFloat64Index(Numeric):
         tm.assert_index_equal(result, expected)
 
         # allow_fill=False
-        result = idx.take(np.array([1, 0, -1]), allow_fill=False, fill_value=True)
+        result = idx.take(
+            np.array([1, 0, -1]), allow_fill=False, fill_value=True
+        )
         expected = pd.Float64Index([2.0, 1.0, 3.0], name="xxx")
         tm.assert_index_equal(result, expected)
 
@@ -569,16 +586,18 @@ class NumericInt(Numeric):
         tm.assert_index_equal(result, expected)
 
         name = self._holder.__name__
-        msg = ("Unable to fill values because " "{name} cannot contain NA").format(
-            name=name
-        )
+        msg = (
+            "Unable to fill values because " "{name} cannot contain NA"
+        ).format(name=name)
 
         # fill_value=True
         with pytest.raises(ValueError, match=msg):
             idx.take(np.array([1, 0, -1]), fill_value=True)
 
         # allow_fill=False
-        result = idx.take(np.array([1, 0, -1]), allow_fill=False, fill_value=True)
+        result = idx.take(
+            np.array([1, 0, -1]), allow_fill=False, fill_value=True
+        )
         expected = self._holder([2, 1, 3], name="xxx")
         tm.assert_index_equal(result, expected)
 
@@ -704,12 +723,16 @@ class TestInt64Index(NumericInt):
     def test_intersection(self):
         other = Index([1, 2, 3, 4, 5])
         result = self.index.intersection(other)
-        expected = Index(np.sort(np.intersect1d(self.index.values, other.values)))
+        expected = Index(
+            np.sort(np.intersect1d(self.index.values, other.values))
+        )
         tm.assert_index_equal(result, expected)
 
         result = other.intersection(self.index)
         expected = Index(
-            np.sort(np.asarray(np.intersect1d(self.index.values, other.values)))
+            np.sort(
+                np.asarray(np.intersect1d(self.index.values, other.values))
+            )
         )
         tm.assert_index_equal(result, expected)
 
@@ -718,7 +741,9 @@ class TestInt64Index(NumericInt):
         other_mono = Int64Index([1, 2, 5, 7, 12, 25])
 
         # not monotonic
-        res, lidx, ridx = self.index.join(other, how="inner", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other, how="inner", return_indexers=True
+        )
 
         # no guarantee of sortedness, so sort for comparison purposes
         ind = res.argsort()
@@ -736,7 +761,9 @@ class TestInt64Index(NumericInt):
         tm.assert_numpy_array_equal(ridx, eridx)
 
         # monotonic
-        res, lidx, ridx = self.index.join(other_mono, how="inner", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other_mono, how="inner", return_indexers=True
+        )
 
         res2 = self.index.intersection(other_mono)
         tm.assert_index_equal(res, res2)
@@ -753,7 +780,9 @@ class TestInt64Index(NumericInt):
         other_mono = Int64Index([1, 2, 5, 7, 12, 25])
 
         # not monotonic
-        res, lidx, ridx = self.index.join(other, how="left", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other, how="left", return_indexers=True
+        )
         eres = self.index
         eridx = np.array([-1, 4, -1, -1, -1, -1, 1, -1, -1, -1], dtype=np.intp)
 
@@ -763,7 +792,9 @@ class TestInt64Index(NumericInt):
         tm.assert_numpy_array_equal(ridx, eridx)
 
         # monotonic
-        res, lidx, ridx = self.index.join(other_mono, how="left", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other_mono, how="left", return_indexers=True
+        )
         eridx = np.array([-1, 1, -1, -1, -1, -1, 4, -1, -1, -1], dtype=np.intp)
         assert isinstance(res, Int64Index)
         tm.assert_index_equal(res, eres)
@@ -786,7 +817,9 @@ class TestInt64Index(NumericInt):
         other_mono = Int64Index([1, 2, 5, 7, 12, 25])
 
         # not monotonic
-        res, lidx, ridx = self.index.join(other, how="right", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other, how="right", return_indexers=True
+        )
         eres = other
         elidx = np.array([-1, 6, -1, -1, 1, -1], dtype=np.intp)
 
@@ -796,7 +829,9 @@ class TestInt64Index(NumericInt):
         assert ridx is None
 
         # monotonic
-        res, lidx, ridx = self.index.join(other_mono, how="right", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other_mono, how="right", return_indexers=True
+        )
         eres = other_mono
         elidx = np.array([-1, 1, -1, -1, 6, -1], dtype=np.intp)
         assert isinstance(other, Int64Index)
@@ -848,12 +883,16 @@ class TestInt64Index(NumericInt):
 
         # not monotonic
         # guarantee of sortedness
-        res, lidx, ridx = self.index.join(other, how="outer", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other, how="outer", return_indexers=True
+        )
         noidx_res = self.index.join(other, how="outer")
         tm.assert_index_equal(res, noidx_res)
 
         eres = Int64Index([0, 1, 2, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 25])
-        elidx = np.array([0, -1, 1, 2, -1, 3, -1, 4, 5, 6, 7, 8, 9, -1], dtype=np.intp)
+        elidx = np.array(
+            [0, -1, 1, 2, -1, 3, -1, 4, 5, 6, 7, 8, 9, -1], dtype=np.intp
+        )
         eridx = np.array(
             [-1, 3, 4, -1, 5, -1, 0, -1, -1, 1, -1, -1, -1, 2], dtype=np.intp
         )
@@ -864,11 +903,15 @@ class TestInt64Index(NumericInt):
         tm.assert_numpy_array_equal(ridx, eridx)
 
         # monotonic
-        res, lidx, ridx = self.index.join(other_mono, how="outer", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other_mono, how="outer", return_indexers=True
+        )
         noidx_res = self.index.join(other_mono, how="outer")
         tm.assert_index_equal(res, noidx_res)
 
-        elidx = np.array([0, -1, 1, 2, -1, 3, -1, 4, 5, 6, 7, 8, 9, -1], dtype=np.intp)
+        elidx = np.array(
+            [0, -1, 1, 2, -1, 3, -1, 4, 5, 6, 7, 8, 9, -1], dtype=np.intp
+        )
         eridx = np.array(
             [-1, 0, 1, -1, 2, -1, 3, -1, -1, 4, -1, -1, -1, 5], dtype=np.intp
         )
@@ -884,7 +927,13 @@ class TestUInt64Index(NumericInt):
     _holder = UInt64Index
 
     def setup_method(self, method):
-        vals = [2 ** 63, 2 ** 63 + 10, 2 ** 63 + 15, 2 ** 63 + 20, 2 ** 63 + 25]
+        vals = [
+            2 ** 63,
+            2 ** 63 + 10,
+            2 ** 63 + 15,
+            2 ** 63 + 20,
+            2 ** 63 + 25,
+        ]
         self.indices = dict(
             index=UInt64Index(vals), index_dec=UInt64Index(reversed(vals))
         )
@@ -927,25 +976,35 @@ class TestUInt64Index(NumericInt):
         tm.assert_numpy_array_equal(indexer, expected)
 
     def test_intersection(self):
-        other = Index([2 ** 63, 2 ** 63 + 5, 2 ** 63 + 10, 2 ** 63 + 15, 2 ** 63 + 20])
+        other = Index(
+            [2 ** 63, 2 ** 63 + 5, 2 ** 63 + 10, 2 ** 63 + 15, 2 ** 63 + 20]
+        )
         result = self.index.intersection(other)
-        expected = Index(np.sort(np.intersect1d(self.index.values, other.values)))
+        expected = Index(
+            np.sort(np.intersect1d(self.index.values, other.values))
+        )
         tm.assert_index_equal(result, expected)
 
         result = other.intersection(self.index)
         expected = Index(
-            np.sort(np.asarray(np.intersect1d(self.index.values, other.values)))
+            np.sort(
+                np.asarray(np.intersect1d(self.index.values, other.values))
+            )
         )
         tm.assert_index_equal(result, expected)
 
     def test_join_inner(self):
-        other = UInt64Index(2 ** 63 + np.array([7, 12, 25, 1, 2, 10], dtype="uint64"))
+        other = UInt64Index(
+            2 ** 63 + np.array([7, 12, 25, 1, 2, 10], dtype="uint64")
+        )
         other_mono = UInt64Index(
             2 ** 63 + np.array([1, 2, 7, 10, 12, 25], dtype="uint64")
         )
 
         # not monotonic
-        res, lidx, ridx = self.index.join(other, how="inner", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other, how="inner", return_indexers=True
+        )
 
         # no guarantee of sortedness, so sort for comparison purposes
         ind = res.argsort()
@@ -963,7 +1022,9 @@ class TestUInt64Index(NumericInt):
         tm.assert_numpy_array_equal(ridx, eridx)
 
         # monotonic
-        res, lidx, ridx = self.index.join(other_mono, how="inner", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other_mono, how="inner", return_indexers=True
+        )
 
         res2 = self.index.intersection(other_mono)
         tm.assert_index_equal(res, res2)
@@ -977,13 +1038,17 @@ class TestUInt64Index(NumericInt):
         tm.assert_numpy_array_equal(ridx, eridx)
 
     def test_join_left(self):
-        other = UInt64Index(2 ** 63 + np.array([7, 12, 25, 1, 2, 10], dtype="uint64"))
+        other = UInt64Index(
+            2 ** 63 + np.array([7, 12, 25, 1, 2, 10], dtype="uint64")
+        )
         other_mono = UInt64Index(
             2 ** 63 + np.array([1, 2, 7, 10, 12, 25], dtype="uint64")
         )
 
         # not monotonic
-        res, lidx, ridx = self.index.join(other, how="left", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other, how="left", return_indexers=True
+        )
         eres = self.index
         eridx = np.array([-1, 5, -1, -1, 2], dtype=np.intp)
 
@@ -993,7 +1058,9 @@ class TestUInt64Index(NumericInt):
         tm.assert_numpy_array_equal(ridx, eridx)
 
         # monotonic
-        res, lidx, ridx = self.index.join(other_mono, how="left", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other_mono, how="left", return_indexers=True
+        )
         eridx = np.array([-1, 3, -1, -1, 5], dtype=np.intp)
 
         assert isinstance(res, UInt64Index)
@@ -1007,7 +1074,9 @@ class TestUInt64Index(NumericInt):
         res, lidx, ridx = idx2.join(idx, how="left", return_indexers=True)
 
         # 1 is in idx2, so it should be x2
-        eres = UInt64Index(2 ** 63 + np.array([1, 1, 2, 5, 7, 9], dtype="uint64"))
+        eres = UInt64Index(
+            2 ** 63 + np.array([1, 1, 2, 5, 7, 9], dtype="uint64")
+        )
         eridx = np.array([0, 1, 2, 3, -1, -1], dtype=np.intp)
         elidx = np.array([0, 0, 1, 2, 3, 4], dtype=np.intp)
 
@@ -1016,13 +1085,17 @@ class TestUInt64Index(NumericInt):
         tm.assert_numpy_array_equal(ridx, eridx)
 
     def test_join_right(self):
-        other = UInt64Index(2 ** 63 + np.array([7, 12, 25, 1, 2, 10], dtype="uint64"))
+        other = UInt64Index(
+            2 ** 63 + np.array([7, 12, 25, 1, 2, 10], dtype="uint64")
+        )
         other_mono = UInt64Index(
             2 ** 63 + np.array([1, 2, 7, 10, 12, 25], dtype="uint64")
         )
 
         # not monotonic
-        res, lidx, ridx = self.index.join(other, how="right", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other, how="right", return_indexers=True
+        )
         eres = other
         elidx = np.array([-1, -1, 4, -1, -1, 1], dtype=np.intp)
 
@@ -1032,7 +1105,9 @@ class TestUInt64Index(NumericInt):
         assert ridx is None
 
         # monotonic
-        res, lidx, ridx = self.index.join(other_mono, how="right", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other_mono, how="right", return_indexers=True
+        )
         eres = other_mono
         elidx = np.array([-1, -1, -1, 1, -1, 4], dtype=np.intp)
 
@@ -1047,7 +1122,9 @@ class TestUInt64Index(NumericInt):
         res, lidx, ridx = idx.join(idx2, how="right", return_indexers=True)
 
         # 1 is in idx2, so it should be x2
-        eres = UInt64Index(2 ** 63 + np.array([1, 1, 2, 5, 7, 9], dtype="uint64"))
+        eres = UInt64Index(
+            2 ** 63 + np.array([1, 1, 2, 5, 7, 9], dtype="uint64")
+        )
         elidx = np.array([0, 1, 2, 3, -1, -1], dtype=np.intp)
         eridx = np.array([0, 0, 1, 2, 3, 4], dtype=np.intp)
 
@@ -1087,19 +1164,24 @@ class TestUInt64Index(NumericInt):
         tm.assert_index_equal(right2, self.index.astype(object))
 
     def test_join_outer(self):
-        other = UInt64Index(2 ** 63 + np.array([7, 12, 25, 1, 2, 10], dtype="uint64"))
+        other = UInt64Index(
+            2 ** 63 + np.array([7, 12, 25, 1, 2, 10], dtype="uint64")
+        )
         other_mono = UInt64Index(
             2 ** 63 + np.array([1, 2, 7, 10, 12, 25], dtype="uint64")
         )
 
         # not monotonic
         # guarantee of sortedness
-        res, lidx, ridx = self.index.join(other, how="outer", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other, how="outer", return_indexers=True
+        )
         noidx_res = self.index.join(other, how="outer")
         tm.assert_index_equal(res, noidx_res)
 
         eres = UInt64Index(
-            2 ** 63 + np.array([0, 1, 2, 7, 10, 12, 15, 20, 25], dtype="uint64")
+            2 ** 63
+            + np.array([0, 1, 2, 7, 10, 12, 15, 20, 25], dtype="uint64")
         )
         elidx = np.array([0, -1, -1, -1, 1, -1, 2, 3, 4], dtype=np.intp)
         eridx = np.array([-1, 3, 4, 0, 5, 1, -1, -1, 2], dtype=np.intp)
@@ -1110,7 +1192,9 @@ class TestUInt64Index(NumericInt):
         tm.assert_numpy_array_equal(ridx, eridx)
 
         # monotonic
-        res, lidx, ridx = self.index.join(other_mono, how="outer", return_indexers=True)
+        res, lidx, ridx = self.index.join(
+            other_mono, how="outer", return_indexers=True
+        )
         noidx_res = self.index.join(other_mono, how="outer")
         tm.assert_index_equal(res, noidx_res)
 

@@ -91,7 +91,9 @@ class TestArithmeticOps(BasePeriodTests, base.BaseArithmeticOpsTests):
             self.check_opname(s, all_arithmetic_operators, s.iloc[0], exc=None)
         else:
             # ... but not the rest.
-            super().test_arith_series_with_scalar(data, all_arithmetic_operators)
+            super().test_arith_series_with_scalar(
+                data, all_arithmetic_operators
+            )
 
     def test_arith_series_with_array(self, data, all_arithmetic_operators):
         if all_arithmetic_operators in self.implements:
@@ -99,7 +101,9 @@ class TestArithmeticOps(BasePeriodTests, base.BaseArithmeticOpsTests):
             self.check_opname(s, all_arithmetic_operators, s.iloc[0], exc=None)
         else:
             # ... but not the rest.
-            super().test_arith_series_with_scalar(data, all_arithmetic_operators)
+            super().test_arith_series_with_scalar(
+                data, all_arithmetic_operators
+            )
 
     def _check_divmod_op(self, s, op, other, exc=NotImplementedError):
         super()._check_divmod_op(s, op, other, exc=TypeError)

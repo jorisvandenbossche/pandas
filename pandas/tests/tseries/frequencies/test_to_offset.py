@@ -38,7 +38,8 @@ def test_to_offset(freq_input, expected):
 
 
 @pytest.mark.parametrize(
-    "freqstr,expected", [("-1S", -1), ("-2SM", -2), ("-1SMS", -1), ("-5min10s", -310)]
+    "freqstr,expected",
+    [("-1S", -1), ("-2SM", -2), ("-1SMS", -1), ("-5min10s", -310)],
 )
 def test_to_offset_negative(freqstr, expected):
     result = frequencies.to_offset(freqstr)

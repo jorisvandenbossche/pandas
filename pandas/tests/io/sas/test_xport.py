@@ -84,16 +84,24 @@ class TestXport:
         tm.assert_frame_equal(data, data_csv, check_index_type=False)
 
         # Test incremental read with `read` method.
-        reader = read_sas(self.file01, index="SEQN", format="xport", iterator=True)
+        reader = read_sas(
+            self.file01, index="SEQN", format="xport", iterator=True
+        )
         data = reader.read(10)
         reader.close()
-        tm.assert_frame_equal(data, data_csv.iloc[0:10, :], check_index_type=False)
+        tm.assert_frame_equal(
+            data, data_csv.iloc[0:10, :], check_index_type=False
+        )
 
         # Test incremental read with `get_chunk` method.
-        reader = read_sas(self.file01, index="SEQN", format="xport", chunksize=10)
+        reader = read_sas(
+            self.file01, index="SEQN", format="xport", chunksize=10
+        )
         data = reader.get_chunk()
         reader.close()
-        tm.assert_frame_equal(data, data_csv.iloc[0:10, :], check_index_type=False)
+        tm.assert_frame_equal(
+            data, data_csv.iloc[0:10, :], check_index_type=False
+        )
 
     def test1_incremental(self):
         # Test with DEMO_G.xpt, reading full file incrementally

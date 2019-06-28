@@ -80,7 +80,9 @@ class _DeprecatedModule:
             if deprmodto is False:
                 warnings.warn(
                     "{deprmod}.{name} is deprecated and will be removed in "
-                    "a future version.".format(deprmod=self.deprmod, name=name),
+                    "a future version.".format(
+                        deprmod=self.deprmod, name=name
+                    ),
                     FutureWarning,
                     stacklevel=2,
                 )

@@ -6,7 +6,14 @@ import pytest
 from pandas._libs.tslibs import period as libperiod
 
 import pandas as pd
-from pandas import DatetimeIndex, Period, PeriodIndex, Series, notna, period_range
+from pandas import (
+    DatetimeIndex,
+    Period,
+    PeriodIndex,
+    Series,
+    notna,
+    period_range,
+)
 from pandas.util import testing as tm
 
 
@@ -20,7 +27,9 @@ class TestGetItem:
         assert result is not idx
 
     def test_getitem(self):
-        idx1 = pd.period_range("2011-01-01", "2011-01-31", freq="D", name="idx")
+        idx1 = pd.period_range(
+            "2011-01-01", "2011-01-31", freq="D", name="idx"
+        )
 
         for idx in [idx1]:
             result = idx[0]
@@ -30,14 +39,22 @@ class TestGetItem:
             assert result == pd.Period("2011-01-31", freq="D")
 
             result = idx[0:5]
-            expected = pd.period_range("2011-01-01", "2011-01-05", freq="D", name="idx")
+            expected = pd.period_range(
+                "2011-01-01", "2011-01-05", freq="D", name="idx"
+            )
             tm.assert_index_equal(result, expected)
             assert result.freq == expected.freq
             assert result.freq == "D"
 
             result = idx[0:10:2]
             expected = pd.PeriodIndex(
-                ["2011-01-01", "2011-01-03", "2011-01-05", "2011-01-07", "2011-01-09"],
+                [
+                    "2011-01-01",
+                    "2011-01-03",
+                    "2011-01-05",
+                    "2011-01-07",
+                    "2011-01-09",
+                ],
                 freq="D",
                 name="idx",
             )
@@ -47,7 +64,13 @@ class TestGetItem:
 
             result = idx[-20:-5:3]
             expected = pd.PeriodIndex(
-                ["2011-01-12", "2011-01-15", "2011-01-18", "2011-01-21", "2011-01-24"],
+                [
+                    "2011-01-12",
+                    "2011-01-15",
+                    "2011-01-18",
+                    "2011-01-21",
+                    "2011-01-24",
+                ],
                 freq="D",
                 name="idx",
             )
@@ -57,7 +80,13 @@ class TestGetItem:
 
             result = idx[4::-1]
             expected = PeriodIndex(
-                ["2011-01-05", "2011-01-04", "2011-01-03", "2011-01-02", "2011-01-01"],
+                [
+                    "2011-01-05",
+                    "2011-01-04",
+                    "2011-01-03",
+                    "2011-01-02",
+                    "2011-01-01",
+                ],
                 freq="D",
                 name="idx",
             )
@@ -69,10 +98,14 @@ class TestGetItem:
         idx = period_range("2007-01", periods=10, freq="M", name="x")
 
         result = idx[[1, 3, 5]]
-        exp = pd.PeriodIndex(["2007-02", "2007-04", "2007-06"], freq="M", name="x")
+        exp = pd.PeriodIndex(
+            ["2007-02", "2007-04", "2007-06"], freq="M", name="x"
+        )
         tm.assert_index_equal(result, exp)
 
-        result = idx[[True, True, False, False, False, True, True, False, False, False]]
+        result = idx[
+            [True, True, False, False, False, True, True, False, False, False]
+        ]
         exp = pd.PeriodIndex(
             ["2007-01", "2007-02", "2007-06", "2007-07"], freq="M", name="x"
         )
@@ -131,7 +164,9 @@ class TestGetItem:
         assert s[pd.NaT] == 1
 
         s = pd.Series(idx, index=idx)
-        assert s[pd.Period("2011-01", freq="M")] == pd.Period("2011-01", freq="M")
+        assert s[pd.Period("2011-01", freq="M")] == pd.Period(
+            "2011-01", freq="M"
+        )
         assert s[pd.NaT] is pd.NaT
 
     def test_getitem_list_periods(self):
@@ -143,8 +178,12 @@ class TestGetItem:
 
     def test_getitem_seconds(self):
         # GH#6716
-        didx = pd.date_range(start="2013/01/01 09:00:00", freq="S", periods=4000)
-        pidx = period_range(start="2013/01/01 09:00:00", freq="S", periods=4000)
+        didx = pd.date_range(
+            start="2013/01/01 09:00:00", freq="S", periods=4000
+        )
+        pidx = period_range(
+            start="2013/01/01 09:00:00", freq="S", periods=4000
+        )
 
         for idx in [didx, pidx]:
             # getitem against index should raise ValueError
@@ -239,7 +278,9 @@ class TestWhere:
 class TestTake:
     def test_take(self):
         # GH#10295
-        idx1 = pd.period_range("2011-01-01", "2011-01-31", freq="D", name="idx")
+        idx1 = pd.period_range(
+            "2011-01-01", "2011-01-31", freq="D", name="idx"
+        )
 
         for idx in [idx1]:
             result = idx.take([0])
@@ -249,14 +290,18 @@ class TestTake:
             assert result == pd.Period("2011-01-06", freq="D")
 
             result = idx.take([0, 1, 2])
-            expected = pd.period_range("2011-01-01", "2011-01-03", freq="D", name="idx")
+            expected = pd.period_range(
+                "2011-01-01", "2011-01-03", freq="D", name="idx"
+            )
             tm.assert_index_equal(result, expected)
             assert result.freq == "D"
             assert result.freq == expected.freq
 
             result = idx.take([0, 2, 4])
             expected = pd.PeriodIndex(
-                ["2011-01-01", "2011-01-03", "2011-01-05"], freq="D", name="idx"
+                ["2011-01-01", "2011-01-03", "2011-01-05"],
+                freq="D",
+                name="idx",
             )
             tm.assert_index_equal(result, expected)
             assert result.freq == expected.freq
@@ -264,7 +309,9 @@ class TestTake:
 
             result = idx.take([7, 4, 1])
             expected = pd.PeriodIndex(
-                ["2011-01-08", "2011-01-05", "2011-01-02"], freq="D", name="idx"
+                ["2011-01-08", "2011-01-05", "2011-01-02"],
+                freq="D",
+                name="idx",
             )
             tm.assert_index_equal(result, expected)
             assert result.freq == expected.freq
@@ -272,7 +319,9 @@ class TestTake:
 
             result = idx.take([3, 2, 5])
             expected = PeriodIndex(
-                ["2011-01-04", "2011-01-03", "2011-01-06"], freq="D", name="idx"
+                ["2011-01-04", "2011-01-03", "2011-01-06"],
+                freq="D",
+                name="idx",
             )
             tm.assert_index_equal(result, expected)
             assert result.freq == expected.freq
@@ -280,14 +329,18 @@ class TestTake:
 
             result = idx.take([-3, 2, 5])
             expected = PeriodIndex(
-                ["2011-01-29", "2011-01-03", "2011-01-06"], freq="D", name="idx"
+                ["2011-01-29", "2011-01-03", "2011-01-06"],
+                freq="D",
+                name="idx",
             )
             tm.assert_index_equal(result, expected)
             assert result.freq == expected.freq
             assert result.freq == "D"
 
     def test_take_misc(self):
-        index = period_range(start="1/1/10", end="12/31/12", freq="D", name="idx")
+        index = period_range(
+            start="1/1/10", end="12/31/12", freq="D", name="idx"
+        )
         expected = PeriodIndex(
             [
                 datetime(2010, 1, 6),
@@ -327,7 +380,9 @@ class TestTake:
         tm.assert_index_equal(result, expected)
 
         # allow_fill=False
-        result = idx.take(np.array([1, 0, -1]), allow_fill=False, fill_value=True)
+        result = idx.take(
+            np.array([1, 0, -1]), allow_fill=False, fill_value=True
+        )
         expected = pd.PeriodIndex(
             ["2011-02-01", "2011-01-01", "2011-03-01"], name="xxx", freq="D"
         )
@@ -544,17 +599,24 @@ class TestIndexing:
 
         target = pd.PeriodIndex([tp0, tp1, tp2, tp3])
         tm.assert_numpy_array_equal(
-            idx.get_indexer(target, "pad"), np.array([-1, 0, 1, 2], dtype=np.intp)
+            idx.get_indexer(target, "pad"),
+            np.array([-1, 0, 1, 2], dtype=np.intp),
         )
         tm.assert_numpy_array_equal(
-            idx.get_indexer(target, "backfill"), np.array([0, 1, 2, -1], dtype=np.intp)
+            idx.get_indexer(target, "backfill"),
+            np.array([0, 1, 2, -1], dtype=np.intp),
         )
         tm.assert_numpy_array_equal(
-            idx.get_indexer(target, "nearest"), np.array([0, 0, 1, 2], dtype=np.intp)
+            idx.get_indexer(target, "nearest"),
+            np.array([0, 0, 1, 2], dtype=np.intp),
         )
 
-        res = idx.get_indexer(target, "nearest", tolerance=pd.Timedelta("1 day"))
-        tm.assert_numpy_array_equal(res, np.array([0, 0, 1, -1], dtype=np.intp))
+        res = idx.get_indexer(
+            target, "nearest", tolerance=pd.Timedelta("1 day")
+        )
+        tm.assert_numpy_array_equal(
+            res, np.array([0, 0, 1, -1], dtype=np.intp)
+        )
 
     def test_get_indexer_non_unique(self):
         # GH 17717
@@ -581,23 +643,35 @@ class TestIndexing:
             assert idx.get_loc(idx[1], method) == 1
             assert idx.get_loc(idx[1].asfreq("H", how="start"), method) == 1
             assert idx.get_loc(idx[1].to_timestamp(), method) == 1
-            assert idx.get_loc(idx[1].to_timestamp().to_pydatetime(), method) == 1
+            assert (
+                idx.get_loc(idx[1].to_timestamp().to_pydatetime(), method) == 1
+            )
             assert idx.get_loc(str(idx[1]), method) == 1
 
         idx = pd.period_range("2000-01-01", periods=5)[::2]
-        assert idx.get_loc("2000-01-02T12", method="nearest", tolerance="1 day") == 1
         assert (
-            idx.get_loc("2000-01-02T12", method="nearest", tolerance=pd.Timedelta("1D"))
+            idx.get_loc("2000-01-02T12", method="nearest", tolerance="1 day")
             == 1
         )
         assert (
             idx.get_loc(
-                "2000-01-02T12", method="nearest", tolerance=np.timedelta64(1, "D")
+                "2000-01-02T12", method="nearest", tolerance=pd.Timedelta("1D")
             )
             == 1
         )
         assert (
-            idx.get_loc("2000-01-02T12", method="nearest", tolerance=timedelta(1)) == 1
+            idx.get_loc(
+                "2000-01-02T12",
+                method="nearest",
+                tolerance=np.timedelta64(1, "D"),
+            )
+            == 1
+        )
+        assert (
+            idx.get_loc(
+                "2000-01-02T12", method="nearest", tolerance=timedelta(1)
+            )
+            == 1
         )
 
         msg = "unit abbreviation w/o a number"
@@ -610,7 +684,8 @@ class TestIndexing:
         with pytest.raises(KeyError, match=r"^Period\('2000-01-10', 'D'\)$"):
             idx.get_loc("2000-01-10", method="nearest", tolerance="1 day")
         with pytest.raises(
-            ValueError, match="list-like tolerance size must match target index size"
+            ValueError,
+            match="list-like tolerance size must match target index size",
         ):
             idx.get_loc(
                 "2000-01-10",
@@ -635,10 +710,12 @@ class TestIndexing:
             idx.get_indexer(target, "pad"), np.array([-1, 0, 1], dtype=np.intp)
         )
         tm.assert_numpy_array_equal(
-            idx.get_indexer(target, "backfill"), np.array([0, 1, 2], dtype=np.intp)
+            idx.get_indexer(target, "backfill"),
+            np.array([0, 1, 2], dtype=np.intp),
         )
         tm.assert_numpy_array_equal(
-            idx.get_indexer(target, "nearest"), np.array([0, 1, 1], dtype=np.intp)
+            idx.get_indexer(target, "nearest"),
+            np.array([0, 1, 1], dtype=np.intp),
         )
         tm.assert_numpy_array_equal(
             idx.get_indexer(target, "nearest", tolerance="1 hour"),
@@ -660,7 +737,9 @@ class TestIndexing:
         ]
         tm.assert_numpy_array_equal(
             idx.get_indexer(
-                target, "nearest", tolerance=[np.timedelta64(x) for x in tol_raw]
+                target,
+                "nearest",
+                tolerance=[np.timedelta64(x) for x in tol_raw],
             ),
             np.array([0, -1, 1], dtype=np.intp),
         )
@@ -670,7 +749,8 @@ class TestIndexing:
             np.timedelta64(1, "M"),
         ]
         with pytest.raises(
-            libperiod.IncompatibleFrequency, match="Input has different freq=None from"
+            libperiod.IncompatibleFrequency,
+            match="Input has different freq=None from",
         ):
             idx.get_indexer(target, "nearest", tolerance=tol_bad)
 

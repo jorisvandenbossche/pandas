@@ -47,21 +47,39 @@ class TestDatetimeIndexArithmetic:
         drange = pd.date_range("20130101", periods=5)
         result = drange.shift(1)
         expected = pd.DatetimeIndex(
-            ["2013-01-02", "2013-01-03", "2013-01-04", "2013-01-05", "2013-01-06"],
+            [
+                "2013-01-02",
+                "2013-01-03",
+                "2013-01-04",
+                "2013-01-05",
+                "2013-01-06",
+            ],
             freq="D",
         )
         tm.assert_index_equal(result, expected)
 
         result = drange.shift(-1)
         expected = pd.DatetimeIndex(
-            ["2012-12-31", "2013-01-01", "2013-01-02", "2013-01-03", "2013-01-04"],
+            [
+                "2012-12-31",
+                "2013-01-01",
+                "2013-01-02",
+                "2013-01-03",
+                "2013-01-04",
+            ],
             freq="D",
         )
         tm.assert_index_equal(result, expected)
 
         result = drange.shift(3, freq="2D")
         expected = pd.DatetimeIndex(
-            ["2013-01-07", "2013-01-08", "2013-01-09", "2013-01-10", "2013-01-11"],
+            [
+                "2013-01-07",
+                "2013-01-08",
+                "2013-01-09",
+                "2013-01-10",
+                "2013-01-11",
+            ],
             freq="D",
         )
         tm.assert_index_equal(result, expected)
@@ -99,7 +117,9 @@ class TestDatetimeIndexArithmetic:
 
     def test_dti_shift_across_dst(self):
         # GH 8616
-        idx = date_range("2013-11-03", tz="America/Chicago", periods=7, freq="H")
+        idx = date_range(
+            "2013-11-03", tz="America/Chicago", periods=7, freq="H"
+        )
         s = Series(index=idx[:-1])
         result = s.shift(freq="H")
         expected = Series(index=idx[1:])

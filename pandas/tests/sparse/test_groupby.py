@@ -12,7 +12,16 @@ class TestSparseGroupBy:
         self.dense = pd.DataFrame(
             {
                 "A": ["foo", "bar", "foo", "bar", "foo", "bar", "foo", "foo"],
-                "B": ["one", "one", "two", "three", "two", "two", "one", "three"],
+                "B": [
+                    "one",
+                    "one",
+                    "two",
+                    "three",
+                    "two",
+                    "two",
+                    "one",
+                    "three",
+                ],
                 "C": np.random.randn(8),
                 "D": np.random.randn(8),
                 "E": [np.nan, np.nan, 1, 2, np.nan, 1, np.nan, np.nan],

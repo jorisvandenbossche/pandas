@@ -293,7 +293,9 @@ class TestSeriesPlots(TestPlotBase):
         # if sum of values is less than 1.0, pie handle them as rate and draw
         # semicircle.
         series = Series(
-            np.random.randint(1, 5), index=["a", "b", "c", "d", "e"], name="YLABEL"
+            np.random.randint(1, 5),
+            index=["a", "b", "c", "d", "e"],
+            name="YLABEL",
         )
         ax = _check_plot_works(series.plot.pie)
         self._check_text_labels(ax.texts, series.index)
@@ -313,7 +315,9 @@ class TestSeriesPlots(TestPlotBase):
         # with labels and colors
         labels = ["A", "B", "C", "D", "E"]
         color_args = ["r", "g", "b", "c", "m"]
-        ax = _check_plot_works(series.plot.pie, labels=labels, colors=color_args)
+        ax = _check_plot_works(
+            series.plot.pie, labels=labels, colors=color_args
+        )
         self._check_text_labels(ax.texts, labels)
         self._check_colors(ax.patches, facecolors=color_args)
 
@@ -321,7 +325,10 @@ class TestSeriesPlots(TestPlotBase):
         ax = _check_plot_works(
             series.plot.pie, colors=color_args, autopct="%.2f", fontsize=7
         )
-        pcts = ["{0:.2f}".format(s * 100) for s in series.values / float(series.sum())]
+        pcts = [
+            "{0:.2f}".format(s * 100)
+            for s in series.values / float(series.sum())
+        ]
         expected_texts = list(chain.from_iterable(zip(series.index, pcts)))
         self._check_text_labels(ax.texts, expected_texts)
         for t in ax.texts:
@@ -333,7 +340,9 @@ class TestSeriesPlots(TestPlotBase):
             series.plot.pie()
 
         # includes nan
-        series = Series([1, 2, np.nan, 4], index=["a", "b", "c", "d"], name="YLABEL")
+        series = Series(
+            [1, 2, np.nan, 4], index=["a", "b", "c", "d"], name="YLABEL"
+        )
         ax = _check_plot_works(series.plot.pie)
         self._check_text_labels(ax.texts, ["a", "b", "", "d"])
 
@@ -356,7 +365,9 @@ class TestSeriesPlots(TestPlotBase):
     def test_hist_df_with_nonnumerics(self):
         # GH 9853
         with tm.RNGContext(1):
-            df = DataFrame(np.random.randn(10, 4), columns=["A", "B", "C", "D"])
+            df = DataFrame(
+                np.random.randn(10, 4), columns=["A", "B", "C", "D"]
+            )
         df["E"] = ["x", "y"] * 5
         _, ax = self.plt.subplots()
         ax = df.plot.hist(bins=5, ax=ax)
@@ -411,35 +422,51 @@ class TestSeriesPlots(TestPlotBase):
 
         # _check_plot_works adds an ax so catch warning. see GH #13188
         with tm.assert_produces_warning(UserWarning):
-            axes = _check_plot_works(df.height.hist, by=df.gender, layout=(2, 1))
+            axes = _check_plot_works(
+                df.height.hist, by=df.gender, layout=(2, 1)
+            )
         self._check_axes_shape(axes, axes_num=2, layout=(2, 1))
 
         with tm.assert_produces_warning(UserWarning):
-            axes = _check_plot_works(df.height.hist, by=df.gender, layout=(3, -1))
+            axes = _check_plot_works(
+                df.height.hist, by=df.gender, layout=(3, -1)
+            )
         self._check_axes_shape(axes, axes_num=2, layout=(3, 1))
 
         with tm.assert_produces_warning(UserWarning):
-            axes = _check_plot_works(df.height.hist, by=df.category, layout=(4, 1))
+            axes = _check_plot_works(
+                df.height.hist, by=df.category, layout=(4, 1)
+            )
         self._check_axes_shape(axes, axes_num=4, layout=(4, 1))
 
         with tm.assert_produces_warning(UserWarning):
-            axes = _check_plot_works(df.height.hist, by=df.category, layout=(2, -1))
+            axes = _check_plot_works(
+                df.height.hist, by=df.category, layout=(2, -1)
+            )
         self._check_axes_shape(axes, axes_num=4, layout=(2, 2))
 
         with tm.assert_produces_warning(UserWarning):
-            axes = _check_plot_works(df.height.hist, by=df.category, layout=(3, -1))
+            axes = _check_plot_works(
+                df.height.hist, by=df.category, layout=(3, -1)
+            )
         self._check_axes_shape(axes, axes_num=4, layout=(3, 2))
 
         with tm.assert_produces_warning(UserWarning):
-            axes = _check_plot_works(df.height.hist, by=df.category, layout=(-1, 4))
+            axes = _check_plot_works(
+                df.height.hist, by=df.category, layout=(-1, 4)
+            )
         self._check_axes_shape(axes, axes_num=4, layout=(1, 4))
 
         with tm.assert_produces_warning(UserWarning):
-            axes = _check_plot_works(df.height.hist, by=df.classroom, layout=(2, 2))
+            axes = _check_plot_works(
+                df.height.hist, by=df.classroom, layout=(2, 2)
+            )
         self._check_axes_shape(axes, axes_num=3, layout=(2, 2))
 
         axes = df.height.hist(by=df.category, layout=(4, 2), figsize=(12, 7))
-        self._check_axes_shape(axes, axes_num=4, layout=(4, 2), figsize=(12, 7))
+        self._check_axes_shape(
+            axes, axes_num=4, layout=(4, 2), figsize=(12, 7)
+        )
 
     @pytest.mark.slow
     def test_hist_no_overlap(self):
@@ -477,7 +504,9 @@ class TestSeriesPlots(TestPlotBase):
         df["b"].plot.hist(ax=ax, legend=True, secondary_y=True)
         # both legends are draw on left ax
         # left axis must be invisible, right axis must be visible
-        self._check_legend_labels(ax.left_ax, labels=["a (right)", "b (right)"])
+        self._check_legend_labels(
+            ax.left_ax, labels=["a (right)", "b (right)"]
+        )
         assert not ax.left_ax.get_yaxis().get_visible()
         assert ax.get_yaxis().get_visible()
         tm.close()
@@ -612,9 +641,13 @@ class TestSeriesPlots(TestPlotBase):
         _check_plot_works(self.ts.plot.kde, bw_method=None, ind=20)
         _check_plot_works(self.ts.plot.kde, bw_method=None, ind=np.int(20))
         _check_plot_works(self.ts.plot.kde, bw_method=0.5, ind=sample_points)
-        _check_plot_works(self.ts.plot.density, bw_method=0.5, ind=sample_points)
+        _check_plot_works(
+            self.ts.plot.density, bw_method=0.5, ind=sample_points
+        )
         _, ax = self.plt.subplots()
-        ax = self.ts.plot.kde(logy=True, bw_method=0.5, ind=sample_points, ax=ax)
+        ax = self.ts.plot.kde(
+            logy=True, bw_method=0.5, ind=sample_points, ax=ax
+        )
         self._check_ax_scales(ax, yaxis="log")
         self._check_text_labels(ax.yaxis.get_label(), "Density")
 
@@ -833,9 +866,9 @@ class TestSeriesPlots(TestPlotBase):
     def test_time_series_plot_color_kwargs(self):
         # #1890
         _, ax = self.plt.subplots()
-        ax = Series(np.arange(12) + 1, index=date_range("1/1/2000", periods=12)).plot(
-            color="green", ax=ax
-        )
+        ax = Series(
+            np.arange(12) + 1, index=date_range("1/1/2000", periods=12)
+        ).plot(color="green", ax=ax)
         self._check_colors(ax.get_lines(), linecolors=["green"])
 
     def test_time_series_plot_color_with_empty_kwargs(self):

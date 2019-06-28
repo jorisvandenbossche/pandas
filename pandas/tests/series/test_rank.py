@@ -19,7 +19,9 @@ class TestSeriesRank(TestData):
     s = Series([1, 3, 4, 2, nan, 2, 1, 5, nan, 3])
 
     results = {
-        "average": np.array([1.5, 5.5, 7.0, 3.5, nan, 3.5, 1.5, 8.0, nan, 5.5]),
+        "average": np.array(
+            [1.5, 5.5, 7.0, 3.5, nan, 3.5, 1.5, 8.0, nan, 5.5]
+        ),
         "min": np.array([1, 5, 7, 3, nan, 3, 1, 8, nan, 5]),
         "max": np.array([2, 6, 7, 4, nan, 4, 2, 8, nan, 6]),
         "first": np.array([1, 5, 7, 3, nan, 4, 2, 8, nan, 6]),
@@ -124,7 +126,14 @@ class TestSeriesRank(TestData):
             ["first", "second", "third", "fourth", "fifth", "sixth"]
         ).astype(
             CategoricalDtype(
-                categories=["first", "second", "third", "fourth", "fifth", "sixth"],
+                categories=[
+                    "first",
+                    "second",
+                    "third",
+                    "fourth",
+                    "fifth",
+                    "sixth",
+                ],
                 ordered=True,
             )
         )
@@ -136,7 +145,14 @@ class TestSeriesRank(TestData):
             ["first", "second", "third", "fourth", "fifth", "sixth"]
         ).astype(
             CategoricalDtype(
-                categories=["first", "second", "third", "fourth", "fifth", "sixth"],
+                categories=[
+                    "first",
+                    "second",
+                    "third",
+                    "fourth",
+                    "fifth",
+                    "sixth",
+                ],
                 ordered=False,
             )
         )
@@ -156,7 +172,15 @@ class TestSeriesRank(TestData):
             ["first", "second", "third", "fourth", "fifth", "sixth", np.NaN]
         ).astype(
             CategoricalDtype(
-                ["first", "second", "third", "fourth", "fifth", "sixth", "seventh"],
+                [
+                    "first",
+                    "second",
+                    "third",
+                    "fourth",
+                    "fifth",
+                    "sixth",
+                    "seventh",
+                ],
                 True,
             )
         )
@@ -174,9 +198,15 @@ class TestSeriesRank(TestData):
         exp_bot = Series([6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 7.0])
         exp_keep = Series([6.0, 5.0, 4.0, 3.0, 2.0, 1.0, np.NaN])
 
-        assert_series_equal(na_ser.rank(na_option="top", ascending=False), exp_top)
-        assert_series_equal(na_ser.rank(na_option="bottom", ascending=False), exp_bot)
-        assert_series_equal(na_ser.rank(na_option="keep", ascending=False), exp_keep)
+        assert_series_equal(
+            na_ser.rank(na_option="top", ascending=False), exp_top
+        )
+        assert_series_equal(
+            na_ser.rank(na_option="bottom", ascending=False), exp_bot
+        )
+        assert_series_equal(
+            na_ser.rank(na_option="keep", ascending=False), exp_keep
+        )
 
         # Test invalid values for na_option
         msg = "na_option must be one of 'keep', 'top', or 'bottom'"
@@ -249,7 +279,10 @@ class TestSeriesRank(TestData):
                 ],
                 "float32",
             ),
-            ([np.iinfo(np.uint8).min, 1, 2, 100, np.iinfo(np.uint8).max], "uint8"),
+            (
+                [np.iinfo(np.uint8).min, 1, 2, 100, np.iinfo(np.uint8).max],
+                "uint8",
+            ),
             pytest.param(
                 [
                     np.iinfo(np.int64).min,
@@ -314,7 +347,9 @@ class TestSeriesRank(TestData):
 
     @td.skip_if_no_scipy
     @pytest.mark.parametrize("ascending", [True, False])
-    @pytest.mark.parametrize("method", ["average", "min", "max", "first", "dense"])
+    @pytest.mark.parametrize(
+        "method", ["average", "min", "max", "first", "dense"]
+    )
     @pytest.mark.parametrize("na_option", ["top", "bottom", "keep"])
     def test_rank_tie_methods_on_infs_nans(self, method, na_option, ascending):
         dtypes = [
@@ -341,7 +376,9 @@ class TestSeriesRank(TestData):
                 order = [ranks[0], [np.nan] * chunk, ranks[1]]
             expected = order if ascending else order[::-1]
             expected = list(chain.from_iterable(expected))
-            result = s.rank(method=method, na_option=na_option, ascending=ascending)
+            result = s.rank(
+                method=method, na_option=na_option, ascending=ascending
+            )
             tm.assert_series_equal(result, Series(expected, dtype="float64"))
 
         for dtype, na_value, pos_inf, neg_inf in dtypes:
@@ -459,7 +496,10 @@ class TestSeriesRank(TestData):
         ([1, 2, 2], [1.0 / 2, 2.0 / 2, 2.0 / 2]),
         ([4, 2, 1], [3.0 / 3, 2.0 / 3, 1.0 / 3]),
         ([1, 1, 5, 5, 3], [1.0 / 3, 1.0 / 3, 3.0 / 3, 3.0 / 3, 2.0 / 3]),
-        ([1, 1, 3, 3, 5, 5], [1.0 / 3, 1.0 / 3, 2.0 / 3, 2.0 / 3, 3.0 / 3, 3.0 / 3]),
+        (
+            [1, 1, 3, 3, 5, 5],
+            [1.0 / 3, 1.0 / 3, 2.0 / 3, 2.0 / 3, 3.0 / 3, 3.0 / 3],
+        ),
         ([-5, -4, -3, -2, -1], [1.0 / 5, 2.0 / 5, 3.0 / 5, 4.0 / 5, 5.0 / 5]),
     ],
 )
@@ -481,7 +521,10 @@ def test_rank_dense_pct(dtype, ser, exp):
         ([1, 2, 2], [1.0 / 3, 2.0 / 3, 2.0 / 3]),
         ([4, 2, 1], [3.0 / 3, 2.0 / 3, 1.0 / 3]),
         ([1, 1, 5, 5, 3], [1.0 / 5, 1.0 / 5, 4.0 / 5, 4.0 / 5, 3.0 / 5]),
-        ([1, 1, 3, 3, 5, 5], [1.0 / 6, 1.0 / 6, 3.0 / 6, 3.0 / 6, 5.0 / 6, 5.0 / 6]),
+        (
+            [1, 1, 3, 3, 5, 5],
+            [1.0 / 6, 1.0 / 6, 3.0 / 6, 3.0 / 6, 5.0 / 6, 5.0 / 6],
+        ),
         ([-5, -4, -3, -2, -1], [1.0 / 5, 2.0 / 5, 3.0 / 5, 4.0 / 5, 5.0 / 5]),
     ],
 )
@@ -503,7 +546,10 @@ def test_rank_min_pct(dtype, ser, exp):
         ([1, 2, 2], [1.0 / 3, 3.0 / 3, 3.0 / 3]),
         ([4, 2, 1], [3.0 / 3, 2.0 / 3, 1.0 / 3]),
         ([1, 1, 5, 5, 3], [2.0 / 5, 2.0 / 5, 5.0 / 5, 5.0 / 5, 3.0 / 5]),
-        ([1, 1, 3, 3, 5, 5], [2.0 / 6, 2.0 / 6, 4.0 / 6, 4.0 / 6, 6.0 / 6, 6.0 / 6]),
+        (
+            [1, 1, 3, 3, 5, 5],
+            [2.0 / 6, 2.0 / 6, 4.0 / 6, 4.0 / 6, 6.0 / 6, 6.0 / 6],
+        ),
         ([-5, -4, -3, -2, -1], [1.0 / 5, 2.0 / 5, 3.0 / 5, 4.0 / 5, 5.0 / 5]),
     ],
 )
@@ -525,7 +571,10 @@ def test_rank_max_pct(dtype, ser, exp):
         ([1, 2, 2], [1.0 / 3, 2.5 / 3, 2.5 / 3]),
         ([4, 2, 1], [3.0 / 3, 2.0 / 3, 1.0 / 3]),
         ([1, 1, 5, 5, 3], [1.5 / 5, 1.5 / 5, 4.5 / 5, 4.5 / 5, 3.0 / 5]),
-        ([1, 1, 3, 3, 5, 5], [1.5 / 6, 1.5 / 6, 3.5 / 6, 3.5 / 6, 5.5 / 6, 5.5 / 6]),
+        (
+            [1, 1, 3, 3, 5, 5],
+            [1.5 / 6, 1.5 / 6, 3.5 / 6, 3.5 / 6, 5.5 / 6, 5.5 / 6],
+        ),
         ([-5, -4, -3, -2, -1], [1.0 / 5, 2.0 / 5, 3.0 / 5, 4.0 / 5, 5.0 / 5]),
     ],
 )
@@ -547,7 +596,10 @@ def test_rank_average_pct(dtype, ser, exp):
         ([1, 2, 2], [1.0 / 3, 2.0 / 3, 3.0 / 3]),
         ([4, 2, 1], [3.0 / 3, 2.0 / 3, 1.0 / 3]),
         ([1, 1, 5, 5, 3], [1.0 / 5, 2.0 / 5, 4.0 / 5, 5.0 / 5, 3.0 / 5]),
-        ([1, 1, 3, 3, 5, 5], [1.0 / 6, 2.0 / 6, 3.0 / 6, 4.0 / 6, 5.0 / 6, 6.0 / 6]),
+        (
+            [1, 1, 3, 3, 5, 5],
+            [1.0 / 6, 2.0 / 6, 3.0 / 6, 4.0 / 6, 5.0 / 6, 6.0 / 6],
+        ),
         ([-5, -4, -3, -2, -1], [1.0 / 5, 2.0 / 5, 3.0 / 5, 4.0 / 5, 5.0 / 5]),
     ],
 )

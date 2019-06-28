@@ -55,7 +55,9 @@ from typing import Dict, List
 import warnings
 
 DeprecatedOption = namedtuple("DeprecatedOption", "key msg rkey removal_ver")
-RegisteredOption = namedtuple("RegisteredOption", "key defval doc validator cb")
+RegisteredOption = namedtuple(
+    "RegisteredOption", "key defval doc validator cb"
+)
 
 # holds deprecated option metdata
 _deprecated_options = {}  # type: Dict[str, DeprecatedOption]
@@ -110,7 +112,9 @@ def _set_option(*args, **kwargs):
     # must at least 1 arg deal with constraints later
     nargs = len(args)
     if not nargs or nargs % 2 != 0:
-        raise ValueError("Must provide an even number of non-keyword " "arguments")
+        raise ValueError(
+            "Must provide an even number of non-keyword " "arguments"
+        )
 
     # default to false
     silent = kwargs.pop("silent", False)
@@ -236,7 +240,9 @@ class CallableDynamicDoc:
     def __doc__(self):
         opts_desc = _describe_option("all", _print_desc=False)
         opts_list = pp_options_list(list(_registered_options.keys()))
-        return self.__doc_tmpl__.format(opts_desc=opts_desc, opts_list=opts_list)
+        return self.__doc_tmpl__.format(
+            opts_desc=opts_desc, opts_list=opts_list
+        )
 
 
 _get_option_tmpl = """
@@ -395,13 +401,16 @@ class option_context:
     def __init__(self, *args):
         if not (len(args) % 2 == 0 and len(args) >= 2):
             raise ValueError(
-                "Need to invoke as" " option_context(pat, val, [(pat, val), ...])."
+                "Need to invoke as"
+                " option_context(pat, val, [(pat, val), ...])."
             )
 
         self.ops = list(zip(args[::2], args[1::2]))
 
     def __enter__(self):
-        self.undo = [(pat, _get_option(pat, silent=True)) for pat, val in self.ops]
+        self.undo = [
+            (pat, _get_option(pat, silent=True)) for pat, val in self.ops
+        ]
 
         for pat, val in self.ops:
             _set_option(pat, val, silent=True)
@@ -623,7 +632,9 @@ def _warn_if_deprecated(key):
         else:
             msg = "'{key}' is deprecated".format(key=key)
             if d.removal_ver:
-                msg += " and will be removed in {version}".format(version=d.removal_ver)
+                msg += " and will be removed in {version}".format(
+                    version=d.removal_ver
+                )
             if d.rkey:
                 msg += ", please use '{rkey}' instead.".format(rkey=d.rkey)
             else:

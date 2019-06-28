@@ -20,7 +20,9 @@ class TestConfig:
 
     def setup_method(self, method):
         setattr(self.cf, "_global_config", {})
-        setattr(self.cf, "options", self.cf.DictWrapper(self.cf._global_config))
+        setattr(
+            self.cf, "options", self.cf.DictWrapper(self.cf._global_config)
+        )
         setattr(self.cf, "_deprecated_options", {})
         setattr(self.cf, "_registered_options", {})
 
@@ -208,10 +210,14 @@ class TestConfig:
 
     def test_validation(self):
         self.cf.register_option("a", 1, "doc", validator=self.cf.is_int)
-        self.cf.register_option("b.c", "hullo", "doc2", validator=self.cf.is_text)
+        self.cf.register_option(
+            "b.c", "hullo", "doc2", validator=self.cf.is_text
+        )
         msg = "Value must have type '<class 'int'>'"
         with pytest.raises(ValueError, match=msg):
-            self.cf.register_option("a.b.c.d2", "NO", "doc", validator=self.cf.is_int)
+            self.cf.register_option(
+                "a.b.c.d2", "NO", "doc", validator=self.cf.is_int
+            )
 
         self.cf.set_option("a", 2)  # int is_int
         self.cf.set_option("b.c", "wurld")  # str is_str
@@ -235,7 +241,9 @@ class TestConfig:
 
     def test_reset_option(self):
         self.cf.register_option("a", 1, "doc", validator=self.cf.is_int)
-        self.cf.register_option("b.c", "hullo", "doc2", validator=self.cf.is_str)
+        self.cf.register_option(
+            "b.c", "hullo", "doc2", validator=self.cf.is_str
+        )
         assert self.cf.get_option("a") == 1
         assert self.cf.get_option("b.c") == "hullo"
 
@@ -253,7 +261,9 @@ class TestConfig:
 
     def test_reset_option_all(self):
         self.cf.register_option("a", 1, "doc", validator=self.cf.is_int)
-        self.cf.register_option("b.c", "hullo", "doc2", validator=self.cf.is_str)
+        self.cf.register_option(
+            "b.c", "hullo", "doc2", validator=self.cf.is_str
+        )
         assert self.cf.get_option("a") == 1
         assert self.cf.get_option("b.c") == "hullo"
 

@@ -3,7 +3,14 @@ from warnings import catch_warnings
 import numpy as np
 import pytest
 
-from pandas import DataFrame, Float64Index, Index, Int64Index, RangeIndex, Series
+from pandas import (
+    DataFrame,
+    Float64Index,
+    Index,
+    Int64Index,
+    RangeIndex,
+    Series,
+)
 import pandas.util.testing as tm
 from pandas.util.testing import assert_almost_equal, assert_series_equal
 
@@ -57,7 +64,9 @@ class TestFloatIndexers:
 
             msg = (
                 "cannot do positional indexing on {klass} with these "
-                r"indexers \[3\.0\] of {kind}".format(klass=type(i), kind=str(float))
+                r"indexers \[3\.0\] of {kind}".format(
+                    klass=type(i), kind=str(float)
+                )
             )
             with pytest.raises(TypeError, match=msg):
                 s.iloc[3.0] = 0
@@ -104,7 +113,9 @@ class TestFloatIndexers:
                             r" on {klass} with these indexers \[3\.0\] of"
                             r" {kind}|"
                             "Cannot index by location index with a"
-                            " non-integer key".format(klass=type(i), kind=str(float))
+                            " non-integer key".format(
+                                klass=type(i), kind=str(float)
+                            )
                         )
                     with catch_warnings(record=True):
                         with pytest.raises(error, match=msg):
@@ -140,7 +151,11 @@ class TestFloatIndexers:
                 if s.index.inferred_type in ["categorical"]:
                     # Value or Type Error
                     pass
-                elif s.index.inferred_type in ["datetime64", "timedelta64", "period"]:
+                elif s.index.inferred_type in [
+                    "datetime64",
+                    "timedelta64",
+                    "period",
+                ]:
 
                     # these should prob work
                     # and are inconsisten between series/dataframe ATM
@@ -289,7 +304,9 @@ class TestFloatIndexers:
                         if getitem:
                             expected = Series(100, index=range(len(s)), name=3)
                         else:
-                            expected = Series(100.0, index=range(len(s)), name=3)
+                            expected = Series(
+                                100.0, index=range(len(s)), name=3
+                            )
 
                     s2 = s.copy()
                     with catch_warnings(record=True):
@@ -313,7 +330,9 @@ class TestFloatIndexers:
         for s in [
             Series(np.arange(len(index)), index=index),
             DataFrame(
-                np.random.randn(len(index), len(index)), index=index, columns=index
+                np.random.randn(len(index), len(index)),
+                index=index,
+                columns=index,
             ),
         ]:
 
@@ -807,7 +826,9 @@ class TestFloatIndexers:
             result3 = s.loc[[1.6, 5, 10]]
         assert_series_equal(result1, result2)
         assert_series_equal(result1, result3)
-        assert_series_equal(result1, Series([np.nan, 2, 4], index=[1.6, 5, 10]))
+        assert_series_equal(
+            result1, Series([np.nan, 2, 4], index=[1.6, 5, 10])
+        )
 
         with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
             result1 = s[[0, 1, 2]]
@@ -817,7 +838,9 @@ class TestFloatIndexers:
             result3 = s.loc[[0, 1, 2]]
         assert_series_equal(result1, result2)
         assert_series_equal(result1, result3)
-        assert_series_equal(result1, Series([0.0, np.nan, np.nan], index=[0, 1, 2]))
+        assert_series_equal(
+            result1, Series([0.0, np.nan, np.nan], index=[0, 1, 2])
+        )
 
         result1 = s.loc[[2.5, 5]]
         result2 = s.loc[[2.5, 5]]

@@ -319,7 +319,9 @@ def eval(
             target=target,
         )
 
-        parsed_expr = Expr(expr, engine=engine, parser=parser, env=env, truediv=truediv)
+        parsed_expr = Expr(
+            expr, engine=engine, parser=parser, env=env, truediv=truediv
+        )
 
         # construct the engine and evaluate the parsed expression
         eng = _engines[engine]
@@ -333,7 +335,9 @@ def eval(
                     " if all expressions contain an assignment"
                 )
             elif inplace:
-                raise ValueError("Cannot operate inplace " "if there is no assignment")
+                raise ValueError(
+                    "Cannot operate inplace " "if there is no assignment"
+                )
 
         # assign if needed
         assigner = parsed_expr.assigner

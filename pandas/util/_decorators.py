@@ -7,7 +7,13 @@ from pandas._libs.properties import cache_readonly  # noqa
 
 
 def deprecate(
-    name, alternative, version, alt_name=None, klass=None, stacklevel=2, msg=None
+    name,
+    alternative,
+    version,
+    alt_name=None,
+    klass=None,
+    stacklevel=2,
+    msg=None,
 ):
     """
     Return a new function that emits a deprecation warning on use.
@@ -37,7 +43,9 @@ def deprecate(
 
     alt_name = alt_name or alternative.__name__
     klass = klass or FutureWarning
-    warning_msg = msg or "{} is deprecated, use {} instead".format(name, alt_name)
+    warning_msg = msg or "{} is deprecated, use {} instead".format(
+        name, alt_name
+    )
 
     @wraps(alternative)
     def wrapper(*args, **kwargs):
@@ -143,9 +151,14 @@ def deprecate_kwarg(old_arg_name, new_arg_name, mapping=None, stacklevel=2):
     should raise warning
     """
 
-    if mapping is not None and not hasattr(mapping, "get") and not callable(mapping):
+    if (
+        mapping is not None
+        and not hasattr(mapping, "get")
+        and not callable(mapping)
+    ):
         raise TypeError(
-            "mapping from old to new argument values " "must be dict or callable!"
+            "mapping from old to new argument values "
+            "must be dict or callable!"
         )
 
     def _deprecate_kwarg(func):
@@ -166,7 +179,9 @@ def deprecate_kwarg(old_arg_name, new_arg_name, mapping=None, stacklevel=2):
             if old_arg_value is not None:
                 if mapping is not None:
                     if hasattr(mapping, "get"):
-                        new_arg_value = mapping.get(old_arg_value, old_arg_value)
+                        new_arg_value = mapping.get(
+                            old_arg_value, old_arg_value
+                        )
                     else:
                         new_arg_value = mapping(old_arg_value)
                     msg = (
@@ -188,7 +203,8 @@ def deprecate_kwarg(old_arg_name, new_arg_name, mapping=None, stacklevel=2):
                 warnings.warn(msg, FutureWarning, stacklevel=stacklevel)
                 if kwargs.get(new_arg_name, None) is not None:
                     msg = (
-                        "Can only specify '{old_name}' or '{new_name}', " "not both"
+                        "Can only specify '{old_name}' or '{new_name}', "
+                        "not both"
                     ).format(old_name=old_arg_name, new_name=new_arg_name)
                     raise TypeError(msg)
                 else:

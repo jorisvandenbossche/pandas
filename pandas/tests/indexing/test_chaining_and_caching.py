@@ -35,7 +35,9 @@ class TestCaching:
         cont = ["one", "two", "three", "four", "five", "six", "seven"]
 
         for do_ref in [False, False]:
-            df = DataFrame({"a": cont, "b": cont[3:] + cont[:3], "c": np.arange(7)})
+            df = DataFrame(
+                {"a": cont, "b": cont[3:] + cont[:3], "c": np.arange(7)}
+            )
 
             # ref the cache
             if do_ref:
@@ -52,7 +54,9 @@ class TestCaching:
         expected = DataFrame(
             {"A": [600, 600, 600]}, index=date_range("5/7/2014", "5/9/2014")
         )
-        out = DataFrame({"A": [0, 0, 0]}, index=date_range("5/7/2014", "5/9/2014"))
+        out = DataFrame(
+            {"A": [0, 0, 0]}, index=date_range("5/7/2014", "5/9/2014")
+        )
         df = DataFrame({"C": ["A", "A", "A"], "D": [100, 200, 300]})
 
         # loop through df to update out
@@ -66,7 +70,9 @@ class TestCaching:
 
         # try via a chain indexing
         # this actually works
-        out = DataFrame({"A": [0, 0, 0]}, index=date_range("5/7/2014", "5/9/2014"))
+        out = DataFrame(
+            {"A": [0, 0, 0]}, index=date_range("5/7/2014", "5/9/2014")
+        )
         for ix, row in df.iterrows():
             v = out[row["C"]][six:eix] + row["D"]
             out[row["C"]][six:eix] = v
@@ -74,7 +80,9 @@ class TestCaching:
         tm.assert_frame_equal(out, expected)
         tm.assert_series_equal(out["A"], expected["A"])
 
-        out = DataFrame({"A": [0, 0, 0]}, index=date_range("5/7/2014", "5/9/2014"))
+        out = DataFrame(
+            {"A": [0, 0, 0]}, index=date_range("5/7/2014", "5/9/2014")
+        )
         for ix, row in df.iterrows():
             out.loc[six:eix, row["C"]] += row["D"]
 
@@ -103,7 +111,9 @@ class TestChaining:
         df = DataFrame({"response": data, "response1": data})
         mask = df.response == "timeout"
         df.response[mask] = "none"
-        tm.assert_frame_equal(df, DataFrame({"response": mdata, "response1": data}))
+        tm.assert_frame_equal(
+            df, DataFrame({"response": mdata, "response1": data})
+        )
 
         # GH 6056
         expected = DataFrame(dict(A=[np.nan, "bar", "bah", "foo", "bar"]))
@@ -123,7 +133,9 @@ class TestChaining:
 
         # work with the chain
         expected = DataFrame([[-5, 1], [-6, 3]], columns=list("AB"))
-        df = DataFrame(np.arange(4).reshape(2, 2), columns=list("AB"), dtype="int64")
+        df = DataFrame(
+            np.arange(4).reshape(2, 2), columns=list("AB"), dtype="int64"
+        )
         assert df._is_copy is None
 
         df["A"][0] = -5
@@ -246,7 +258,9 @@ class TestChaining:
 
         df = random_text(100000)
         indexer = df.letters.apply(lambda x: len(x) > 10)
-        df.loc[indexer, "letters"] = df.loc[indexer, "letters"].apply(str.lower)
+        df.loc[indexer, "letters"] = df.loc[indexer, "letters"].apply(
+            str.lower
+        )
 
         # an identical take, so no copy
         df = DataFrame({"a": [1]}).dropna()
@@ -303,17 +317,26 @@ class TestChaining:
 
         # operating on a copy
         df = DataFrame(
-            {"a": list(range(4)), "b": list("ab.."), "c": ["a", "b", np.nan, "d"]}
+            {
+                "a": list(range(4)),
+                "b": list("ab.."),
+                "c": ["a", "b", np.nan, "d"],
+            }
         )
         mask = pd.isna(df.c)
 
-        msg = "A value is trying to be set on a copy of a slice from a" " DataFrame"
+        msg = (
+            "A value is trying to be set on a copy of a slice from a"
+            " DataFrame"
+        )
         with pytest.raises(com.SettingWithCopyError, match=msg):
             df[["c"]][mask] = df[["b"]][mask]
 
         # invalid warning as we are returning a new object
         # GH 8730
-        df1 = DataFrame({"x": Series(["a", "b", "c"]), "y": Series(["d", "e", "f"])})
+        df1 = DataFrame(
+            {"x": Series(["a", "b", "c"]), "y": Series(["d", "e", "f"])}
+        )
         df2 = df1[["x"]]
 
         # this should not raise

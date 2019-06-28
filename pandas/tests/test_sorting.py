@@ -52,7 +52,9 @@ class TestSorting:
         exp_index, _ = right.index.sortlevel(0)
         tm.assert_index_equal(right.index, exp_index)
 
-        tups = list(map(tuple, df[["A", "B", "C", "D", "E", "F", "G", "H"]].values))
+        tups = list(
+            map(tuple, df[["A", "B", "C", "D", "E", "F", "G", "H"]].values)
+        )
         tups = com.asarray_tuplesafe(tups)
 
         expected = df.groupby(tups).sum()["values"]
@@ -66,7 +68,9 @@ class TestSorting:
 
         # GH9096
         values = range(55109)
-        data = DataFrame.from_dict({"a": values, "b": values, "c": values, "d": values})
+        data = DataFrame.from_dict(
+            {"a": values, "b": values, "c": values, "d": values}
+        )
         grouped = data.groupby(["a", "b", "c", "d"])
         assert len(grouped) == len(values)
 
@@ -139,37 +143,51 @@ class TestSorting:
         # arrays."""
 
         # mergesort, ascending=True, na_position='last'
-        result = nargsort(items, kind="mergesort", ascending=True, na_position="last")
+        result = nargsort(
+            items, kind="mergesort", ascending=True, na_position="last"
+        )
         exp = list(range(5, 105)) + list(range(5)) + list(range(105, 110))
         tm.assert_numpy_array_equal(result, np.array(exp), check_dtype=False)
 
         # mergesort, ascending=True, na_position='first'
-        result = nargsort(items, kind="mergesort", ascending=True, na_position="first")
+        result = nargsort(
+            items, kind="mergesort", ascending=True, na_position="first"
+        )
         exp = list(range(5)) + list(range(105, 110)) + list(range(5, 105))
         tm.assert_numpy_array_equal(result, np.array(exp), check_dtype=False)
 
         # mergesort, ascending=False, na_position='last'
-        result = nargsort(items, kind="mergesort", ascending=False, na_position="last")
+        result = nargsort(
+            items, kind="mergesort", ascending=False, na_position="last"
+        )
         exp = list(range(104, 4, -1)) + list(range(5)) + list(range(105, 110))
         tm.assert_numpy_array_equal(result, np.array(exp), check_dtype=False)
 
         # mergesort, ascending=False, na_position='first'
-        result = nargsort(items, kind="mergesort", ascending=False, na_position="first")
+        result = nargsort(
+            items, kind="mergesort", ascending=False, na_position="first"
+        )
         exp = list(range(5)) + list(range(105, 110)) + list(range(104, 4, -1))
         tm.assert_numpy_array_equal(result, np.array(exp), check_dtype=False)
 
         # mergesort, ascending=True, na_position='last'
-        result = nargsort(items2, kind="mergesort", ascending=True, na_position="last")
+        result = nargsort(
+            items2, kind="mergesort", ascending=True, na_position="last"
+        )
         exp = list(range(5, 105)) + list(range(5)) + list(range(105, 110))
         tm.assert_numpy_array_equal(result, np.array(exp), check_dtype=False)
 
         # mergesort, ascending=True, na_position='first'
-        result = nargsort(items2, kind="mergesort", ascending=True, na_position="first")
+        result = nargsort(
+            items2, kind="mergesort", ascending=True, na_position="first"
+        )
         exp = list(range(5)) + list(range(105, 110)) + list(range(5, 105))
         tm.assert_numpy_array_equal(result, np.array(exp), check_dtype=False)
 
         # mergesort, ascending=False, na_position='last'
-        result = nargsort(items2, kind="mergesort", ascending=False, na_position="last")
+        result = nargsort(
+            items2, kind="mergesort", ascending=False, na_position="last"
+        )
         exp = list(range(104, 4, -1)) + list(range(5)) + list(range(105, 110))
         tm.assert_numpy_array_equal(result, np.array(exp), check_dtype=False)
 
@@ -186,15 +204,21 @@ class TestMerge:
     def test_int64_overflow_issues(self):
 
         # #2690, combinatorial explosion
-        df1 = DataFrame(np.random.randn(1000, 7), columns=list("ABCDEF") + ["G1"])
-        df2 = DataFrame(np.random.randn(1000, 7), columns=list("ABCDEF") + ["G2"])
+        df1 = DataFrame(
+            np.random.randn(1000, 7), columns=list("ABCDEF") + ["G1"]
+        )
+        df2 = DataFrame(
+            np.random.randn(1000, 7), columns=list("ABCDEF") + ["G2"]
+        )
 
         # it works!
         result = merge(df1, df2, how="outer")
         assert len(result) == 2000
 
         low, high, n = -1 << 10, 1 << 10, 1 << 20
-        left = DataFrame(np.random.randint(low, high, (n, 7)), columns=list("ABCDEFG"))
+        left = DataFrame(
+            np.random.randint(low, high, (n, 7)), columns=list("ABCDEFG")
+        )
         left["left"] = left.sum(axis=1)
 
         # one-2-one match
@@ -286,7 +310,8 @@ class TestMerge:
         def verify_order(df):
             kcols = list("ABCDEFG")
             assert_frame_equal(
-                df[kcols].copy(), df[kcols].sort_values(kcols, kind="mergesort")
+                df[kcols].copy(),
+                df[kcols].sort_values(kcols, kind="mergesort"),
             )
 
         out = DataFrame(vals, columns=list("ABCDEFG") + ["left", "right"])
@@ -311,7 +336,9 @@ class TestMerge:
 
                 # as in GH9092 dtypes break with outer/right join
                 assert_frame_equal(
-                    frame, align(res), check_dtype=how not in ("right", "outer")
+                    frame,
+                    align(res),
+                    check_dtype=how not in ("right", "outer"),
                 )
 
 
@@ -369,7 +396,9 @@ class TestSafeSort:
 
         # na_sentinel
         labels = [0, 1, 1, 2, 3, 0, 99, 4]
-        result, result_labels = safe_sort(values, labels, na_sentinel=99, verify=verify)
+        result, result_labels = safe_sort(
+            values, labels, na_sentinel=99, verify=verify
+        )
         expected_labels = np.array([3, 1, 1, 2, 0, 3, 99, 4], dtype=np.intp)
         tm.assert_numpy_array_equal(result, expected)
         tm.assert_numpy_array_equal(result_labels, expected_labels)
@@ -387,9 +416,12 @@ class TestSafeSort:
 
         # out of bound indices
         labels = [0, 101, 102, 2, 3, 0, 99, 4]
-        result, result_labels = safe_sort(values, labels, na_sentinel=na_sentinel)
+        result, result_labels = safe_sort(
+            values, labels, na_sentinel=na_sentinel
+        )
         expected_labels = np.array(
-            [3, na_sentinel, na_sentinel, 2, 0, 3, na_sentinel, 4], dtype=np.intp
+            [3, na_sentinel, na_sentinel, 2, 0, 3, na_sentinel, 4],
+            dtype=np.intp,
         )
         tm.assert_numpy_array_equal(result, expected)
         tm.assert_numpy_array_equal(result_labels, expected_labels)
@@ -426,7 +458,9 @@ class TestSafeSort:
             safe_sort(arr)
 
     def test_exceptions(self):
-        with pytest.raises(TypeError, match="Only list-like objects are allowed"):
+        with pytest.raises(
+            TypeError, match="Only list-like objects are allowed"
+        ):
             safe_sort(values=1)
 
         with pytest.raises(TypeError, match="Only list-like objects or None"):

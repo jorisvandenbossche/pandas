@@ -164,8 +164,26 @@ def create_data():
             tuple(
                 zip(
                     *[
-                        ["bar", "bar", "baz", "baz", "foo", "foo", "qux", "qux"],
-                        ["one", "two", "one", "two", "one", "two", "one", "two"],
+                        [
+                            "bar",
+                            "bar",
+                            "baz",
+                            "baz",
+                            "foo",
+                            "foo",
+                            "qux",
+                            "qux",
+                        ],
+                        [
+                            "one",
+                            "two",
+                            "one",
+                            "two",
+                            "one",
+                            "two",
+                            "one",
+                            "two",
+                        ],
                     ]
                 )
             ),
@@ -178,15 +196,19 @@ def create_data():
         int=Series(data["B"]),
         mixed=Series(data["E"]),
         ts=Series(
-            np.arange(10).astype(np.int64), index=date_range("20130101", periods=10)
+            np.arange(10).astype(np.int64),
+            index=date_range("20130101", periods=10),
         ),
         mi=Series(
             np.arange(5).astype(np.float64),
             index=MultiIndex.from_tuples(
-                tuple(zip(*[[1, 1, 2, 2, 2], [3, 4, 3, 4, 5]])), names=["one", "two"]
+                tuple(zip(*[[1, 1, 2, 2, 2], [3, 4, 3, 4, 5]])),
+                names=["one", "two"],
             ),
         ),
-        dup=Series(np.arange(5).astype(np.float64), index=["A", "B", "C", "D", "A"]),
+        dup=Series(
+            np.arange(5).astype(np.float64), index=["A", "B", "C", "D", "A"]
+        ),
         cat=Series(Categorical(["foo", "bar", "baz"])),
         dt=Series(date_range("20130101", periods=5)),
         dt_tz=Series(date_range("20130101", periods=5, tz="US/Eastern")),
@@ -200,7 +222,10 @@ def create_data():
         int=DataFrame({"A": series["int"], "B": series["int"] + 1}),
         mixed=DataFrame({k: data[k] for k in ["A", "B", "C", "D"]}),
         mi=DataFrame(
-            {"A": np.arange(5).astype(np.float64), "B": np.arange(5).astype(np.int64)},
+            {
+                "A": np.arange(5).astype(np.float64),
+                "B": np.arange(5).astype(np.int64),
+            },
             index=MultiIndex.from_tuples(
                 tuple(
                     zip(
@@ -214,7 +239,8 @@ def create_data():
             ),
         ),
         dup=DataFrame(
-            np.arange(15).reshape(5, 3).astype(np.float64), columns=["A", "B", "A"]
+            np.arange(15).reshape(5, 3).astype(np.float64),
+            columns=["A", "B", "A"],
         ),
         cat_onecol=DataFrame({"A": Categorical(["foo", "bar"])}),
         cat_and_float=DataFrame(
@@ -367,7 +393,9 @@ def write_legacy_msgpack(output_dir, compress):
     print("  output dir    : {0}".format(output_dir))
     print("  storage format: msgpack")
     pth = "{0}.msgpack".format(platform_name())
-    to_msgpack(os.path.join(output_dir, pth), create_msgpack_data(), compress=compress)
+    to_msgpack(
+        os.path.join(output_dir, pth), create_msgpack_data(), compress=compress
+    )
 
     print("created msgpack file: %s" % pth)
 

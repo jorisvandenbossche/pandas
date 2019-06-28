@@ -19,7 +19,11 @@ from pandas.core.dtypes.common import (
     is_scalar,
     is_timedelta64_dtype,
 )
-from pandas.core.dtypes.generic import ABCDataFrame, ABCSeries, ABCTimedeltaIndex
+from pandas.core.dtypes.generic import (
+    ABCDataFrame,
+    ABCSeries,
+    ABCTimedeltaIndex,
+)
 
 from pandas.core import ops
 import pandas.core.common as com
@@ -398,7 +402,9 @@ class RangeIndex(Int64Index):
         no_steps = len(self) - 1
         if no_steps == -1:
             return np.nan
-        elif (meth == "min" and self.step > 0) or (meth == "max" and self.step < 0):
+        elif (meth == "min" and self.step > 0) or (
+            meth == "max" and self.step < 0
+        ):
             return self.start
 
         return self.start + self.step * no_steps
@@ -497,7 +503,9 @@ class RangeIndex(Int64Index):
 
         # calculate parameters for the RangeIndex describing the
         # intersection disregarding the lower bounds
-        tmp_start = first.start + (second.start - first.start) * first.step // gcd * s
+        tmp_start = (
+            first.start + (second.start - first.start) * first.step // gcd * s
+        )
         new_step = first.step * second.step // gcd
         new_range = range(tmp_start, int_high, new_step)
         new_index = self._simple_new(new_range)
@@ -592,7 +600,9 @@ class RangeIndex(Int64Index):
                     and (abs(start_s - start_o) <= step_s / 2)
                     and (abs(end_s - end_o) <= step_s / 2)
                 ):
-                    return self.__class__(start_r, end_r + step_s / 2, step_s / 2)
+                    return self.__class__(
+                        start_r, end_r + step_s / 2, step_s / 2
+                    )
             elif step_o % step_s == 0:
                 if (
                     (start_o - start_s) % step_s == 0
@@ -610,10 +620,14 @@ class RangeIndex(Int64Index):
         return self._int64index._union(other, sort=sort)
 
     @Appender(_index_shared_docs["join"])
-    def join(self, other, how="left", level=None, return_indexers=False, sort=False):
+    def join(
+        self, other, how="left", level=None, return_indexers=False, sort=False
+    ):
         if how == "outer" and self is not other:
             # note: could return RangeIndex in more circumstances
-            return self._int64index.join(other, how, level, return_indexers, sort)
+            return self._int64index.join(
+                other, how, level, return_indexers, sort
+            )
 
         return super().join(other, how, level, return_indexers, sort)
 
@@ -661,7 +675,11 @@ class RangeIndex(Int64Index):
             return NotImplemented
 
         if is_integer(other) and other != 0:
-            if len(self) == 0 or self.start % other == 0 and self.step % other == 0:
+            if (
+                len(self) == 0
+                or self.start % other == 0
+                and self.step % other == 0
+            ):
                 start = self.start // other
                 step = self.step // other
                 stop = start + len(self) * step
@@ -756,8 +774,12 @@ class RangeIndex(Int64Index):
         cls.__rsub__ = _make_evaluate_binop(ops.rsub)
         cls.__mul__ = _make_evaluate_binop(operator.mul, step=operator.mul)
         cls.__rmul__ = _make_evaluate_binop(ops.rmul, step=ops.rmul)
-        cls.__truediv__ = _make_evaluate_binop(operator.truediv, step=operator.truediv)
-        cls.__rtruediv__ = _make_evaluate_binop(ops.rtruediv, step=ops.rtruediv)
+        cls.__truediv__ = _make_evaluate_binop(
+            operator.truediv, step=operator.truediv
+        )
+        cls.__rtruediv__ = _make_evaluate_binop(
+            ops.rtruediv, step=ops.rtruediv
+        )
 
 
 RangeIndex._add_numeric_methods()

@@ -26,7 +26,11 @@ class TestSeriesCombine:
             datetime_series.append(datetime_series, verify_integrity=True)
 
     def test_append_many(self, datetime_series):
-        pieces = [datetime_series[:5], datetime_series[5:10], datetime_series[10:]]
+        pieces = [
+            datetime_series[:5],
+            datetime_series[5:10],
+            datetime_series[10:],
+        ]
 
         result = pieces[0].append(pieces[1:])
         assert_series_equal(result, datetime_series)
@@ -94,7 +98,9 @@ class TestSeriesCombine:
         combined = strings.combine_first(floats)
 
         tm.assert_series_equal(strings, combined.loc[index[::2]])
-        tm.assert_series_equal(floats[1::2].astype(object), combined.loc[index[1::2]])
+        tm.assert_series_equal(
+            floats[1::2].astype(object), combined.loc[index[1::2]]
+        )
 
         # corner case
         s = Series([1.0, 2, 3], index=[0, 1, 2])
@@ -156,11 +162,16 @@ class TestSeriesCombine:
     def test_concat_empty_series_dtypes_roundtrips(self):
 
         # round-tripping with self & like self
-        dtypes = map(np.dtype, ["float64", "int8", "uint8", "bool", "m8[ns]", "M8[ns]"])
+        dtypes = map(
+            np.dtype, ["float64", "int8", "uint8", "bool", "m8[ns]", "M8[ns]"]
+        )
 
         for dtype in dtypes:
             assert pd.concat([Series(dtype=dtype)]).dtype == dtype
-            assert pd.concat([Series(dtype=dtype), Series(dtype=dtype)]).dtype == dtype
+            assert (
+                pd.concat([Series(dtype=dtype), Series(dtype=dtype)]).dtype
+                == dtype
+            )
 
         def int_result_type(dtype, dtype2):
             typs = {dtype.kind, dtype2.kind}
@@ -197,16 +208,22 @@ class TestSeriesCombine:
                     continue
 
                 expected = get_result_type(dtype, dtype2)
-                result = pd.concat([Series(dtype=dtype), Series(dtype=dtype2)]).dtype
+                result = pd.concat(
+                    [Series(dtype=dtype), Series(dtype=dtype2)]
+                ).dtype
                 assert result.kind == expected
 
     def test_combine_first_dt_tz_values(self, tz_naive_fixture):
         ser1 = pd.Series(
-            pd.DatetimeIndex(["20150101", "20150102", "20150103"], tz=tz_naive_fixture),
+            pd.DatetimeIndex(
+                ["20150101", "20150102", "20150103"], tz=tz_naive_fixture
+            ),
             name="ser1",
         )
         ser2 = pd.Series(
-            pd.DatetimeIndex(["20160514", "20160515", "20160516"], tz=tz_naive_fixture),
+            pd.DatetimeIndex(
+                ["20160514", "20160515", "20160516"], tz=tz_naive_fixture
+            ),
             index=[2, 3, 4],
             name="ser2",
         )
@@ -251,20 +268,29 @@ class TestSeriesCombine:
         )
         assert (
             pd.concat(
-                [Series(dtype="M8[ns]"), Series(dtype=np.bool_), Series(dtype=np.int64)]
+                [
+                    Series(dtype="M8[ns]"),
+                    Series(dtype=np.bool_),
+                    Series(dtype=np.int64),
+                ]
             ).dtype
             == np.object_
         )
 
         # categorical
         assert (
-            pd.concat([Series(dtype="category"), Series(dtype="category")]).dtype
+            pd.concat(
+                [Series(dtype="category"), Series(dtype="category")]
+            ).dtype
             == "category"
         )
         # GH 18515
         assert (
             pd.concat(
-                [Series(np.array([]), dtype="category"), Series(dtype="float64")]
+                [
+                    Series(np.array([]), dtype="category"),
+                    Series(dtype="float64"),
+                ]
             ).dtype
             == "float64"
         )
@@ -276,7 +302,10 @@ class TestSeriesCombine:
         # sparse
         # TODO: move?
         result = pd.concat(
-            [Series(dtype="float64").to_sparse(), Series(dtype="float64").to_sparse()]
+            [
+                Series(dtype="float64").to_sparse(),
+                Series(dtype="float64").to_sparse(),
+            ]
         )
         assert result.dtype == "Sparse[float64]"
 
@@ -351,9 +380,15 @@ class TestTimeseries:
 
     def test_append_concat_tz(self):
         # see gh-2938
-        rng = date_range("5/8/2012 1:45", periods=10, freq="5T", tz="US/Eastern")
-        rng2 = date_range("5/8/2012 2:35", periods=10, freq="5T", tz="US/Eastern")
-        rng3 = date_range("5/8/2012 1:45", periods=20, freq="5T", tz="US/Eastern")
+        rng = date_range(
+            "5/8/2012 1:45", periods=10, freq="5T", tz="US/Eastern"
+        )
+        rng2 = date_range(
+            "5/8/2012 2:35", periods=10, freq="5T", tz="US/Eastern"
+        )
+        rng3 = date_range(
+            "5/8/2012 1:45", periods=20, freq="5T", tz="US/Eastern"
+        )
         ts = Series(np.random.randn(len(rng)), rng)
         df = DataFrame(np.random.randn(len(rng), 4), index=rng)
         ts2 = Series(np.random.randn(len(rng2)), rng2)

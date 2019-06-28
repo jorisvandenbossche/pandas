@@ -96,7 +96,16 @@ class TestDataFrame(Generic):
         df = DataFrame(
             {
                 "A": ["foo", "bar", "foo", "bar", "foo", "bar", "foo", "foo"],
-                "B": ["one", "one", "two", "three", "two", "two", "one", "three"],
+                "B": [
+                    "one",
+                    "one",
+                    "two",
+                    "three",
+                    "two",
+                    "two",
+                    "one",
+                    "three",
+                ],
                 "C": np.random.randn(8),
                 "D": np.random.randn(8),
             }
@@ -129,7 +138,11 @@ class TestDataFrame(Generic):
             for name in self._metadata:
                 if method == "merge":
                     left, right = other.left, other.right
-                    value = getattr(left, name, "") + "|" + getattr(right, name, "")
+                    value = (
+                        getattr(left, name, "")
+                        + "|"
+                        + getattr(right, name, "")
+                    )
                     object.__setattr__(self, name, value)
                 else:
                     object.__setattr__(self, name, getattr(other, name, ""))
@@ -150,7 +163,11 @@ class TestDataFrame(Generic):
             for name in self._metadata:
                 if method == "concat":
                     value = "+".join(
-                        [getattr(o, name) for o in other.objs if getattr(o, name, None)]
+                        [
+                            getattr(o, name)
+                            for o in other.objs
+                            if getattr(o, name, None)
+                        ]
                     )
                     object.__setattr__(self, name, value)
                 else:
@@ -264,7 +281,9 @@ class TestDataFrame(Generic):
 
         # available in 0.7.1
         # MultiIndex
-        df.index = pd.MultiIndex.from_product([["a"], range(3)], names=["one", "two"])
+        df.index = pd.MultiIndex.from_product(
+            [["a"], range(3)], names=["one", "two"]
+        )
         result = df.to_xarray()
         assert result.dims["one"] == 1
         assert result.dims["two"] == 3

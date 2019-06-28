@@ -124,10 +124,14 @@ class Properties(PandasDelegate, PandasObject, NoNewAttributesMixin):
 
 
 @delegate_names(
-    delegate=DatetimeArray, accessors=DatetimeArray._datetimelike_ops, typ="property"
+    delegate=DatetimeArray,
+    accessors=DatetimeArray._datetimelike_ops,
+    typ="property",
 )
 @delegate_names(
-    delegate=DatetimeArray, accessors=DatetimeArray._datetimelike_methods, typ="method"
+    delegate=DatetimeArray,
+    accessors=DatetimeArray._datetimelike_methods,
+    typ="method",
 )
 class DatetimeProperties(Properties):
     """
@@ -195,7 +199,9 @@ class DatetimeProperties(Properties):
 
 
 @delegate_names(
-    delegate=TimedeltaArray, accessors=TimedeltaArray._datetimelike_ops, typ="property"
+    delegate=TimedeltaArray,
+    accessors=TimedeltaArray._datetimelike_ops,
+    typ="property",
 )
 @delegate_names(
     delegate=TimedeltaArray,
@@ -286,10 +292,14 @@ class TimedeltaProperties(Properties):
 
 
 @delegate_names(
-    delegate=PeriodArray, accessors=PeriodArray._datetimelike_ops, typ="property"
+    delegate=PeriodArray,
+    accessors=PeriodArray._datetimelike_ops,
+    typ="property",
 )
 @delegate_names(
-    delegate=PeriodArray, accessors=PeriodArray._datetimelike_methods, typ="method"
+    delegate=PeriodArray,
+    accessors=PeriodArray._datetimelike_methods,
+    typ="method",
 )
 class PeriodProperties(Properties):
     """
@@ -340,4 +350,6 @@ class CombinedDatetimelikeProperties(
         except Exception:
             pass  # we raise an attribute error anyway
 
-        raise AttributeError("Can only use .dt accessor with datetimelike " "values")
+        raise AttributeError(
+            "Can only use .dt accessor with datetimelike " "values"
+        )

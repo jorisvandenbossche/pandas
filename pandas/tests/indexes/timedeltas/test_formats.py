@@ -15,10 +15,13 @@ class TestTimedeltaIndexRendering:
 
         exp1 = """TimedeltaIndex([], dtype='timedelta64[ns]', freq='D')"""
 
-        exp2 = "TimedeltaIndex(['1 days'], dtype='timedelta64[ns]', " "freq='D')"
+        exp2 = (
+            "TimedeltaIndex(['1 days'], dtype='timedelta64[ns]', " "freq='D')"
+        )
 
         exp3 = (
-            "TimedeltaIndex(['1 days', '2 days'], " "dtype='timedelta64[ns]', freq='D')"
+            "TimedeltaIndex(['1 days', '2 days'], "
+            "dtype='timedelta64[ns]', freq='D')"
         )
 
         exp4 = (
@@ -51,7 +54,12 @@ class TestTimedeltaIndexRendering:
 
         exp3 = "0   1 days\n" "1   2 days\n" "dtype: timedelta64[ns]"
 
-        exp4 = "0   1 days\n" "1   2 days\n" "2   3 days\n" "dtype: timedelta64[ns]"
+        exp4 = (
+            "0   1 days\n"
+            "1   2 days\n"
+            "2   3 days\n"
+            "dtype: timedelta64[ns]"
+        )
 
         exp5 = (
             "0   1 days 00:00:01\n"
@@ -83,7 +91,9 @@ class TestTimedeltaIndexRendering:
 
         exp4 = "TimedeltaIndex: 3 entries, 1 days to 3 days\n" "Freq: D"
 
-        exp5 = "TimedeltaIndex: 3 entries, 1 days 00:00:01 to 3 days " "00:00:00"
+        exp5 = (
+            "TimedeltaIndex: 3 entries, 1 days 00:00:01 to 3 days " "00:00:00"
+        )
 
         for idx, expected in zip(
             [idx1, idx2, idx3, idx4, idx5], [exp1, exp2, exp3, exp4, exp5]

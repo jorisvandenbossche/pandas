@@ -41,7 +41,9 @@ def test_multi_thread_string_io_read_csv(all_parsers):
     num_files = 100
 
     bytes_to_df = [
-        "\n".join(["%d,%d,%d" % (i, i, i) for i in range(max_row_range)]).encode()
+        "\n".join(
+            ["%d,%d,%d" % (i, i, i) for i in range(max_row_range)]
+        ).encode()
         for _ in range(num_files)
     ]
     files = [BytesIO(b) for b in bytes_to_df]
@@ -111,7 +113,8 @@ def _generate_multi_thread_dataframe(parser, path, num_rows, num_tasks):
         )
 
     tasks = [
-        (num_rows * i // num_tasks, num_rows // num_tasks) for i in range(num_tasks)
+        (num_rows * i // num_tasks, num_rows // num_tasks)
+        for i in range(num_tasks)
     ]
 
     pool = ThreadPool(processes=num_tasks)

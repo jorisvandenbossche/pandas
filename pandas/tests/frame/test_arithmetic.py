@@ -56,7 +56,9 @@ class TestFrameComparisons:
         df2["dates"] = df["a"]
         check(df, df2)
 
-        df = pd.DataFrame(np.random.randint(10, size=(10, 2)), columns=["a", "b"])
+        df = pd.DataFrame(
+            np.random.randint(10, size=(10, 2)), columns=["a", "b"]
+        )
         df2 = pd.DataFrame(
             {
                 "a": pd.date_range("20010101", periods=len(df)),
@@ -78,7 +80,14 @@ class TestFrameComparisons:
             }
         )
         df.loc[np.random.rand(len(df)) > 0.5, "dates2"] = pd.NaT
-        ops = {"gt": "lt", "lt": "gt", "ge": "le", "le": "ge", "eq": "eq", "ne": "ne"}
+        ops = {
+            "gt": "lt",
+            "lt": "gt",
+            "ge": "le",
+            "le": "ge",
+            "eq": "eq",
+            "ne": "ne",
+        }
 
         for left, right in ops.items():
             left_f = getattr(operator, left)
@@ -118,7 +127,9 @@ class TestFrameComparisons:
         #  len(df.columns) is supported as of GH#22800
         df = pd.DataFrame(np.arange(6).reshape((3, 2)))
 
-        expected = pd.DataFrame([[False, False], [True, False], [False, False]])
+        expected = pd.DataFrame(
+            [[False, False], [True, False], [False, False]]
+        )
 
         result = df == (2, 2)
         tm.assert_frame_equal(result, expected)
@@ -323,7 +334,8 @@ class TestFrameFlexArithmetic:
         expected = pd.DataFrame(
             {
                 "A": pd.Series(
-                    ["2016-01-02", "2016-01-03", "2016-01-05"], dtype="datetime64[ns]"
+                    ["2016-01-02", "2016-01-03", "2016-01-05"],
+                    dtype="datetime64[ns]",
                 ),
                 "B": ser * 2,
             }
@@ -382,7 +394,9 @@ class TestFrameFlexArithmetic:
         expected = f(int_frame, 2 * int_frame)
         tm.assert_frame_equal(result, expected)
 
-    def test_arith_flex_frame_raise(self, all_arithmetic_operators, float_frame):
+    def test_arith_flex_frame_raise(
+        self, all_arithmetic_operators, float_frame
+    ):
         # one instance of parametrized fixture
         op = all_arithmetic_operators
 
@@ -499,7 +513,9 @@ class TestFrameArithmetic:
         result = collike + df
         tm.assert_frame_equal(result, expected)
 
-    def test_df_arith_2d_array_rowlike_broadcasts(self, all_arithmetic_operators):
+    def test_df_arith_2d_array_rowlike_broadcasts(
+        self, all_arithmetic_operators
+    ):
         # GH#23000
         opname = all_arithmetic_operators
 
@@ -527,7 +543,9 @@ class TestFrameArithmetic:
         result = getattr(df, opname)(rowlike)
         tm.assert_frame_equal(result, expected)
 
-    def test_df_arith_2d_array_collike_broadcasts(self, all_arithmetic_operators):
+    def test_df_arith_2d_array_collike_broadcasts(
+        self, all_arithmetic_operators
+    ):
         # GH#23000
         opname = all_arithmetic_operators
 
@@ -548,7 +566,9 @@ class TestFrameArithmetic:
             #   DataFrame op will return all-float.  So we upcast `expected`
             dtype = np.common_type(*[x.values for x in exvals.values()])
 
-        expected = pd.DataFrame(exvals, columns=df.columns, index=df.index, dtype=dtype)
+        expected = pd.DataFrame(
+            exvals, columns=df.columns, index=df.index, dtype=dtype
+        )
 
         result = getattr(df, opname)(collike)
         tm.assert_frame_equal(result, expected)
@@ -608,7 +628,8 @@ class TestFrameArithmetic:
         _test_op(df, lambda x, y: x ** y)
 
     @pytest.mark.parametrize(
-        "values", [[1, 2], (1, 2), np.array([1, 2]), range(1, 3), deque([1, 2])]
+        "values",
+        [[1, 2], (1, 2), np.array([1, 2]), range(1, 3), deque([1, 2])],
     )
     def test_arith_alignment_non_pandas_object(self, values):
         # GH#17901
@@ -625,20 +646,30 @@ class TestFrameArithmetic:
         )
 
         val1 = df.xs("a").values
-        added = pd.DataFrame(df.values + val1, index=df.index, columns=df.columns)
+        added = pd.DataFrame(
+            df.values + val1, index=df.index, columns=df.columns
+        )
         tm.assert_frame_equal(df + val1, added)
 
-        added = pd.DataFrame((df.values.T + val1).T, index=df.index, columns=df.columns)
+        added = pd.DataFrame(
+            (df.values.T + val1).T, index=df.index, columns=df.columns
+        )
         tm.assert_frame_equal(df.add(val1, axis=0), added)
 
         val2 = list(df["two"])
 
-        added = pd.DataFrame(df.values + val2, index=df.index, columns=df.columns)
+        added = pd.DataFrame(
+            df.values + val2, index=df.index, columns=df.columns
+        )
         tm.assert_frame_equal(df + val2, added)
 
-        added = pd.DataFrame((df.values.T + val2).T, index=df.index, columns=df.columns)
+        added = pd.DataFrame(
+            (df.values.T + val2).T, index=df.index, columns=df.columns
+        )
         tm.assert_frame_equal(df.add(val2, axis="index"), added)
 
         val3 = np.random.rand(*df.shape)
-        added = pd.DataFrame(df.values + val3, index=df.index, columns=df.columns)
+        added = pd.DataFrame(
+            df.values + val3, index=df.index, columns=df.columns
+        )
         tm.assert_frame_equal(df.add(val3), added)

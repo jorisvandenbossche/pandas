@@ -20,7 +20,10 @@ from pandas.core.computation.check import _NUMEXPR_VERSION
 from pandas.core.computation.engines import NumExprClobberingError, _engines
 import pandas.core.computation.expr as expr
 from pandas.core.computation.expr import PandasExprVisitor, PythonExprVisitor
-from pandas.core.computation.expressions import _NUMEXPR_INSTALLED, _USE_NUMEXPR
+from pandas.core.computation.expressions import (
+    _NUMEXPR_INSTALLED,
+    _USE_NUMEXPR,
+)
 from pandas.core.computation.ops import (
     _arith_ops_syms,
     _binary_math_ops,
@@ -76,7 +79,9 @@ def unary_fns_for_ne():
         if _NUMEXPR_VERSION >= LooseVersion("2.6.9"):
             return _unary_math_ops
         else:
-            return tuple(x for x in _unary_math_ops if x not in ("floor", "ceil"))
+            return tuple(
+                x for x in _unary_math_ops if x not in ("floor", "ceil")
+            )
     else:
         pytest.skip("numexpr is not present")
 
@@ -101,8 +106,14 @@ def _eval_single_bin(lhs, cmp1, rhs, engine):
 
 def _series_and_2d_ndarray(lhs, rhs):
     return (
-        isinstance(lhs, Series) and isinstance(rhs, np.ndarray) and rhs.ndim > 1
-    ) or (isinstance(rhs, Series) and isinstance(lhs, np.ndarray) and lhs.ndim > 1)
+        isinstance(lhs, Series)
+        and isinstance(rhs, np.ndarray)
+        and rhs.ndim > 1
+    ) or (
+        isinstance(rhs, Series)
+        and isinstance(lhs, np.ndarray)
+        and lhs.ndim > 1
+    )
 
 
 def _series_and_frame(lhs, rhs):
@@ -116,7 +127,9 @@ def _bool_and_frame(lhs, rhs):
 
 
 def _is_py3_complex_incompat(result, expected):
-    return isinstance(expected, (complex, np.complexfloating)) and np.isnan(result)
+    return isinstance(expected, (complex, np.complexfloating)) and np.isnan(
+        result
+    )
 
 
 _good_arith_ops = set(_arith_ops_syms).difference(_special_case_arith_ops_syms)
@@ -631,12 +644,24 @@ class TestEvalNumexprPandas:
         assert pd.eval("~1", parser=self.parser, engine=self.engine) == ~1
         assert pd.eval("-1", parser=self.parser, engine=self.engine) == -1
         assert pd.eval("+1", parser=self.parser, engine=self.engine) == +1
-        assert pd.eval("~True", parser=self.parser, engine=self.engine) == ~True
-        assert pd.eval("~False", parser=self.parser, engine=self.engine) == ~False
-        assert pd.eval("-True", parser=self.parser, engine=self.engine) == -True
-        assert pd.eval("-False", parser=self.parser, engine=self.engine) == -False
-        assert pd.eval("+True", parser=self.parser, engine=self.engine) == +True
-        assert pd.eval("+False", parser=self.parser, engine=self.engine) == +False
+        assert (
+            pd.eval("~True", parser=self.parser, engine=self.engine) == ~True
+        )
+        assert (
+            pd.eval("~False", parser=self.parser, engine=self.engine) == ~False
+        )
+        assert (
+            pd.eval("-True", parser=self.parser, engine=self.engine) == -True
+        )
+        assert (
+            pd.eval("-False", parser=self.parser, engine=self.engine) == -False
+        )
+        assert (
+            pd.eval("+True", parser=self.parser, engine=self.engine) == +True
+        )
+        assert (
+            pd.eval("+False", parser=self.parser, engine=self.engine) == +False
+        )
 
     def test_unary_in_array(self):
         # GH 11235
@@ -734,7 +759,9 @@ class TestEvalNumexprPandas:
         expected = np.float64(exp)
         assert result == expected
 
-        df = pd.DataFrame({"A": [1000000000.0009, 1000000000.0011, 1000000000.0015]})
+        df = pd.DataFrame(
+            {"A": [1000000000.0009, 1000000000.0011, 1000000000.0015]}
+        )
         cutoff = 1000000000.0006
         result = df.query("A < %.4f" % cutoff)
         assert result.empty
@@ -778,7 +805,9 @@ class TestEvalNumexprPython(TestEvalNumexprPandas):
             filter(lambda x: x not in ("in", "not in"), expr._cmp_ops_syms)
         )
         self.cmp2_ops = self.cmp_ops[::-1]
-        self.bin_ops = [s for s in expr._bool_ops_syms if s not in ("and", "or")]
+        self.bin_ops = [
+            s for s in expr._bool_ops_syms if s not in ("and", "or")
+        ]
         self.special_case_ops = _special_case_arith_ops_syms
         self.arith_ops = _good_arith_ops
         self.unary_ops = "+", "-", "~"
@@ -826,7 +855,9 @@ class TestEvalPythonPandas(TestEvalPythonPython):
         cls.parser = "pandas"
 
     def check_chained_cmp_op(self, lhs, cmp1, mid, cmp2, rhs):
-        TestEvalNumexprPandas.check_chained_cmp_op(self, lhs, cmp1, mid, cmp2, rhs)
+        TestEvalNumexprPandas.check_chained_cmp_op(
+            self, lhs, cmp1, mid, cmp2, rhs
+        )
 
 
 f = lambda *args, **kwargs: np.random.randn()
@@ -882,15 +913,25 @@ class TestAlignment:
         assert_frame_equal(res, df * ~2)
 
     def test_basic_frame_alignment(self, engine, parser):
-        args = product(self.lhs_index_types, self.index_types, self.index_types)
+        args = product(
+            self.lhs_index_types, self.index_types, self.index_types
+        )
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("always", RuntimeWarning)
             for lr_idx_type, rr_idx_type, c_idx_type in args:
                 df = mkdf(
-                    10, 10, data_gen_f=f, r_idx_type=lr_idx_type, c_idx_type=c_idx_type
+                    10,
+                    10,
+                    data_gen_f=f,
+                    r_idx_type=lr_idx_type,
+                    c_idx_type=c_idx_type,
                 )
                 df2 = mkdf(
-                    20, 10, data_gen_f=f, r_idx_type=rr_idx_type, c_idx_type=c_idx_type
+                    20,
+                    10,
+                    data_gen_f=f,
+                    r_idx_type=rr_idx_type,
+                    c_idx_type=c_idx_type,
                 )
                 # only warns if not monotonic and not sortable
                 if should_warn(df.index, df2.index):
@@ -904,19 +945,28 @@ class TestAlignment:
         args = product(self.lhs_index_types, repeat=2)
         for r_idx_type, c_idx_type in args:
             df = mkdf(
-                10, 10, data_gen_f=f, r_idx_type=r_idx_type, c_idx_type=c_idx_type
+                10,
+                10,
+                data_gen_f=f,
+                r_idx_type=r_idx_type,
+                c_idx_type=c_idx_type,
             )
             res = pd.eval("df < 2", engine=engine, parser=parser)
             assert_frame_equal(res, df < 2)
 
-            df3 = DataFrame(randn(*df.shape), index=df.index, columns=df.columns)
+            df3 = DataFrame(
+                randn(*df.shape), index=df.index, columns=df.columns
+            )
             res = pd.eval("df < df3", engine=engine, parser=parser)
             assert_frame_equal(res, df < df3)
 
     @pytest.mark.slow
     def test_medium_complex_frame_alignment(self, engine, parser):
         args = product(
-            self.lhs_index_types, self.index_types, self.index_types, self.index_types
+            self.lhs_index_types,
+            self.index_types,
+            self.index_types,
+            self.index_types,
         )
 
         with warnings.catch_warnings(record=True):
@@ -928,15 +978,23 @@ class TestAlignment:
                 df3 = mkdf(5, 2, data_gen_f=f, r_idx_type=r2, c_idx_type=c2)
                 if should_warn(df.index, df2.index, df3.index):
                     with tm.assert_produces_warning(RuntimeWarning):
-                        res = pd.eval("df + df2 + df3", engine=engine, parser=parser)
+                        res = pd.eval(
+                            "df + df2 + df3", engine=engine, parser=parser
+                        )
                 else:
-                    res = pd.eval("df + df2 + df3", engine=engine, parser=parser)
+                    res = pd.eval(
+                        "df + df2 + df3", engine=engine, parser=parser
+                    )
                 assert_frame_equal(res, df + df2 + df3)
 
     def test_basic_frame_series_alignment(self, engine, parser):
         def testit(r_idx_type, c_idx_type, index_name):
             df = mkdf(
-                10, 10, data_gen_f=f, r_idx_type=r_idx_type, c_idx_type=c_idx_type
+                10,
+                10,
+                data_gen_f=f,
+                r_idx_type=r_idx_type,
+                c_idx_type=c_idx_type,
             )
             index = getattr(df, index_name)
             s = Series(np.random.randn(5), index[:5])
@@ -953,7 +1011,9 @@ class TestAlignment:
                 expected = df + s
             assert_frame_equal(res, expected)
 
-        args = product(self.lhs_index_types, self.index_types, ("index", "columns"))
+        args = product(
+            self.lhs_index_types, self.index_types, ("index", "columns")
+        )
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("always", RuntimeWarning)
             for r_idx_type, c_idx_type, index_name in args:
@@ -961,7 +1021,13 @@ class TestAlignment:
 
     def test_basic_series_frame_alignment(self, engine, parser):
         def testit(r_idx_type, c_idx_type, index_name):
-            df = mkdf(10, 7, data_gen_f=f, r_idx_type=r_idx_type, c_idx_type=c_idx_type)
+            df = mkdf(
+                10,
+                7,
+                data_gen_f=f,
+                r_idx_type=r_idx_type,
+                c_idx_type=c_idx_type,
+            )
             index = getattr(df, index_name)
             s = Series(np.random.randn(5), index[:5])
             if should_warn(s.index, df.index):
@@ -996,14 +1062,21 @@ class TestAlignment:
 
     def test_series_frame_commutativity(self, engine, parser):
         args = product(
-            self.lhs_index_types, self.index_types, ("+", "*"), ("index", "columns")
+            self.lhs_index_types,
+            self.index_types,
+            ("+", "*"),
+            ("index", "columns"),
         )
 
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("always", RuntimeWarning)
             for r_idx_type, c_idx_type, op, index_name in args:
                 df = mkdf(
-                    10, 10, data_gen_f=f, r_idx_type=r_idx_type, c_idx_type=c_idx_type
+                    10,
+                    10,
+                    data_gen_f=f,
+                    r_idx_type=r_idx_type,
+                    c_idx_type=c_idx_type,
                 )
                 index = getattr(df, index_name)
                 s = Series(np.random.randn(5), index[:5])
@@ -1028,7 +1101,10 @@ class TestAlignment:
         import random
 
         args = product(
-            self.lhs_index_types, self.index_types, self.index_types, self.index_types
+            self.lhs_index_types,
+            self.index_types,
+            self.index_types,
+            self.index_types,
         )
         n = 3
         m1 = 5
@@ -1063,7 +1139,9 @@ class TestAlignment:
 
                 if should_warn(df2.index, s.index, df.index):
                     with tm.assert_produces_warning(RuntimeWarning):
-                        res = pd.eval("df2 + s + df", engine=engine, parser=parser)
+                        res = pd.eval(
+                            "df2 + s + df", engine=engine, parser=parser
+                        )
                 else:
                     res = pd.eval("df2 + s + df", engine=engine, parser=parser)
                 assert res.shape == expected.shape
@@ -1155,18 +1233,26 @@ class TestOperationsNumExprPandas:
 
                 expec = _eval_single_bin(x, op, 1, self.engine)
                 y = self.eval(
-                    ex2, local_dict={"x": x}, engine=self.engine, parser=self.parser
+                    ex2,
+                    local_dict={"x": x},
+                    engine=self.engine,
+                    parser=self.parser,
                 )
                 assert y == expec
 
                 expec = _eval_single_bin(1, op, x + 1, self.engine)
                 y = self.eval(
-                    ex3, local_dict={"x": x}, engine=self.engine, parser=self.parser
+                    ex3,
+                    local_dict={"x": x},
+                    engine=self.engine,
+                    parser=self.parser,
                 )
                 assert y == expec
 
     def test_simple_bool_ops(self):
-        for op, lhs, rhs in product(expr._bool_ops_syms, (True, False), (True, False)):
+        for op, lhs, rhs in product(
+            expr._bool_ops_syms, (True, False), (True, False)
+        ):
             ex = "{0} {1} {2}".format(lhs, op, rhs)
             res = self.eval(ex)
             exp = eval(ex)
@@ -1318,7 +1404,9 @@ class TestOperationsNumExprPandas:
 
         # explicit targets
         df = orig_df.copy()
-        self.eval("c = df.a + df.b", local_dict={"df": df}, target=df, inplace=True)
+        self.eval(
+            "c = df.a + df.b", local_dict={"df": df}, target=df, inplace=True
+        )
         expected = orig_df.copy()
         expected["c"] = expected["a"] + expected["b"]
         assert_frame_equal(df, expected)
@@ -1482,7 +1570,9 @@ class TestOperationsNumExprPandas:
         self.eval("a = 1 + 2", target=df, inplace=True)
         tm.assert_dict_equal(df, expected)
 
-    @pytest.mark.parametrize("invalid_target", [1, "cat", [1, 2], np.array([]), (1, 3)])
+    @pytest.mark.parametrize(
+        "invalid_target", [1, "cat", [1, 2], np.array([]), (1, 3)]
+    )
     @pytest.mark.filterwarnings("ignore::FutureWarning")
     def test_cannot_item_assign(self, invalid_target):
         msg = "Cannot assign expression output to target"
@@ -1503,7 +1593,9 @@ class TestOperationsNumExprPandas:
         with pytest.raises(ValueError, match=msg):
             self.eval(expression, target=invalid_target, inplace=False)
 
-    @pytest.mark.parametrize("target", [1, "cat", [1, 2], np.array([]), (1, 3), {1: 2}])
+    @pytest.mark.parametrize(
+        "target", [1, "cat", [1, 2], np.array([]), (1, 3), {1: 2}]
+    )
     def test_inplace_no_assignment(self, target):
         expression = "1 + 2"
 
@@ -1549,28 +1641,44 @@ class TestOperationsNumExprPandas:
 
     def test_simple_in_ops(self):
         if self.parser != "python":
-            res = pd.eval("1 in [1, 2]", engine=self.engine, parser=self.parser)
+            res = pd.eval(
+                "1 in [1, 2]", engine=self.engine, parser=self.parser
+            )
             assert res
 
-            res = pd.eval("2 in (1, 2)", engine=self.engine, parser=self.parser)
+            res = pd.eval(
+                "2 in (1, 2)", engine=self.engine, parser=self.parser
+            )
             assert res
 
-            res = pd.eval("3 in (1, 2)", engine=self.engine, parser=self.parser)
+            res = pd.eval(
+                "3 in (1, 2)", engine=self.engine, parser=self.parser
+            )
             assert not res
 
-            res = pd.eval("3 not in (1, 2)", engine=self.engine, parser=self.parser)
+            res = pd.eval(
+                "3 not in (1, 2)", engine=self.engine, parser=self.parser
+            )
             assert res
 
-            res = pd.eval("[3] not in (1, 2)", engine=self.engine, parser=self.parser)
+            res = pd.eval(
+                "[3] not in (1, 2)", engine=self.engine, parser=self.parser
+            )
             assert res
 
-            res = pd.eval("[3] in ([3], 2)", engine=self.engine, parser=self.parser)
+            res = pd.eval(
+                "[3] in ([3], 2)", engine=self.engine, parser=self.parser
+            )
             assert res
 
-            res = pd.eval("[[3]] in [[[3]], 2]", engine=self.engine, parser=self.parser)
+            res = pd.eval(
+                "[[3]] in [[[3]], 2]", engine=self.engine, parser=self.parser
+            )
             assert res
 
-            res = pd.eval("(3,) in [(3,), 2]", engine=self.engine, parser=self.parser)
+            res = pd.eval(
+                "(3,) in [(3,), 2]", engine=self.engine, parser=self.parser
+            )
             assert res
 
             res = pd.eval(
@@ -1590,14 +1698,20 @@ class TestOperationsNumExprPandas:
             with pytest.raises(NotImplementedError):
                 pd.eval("3 in (1, 2)", engine=self.engine, parser=self.parser)
             with pytest.raises(NotImplementedError):
-                pd.eval("3 not in (1, 2)", engine=self.engine, parser=self.parser)
-            with pytest.raises(NotImplementedError):
                 pd.eval(
-                    "[(3,)] in (1, 2, [(3,)])", engine=self.engine, parser=self.parser
+                    "3 not in (1, 2)", engine=self.engine, parser=self.parser
                 )
             with pytest.raises(NotImplementedError):
                 pd.eval(
-                    "[3] not in (1, 2, [[3]])", engine=self.engine, parser=self.parser
+                    "[(3,)] in (1, 2, [(3,)])",
+                    engine=self.engine,
+                    parser=self.parser,
+                )
+            with pytest.raises(NotImplementedError):
+                pd.eval(
+                    "[3] not in (1, 2, [[3]])",
+                    engine=self.engine,
+                    parser=self.parser,
                 )
 
 
@@ -1609,7 +1723,9 @@ class TestOperationsNumExprPython(TestOperationsNumExprPandas):
         cls.engine = "numexpr"
         cls.parser = "python"
         cls.arith_ops = expr._arith_ops_syms + expr._cmp_ops_syms
-        cls.arith_ops = filter(lambda x: x not in ("in", "not in"), cls.arith_ops)
+        cls.arith_ops = filter(
+            lambda x: x not in ("in", "not in"), cls.arith_ops
+        )
 
     def test_check_many_exprs(self):
         a = 1  # noqa
@@ -1677,7 +1793,9 @@ class TestOperationsNumExprPython(TestOperationsNumExprPandas):
                 assert res == exp
 
     def test_simple_bool_ops(self):
-        for op, lhs, rhs in product(expr._bool_ops_syms, (True, False), (True, False)):
+        for op, lhs, rhs in product(
+            expr._bool_ops_syms, (True, False), (True, False)
+        ):
             ex = "lhs {0} rhs".format(op)
             if op in ("and", "or"):
                 with pytest.raises(NotImplementedError):
@@ -1694,7 +1812,9 @@ class TestOperationsPythonPython(TestOperationsNumExprPython):
         super().setup_class()
         cls.engine = cls.parser = "python"
         cls.arith_ops = expr._arith_ops_syms + expr._cmp_ops_syms
-        cls.arith_ops = filter(lambda x: x not in ("in", "not in"), cls.arith_ops)
+        cls.arith_ops = filter(
+            lambda x: x not in ("in", "not in"), cls.arith_ops
+        )
 
 
 class TestOperationsPythonPandas(TestOperationsNumExprPandas):
@@ -1736,7 +1856,9 @@ class TestMathPythonPython:
                 expect = getattr(np, fn)(a)
             tm.assert_series_equal(got, expect, check_names=False)
 
-    def test_floor_and_ceil_functions_raise_error(self, ne_lt_2_6_9, unary_fns_for_ne):
+    def test_floor_and_ceil_functions_raise_error(
+        self, ne_lt_2_6_9, unary_fns_for_ne
+    ):
         for fn in ("floor", "ceil"):
             msg = '"{0}" is not a supported function'.format(fn)
             with pytest.raises(ValueError, match=msg):
@@ -1768,7 +1890,12 @@ class TestMathPythonPython:
 
     def test_df_arithmetic_subexpression(self):
         df = DataFrame({"a": np.random.randn(10), "b": np.random.randn(10)})
-        df.eval("e = sin(a + b)", engine=self.engine, parser=self.parser, inplace=True)
+        df.eval(
+            "e = sin(a + b)",
+            engine=self.engine,
+            parser=self.parser,
+            inplace=True,
+        )
         got = df.e
         expect = np.sin(df.a + df.b)
         tm.assert_series_equal(got, expect, check_names=False)
@@ -1776,7 +1903,9 @@ class TestMathPythonPython:
     def check_result_type(self, dtype, expect_dtype):
         df = DataFrame({"a": np.random.randn(10).astype(dtype)})
         assert df.a.dtype == dtype
-        df.eval("b = sin(a)", engine=self.engine, parser=self.parser, inplace=True)
+        df.eval(
+            "b = sin(a)", engine=self.engine, parser=self.parser, inplace=True
+        )
         got = df.b
         expect = np.sin(df.a)
         assert expect.dtype == got.dtype
@@ -1934,7 +2063,9 @@ def test_numexpr_builtin_raises(engine, parser):
 def test_bad_resolver_raises(engine, parser):
     cannot_resolve = 42, 3.0
     with pytest.raises(TypeError, match="Resolver of type .+"):
-        pd.eval("1 + 2", resolvers=cannot_resolve, engine=engine, parser=parser)
+        pd.eval(
+            "1 + 2", resolvers=cannot_resolve, engine=engine, parser=parser
+        )
 
 
 def test_empty_string_raises(engine, parser):
@@ -1944,7 +2075,9 @@ def test_empty_string_raises(engine, parser):
 
 
 def test_more_than_one_expression_raises(engine, parser):
-    with pytest.raises(SyntaxError, match=("only a single expression " "is allowed")):
+    with pytest.raises(
+        SyntaxError, match=("only a single expression " "is allowed")
+    ):
         pd.eval("1 + 1; 2 + 2", engine=engine, parser=parser)
 
 

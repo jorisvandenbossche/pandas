@@ -71,7 +71,9 @@ def test_union_different_types(index_pair):
     assert idx2.union(idx1).dtype == np.dtype("O")
 
 
-@pytest.mark.parametrize("idx_fact1,idx_fact2", COMPATIBLE_INCONSISTENT_PAIRS.values())
+@pytest.mark.parametrize(
+    "idx_fact1,idx_fact2", COMPATIBLE_INCONSISTENT_PAIRS.values()
+)
 def test_compatible_inconsistent_pairs(idx_fact1, idx_fact2):
     # GH 23525
     idx1 = idx_fact1(10)

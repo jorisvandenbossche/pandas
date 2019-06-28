@@ -178,7 +178,9 @@ class Holiday:
         self.start_date = (
             Timestamp(start_date) if start_date is not None else start_date
         )
-        self.end_date = Timestamp(end_date) if end_date is not None else end_date
+        self.end_date = (
+            Timestamp(end_date) if end_date is not None else end_date
+        )
         self.observance = observance
         assert days_of_week is None or type(days_of_week) == tuple
         self.days_of_week = days_of_week
@@ -232,14 +234,16 @@ class Holiday:
 
         if self.start_date is not None:
             filter_start_date = max(
-                self.start_date.tz_localize(filter_start_date.tz), filter_start_date
+                self.start_date.tz_localize(filter_start_date.tz),
+                filter_start_date,
             )
         if self.end_date is not None:
             filter_end_date = min(
                 self.end_date.tz_localize(filter_end_date.tz), filter_end_date
             )
         holiday_dates = holiday_dates[
-            (holiday_dates >= filter_start_date) & (holiday_dates <= filter_end_date)
+            (holiday_dates >= filter_start_date)
+            & (holiday_dates <= filter_end_date)
         ]
         if return_name:
             return Series(self.name, index=holiday_dates)
@@ -410,7 +414,11 @@ class AbstractHolidayCalendar(metaclass=HolidayCalendarMetaClass):
         holidays = None
         # If we don't have a cache or the dates are outside the prior cache, we
         # get them again
-        if self._cache is None or start < self._cache[0] or end > self._cache[1]:
+        if (
+            self._cache is None
+            or start < self._cache[0]
+            or end > self._cache[1]
+        ):
             for rule in self.rules:
                 rule_holidays = rule.dates(start, end, return_name=True)
 
@@ -486,7 +494,9 @@ class AbstractHolidayCalendar(metaclass=HolidayCalendarMetaClass):
 USMemorialDay = Holiday(
     "Memorial Day", month=5, day=31, offset=DateOffset(weekday=MO(-1))
 )
-USLaborDay = Holiday("Labor Day", month=9, day=1, offset=DateOffset(weekday=MO(1)))
+USLaborDay = Holiday(
+    "Labor Day", month=9, day=1, offset=DateOffset(weekday=MO(1))
+)
 USColumbusDay = Holiday(
     "Columbus Day", month=10, day=1, offset=DateOffset(weekday=MO(2))
 )
@@ -505,7 +515,9 @@ USPresidentsDay = Holiday(
 )
 GoodFriday = Holiday("Good Friday", month=1, day=1, offset=[Easter(), Day(-2)])
 
-EasterMonday = Holiday("Easter Monday", month=1, day=1, offset=[Easter(), Day(1)])
+EasterMonday = Holiday(
+    "Easter Monday", month=1, day=1, offset=[Easter(), Day(1)]
+)
 
 
 class USFederalHolidayCalendar(AbstractHolidayCalendar):
@@ -529,7 +541,9 @@ class USFederalHolidayCalendar(AbstractHolidayCalendar):
     ]
 
 
-def HolidayCalendarFactory(name, base, other, base_class=AbstractHolidayCalendar):
+def HolidayCalendarFactory(
+    name, base, other, base_class=AbstractHolidayCalendar
+):
     rules = AbstractHolidayCalendar.merge_class(base, other)
     calendar_class = type(name, (base_class,), {"rules": rules, "name": name})
     return calendar_class

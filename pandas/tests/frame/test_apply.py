@@ -48,12 +48,16 @@ class TestDataFrameApply:
             assert applied.index is float_frame.index  # want this
 
         # invalid axis
-        df = DataFrame([[1, 2, 3], [4, 5, 6], [7, 8, 9]], index=["a", "a", "c"])
+        df = DataFrame(
+            [[1, 2, 3], [4, 5, 6], [7, 8, 9]], index=["a", "a", "c"]
+        )
         with pytest.raises(ValueError):
             df.apply(lambda x: x, 2)
 
         # GH 9573
-        df = DataFrame({"c0": ["A", "A", "B", "B"], "c1": ["C", "C", "D", "D"]})
+        df = DataFrame(
+            {"c0": ["A", "A", "B", "B"], "c1": ["C", "C", "D", "D"]}
+        )
         df = df.apply(lambda ts: ts.astype("category"))
 
         assert df.shape == (4, 2)
@@ -105,13 +109,17 @@ class TestDataFrameApply:
         result = empty_frame.apply(x.append, axis=1, result_type="expand")
         assert_frame_equal(result, empty_frame)
         result = empty_frame.apply(x.append, axis=1, result_type="reduce")
-        assert_series_equal(result, Series([], index=pd.Index([], dtype=object)))
+        assert_series_equal(
+            result, Series([], index=pd.Index([], dtype=object))
+        )
 
         empty_with_cols = DataFrame(columns=["a", "b", "c"])
         result = empty_with_cols.apply(x.append, axis=1, result_type="expand")
         assert_frame_equal(result, empty_with_cols)
         result = empty_with_cols.apply(x.append, axis=1, result_type="reduce")
-        assert_series_equal(result, Series([], index=pd.Index([], dtype=object)))
+        assert_series_equal(
+            result, Series([], index=pd.Index([], dtype=object))
+        )
 
         # Ensure that x.append hasn't been called
         assert x == []
@@ -124,7 +132,9 @@ class TestDataFrameApply:
             empty_frame.apply(x.append, axis=1, reduce=True)
 
     def test_apply_standard_nonunique(self):
-        df = DataFrame([[1, 2, 3], [4, 5, 6], [7, 8, 9]], index=["a", "a", "c"])
+        df = DataFrame(
+            [[1, 2, 3], [4, 5, 6], [7, 8, 9]], index=["a", "a", "c"]
+        )
 
         result = df.apply(lambda s: s[0], axis=1)
         expected = Series([1, 4, 7], ["a", "a", "c"])
@@ -141,7 +151,9 @@ class TestDataFrameApply:
             pytest.param([1], {}, id="axis_from_args"),
             pytest.param([], {"axis": 1}, id="axis_from_kwds"),
             pytest.param([], {"numeric_only": True}, id="optional_kwds"),
-            pytest.param([1, None], {"numeric_only": True}, id="args_and_kwds"),
+            pytest.param(
+                [1, None], {"numeric_only": True}, id="args_and_kwds"
+            ),
         ],
     )
     def test_apply_with_string_funcs(self, float_frame, func, args, kwds):
@@ -181,7 +193,8 @@ class TestDataFrameApply:
         tm.assert_frame_equal(result, expected)
 
         result = float_frame.apply(
-            lambda x: list(range(len(float_frame.index))), result_type="broadcast"
+            lambda x: list(range(len(float_frame.index))),
+            result_type="broadcast",
         )
         m = list(range(len(float_frame.index)))
         expected = DataFrame(
@@ -410,7 +423,11 @@ class TestDataFrameApply:
             return row
 
         def transform2(row):
-            if notna(row["C"]) and row["C"].startswith("shin") and row["A"] == "foo":
+            if (
+                notna(row["C"])
+                and row["C"].startswith("shin")
+                and row["A"] == "foo"
+            ):
                 row["D"] = 7
             return row
 
@@ -526,14 +543,17 @@ class TestDataFrameApply:
 
         result = float_frame.apply(lambda x: np.repeat(x.name, len(x)), axis=1)
         expected = Series(
-            np.repeat(t[0], len(float_frame.columns)) for t in float_frame.itertuples()
+            np.repeat(t[0], len(float_frame.columns))
+            for t in float_frame.itertuples()
         )
         expected.index = float_frame.index
         assert_series_equal(result, expected)
 
     def test_apply_multi_index(self, float_frame):
         index = MultiIndex.from_arrays([["a", "a", "b"], ["c", "d", "d"]])
-        s = DataFrame([[1, 2], [3, 4], [5, 6]], index=index, columns=["col1", "col2"])
+        s = DataFrame(
+            [[1, 2], [3, 4], [5, 6]], index=index, columns=["col1", "col2"]
+        )
         result = s.apply(lambda x: Series({"min": min(x), "max": max(x)}), 1)
         expected = DataFrame(
             [[1, 2], [3, 4], [5, 6]], index=index, columns=["min", "max"]
@@ -659,14 +679,22 @@ class TestDataFrameApply:
     def test_apply_non_numpy_dtype(self):
         # GH 12244
         df = DataFrame(
-            {"dt": pd.date_range("2015-01-01", periods=3, tz="Europe/Brussels")}
+            {
+                "dt": pd.date_range(
+                    "2015-01-01", periods=3, tz="Europe/Brussels"
+                )
+            }
         )
         result = df.apply(lambda x: x)
         assert_frame_equal(result, df)
 
         result = df.apply(lambda x: x + pd.Timedelta("1day"))
         expected = DataFrame(
-            {"dt": pd.date_range("2015-01-02", periods=3, tz="Europe/Brussels")}
+            {
+                "dt": pd.date_range(
+                    "2015-01-02", periods=3, tz="Europe/Brussels"
+                )
+            }
         )
         assert_frame_equal(result, expected)
 
@@ -722,7 +750,11 @@ class TestInferOutputShape:
         df["author"] = ["X", "Y", "Z"]
         df["publisher"] = ["BBC", "NBC", "N24"]
         df["date"] = pd.to_datetime(
-            ["17-10-2010 07:15:30", "13-05-2011 08:20:35", "15-01-2013 09:09:09"]
+            [
+                "17-10-2010 07:15:30",
+                "13-05-2011 08:20:35",
+                "15-01-2013 09:09:09",
+            ]
         )
         result = df.apply(lambda x: {}, axis=1)
         expected = Series([{}, {}, {}])
@@ -766,11 +798,16 @@ class TestInferOutputShape:
 
         # GH 18919
         df = DataFrame(
-            {"x": Series([["a", "b"], ["q"]]), "y": Series([["z"], ["q", "t"]])}
+            {
+                "x": Series([["a", "b"], ["q"]]),
+                "y": Series([["z"], ["q", "t"]]),
+            }
         )
         df.index = MultiIndex.from_tuples([("i0", "j0"), ("i1", "j1")])
 
-        result = df.apply(lambda row: [el for el in row["x"] if el in row["y"]], axis=1)
+        result = df.apply(
+            lambda row: [el for el in row["x"] if el in row["y"]], axis=1
+        )
         expected = Series([[], ["q"]], index=df.index)
         assert_series_equal(result, expected)
 
@@ -808,11 +845,15 @@ class TestInferOutputShape:
         df = DataFrame({"a": [1, 2, 3]}, index=list("abc"))
 
         result = df.apply(lambda row: np.ones(1), axis=1)
-        expected = Series([np.ones(1) for t in df.itertuples()], index=df.index)
+        expected = Series(
+            [np.ones(1) for t in df.itertuples()], index=df.index
+        )
         assert_series_equal(result, expected)
 
         result = df.apply(lambda row: np.ones(2), axis=1)
-        expected = Series([np.ones(2) for t in df.itertuples()], index=df.index)
+        expected = Series(
+            [np.ones(2) for t in df.itertuples()], index=df.index
+        )
         assert_series_equal(result, expected)
 
         # GH 17892
@@ -855,14 +896,17 @@ class TestInferOutputShape:
         df = int_frame_const_col
 
         result = df.apply(
-            lambda x: Series([1, 2, 3], index=["test", "other", "cols"]), axis=1
+            lambda x: Series([1, 2, 3], index=["test", "other", "cols"]),
+            axis=1,
         )
         expected = int_frame_const_col.rename(
             columns={"A": "test", "B": "other", "C": "cols"}
         )
         assert_frame_equal(result, expected)
 
-        result = df.apply(lambda x: Series([1, 2], index=["test", "other"]), axis=1)
+        result = df.apply(
+            lambda x: Series([1, 2], index=["test", "other"]), axis=1
+        )
         expected = expected[["test", "other"]]
         assert_frame_equal(result, expected)
 
@@ -888,7 +932,9 @@ class TestInferOutputShape:
 
         columns = ["other", "col", "names"]
         result = df.apply(
-            lambda x: Series([1, 2, 3], index=columns), axis=1, result_type="broadcast"
+            lambda x: Series([1, 2, 3], index=columns),
+            axis=1,
+            result_type="broadcast",
         )
         expected = df.copy()
         assert_frame_equal(result, expected)
@@ -915,7 +961,11 @@ class TestInferOutputShape:
 
     @pytest.mark.parametrize(
         "box",
-        [lambda x: list(x), lambda x: tuple(x), lambda x: np.array(x, dtype="int64")],
+        [
+            lambda x: list(x),
+            lambda x: tuple(x),
+            lambda x: np.array(x, dtype="int64"),
+        ],
         ids=["list", "tuple", "array"],
     )
     def test_consistency_for_boxed(self, box, int_frame_const_col):
@@ -927,7 +977,9 @@ class TestInferOutputShape:
         assert_series_equal(result, expected)
 
         result = df.apply(lambda x: box([1, 2]), axis=1, result_type="expand")
-        expected = int_frame_const_col[["A", "B"]].rename(columns={"A": 0, "B": 1})
+        expected = int_frame_const_col[["A", "B"]].rename(
+            columns={"A": 0, "B": 1}
+        )
         assert_frame_equal(result, expected)
 
 
@@ -1023,7 +1075,9 @@ class TestDataFrameAggregate:
             with np.errstate(all="ignore"):
                 df.agg({"A": ["abs", "sum"], "B": ["mean", "max"]}, axis=axis)
 
-    @pytest.mark.parametrize("method", ["abs", "shift", "pct_change", "cumsum", "rank"])
+    @pytest.mark.parametrize(
+        "method", ["abs", "shift", "pct_change", "cumsum", "rank"]
+    )
     def test_transform_method_name(self, method):
         # GH 19760
         df = pd.DataFrame({"A": [-1, 2]})
@@ -1037,7 +1091,9 @@ class TestDataFrameAggregate:
 
         result = df.agg(["min", "max"])
         expected = DataFrame(
-            {"A": [0, 4], "B": [5, 5]}, columns=["A", "B"], index=["min", "max"]
+            {"A": [0, 4], "B": [5, 5]},
+            columns=["A", "B"],
+            index=["min", "max"],
         )
         tm.assert_frame_equal(result, expected)
 
@@ -1183,7 +1239,9 @@ class TestDataFrameAggregate:
         )
 
         result = df.agg("min")
-        expected = Series([1, 1.0, "bar", pd.Timestamp("20130101")], index=df.columns)
+        expected = Series(
+            [1, 1.0, "bar", pd.Timestamp("20130101")], index=df.columns
+        )
         assert_series_equal(result, expected)
 
         result = df.agg(["min"])
@@ -1210,7 +1268,11 @@ class TestDataFrameAggregate:
         # 'size' is a property of frame/series
         # validate that this is working
         df = DataFrame(
-            {"A": [None, 2, 3], "B": [1.0, np.nan, 3.0], "C": ["foo", None, "bar"]}
+            {
+                "A": [None, 2, 3],
+                "B": [1.0, np.nan, 3.0],
+                "C": ["foo", None, "bar"],
+            }
         )
 
         # Function aggregate
@@ -1228,7 +1290,11 @@ class TestDataFrameAggregate:
         # Mix function and non-function aggs
         result1 = df.agg(["count", "size"])
         result2 = df.agg(
-            {"A": ["count", "size"], "B": ["count", "size"], "C": ["count", "size"]}
+            {
+                "A": ["count", "size"],
+                "B": ["count", "size"],
+                "C": ["count", "size"],
+            }
         )
         expected = pd.DataFrame(
             {
@@ -1299,7 +1365,8 @@ class TestDataFrameAggregate:
         "df, func, expected",
         chain(
             _get_cython_table_params(
-                DataFrame(), [("cumprod", DataFrame()), ("cumsum", DataFrame())]
+                DataFrame(),
+                [("cumprod", DataFrame()), ("cumsum", DataFrame())],
             ),
             _get_cython_table_params(
                 DataFrame([[np.nan, 1], [1, 2]]),

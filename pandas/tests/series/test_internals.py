@@ -63,9 +63,13 @@ class TestSeriesInternals:
         results = s._convert(True, False, True)
         assert_series_equal(results, s)
 
-        s = Series([datetime(2001, 1, 1, 0, 0), datetime(2001, 1, 1, 0, 0)], dtype="O")
+        s = Series(
+            [datetime(2001, 1, 1, 0, 0), datetime(2001, 1, 1, 0, 0)], dtype="O"
+        )
         results = s._convert(datetime=True, numeric=True, timedelta=True)
-        expected = Series([datetime(2001, 1, 1, 0, 0), datetime(2001, 1, 1, 0, 0)])
+        expected = Series(
+            [datetime(2001, 1, 1, 0, 0), datetime(2001, 1, 1, 0, 0)]
+        )
         assert_series_equal(results, expected)
         results = s._convert(datetime=False, numeric=True, timedelta=True)
         assert_series_equal(results, s)
@@ -134,7 +138,11 @@ class TestSeriesInternals:
 
         result = s._convert(datetime=True)
         expected = Series(
-            [Timestamp("20010101"), Timestamp("20010102"), Timestamp("20010103")],
+            [
+                Timestamp("20010101"),
+                Timestamp("20010102"),
+                Timestamp("20010103"),
+            ],
             dtype="M8[ns]",
         )
         assert_series_equal(result, expected)
@@ -155,7 +163,9 @@ class TestSeriesInternals:
             ],
             dtype="M8[ns]",
         )
-        result = s2._convert(datetime=True, numeric=False, timedelta=False, coerce=True)
+        result = s2._convert(
+            datetime=True, numeric=False, timedelta=False, coerce=True
+        )
         assert_series_equal(result, expected)
         result = s2._convert(datetime=True, coerce=True)
         assert_series_equal(result, expected)

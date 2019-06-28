@@ -101,10 +101,14 @@ class TestTimestampProperties:
     # GH 12806
     @pytest.mark.parametrize(
         "data",
-        [Timestamp("2017-08-28 23:00:00"), Timestamp("2017-08-28 23:00:00", tz="EST")],
+        [
+            Timestamp("2017-08-28 23:00:00"),
+            Timestamp("2017-08-28 23:00:00", tz="EST"),
+        ],
     )
     @pytest.mark.parametrize(
-        "time_locale", [None] if tm.get_locales() is None else [None] + tm.get_locales()
+        "time_locale",
+        [None] if tm.get_locales() is None else [None] + tm.get_locales(),
     )
     def test_names(self, data, time_locale):
         # GH 17354
@@ -184,7 +188,12 @@ class TestTimestampProperties:
         result = np.array(
             [
                 Timestamp(datetime(*args)).week
-                for args in [(2000, 1, 1), (2000, 1, 2), (2005, 1, 1), (2005, 1, 2)]
+                for args in [
+                    (2000, 1, 1),
+                    (2000, 1, 2),
+                    (2005, 1, 1),
+                    (2005, 1, 2),
+                ]
             ]
         )
         assert (result == [52, 52, 53, 53]).all()
@@ -204,7 +213,9 @@ class TestTimestampConstructors:
         # confirm base representation is correct
         import calendar
 
-        assert calendar.timegm(base_dt.timetuple()) * 1000000000 == base_expected
+        assert (
+            calendar.timegm(base_dt.timetuple()) * 1000000000 == base_expected
+        )
 
         tests = [
             (base_str, base_dt, base_expected),
@@ -249,7 +260,10 @@ class TestTimestampConstructors:
 
             # with timezone
             for tz, offset in timezones:
-                for result in [Timestamp(date_str, tz=tz), Timestamp(date, tz=tz)]:
+                for result in [
+                    Timestamp(date_str, tz=tz),
+                    Timestamp(date, tz=tz),
+                ]:
                     expected_tz = expected - offset * 3600 * 1000000000
                     assert result.value == expected_tz
                     assert conversion.pydt_to_i8(result) == expected_tz
@@ -277,7 +291,9 @@ class TestTimestampConstructors:
         # confirm base representation is correct
         import calendar
 
-        assert calendar.timegm(base_dt.timetuple()) * 1000000000 == base_expected
+        assert (
+            calendar.timegm(base_dt.timetuple()) * 1000000000 == base_expected
+        )
 
         tests = [
             (base_str, base_expected),
@@ -330,7 +346,9 @@ class TestTimestampConstructors:
         # converted to Chicago tz
         result = Timestamp("2013-11-01 00:00:00-0500", tz="America/Chicago")
         assert result.value == Timestamp("2013-11-01 05:00").value
-        expected = "Timestamp('2013-11-01 00:00:00-0500', tz='America/Chicago')"  # noqa
+        expected = (
+            "Timestamp('2013-11-01 00:00:00-0500', tz='America/Chicago')"
+        )  # noqa
         assert repr(result) == expected
         assert result == eval(repr(result))
 
@@ -730,14 +748,20 @@ class TestTimestamp:
 
         for n in ns:
             assert (
-                Timestamp(n).asm8.view("i8") == np.datetime64(n, "ns").view("i8") == n
+                Timestamp(n).asm8.view("i8")
+                == np.datetime64(n, "ns").view("i8")
+                == n
             )
 
-        assert Timestamp("nat").asm8.view("i8") == np.datetime64("nat", "ns").view("i8")
+        assert Timestamp("nat").asm8.view("i8") == np.datetime64(
+            "nat", "ns"
+        ).view("i8")
 
     def test_class_ops_pytz(self):
         def compare(x, y):
-            assert int(Timestamp(x).value / 1e9) == int(Timestamp(y).value / 1e9)
+            assert int(Timestamp(x).value / 1e9) == int(
+                Timestamp(y).value / 1e9
+            )
 
         compare(Timestamp.now(), datetime.now())
         compare(Timestamp.now("UTC"), datetime.now(timezone("UTC")))
@@ -749,7 +773,8 @@ class TestTimestamp:
             datetime.utcfromtimestamp(current_time),
         )
         compare(
-            Timestamp.fromtimestamp(current_time), datetime.fromtimestamp(current_time)
+            Timestamp.fromtimestamp(current_time),
+            datetime.fromtimestamp(current_time),
         )
 
         date_component = datetime.utcnow()
@@ -775,7 +800,8 @@ class TestTimestamp:
             datetime.utcfromtimestamp(current_time),
         )
         compare(
-            Timestamp.fromtimestamp(current_time), datetime.fromtimestamp(current_time)
+            Timestamp.fromtimestamp(current_time),
+            datetime.fromtimestamp(current_time),
         )
 
         date_component = datetime.utcnow()
@@ -814,15 +840,27 @@ class TestTimestamp:
                 (946688461000000000 + 500000) / 1000000000,
                 dict(unit="s", us=499, ns=964),
             ],
-            [(946688461000000000 + 500000000) / 1000000000, dict(unit="s", us=500000)],
+            [
+                (946688461000000000 + 500000000) / 1000000000,
+                dict(unit="s", us=500000),
+            ],
             [(946688461000000000 + 500000) / 1000000, dict(unit="ms", us=500)],
             [(946688461000000000 + 500000) / 1000, dict(unit="us", us=500)],
-            [(946688461000000000 + 500000000) / 1000000, dict(unit="ms", us=500000)],
+            [
+                (946688461000000000 + 500000000) / 1000000,
+                dict(unit="ms", us=500000),
+            ],
             [946688461000000000 / 1000.0 + 5, dict(unit="us", us=5)],
             [946688461000000000 / 1000.0 + 5000, dict(unit="us", us=5000)],
             [946688461000000000 / 1000000.0 + 0.5, dict(unit="ms", us=500)],
-            [946688461000000000 / 1000000.0 + 0.005, dict(unit="ms", us=5, ns=5)],
-            [946688461000000000 / 1000000000.0 + 0.5, dict(unit="s", us=500000)],
+            [
+                946688461000000000 / 1000000.0 + 0.005,
+                dict(unit="ms", us=5, ns=5),
+            ],
+            [
+                946688461000000000 / 1000000000.0 + 0.5,
+                dict(unit="s", us=500000),
+            ],
             [10957 + 0.5, dict(unit="D", h=12)],
         ],
     )

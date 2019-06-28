@@ -42,7 +42,9 @@ class TestCounting:
 
     def test_cumcount_mi(self):
         mi = MultiIndex.from_tuples([[0, 1], [1, 2], [2, 2], [2, 2], [1, 0]])
-        df = DataFrame([["a"], ["a"], ["a"], ["b"], ["a"]], columns=["A"], index=mi)
+        df = DataFrame(
+            [["a"], ["a"], ["a"], ["b"], ["a"]], columns=["A"], index=mi
+        )
         g = df.groupby("A")
         sg = g.A
 
@@ -197,7 +199,10 @@ class TestCounting:
     @pytest.mark.parametrize(
         "datetimelike",
         [
-            [Timestamp("2016-05-%02d 20:09:25+00:00" % i) for i in range(1, 4)],
+            [
+                Timestamp("2016-05-%02d 20:09:25+00:00" % i)
+                for i in range(1, 4)
+            ],
             [Timestamp("2016-05-%02d 20:09:25" % i) for i in range(1, 4)],
             [Timedelta(x, unit="h") for x in range(1, 4)],
             [Period(freq="2W", year=2017, month=x) for x in range(1, 4)],
@@ -217,6 +222,8 @@ class TestCounting:
         # GH21956
         df = DataFrame({"A": [np.nan, np.nan], "B": ["a", "b"], "C": [1, 2]})
         result = df.groupby(["A", "B"]).C.count()
-        mi = MultiIndex(levels=[[], ["a", "b"]], codes=[[], []], names=["A", "B"])
+        mi = MultiIndex(
+            levels=[[], ["a", "b"]], codes=[[], []], names=["A", "B"]
+        )
         expected = Series([], index=mi, dtype=np.int64, name="C")
         assert_series_equal(result, expected, check_index_type=False)

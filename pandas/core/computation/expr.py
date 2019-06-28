@@ -226,7 +226,9 @@ _all_nodes = frozenset(
 
 def _filter_nodes(superclass, all_nodes=_all_nodes):
     """Filter out AST nodes that are subclasses of ``superclass``."""
-    node_names = (node.__name__ for node in all_nodes if issubclass(node, superclass))
+    node_names = (
+        node.__name__ for node in all_nodes if issubclass(node, superclass)
+    )
     return frozenset(node_names)
 
 
@@ -353,7 +355,9 @@ def add_ops(op_classes):
     def f(cls):
         for op_attr_name, op_class in op_classes.items():
             ops = getattr(cls, "{name}_ops".format(name=op_attr_name))
-            ops_map = getattr(cls, "{name}_op_nodes_map".format(name=op_attr_name))
+            ops_map = getattr(
+                cls, "{name}_op_nodes_map".format(name=op_attr_name)
+            )
             for op in ops:
                 op_node = ops_map[op]
                 if op_node is not None:
@@ -433,7 +437,10 @@ class BaseExprVisitor(ast.NodeVisitor):
                 from keyword import iskeyword
 
                 if any(iskeyword(x) for x in clean.split()):
-                    e.msg = "Python keyword not valid identifier" " in numexpr query"
+                    e.msg = (
+                        "Python keyword not valid identifier"
+                        " in numexpr query"
+                    )
                 raise e
 
         method = "visit_" + node.__class__.__name__
@@ -482,7 +489,9 @@ class BaseExprVisitor(ast.NodeVisitor):
             left = self.visit(node.left, side="left")
         if right is None:
             right = self.visit(node.right, side="right")
-        op, op_class, left, right = self._rewrite_membership_op(node, left, right)
+        op, op_class, left, right = self._rewrite_membership_op(
+            node, left, right
+        )
         return op, op_class, left, right
 
     def _maybe_downcast_constants(self, left, right):
@@ -533,7 +542,9 @@ class BaseExprVisitor(ast.NodeVisitor):
         if res.has_invalid_return_type:
             raise TypeError(
                 "unsupported operand type(s) for {op}:"
-                " '{lhs}' and '{rhs}'".format(op=res.op, lhs=lhs.type, rhs=rhs.type)
+                " '{lhs}' and '{rhs}'".format(
+                    op=res.op, lhs=lhs.type, rhs=rhs.type
+                )
             )
 
         if self.engine != "pytables":
@@ -556,7 +567,9 @@ class BaseExprVisitor(ast.NodeVisitor):
             ):
                 # evaluate "==" and "!=" in python if either of our operands
                 # has an object return type
-                return self._maybe_eval(res, eval_in_python + maybe_eval_in_python)
+                return self._maybe_eval(
+                    res, eval_in_python + maybe_eval_in_python
+                )
         return res
 
     def visit_BinOp(self, node, **kwargs):
@@ -608,7 +621,10 @@ class BaseExprVisitor(ast.NodeVisitor):
         except AttributeError:
             # an Op instance
             lhs = pd.eval(
-                value, local_dict=self.env, engine=self.engine, parser=self.parser
+                value,
+                local_dict=self.env,
+                engine=self.engine,
+                parser=self.parser,
             )
             v = lhs[result]
         name = self.env.add_tmp(v)
@@ -656,7 +672,8 @@ class BaseExprVisitor(ast.NodeVisitor):
         self.assigner = getattr(assigner, "name", assigner)
         if self.assigner is None:
             raise SyntaxError(
-                "left hand side of an assignment must be a " "single resolvable name"
+                "left hand side of an assignment must be a "
+                "single resolvable name"
             )
 
         return self.visit(node.value, **kwargs)
@@ -678,7 +695,9 @@ class BaseExprVisitor(ast.NodeVisitor):
                 if isinstance(value, ast.Name) and value.id == attr:
                     return resolved
 
-        raise ValueError("Invalid Attribute context {name}".format(name=ctx.__name__))
+        raise ValueError(
+            "Invalid Attribute context {name}".format(name=ctx.__name__)
+        )
 
     def visit_Call(self, node, side=None, **kwargs):
 
@@ -698,7 +717,9 @@ class BaseExprVisitor(ast.NodeVisitor):
                     raise
 
         if res is None:
-            raise ValueError("Invalid function call {func}".format(func=node.func.id))
+            raise ValueError(
+                "Invalid function call {func}".format(func=node.func.id)
+            )
         if hasattr(res, "value"):
             res = res.value
 
@@ -748,7 +769,9 @@ class BaseExprVisitor(ast.NodeVisitor):
         values = []
         for op, comp in zip(ops, comps):
             new_node = self.visit(
-                ast.Compare(comparators=[comp], left=left, ops=[self.translate_In(op)])
+                ast.Compare(
+                    comparators=[comp], left=left, ops=[self.translate_In(op)]
+                )
             )
             left = comp
             values.append(new_node)
@@ -764,7 +787,9 @@ class BaseExprVisitor(ast.NodeVisitor):
             lhs = self._try_visit_binop(x)
             rhs = self._try_visit_binop(y)
 
-            op, op_class, lhs, rhs = self._maybe_transform_eq_ne(node, lhs, rhs)
+            op, op_class, lhs, rhs = self._maybe_transform_eq_ne(
+                node, lhs, rhs
+            )
             return self._maybe_evaluate_binop(op, node.op, lhs, rhs)
 
         operands = node.values
@@ -777,7 +802,10 @@ _numexpr_supported_calls = frozenset(_reductions + _mathops)
 
 @disallow(
     (_unsupported_nodes | _python_not_supported)
-    - (_boolop_nodes | frozenset(["BoolOp", "Attribute", "In", "NotIn", "Tuple"]))
+    - (
+        _boolop_nodes
+        | frozenset(["BoolOp", "Attribute", "In", "NotIn", "Tuple"])
+    )
 )
 class PandasExprVisitor(BaseExprVisitor):
     def __init__(
@@ -788,7 +816,9 @@ class PandasExprVisitor(BaseExprVisitor):
         preparser=partial(
             _preparse,
             f=_compose(
-                _replace_locals, _replace_booleans, _clean_spaces_backtick_quoted_names
+                _replace_locals,
+                _replace_booleans,
+                _clean_spaces_backtick_quoted_names,
             ),
         ),
     ):
@@ -816,7 +846,13 @@ class Expr(StringMixin):
     """
 
     def __init__(
-        self, expr, engine="numexpr", parser="pandas", env=None, truediv=True, level=0
+        self,
+        expr,
+        engine="numexpr",
+        parser="pandas",
+        env=None,
+        truediv=True,
+        level=0,
     ):
         self.expr = expr
         self.env = env or Scope(level=level + 1)

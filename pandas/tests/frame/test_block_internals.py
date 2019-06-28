@@ -201,18 +201,23 @@ class TestDataFrameBlockInternals:
 
         df = DataFrame({"A": [1.0 + 2.0j, None]})
         result = df["A"]
-        expected = Series(np.asarray([1.0 + 2.0j, np.nan], np.complex_), name="A")
+        expected = Series(
+            np.asarray([1.0 + 2.0j, np.nan], np.complex_), name="A"
+        )
         assert_series_equal(result, expected)
 
         df = DataFrame({"A": [2.0, 1, True, None]})
         result = df["A"]
-        expected = Series(np.asarray([2.0, 1, True, None], np.object_), name="A")
+        expected = Series(
+            np.asarray([2.0, 1, True, None], np.object_), name="A"
+        )
         assert_series_equal(result, expected)
 
         df = DataFrame({"A": [2.0, 1, datetime(2006, 1, 1), None]})
         result = df["A"]
         expected = Series(
-            np.asarray([2.0, 1, datetime(2006, 1, 1), None], np.object_), name="A"
+            np.asarray([2.0, 1, datetime(2006, 1, 1), None], np.object_),
+            name="A",
         )
         assert_series_equal(result, expected)
 
@@ -237,7 +242,12 @@ class TestDataFrameBlockInternals:
         assert float_string_frame["timedelta"].dtype == "m8[ns]"
         result = float_string_frame.get_dtype_counts().sort_values()
         expected = Series(
-            {"float64": 4, "object": 1, "datetime64[ns]": 1, "timedelta64[ns]": 1}
+            {
+                "float64": 4,
+                "object": 1,
+                "datetime64[ns]": 1,
+                "timedelta64[ns]": 1,
+            }
         ).sort_values()
         assert_series_equal(result, expected)
 
@@ -248,7 +258,8 @@ class TestDataFrameBlockInternals:
         df = DataFrame(index=range(3))
         df["A"] = arr
         expected = DataFrame(
-            {"A": pd.timedelta_range("00:00:01", periods=3, freq="s")}, index=range(3)
+            {"A": pd.timedelta_range("00:00:01", periods=3, freq="s")},
+            index=range(3),
         )
         assert_frame_equal(df, expected)
 
@@ -280,7 +291,10 @@ class TestDataFrameBlockInternals:
             data = list(itertools.repeat((datetime(2001, 1, 1), "aa", 20), 9))
             return DataFrame(data=data, columns=["A", "B", "C"], dtype=dtype)
 
-        msg = "compound dtypes are not implemented in the DataFrame" " constructor"
+        msg = (
+            "compound dtypes are not implemented in the DataFrame"
+            " constructor"
+        )
         with pytest.raises(NotImplementedError, match=msg):
             f([("A", "datetime64[h]"), ("B", "str"), ("C", "int32")])
 
@@ -394,7 +408,9 @@ starting,ending,measure
         df.starting = ser_starting.index
         df.ending = ser_ending.index
 
-        tm.assert_index_equal(pd.DatetimeIndex(df.starting), ser_starting.index)
+        tm.assert_index_equal(
+            pd.DatetimeIndex(df.starting), ser_starting.index
+        )
         tm.assert_index_equal(pd.DatetimeIndex(df.ending), ser_ending.index)
 
     def test_is_mixed_type(self, float_frame, float_string_frame):
@@ -414,7 +430,9 @@ starting,ending,measure
             index=np.arange(10),
         )
         result = df.get_dtype_counts()
-        expected = Series({"int64": 1, "float64": 1, datetime64name: 1, objectname: 1})
+        expected = Series(
+            {"int64": 1, "float64": 1, datetime64name: 1, objectname: 1}
+        )
         result = result.sort_index()
         expected = expected.sort_index()
         assert_series_equal(result, expected)
@@ -441,7 +459,9 @@ starting,ending,measure
         expected = df.loc[:, []]
         assert_frame_equal(result, expected)
 
-        df = DataFrame.from_dict({"a": [1, 2], "b": ["foo", "bar"], "c": [np.pi, np.e]})
+        df = DataFrame.from_dict(
+            {"a": [1, 2], "b": ["foo", "bar"], "c": [np.pi, np.e]}
+        )
         result = df._get_numeric_data()
         expected = DataFrame.from_dict({"a": [1, 2], "c": [np.pi, np.e]})
         assert_frame_equal(result, expected)
@@ -455,7 +475,9 @@ starting,ending,measure
         # GH 22290
         df = DataFrame(
             {
-                "A": integer_array([-10, np.nan, 0, 10, 20, 30], dtype="Int64"),
+                "A": integer_array(
+                    [-10, np.nan, 0, 10, 20, 30], dtype="Int64"
+                ),
                 "B": Categorical(list("abcabc")),
                 "C": integer_array([0, 1, 2, 3, np.nan, 5], dtype="UInt8"),
                 "D": IntervalArray.from_breaks(range(7)),
@@ -508,7 +530,9 @@ starting,ending,measure
         assert_frame_equal(result, expected)
 
     def test_convert_objects_no_conversion(self):
-        mixed1 = DataFrame({"a": [1, 2, 3], "b": [4.0, 5, 6], "c": ["x", "y", "z"]})
+        mixed1 = DataFrame(
+            {"a": [1, 2, 3], "b": [4.0, 5, 6], "c": ["x", "y", "z"]}
+        )
         mixed2 = mixed1._convert(datetime=True)
         assert_frame_equal(mixed1, mixed2)
 
@@ -539,7 +563,11 @@ starting,ending,measure
             {
                 "a": [1, 2, 3],
                 "b": [2.0, 3.0, 4.1],
-                "c": [datetime(2016, 1, 1), datetime(2016, 1, 2), datetime(2016, 1, 3)],
+                "c": [
+                    datetime(2016, 1, 1),
+                    datetime(2016, 1, 2),
+                    datetime(2016, 1, 3),
+                ],
                 "d": [2, 3, "d"],
             },
             columns=["a", "b", "c", "d"],
@@ -577,7 +605,9 @@ starting,ending,measure
             }
         )
 
-        tm.assert_index_equal(df._get_numeric_data().columns, pd.Index(["a", "b", "e"]))
+        tm.assert_index_equal(
+            df._get_numeric_data().columns, pd.Index(["a", "b", "e"])
+        )
 
     def test_strange_column_corruption_issue(self):
         # (wesm) Unclear how exactly this is related to internal matters

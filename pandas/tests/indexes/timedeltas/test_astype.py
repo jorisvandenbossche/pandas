@@ -32,7 +32,8 @@ class TestTimedeltaIndex:
 
     def test_astype_object_with_nat(self):
         idx = TimedeltaIndex(
-            [timedelta(days=1), timedelta(days=2), NaT, timedelta(days=4)], name="idx"
+            [timedelta(days=1), timedelta(days=2), NaT, timedelta(days=4)],
+            name="idx",
         )
         expected_list = [
             Timedelta("1 days"),
@@ -50,7 +51,9 @@ class TestTimedeltaIndex:
         idx = TimedeltaIndex([1e14, "NaT", NaT, np.NaN])
 
         result = idx.astype(object)
-        expected = Index([Timedelta("1 days 03:46:40")] + [NaT] * 3, dtype=object)
+        expected = Index(
+            [Timedelta("1 days 03:46:40")] + [NaT] * 3, dtype=object
+        )
         tm.assert_index_equal(result, expected)
 
         result = idx.astype(int)
@@ -105,7 +108,9 @@ class TestTimedeltaIndex:
         obj = pd.timedelta_range("1H", periods=2, freq="H")
 
         result = obj.astype("category")
-        expected = pd.CategoricalIndex([pd.Timedelta("1H"), pd.Timedelta("2H")])
+        expected = pd.CategoricalIndex(
+            [pd.Timedelta("1H"), pd.Timedelta("2H")]
+        )
         tm.assert_index_equal(result, expected)
 
         result = obj._data.astype("category")

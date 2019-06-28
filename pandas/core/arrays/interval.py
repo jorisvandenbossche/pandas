@@ -5,7 +5,11 @@ import numpy as np
 
 from pandas._config import get_option
 
-from pandas._libs.interval import Interval, IntervalMixin, intervals_to_interval_bounds
+from pandas._libs.interval import (
+    Interval,
+    IntervalMixin,
+    intervals_to_interval_bounds,
+)
 from pandas.compat.numpy import function as nv
 from pandas.util._decorators import Appender
 
@@ -32,7 +36,10 @@ from pandas.core.dtypes.generic import (
 )
 from pandas.core.dtypes.missing import isna, notna
 
-from pandas.core.arrays.base import ExtensionArray, _extension_array_shared_docs
+from pandas.core.arrays.base import (
+    ExtensionArray,
+    _extension_array_shared_docs,
+)
 from pandas.core.arrays.categorical import Categorical
 import pandas.core.common as com
 from pandas.core.indexes.base import Index, ensure_index
@@ -147,7 +154,9 @@ class IntervalArray(IntervalMixin, ExtensionArray):
     can_hold_na = True
     _na_value = _fill_value = np.nan
 
-    def __new__(cls, data, closed=None, dtype=None, copy=False, verify_integrity=True):
+    def __new__(
+        cls, data, closed=None, dtype=None, copy=False, verify_integrity=True
+    ):
 
         if isinstance(data, ABCSeries) and is_interval_dtype(data):
             data = data.values
@@ -184,7 +193,13 @@ class IntervalArray(IntervalMixin, ExtensionArray):
 
     @classmethod
     def _simple_new(
-        cls, left, right, closed=None, copy=False, dtype=None, verify_integrity=True
+        cls,
+        left,
+        right,
+        closed=None,
+        copy=False,
+        dtype=None,
+        verify_integrity=True,
     ):
         result = IntervalMixin.__new__(cls)
 
@@ -209,9 +224,14 @@ class IntervalArray(IntervalMixin, ExtensionArray):
             left = left.astype(right.dtype)
 
         if type(left) != type(right):
-            msg = "must not have differing left [{ltype}] and right " "[{rtype}] types"
+            msg = (
+                "must not have differing left [{ltype}] and right "
+                "[{rtype}] types"
+            )
             raise ValueError(
-                msg.format(ltype=type(left).__name__, rtype=type(right).__name__)
+                msg.format(
+                    ltype=type(left).__name__, rtype=type(right).__name__
+                )
             )
         elif is_categorical_dtype(left.dtype) or is_string_dtype(left.dtype):
             # GH 19016
@@ -223,7 +243,9 @@ class IntervalArray(IntervalMixin, ExtensionArray):
         elif isinstance(left, ABCPeriodIndex):
             msg = "Period dtypes are not supported, use a PeriodIndex instead"
             raise ValueError(msg)
-        elif isinstance(left, ABCDatetimeIndex) and str(left.tz) != str(right.tz):
+        elif isinstance(left, ABCDatetimeIndex) and str(left.tz) != str(
+            right.tz
+        ):
             msg = (
                 "left and right must have the same time zone, got "
                 "'{left_tz}' and '{right_tz}'"
@@ -292,7 +314,9 @@ class IntervalArray(IntervalMixin, ExtensionArray):
     def from_breaks(cls, breaks, closed="right", copy=False, dtype=None):
         breaks = maybe_convert_platform_interval(breaks)
 
-        return cls.from_arrays(breaks[:-1], breaks[1:], closed, copy=copy, dtype=dtype)
+        return cls.from_arrays(
+            breaks[:-1], breaks[1:], closed, copy=copy, dtype=dtype
+        )
 
     _interval_shared_docs[
         "from_arrays"
@@ -461,7 +485,8 @@ class IntervalArray(IntervalMixin, ExtensionArray):
                     lhs, rhs = d
                 except ValueError:
                     msg = (
-                        "{name}.from_tuples requires tuples of " "length 2, got {tpl}"
+                        "{name}.from_tuples requires tuples of "
+                        "length 2, got {tpl}"
                     ).format(name=name, tpl=d)
                     raise ValueError(msg)
                 except TypeError:
@@ -486,7 +511,9 @@ class IntervalArray(IntervalMixin, ExtensionArray):
         """
         if self.closed not in _VALID_CLOSED:
             raise ValueError(
-                "invalid option for 'closed': {closed}".format(closed=self.closed)
+                "invalid option for 'closed': {closed}".format(
+                    closed=self.closed
+                )
             )
         if len(self.left) != len(self.right):
             raise ValueError("left and right must have the same length")
@@ -593,7 +620,9 @@ class IntervalArray(IntervalMixin, ExtensionArray):
         filled : IntervalArray with NA/NaN filled
         """
         if method is not None:
-            raise TypeError("Filling by method is not supported for " "IntervalArray.")
+            raise TypeError(
+                "Filling by method is not supported for " "IntervalArray."
+            )
         if limit is not None:
             raise TypeError("limit is not supported for IntervalArray.")
 
@@ -721,7 +750,9 @@ class IntervalArray(IntervalMixin, ExtensionArray):
             pass
 
         closed = closed or self.closed
-        return self._simple_new(left, right, closed=closed, verify_integrity=False)
+        return self._simple_new(
+            left, right, closed=closed, verify_integrity=False
+        )
 
     def copy(self):
         """
@@ -753,7 +784,9 @@ class IntervalArray(IntervalMixin, ExtensionArray):
     def shape(self):
         return self.left.shape
 
-    def take(self, indices, allow_fill=False, fill_value=None, axis=None, **kwargs):
+    def take(
+        self, indices, allow_fill=False, fill_value=None, axis=None, **kwargs
+    ):
         """
         Take elements from the IntervalArray.
 
@@ -857,7 +890,9 @@ class IntervalArray(IntervalMixin, ExtensionArray):
         # TODO: integrate with categorical and make generic
         # name argument is unused here; just for compat with base / categorical
         n = len(self)
-        max_seq_items = min((get_option("display.max_seq_items") or n) // 10, 10)
+        max_seq_items = min(
+            (get_option("display.max_seq_items") or n) // 10, 10
+        )
 
         formatter = str
 
@@ -1005,7 +1040,8 @@ class IntervalArray(IntervalMixin, ExtensionArray):
     # Mypy does not support decorated properties
     @property  # type: ignore
     @Appender(
-        _interval_shared_docs["is_non_overlapping_monotonic"] % _shared_docs_kwargs
+        _interval_shared_docs["is_non_overlapping_monotonic"]
+        % _shared_docs_kwargs
     )
     def is_non_overlapping_monotonic(self):
         # must be increasing  (e.g., [0, 1), [1, 2), [2, 3), ... )
@@ -1066,7 +1102,8 @@ class IntervalArray(IntervalMixin, ExtensionArray):
         """
 
     @Appender(
-        _interval_shared_docs["to_tuples"] % dict(return_type="ndarray", examples="")
+        _interval_shared_docs["to_tuples"]
+        % dict(return_type="ndarray", examples="")
     )
     def to_tuples(self, na_tuple=True):
         tuples = com.asarray_tuplesafe(zip(self.left, self.right))

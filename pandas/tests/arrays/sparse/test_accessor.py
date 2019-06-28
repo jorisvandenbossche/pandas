@@ -34,7 +34,9 @@ class TestFrameAccessor:
         sp_dtype = pd.SparseDtype(dtype, np.array(0, dtype=dtype).item())
 
         mat = scipy.sparse.eye(10, format=format, dtype=dtype)
-        result = pd.DataFrame.sparse.from_spmatrix(mat, index=labels, columns=labels)
+        result = pd.DataFrame.sparse.from_spmatrix(
+            mat, index=labels, columns=labels
+        )
         expected = pd.DataFrame(
             np.eye(10, dtype=dtype), index=labels, columns=labels
         ).astype(sp_dtype)
@@ -42,7 +44,11 @@ class TestFrameAccessor:
 
     @pytest.mark.parametrize(
         "columns",
-        [["a", "b"], pd.MultiIndex.from_product([["A"], ["a", "b"]]), ["a", "a"]],
+        [
+            ["a", "b"],
+            pd.MultiIndex.from_product([["A"], ["a", "b"]]),
+            ["a", "a"],
+        ],
     )
     @td.skip_if_no_scipy
     def test_from_spmatrix_columns(self, columns):
@@ -59,7 +65,9 @@ class TestFrameAccessor:
     def test_to_coo(self):
         import scipy.sparse
 
-        df = pd.DataFrame({"A": [0, 1, 0], "B": [1, 0, 0]}, dtype="Sparse[int64, 0]")
+        df = pd.DataFrame(
+            {"A": [0, 1, 0], "B": [1, 0, 0]}, dtype="Sparse[int64, 0]"
+        )
         result = df.sparse.to_coo()
         expected = scipy.sparse.coo_matrix(np.asarray(df))
         assert (result != expected).nnz == 0
@@ -69,7 +77,9 @@ class TestFrameAccessor:
             {
                 "A": pd.SparseArray([1, 0], dtype=pd.SparseDtype("int64", 0)),
                 "B": pd.SparseArray([1, 0], dtype=pd.SparseDtype("int64", 1)),
-                "C": pd.SparseArray([1.0, 0.0], dtype=pd.SparseDtype("float64", 0.0)),
+                "C": pd.SparseArray(
+                    [1.0, 0.0], dtype=pd.SparseDtype("float64", 0.0)
+                ),
             },
             index=["b", "a"],
         )
@@ -103,7 +113,9 @@ class TestFrameAccessor:
             pd.SparseArray(np.array([1, 1, 1], dtype=dtype)), index=index
         )
         if dense_index:
-            expected = expected.reindex(pd.MultiIndex.from_product(index.levels))
+            expected = expected.reindex(
+                pd.MultiIndex.from_product(index.levels)
+            )
 
         tm.assert_series_equal(result, expected)
 

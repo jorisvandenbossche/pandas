@@ -1,5 +1,9 @@
 from .array_ import array  # noqa
-from .base import ExtensionArray, ExtensionOpsMixin, ExtensionScalarOpsMixin  # noqa
+from .base import (
+    ExtensionArray,
+    ExtensionOpsMixin,
+    ExtensionScalarOpsMixin,
+)  # noqa
 from .categorical import Categorical  # noqa
 from .datetimes import DatetimeArray  # noqa
 from .interval import IntervalArray  # noqa

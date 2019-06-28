@@ -24,7 +24,9 @@ from pandas.conftest import (
 from pandas.core.sparse.api import SparseDtype
 import pandas.util.testing as tm
 
-ignore_sparse_warning = pytest.mark.filterwarnings("ignore:Sparse:FutureWarning")
+ignore_sparse_warning = pytest.mark.filterwarnings(
+    "ignore:Sparse:FutureWarning"
+)
 
 
 # EA & Actual Dtypes
@@ -83,7 +85,9 @@ class TestPandasDtype:
         ],
     )
     def test_datetimetz_dtype(self, dtype):
-        assert com.pandas_dtype(dtype) == DatetimeTZDtype.construct_from_string(dtype)
+        assert com.pandas_dtype(
+            dtype
+        ) == DatetimeTZDtype.construct_from_string(dtype)
         assert com.pandas_dtype(dtype) == dtype
 
     def test_categorical_dtype(self):
@@ -118,8 +122,12 @@ dtypes = dict(
 )
 
 
-@pytest.mark.parametrize("name1,dtype1", list(dtypes.items()), ids=lambda x: str(x))
-@pytest.mark.parametrize("name2,dtype2", list(dtypes.items()), ids=lambda x: str(x))
+@pytest.mark.parametrize(
+    "name1,dtype1", list(dtypes.items()), ids=lambda x: str(x)
+)
+@pytest.mark.parametrize(
+    "name2,dtype2", list(dtypes.items()), ids=lambda x: str(x)
+)
 def test_dtype_equal(name1, dtype1, name2, dtype2):
 
     # match equal to self, but not equal to other
@@ -154,11 +162,15 @@ def get_is_dtype_funcs():
 
     """
 
-    fnames = [f for f in dir(com) if (f.startswith("is_") and f.endswith("dtype"))]
+    fnames = [
+        f for f in dir(com) if (f.startswith("is_") and f.endswith("dtype"))
+    ]
     return [getattr(com, fname) for fname in fnames]
 
 
-@pytest.mark.parametrize("func", get_is_dtype_funcs(), ids=lambda x: x.__name__)
+@pytest.mark.parametrize(
+    "func", get_is_dtype_funcs(), ids=lambda x: x.__name__
+)
 def test_get_dtype_error_catch(func):
     # see gh-15941
     #
@@ -244,7 +256,9 @@ def test_is_datetime64tz_dtype():
     assert not com.is_datetime64tz_dtype(object)
     assert not com.is_datetime64tz_dtype([1, 2, 3])
     assert not com.is_datetime64tz_dtype(pd.DatetimeIndex([1, 2, 3]))
-    assert com.is_datetime64tz_dtype(pd.DatetimeIndex(["2000"], tz="US/Eastern"))
+    assert com.is_datetime64tz_dtype(
+        pd.DatetimeIndex(["2000"], tz="US/Eastern")
+    )
 
 
 def test_is_timedelta64_dtype():
@@ -420,7 +434,8 @@ def test_is_not_unsigned_integer_dtype(dtype):
 
 
 @pytest.mark.parametrize(
-    "dtype", [np.int64, np.array([1, 2], dtype=np.int64), "Int64", pd.Int64Dtype]
+    "dtype",
+    [np.int64, np.array([1, 2], dtype=np.int64), "Int64", pd.Int64Dtype],
 )
 def test_is_int64_dtype(dtype):
     assert com.is_int64_dtype(dtype)
@@ -478,7 +493,9 @@ def test_is_datetime64_ns_dtype():
 
 def test_is_timedelta64_ns_dtype():
     assert not com.is_timedelta64_ns_dtype(np.dtype("m8[ps]"))
-    assert not com.is_timedelta64_ns_dtype(np.array([1, 2], dtype=np.timedelta64))
+    assert not com.is_timedelta64_ns_dtype(
+        np.array([1, 2], dtype=np.timedelta64)
+    )
 
     assert com.is_timedelta64_ns_dtype(np.dtype("m8[ns]"))
     assert com.is_timedelta64_ns_dtype(np.array([1, 2], dtype="m8[ns]"))
@@ -491,12 +508,18 @@ def test_is_datetime_or_timedelta_dtype():
     assert not com.is_datetime_or_timedelta_dtype(np.array(["a", "b"]))
 
     # TODO(jreback), this is slightly suspect
-    assert not com.is_datetime_or_timedelta_dtype(DatetimeTZDtype("ns", "US/Eastern"))
+    assert not com.is_datetime_or_timedelta_dtype(
+        DatetimeTZDtype("ns", "US/Eastern")
+    )
 
     assert com.is_datetime_or_timedelta_dtype(np.datetime64)
     assert com.is_datetime_or_timedelta_dtype(np.timedelta64)
-    assert com.is_datetime_or_timedelta_dtype(np.array([], dtype=np.timedelta64))
-    assert com.is_datetime_or_timedelta_dtype(np.array([], dtype=np.datetime64))
+    assert com.is_datetime_or_timedelta_dtype(
+        np.array([], dtype=np.timedelta64)
+    )
+    assert com.is_datetime_or_timedelta_dtype(
+        np.array([], dtype=np.datetime64)
+    )
 
 
 def test_is_numeric_v_string_like():
@@ -504,7 +527,9 @@ def test_is_numeric_v_string_like():
     assert not com.is_numeric_v_string_like(1, "foo")
     assert not com.is_numeric_v_string_like("foo", "foo")
     assert not com.is_numeric_v_string_like(np.array([1]), np.array([2]))
-    assert not com.is_numeric_v_string_like(np.array(["foo"]), np.array(["foo"]))
+    assert not com.is_numeric_v_string_like(
+        np.array(["foo"]), np.array(["foo"])
+    )
 
     assert com.is_numeric_v_string_like(np.array([1]), "foo")
     assert com.is_numeric_v_string_like("foo", np.array([1]))
@@ -637,7 +662,9 @@ def test_is_complex_dtype():
 
 
 def test_is_offsetlike():
-    assert com.is_offsetlike(np.array([pd.DateOffset(month=3), pd.offsets.Nano()]))
+    assert com.is_offsetlike(
+        np.array([pd.DateOffset(month=3), pd.offsets.Nano()])
+    )
     assert com.is_offsetlike(pd.offsets.MonthEnd())
     assert com.is_offsetlike(pd.Index([pd.DateOffset(second=1)]))
 
@@ -671,7 +698,10 @@ def test_is_offsetlike():
         (pd.DatetimeIndex([1, 2]), np.dtype("=M8[ns]")),
         (pd.DatetimeIndex([1, 2]).dtype, np.dtype("=M8[ns]")),
         ("<M8[ns]", np.dtype("<M8[ns]")),
-        ("datetime64[ns, Europe/London]", DatetimeTZDtype("ns", "Europe/London")),
+        (
+            "datetime64[ns, Europe/London]",
+            DatetimeTZDtype("ns", "Europe/London"),
+        ),
         (PeriodDtype(freq="D"), PeriodDtype(freq="D")),
         ("period[D]", PeriodDtype(freq="D")),
         (IntervalDtype(), IntervalDtype()),

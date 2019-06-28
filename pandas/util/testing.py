@@ -220,7 +220,9 @@ def decompress_file(path, compression):
         if len(zip_names) == 1:
             f = zip_file.open(zip_names.pop())
         else:
-            raise ValueError("ZIP file {} error. Only one file per ZIP.".format(path))
+            raise ValueError(
+                "ZIP file {} error. Only one file per ZIP.".format(path)
+            )
     else:
         msg = "Unrecognized compression type: {}".format(compression)
         raise ValueError(msg)
@@ -355,7 +357,9 @@ def assert_almost_equal(
                 # Do not compare bool classes, like np.bool_ and bool.
                 pass
             else:
-                if isinstance(left, np.ndarray) or isinstance(right, np.ndarray):
+                if isinstance(left, np.ndarray) or isinstance(
+                    right, np.ndarray
+                ):
                     obj = "numpy array"
                 else:
                     obj = "Input"
@@ -409,7 +413,9 @@ def randbool(size=(), p=0.5):
     return rand(*size) <= p
 
 
-RANDS_CHARS = np.array(list(string.ascii_letters + string.digits), dtype=(np.str_, 1))
+RANDS_CHARS = np.array(
+    list(string.ascii_letters + string.digits), dtype=(np.str_, 1)
+)
 RANDU_CHARS = np.array(
     list("".join(map(chr, range(1488, 1488 + 26))) + string.digits),
     dtype=(np.unicode_, 1),
@@ -677,7 +683,11 @@ def assert_index_equal(
     # skip exact index checking when `check_categorical` is False
     if check_exact and check_categorical:
         if not left.equals(right):
-            diff = np.sum((left.values != right.values).astype(int)) * 100.0 / len(left)
+            diff = (
+                np.sum((left.values != right.values).astype(int))
+                * 100.0
+                / len(left)
+            )
             msg = "{obj} values are different ({pct} %)".format(
                 obj=obj, pct=np.round(diff, 5)
             )
@@ -698,7 +708,9 @@ def assert_index_equal(
         assert_attr_equal("names", left, right, obj=obj)
     if isinstance(left, pd.PeriodIndex) or isinstance(right, pd.PeriodIndex):
         assert_attr_equal("freq", left, right, obj=obj)
-    if isinstance(left, pd.IntervalIndex) or isinstance(right, pd.IntervalIndex):
+    if isinstance(left, pd.IntervalIndex) or isinstance(
+        right, pd.IntervalIndex
+    ):
         assert_interval_array_equal(left.values, right.values)
 
     if check_categorical:
@@ -728,7 +740,9 @@ def assert_class_equal(left, right, exact=True, obj="Input"):
             types = {type(left).__name__, type(right).__name__}
             if len(types - {"Int64Index", "RangeIndex"}):
                 msg = "{obj} classes are not equivalent".format(obj=obj)
-                raise_assert_detail(obj, msg, repr_class(left), repr_class(right))
+                raise_assert_detail(
+                    obj, msg, repr_class(left), repr_class(right)
+                )
     elif exact:
         if type(left) != type(right):
             msg = "{obj} classes are different".format(obj=obj)
@@ -834,7 +848,9 @@ def assert_categorical_equal(
 
     if check_category_order:
         assert_index_equal(
-            left.categories, right.categories, obj="{obj}.categories".format(obj=obj)
+            left.categories,
+            right.categories,
+            obj="{obj}.categories".format(obj=obj),
         )
         assert_numpy_array_equal(
             left.codes,
@@ -857,7 +873,9 @@ def assert_categorical_equal(
     assert_attr_equal("ordered", left, right, obj=obj)
 
 
-def assert_interval_array_equal(left, right, exact="equiv", obj="IntervalArray"):
+def assert_interval_array_equal(
+    left, right, exact="equiv", obj="IntervalArray"
+):
     """Test that two IntervalArrays are equivalent.
 
     Parameters
@@ -896,7 +914,9 @@ def assert_datetime_array_equal(left, right, obj="DatetimeArray"):
     __tracebackhide__ = True
     _check_isinstance(left, right, DatetimeArray)
 
-    assert_numpy_array_equal(left._data, right._data, obj="{obj}._data".format(obj=obj))
+    assert_numpy_array_equal(
+        left._data, right._data, obj="{obj}._data".format(obj=obj)
+    )
     assert_attr_equal("freq", left, right, obj=obj)
     assert_attr_equal("tz", left, right, obj=obj)
 
@@ -904,7 +924,9 @@ def assert_datetime_array_equal(left, right, obj="DatetimeArray"):
 def assert_timedelta_array_equal(left, right, obj="TimedeltaArray"):
     __tracebackhide__ = True
     _check_isinstance(left, right, TimedeltaArray)
-    assert_numpy_array_equal(left._data, right._data, obj="{obj}._data".format(obj=obj))
+    assert_numpy_array_equal(
+        left._data, right._data, obj="{obj}._data".format(obj=obj)
+    )
     assert_attr_equal("freq", left, right, obj=obj)
 
 
@@ -978,11 +1000,15 @@ def assert_numpy_array_equal(
 
     if check_same == "same":
         if left_base is not right_base:
-            msg = "{left!r} is not {right!r}".format(left=left_base, right=right_base)
+            msg = "{left!r} is not {right!r}".format(
+                left=left_base, right=right_base
+            )
             raise AssertionError(msg)
     elif check_same == "copy":
         if left_base is right_base:
-            msg = "{left!r} is {right!r}".format(left=left_base, right=right_base)
+            msg = "{left!r} is {right!r}".format(
+                left=left_base, right=right_base
+            )
             raise AssertionError(msg)
 
     def _raise(left, right, err_msg):
@@ -1183,7 +1209,8 @@ def assert_series_equal(
             # vs Timestamp) but will compare equal
             if not Index(left.values).equals(Index(right.values)):
                 msg = (
-                    "[datetimelike_compat=True] {left} is not equal to " "{right}."
+                    "[datetimelike_compat=True] {left} is not equal to "
+                    "{right}."
                 ).format(left=left.values, right=right.values)
                 raise AssertionError(msg)
         else:
@@ -1193,7 +1220,9 @@ def assert_series_equal(
     elif is_interval_dtype(left) or is_interval_dtype(right):
         assert_interval_array_equal(left.array, right.array)
 
-    elif is_extension_array_dtype(left.dtype) and is_datetime64tz_dtype(left.dtype):
+    elif is_extension_array_dtype(left.dtype) and is_datetime64tz_dtype(
+        left.dtype
+    ):
         # .values is an ndarray, but ._values is the ExtensionArray.
         # TODO: Use .array
         assert is_extension_array_dtype(right.dtype)
@@ -1533,7 +1562,9 @@ def assert_sp_array_equal(
 
     _check_isinstance(left, right, pd.SparseArray)
 
-    assert_numpy_array_equal(left.sp_values, right.sp_values, check_dtype=check_dtype)
+    assert_numpy_array_equal(
+        left.sp_values, right.sp_values, check_dtype=check_dtype
+    )
 
     # SparseIndex comparison
     assert isinstance(left.sp_index, pd._libs.sparse.SparseIndex)
@@ -1563,7 +1594,9 @@ def assert_sp_array_equal(
         assert_attr_equal("fill_value", left, right)
     if check_dtype:
         assert_attr_equal("dtype", left, right)
-    assert_numpy_array_equal(left.to_dense(), right.to_dense(), check_dtype=check_dtype)
+    assert_numpy_array_equal(
+        left.to_dense(), right.to_dense(), check_dtype=check_dtype
+    )
 
 
 def assert_sp_series_equal(
@@ -1610,7 +1643,9 @@ def assert_sp_series_equal(
     if check_series_type:
         assert_class_equal(left, right, obj=obj)
 
-    assert_index_equal(left.index, right.index, obj="{obj}.index".format(obj=obj))
+    assert_index_equal(
+        left.index, right.index, obj="{obj}.index".format(obj=obj)
+    )
 
     assert_sp_array_equal(
         left.values,
@@ -1671,8 +1706,12 @@ def assert_sp_frame_equal(
     if check_frame_type:
         assert_class_equal(left, right, obj=obj)
 
-    assert_index_equal(left.index, right.index, obj="{obj}.index".format(obj=obj))
-    assert_index_equal(left.columns, right.columns, obj="{obj}.columns".format(obj=obj))
+    assert_index_equal(
+        left.index, right.index, obj="{obj}.index".format(obj=obj)
+    )
+    assert_index_equal(
+        left.columns, right.columns, obj="{obj}.columns".format(obj=obj)
+    )
 
     if check_fill_value:
         assert_attr_equal("default_fill_value", left, right, obj=obj)
@@ -1692,7 +1731,9 @@ def assert_sp_frame_equal(
             )
         else:
             assert_series_equal(
-                series.to_dense(), right[col].to_dense(), check_dtype=check_dtype
+                series.to_dense(),
+                right[col].to_dense(),
+                check_dtype=check_dtype,
             )
 
     # do I care?
@@ -1786,7 +1827,9 @@ def makeDateIndex(k=10, freq="B", name=None, **kwargs):
 
 
 def makeTimedeltaIndex(k=10, freq="D", name=None, **kwargs):
-    return pd.timedelta_range(start="1 day", periods=k, freq=freq, name=name, **kwargs)
+    return pd.timedelta_range(
+        start="1 day", periods=k, freq=freq, name=name, **kwargs
+    )
 
 
 def makePeriodIndex(k=10, name=None, **kwargs):
@@ -1796,7 +1839,9 @@ def makePeriodIndex(k=10, name=None, **kwargs):
 
 
 def makeMultiIndex(k=10, names=None, **kwargs):
-    return MultiIndex.from_product((("foo", "bar"), (1, 2)), names=names, **kwargs)
+    return MultiIndex.from_product(
+        (("foo", "bar"), (1, 2)), names=names, **kwargs
+    )
 
 
 def all_index_generator(k=10):
@@ -1955,7 +2000,12 @@ def makeCustomIndex(
     if ndupe_l is None:
         ndupe_l = [1] * nlevels
     assert is_sequence(ndupe_l) and len(ndupe_l) <= nlevels
-    assert names is None or names is False or names is True or len(names) is nlevels
+    assert (
+        names is None
+        or names is False
+        or names is True
+        or len(names) is nlevels
+    )
     assert idx_type is None or (
         idx_type in ("i", "f", "s", "u", "dt", "p", "td") and nlevels == 1
     )
@@ -2104,10 +2154,12 @@ def makeCustomDataframe(
     assert c_idx_nlevels > 0
     assert r_idx_nlevels > 0
     assert r_idx_type is None or (
-        r_idx_type in ("i", "f", "s", "u", "dt", "p", "td") and r_idx_nlevels == 1
+        r_idx_type in ("i", "f", "s", "u", "dt", "p", "td")
+        and r_idx_nlevels == 1
     )
     assert c_idx_type is None or (
-        c_idx_type in ("i", "f", "s", "u", "dt", "p", "td") and c_idx_nlevels == 1
+        c_idx_type in ("i", "f", "s", "u", "dt", "p", "td")
+        and c_idx_nlevels == 1
     )
 
     columns = makeCustomIndex(
@@ -2212,7 +2264,9 @@ def makeMissingCustomDataframe(
 
 def makeMissingDataframe(density=0.9, random_state=None):
     df = makeDataFrame()
-    i, j = _create_missing_idx(*df.shape, density=density, random_state=random_state)
+    i, j = _create_missing_idx(
+        *df.shape, density=density, random_state=random_state
+    )
     df.values[i, j] = np.nan
     return df
 
@@ -2686,7 +2740,8 @@ def assert_produces_warning(
                 saw_warning = True
 
                 if check_stacklevel and issubclass(
-                    actual_warning.category, (FutureWarning, DeprecationWarning)
+                    actual_warning.category,
+                    (FutureWarning, DeprecationWarning),
                 ):
                     from inspect import getframeinfo, stack
 
@@ -2835,7 +2890,9 @@ def test_parallel(num_threads=2, kwargs_list=None):
             threads = []
             for i in range(num_threads):
                 updated_kwargs = update_kwargs(i)
-                thread = threading.Thread(target=func, args=args, kwargs=updated_kwargs)
+                thread = threading.Thread(
+                    target=func, args=args, kwargs=updated_kwargs
+                )
                 threads.append(thread)
             for thread in threads:
                 thread.start()

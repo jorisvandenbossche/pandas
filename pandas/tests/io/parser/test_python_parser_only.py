@@ -86,7 +86,9 @@ baz|7|8|9
     else:
         data = StringIO(data)
 
-    result = parser.read_csv(data, index_col=0, sep=None, skiprows=2, encoding=encoding)
+    result = parser.read_csv(
+        data, index_col=0, sep=None, skiprows=2, encoding=encoding
+    )
     expected = DataFrame(
         [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
         columns=["A", "B", "C"],
@@ -98,7 +100,9 @@ baz|7|8|9
 def test_single_line(python_parser_only):
     # see gh-6607: sniff separator
     parser = python_parser_only
-    result = parser.read_csv(StringIO("1,2"), names=["a", "b"], header=None, sep=None)
+    result = parser.read_csv(
+        StringIO("1,2"), names=["a", "b"], header=None, sep=None
+    )
 
     expected = DataFrame({"a": [1], "b": [2]})
     tm.assert_frame_equal(result, expected)
@@ -117,7 +121,9 @@ also also skip this
     parser = python_parser_only
     result = parser.read_csv(StringIO(data), **kwargs)
 
-    expected = DataFrame([[1, 2, 3], [4, 5, 6], [7, 8, 9]], columns=["A", "B", "C"])
+    expected = DataFrame(
+        [[1, 2, 3], [4, 5, 6], [7, 8, 9]], columns=["A", "B", "C"]
+    )
     tm.assert_frame_equal(result, expected)
 
 
@@ -200,7 +206,9 @@ def test_skipfooter_with_decimal(python_parser_only, add_footer):
     else:
         kwargs = dict()
 
-    result = parser.read_csv(StringIO(data), names=["a"], decimal="#", **kwargs)
+    result = parser.read_csv(
+        StringIO(data), names=["a"], decimal="#", **kwargs
+    )
     tm.assert_frame_equal(result, expected)
 
 
@@ -256,7 +264,11 @@ def test_none_delimiter(python_parser_only, capsys):
     # skipped because it is malformed, but we do
     # not expect any errors to occur.
     result = parser.read_csv(
-        StringIO(data), header=0, sep=None, warn_bad_lines=True, error_bad_lines=False
+        StringIO(data),
+        header=0,
+        sep=None,
+        warn_bad_lines=True,
+        error_bad_lines=False,
     )
     tm.assert_frame_equal(result, expected)
 
@@ -264,7 +276,9 @@ def test_none_delimiter(python_parser_only, capsys):
     assert "Skipping line 3" in captured.err
 
 
-@pytest.mark.parametrize("data", ['a\n1\n"b"a', 'a,b,c\ncat,foo,bar\ndog,foo,"baz'])
+@pytest.mark.parametrize(
+    "data", ['a\n1\n"b"a', 'a,b,c\ncat,foo,bar\ndog,foo,"baz']
+)
 @pytest.mark.parametrize("skipfooter", [0, 1])
 def test_skipfooter_bad_row(python_parser_only, data, skipfooter):
     # see gh-13879 and gh-15910

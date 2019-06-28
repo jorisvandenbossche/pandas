@@ -55,7 +55,9 @@ def test_apply_trivial():
         {"key": ["a", "a", "b", "b", "a"], "data": [1.0, 2.0, 3.0, 4.0, 5.0]},
         columns=["key", "data"],
     )
-    expected = pd.concat([df.iloc[1:], df.iloc[1:]], axis=1, keys=["float64", "object"])
+    expected = pd.concat(
+        [df.iloc[1:], df.iloc[1:]], axis=1, keys=["float64", "object"]
+    )
     result = df.groupby([str(x) for x in df.dtypes], axis=1).apply(
         lambda x: df.iloc[1:]
     )
@@ -77,7 +79,9 @@ def test_apply_trivial_fail():
         columns=["key", "data"],
     )
     expected = pd.concat([df, df], axis=1, keys=["float64", "object"])
-    result = df.groupby([str(x) for x in df.dtypes], axis=1).apply(lambda x: df)
+    result = df.groupby([str(x) for x in df.dtypes], axis=1).apply(
+        lambda x: df
+    )
 
     tm.assert_frame_equal(result, expected)
 
@@ -117,11 +121,17 @@ def test_fast_apply():
 @pytest.mark.parametrize(
     "df, group_names",
     [
-        (DataFrame({"a": [1, 1, 1, 2, 3], "b": ["a", "a", "a", "b", "c"]}), [1, 2, 3]),
+        (
+            DataFrame({"a": [1, 1, 1, 2, 3], "b": ["a", "a", "a", "b", "c"]}),
+            [1, 2, 3],
+        ),
         (DataFrame({"a": [0, 0, 1, 1], "b": [0, 1, 0, 1]}), [0, 1]),
         (DataFrame({"a": [1]}), [1]),
         (DataFrame({"a": [1, 1, 1, 2, 2, 1, 1, 2], "b": range(8)}), [1, 2]),
-        (DataFrame({"a": [1, 2, 3, 1, 2, 3], "two": [4, 5, 6, 7, 8, 9]}), [1, 2, 3]),
+        (
+            DataFrame({"a": [1, 2, 3, 1, 2, 3], "two": [4, 5, 6, 7, 8, 9]}),
+            [1, 2, 3],
+        ),
         (
             DataFrame(
                 {
@@ -285,7 +295,11 @@ def test_apply_series_to_frame():
         with np.errstate(invalid="ignore"):
             logged = np.log(piece)
         return DataFrame(
-            {"value": piece, "demeaned": piece - piece.mean(), "logged": logged}
+            {
+                "value": piece,
+                "demeaned": piece - piece.mean(),
+                "logged": logged,
+            }
         )
 
     dr = bdate_range("1/1/2000", periods=100)
@@ -506,7 +520,11 @@ def test_apply_numeric_coercion_when_datetime():
 
     # GH 15421
     df = pd.DataFrame(
-        {"A": [10, 20, 30], "B": ["foo", "3", "4"], "T": [pd.Timestamp("12:31:22")] * 3}
+        {
+            "A": [10, 20, 30],
+            "B": ["foo", "3", "4"],
+            "T": [pd.Timestamp("12:31:22")] * 3,
+        }
     )
 
     def get_B(g):
@@ -575,8 +593,34 @@ def test_gb_apply_list_of_unequal_len_arrays():
     # GH1738
     df = DataFrame(
         {
-            "group1": ["a", "a", "a", "b", "b", "b", "a", "a", "a", "b", "b", "b"],
-            "group2": ["c", "c", "d", "d", "d", "e", "c", "c", "d", "d", "d", "e"],
+            "group1": [
+                "a",
+                "a",
+                "a",
+                "b",
+                "b",
+                "b",
+                "a",
+                "a",
+                "a",
+                "b",
+                "b",
+                "b",
+            ],
+            "group2": [
+                "c",
+                "c",
+                "d",
+                "d",
+                "d",
+                "e",
+                "c",
+                "c",
+                "d",
+                "d",
+                "d",
+                "e",
+            ],
             "weight": [1.1, 2, 3, 4, 5, 6, 2, 4, 6, 8, 1, 2],
             "value": [7.1, 8, 9, 10, 11, 12, 8, 7, 6, 5, 4, 3],
         }

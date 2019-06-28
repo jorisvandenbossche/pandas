@@ -99,7 +99,8 @@ class ExtensionDtype:
                 return False
         if isinstance(other, type(self)):
             return all(
-                getattr(self, attr) == getattr(other, attr) for attr in self._metadata
+                getattr(self, attr) == getattr(other, attr)
+                for attr in self._metadata
             )
         return False
 
@@ -224,7 +225,9 @@ class ExtensionDtype:
             raise TypeError("Expects a string, got {}".format(type(string)))
         if string != cls.name:
             raise TypeError(
-                "Cannot construct a '{}' from '{}'".format(cls.__name__, string)
+                "Cannot construct a '{}' from '{}'".format(
+                    cls.__name__, string
+                )
             )
         return cls()
 
@@ -253,7 +256,9 @@ class ExtensionDtype:
         """
         dtype = getattr(dtype, "dtype", dtype)
 
-        if isinstance(dtype, (ABCSeries, ABCIndexClass, ABCDataFrame, np.dtype)):
+        if isinstance(
+            dtype, (ABCSeries, ABCIndexClass, ABCDataFrame, np.dtype)
+        ):
             # https://github.com/pandas-dev/pandas/issues/22960
             # avoid passing data to `construct_from_string`. This could
             # cause a FutureWarning from numpy about failing elementwise

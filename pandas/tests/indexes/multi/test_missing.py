@@ -79,7 +79,10 @@ def test_dropna():
     # test if missing values are dropped for multiindex constructed
     # from codes and values
     idx = MultiIndex(
-        levels=[[np.nan, None, pd.NaT, "128", 2], [np.nan, None, pd.NaT, "128", 2]],
+        levels=[
+            [np.nan, None, pd.NaT, "128", 2],
+            [np.nan, None, pd.NaT, "128", 2],
+        ],
         codes=[[0, -1, 1, 2, 3, 4], [0, -1, 3, 3, 3, 4]],
     )
     expected = MultiIndex.from_arrays([["128", 2], ["128", 2]])

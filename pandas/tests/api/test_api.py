@@ -167,7 +167,13 @@ class TestPDApi(Base):
     ]
 
     # top-level to_* funcs
-    funcs_to = ["to_datetime", "to_msgpack", "to_numeric", "to_pickle", "to_timedelta"]
+    funcs_to = [
+        "to_datetime",
+        "to_msgpack",
+        "to_numeric",
+        "to_pickle",
+        "to_timedelta",
+    ]
 
     # top-level to deprecate in the future
     deprecated_funcs_in_future = []

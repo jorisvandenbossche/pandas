@@ -7,7 +7,9 @@ import pandas.util.testing as tm
 
 
 class TestPeriodIndexAsType:
-    @pytest.mark.parametrize("dtype", [float, "timedelta64", "timedelta64[ns]"])
+    @pytest.mark.parametrize(
+        "dtype", [float, "timedelta64", "timedelta64[ns]"]
+    )
     def test_astype_raises(self, dtype):
         # GH#13149, GH#13209
         idx = PeriodIndex(["2016-05-16", "NaT", NaT, np.NaN], freq="D")
@@ -27,7 +29,9 @@ class TestPeriodIndexAsType:
         tm.assert_index_equal(result, expected)
 
         result = idx.astype(np.int64)
-        expected = Int64Index([16937] + [-9223372036854775808] * 3, dtype=np.int64)
+        expected = Int64Index(
+            [16937] + [-9223372036854775808] * 3, dtype=np.int64
+        )
         tm.assert_index_equal(result, expected)
 
         result = idx.astype(str)
@@ -58,7 +62,9 @@ class TestPeriodIndexAsType:
         tm.assert_numpy_array_equal(idx.astype(object).values, exp)
         tm.assert_numpy_array_equal(idx._mpl_repr(), exp)
 
-        exp = np.array([pd.Period("2011-01-01", freq="D"), pd.NaT], dtype=object)
+        exp = np.array(
+            [pd.Period("2011-01-01", freq="D"), pd.NaT], dtype=object
+        )
         idx = pd.PeriodIndex(["2011-01-01", pd.NaT], freq="D")
         tm.assert_numpy_array_equal(idx.astype(object).values, exp)
         tm.assert_numpy_array_equal(idx._mpl_repr(), exp)
@@ -66,7 +72,9 @@ class TestPeriodIndexAsType:
     # TODO: de-duplicate this version (from test_ops) with the one above
     # (from test_period)
     def test_astype_object2(self):
-        idx = pd.period_range(start="2013-01-01", periods=4, freq="M", name="idx")
+        idx = pd.period_range(
+            start="2013-01-01", periods=4, freq="M", name="idx"
+        )
         expected_list = [
             pd.Period("2013-01-31", freq="M"),
             pd.Period("2013-02-28", freq="M"),
@@ -82,7 +90,9 @@ class TestPeriodIndexAsType:
         assert idx.tolist() == expected_list
 
         idx = PeriodIndex(
-            ["2013-01-01", "2013-01-02", "NaT", "2013-01-04"], freq="D", name="idx"
+            ["2013-01-01", "2013-01-02", "NaT", "2013-01-04"],
+            freq="D",
+            name="idx",
         )
         expected_list = [
             pd.Period("2013-01-01", freq="D"),
@@ -109,7 +119,10 @@ class TestPeriodIndexAsType:
         obj = pd.period_range("2000", periods=2)
         result = obj.astype("category")
         expected = pd.CategoricalIndex(
-            [pd.Period("2000-01-01", freq="D"), pd.Period("2000-01-02", freq="D")]
+            [
+                pd.Period("2000-01-01", freq="D"),
+                pd.Period("2000-01-02", freq="D"),
+            ]
         )
         tm.assert_index_equal(result, expected)
 

@@ -14,7 +14,9 @@ import pandas.util.testing as tm
 
 def test_constructor_single_level():
     result = MultiIndex(
-        levels=[["foo", "bar", "baz", "qux"]], codes=[[0, 1, 2, 3]], names=["first"]
+        levels=[["foo", "bar", "baz", "qux"]],
+        codes=[[0, 1, 2, 3]],
+        names=["first"],
     )
     assert isinstance(result, MultiIndex)
     expected = Index(["foo", "bar", "baz", "qux"], name="first")
@@ -112,7 +114,8 @@ def test_na_levels():
         levels=[[np.nan, "s", pd.NaT, 128, None]], codes=[[0, -1, 1, 2, 3, 4]]
     )
     expected = MultiIndex(
-        levels=[[np.nan, "s", pd.NaT, 128, None]], codes=[[-1, -1, 1, -1, 3, -1]]
+        levels=[[np.nan, "s", pd.NaT, 128, None]],
+        codes=[[-1, -1, 1, -1, 3, -1]],
     )
     tm.assert_index_equal(result, expected)
 
@@ -167,7 +170,9 @@ def test_from_arrays(idx):
     tm.assert_index_equal(result, idx)
 
     # infer correctly
-    result = MultiIndex.from_arrays([[pd.NaT, Timestamp("20130101")], ["a", "b"]])
+    result = MultiIndex.from_arrays(
+        [[pd.NaT, Timestamp("20130101")], ["a", "b"]]
+    )
     assert result.levels[0].equals(Index([Timestamp("20130101")]))
     assert result.levels[1].equals(Index(["a", "b"]))
 
@@ -201,8 +206,12 @@ def test_from_arrays_tuples(idx):
 
 
 def test_from_arrays_index_series_datetimetz():
-    idx1 = pd.date_range("2015-01-01 10:00", freq="D", periods=3, tz="US/Eastern")
-    idx2 = pd.date_range("2015-01-01 10:00", freq="H", periods=3, tz="Asia/Tokyo")
+    idx1 = pd.date_range(
+        "2015-01-01 10:00", freq="D", periods=3, tz="US/Eastern"
+    )
+    idx2 = pd.date_range(
+        "2015-01-01 10:00", freq="H", periods=3, tz="Asia/Tokyo"
+    )
     result = pd.MultiIndex.from_arrays([idx1, idx2])
     tm.assert_index_equal(result.get_level_values(0), idx1)
     tm.assert_index_equal(result.get_level_values(1), idx2)
@@ -243,7 +252,9 @@ def test_from_arrays_index_series_period():
 
 
 def test_from_arrays_index_datetimelike_mixed():
-    idx1 = pd.date_range("2015-01-01 10:00", freq="D", periods=3, tz="US/Eastern")
+    idx1 = pd.date_range(
+        "2015-01-01 10:00", freq="D", periods=3, tz="US/Eastern"
+    )
     idx2 = pd.date_range("2015-01-01 10:00", freq="H", periods=3)
     idx3 = pd.timedelta_range("1 days", freq="D", periods=3)
     idx4 = pd.period_range("2011-01-01", freq="D", periods=3)
@@ -267,8 +278,12 @@ def test_from_arrays_index_datetimelike_mixed():
 
 def test_from_arrays_index_series_categorical():
     # GH13743
-    idx1 = pd.CategoricalIndex(list("abcaab"), categories=list("bac"), ordered=False)
-    idx2 = pd.CategoricalIndex(list("abcaab"), categories=list("bac"), ordered=True)
+    idx1 = pd.CategoricalIndex(
+        list("abcaab"), categories=list("bac"), ordered=False
+    )
+    idx2 = pd.CategoricalIndex(
+        list("abcaab"), categories=list("bac"), ordered=True
+    )
 
     result = pd.MultiIndex.from_arrays([idx1, idx2])
     tm.assert_index_equal(result.get_level_values(0), idx1)
@@ -431,7 +446,8 @@ def test_from_product_empty_one_level():
 
 
 @pytest.mark.parametrize(
-    "first, second", [([], []), (["foo", "bar", "baz"], []), ([], ["a", "b", "c"])]
+    "first, second",
+    [([], []), (["foo", "bar", "baz"], []), ([], ["a", "b", "c"])],
 )
 def test_from_product_empty_two_levels(first, second):
     names = ["A", "B"]
@@ -446,15 +462,21 @@ def test_from_product_empty_three_levels(N):
     names = ["A", "B", "C"]
     lvl2 = list(range(N))
     result = MultiIndex.from_product([[], lvl2, []], names=names)
-    expected = MultiIndex(levels=[[], lvl2, []], codes=[[], [], []], names=names)
+    expected = MultiIndex(
+        levels=[[], lvl2, []], codes=[[], [], []], names=names
+    )
     tm.assert_index_equal(result, expected)
 
 
 @pytest.mark.parametrize(
-    "invalid_input", [1, [1], [1, 2], [[1], 2], "a", ["a"], ["a", "b"], [["a"], "b"]]
+    "invalid_input",
+    [1, [1], [1, 2], [[1], 2], "a", ["a"], ["a", "b"], [["a"], "b"]],
 )
 def test_from_product_invalid_input(invalid_input):
-    msg = r"Input must be a list / sequence of iterables|" "Input must be list-like"
+    msg = (
+        r"Input must be a list / sequence of iterables|"
+        "Input must be list-like"
+    )
     with pytest.raises(TypeError, match=msg):
         MultiIndex.from_product(iterables=invalid_input)
 
@@ -474,14 +496,20 @@ def test_from_product_datetimeindex():
 
 
 @pytest.mark.parametrize("ordered", [False, True])
-@pytest.mark.parametrize("f", [lambda x: x, lambda x: pd.Series(x), lambda x: x.values])
+@pytest.mark.parametrize(
+    "f", [lambda x: x, lambda x: pd.Series(x), lambda x: x.values]
+)
 def test_from_product_index_series_categorical(ordered, f):
     # GH13743
     first = ["foo", "bar"]
 
-    idx = pd.CategoricalIndex(list("abcaab"), categories=list("bac"), ordered=ordered)
+    idx = pd.CategoricalIndex(
+        list("abcaab"), categories=list("bac"), ordered=ordered
+    )
     expected = pd.CategoricalIndex(
-        list("abcaab") + list("abcaab"), categories=list("bac"), ordered=ordered
+        list("abcaab") + list("abcaab"),
+        categories=list("bac"),
+        ordered=ordered,
     )
 
     result = pd.MultiIndex.from_product([first, f(idx)])
@@ -617,9 +645,17 @@ def test_from_frame_dtype_fidelity():
     df = pd.DataFrame(
         OrderedDict(
             [
-                ("dates", pd.date_range("19910905", periods=6, tz="US/Eastern")),
+                (
+                    "dates",
+                    pd.date_range("19910905", periods=6, tz="US/Eastern"),
+                ),
                 ("a", [1, 1, 1, 2, 2, 2]),
-                ("b", pd.Categorical(["a", "a", "b", "b", "c", "c"], ordered=True)),
+                (
+                    "b",
+                    pd.Categorical(
+                        ["a", "a", "b", "b", "c", "c"], ordered=True
+                    ),
+                ),
                 ("c", ["x", "x", "y", "z", "x", "y"]),
             ]
         )
@@ -643,7 +679,8 @@ def test_from_frame_dtype_fidelity():
 
 
 @pytest.mark.parametrize(
-    "names_in,names_out", [(None, [("L1", "x"), ("L2", "y")]), (["x", "y"], ["x", "y"])]
+    "names_in,names_out",
+    [(None, [("L1", "x"), ("L2", "y")]), (["x", "y"], ["x", "y"])],
 )
 def test_from_frame_valid_names(names_in, names_out):
     # GH 22420
@@ -659,7 +696,10 @@ def test_from_frame_valid_names(names_in, names_out):
     "names,expected_error_msg",
     [
         ("bad_input", "Names should be list-like for a MultiIndex"),
-        (["a", "b", "c"], "Length of names must match number of levels in MultiIndex"),
+        (
+            ["a", "b", "c"],
+            "Length of names must match number of levels in MultiIndex",
+        ),
     ],
 )
 def test_from_frame_invalid_names(names, expected_error_msg):

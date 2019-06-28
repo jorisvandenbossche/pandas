@@ -45,7 +45,9 @@ def _check_holiday_results(holiday, start, end, expected):
 
     # Verify that timezone info is preserved.
     assert list(
-        holiday.dates(utc.localize(Timestamp(start)), utc.localize(Timestamp(end)))
+        holiday.dates(
+            utc.localize(Timestamp(start)), utc.localize(Timestamp(end))
+        )
     ) == [utc.localize(dt) for dt in expected]
 
 
@@ -73,7 +75,10 @@ def _check_holiday_results(holiday, start, end, expected):
             Holiday("July 4th Eve", month=7, day=3),
             "2001-01-01",
             "2003-03-03",
-            [Timestamp("2001-07-03 00:00:00"), Timestamp("2002-07-03 00:00:00")],
+            [
+                Timestamp("2001-07-03 00:00:00"),
+                Timestamp("2002-07-03 00:00:00"),
+            ],
         ),
         (
             Holiday("July 4th Eve", month=7, day=3, days_of_week=(0, 1, 2, 3)),
@@ -203,7 +208,9 @@ def test_argument_types(transform):
     end_date = datetime(2020, 12, 31)
 
     holidays = USThanksgivingDay.dates(start_date, end_date)
-    holidays2 = USThanksgivingDay.dates(transform(start_date), transform(end_date))
+    holidays2 = USThanksgivingDay.dates(
+        transform(start_date), transform(end_date)
+    )
     tm.assert_index_equal(holidays, holidays2)
 
 

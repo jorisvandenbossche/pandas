@@ -230,7 +230,8 @@ def cut(
         if np.isinf(mn) or np.isinf(mx):
             # GH 24314
             raise ValueError(
-                "cannot specify integer `bins` when input data " "contains infinity"
+                "cannot specify integer `bins` when input data "
+                "contains infinity"
             )
         elif mn == mx:  # adjust end points before binning
             mn -= 0.001 * abs(mn) if mn != 0 else 0.001
@@ -401,12 +402,17 @@ def _bins_to_cuts(
     if labels is not False:
         if labels is None:
             labels = _format_labels(
-                bins, precision, right=right, include_lowest=include_lowest, dtype=dtype
+                bins,
+                precision,
+                right=right,
+                include_lowest=include_lowest,
+                dtype=dtype,
             )
         else:
             if len(labels) != len(bins) - 1:
                 raise ValueError(
-                    "Bin labels must be one fewer than " "the number of bin edges"
+                    "Bin labels must be one fewer than "
+                    "the number of bin edges"
                 )
         if not is_categorical_dtype(labels):
             labels = Categorical(labels, categories=labels, ordered=True)
@@ -492,13 +498,17 @@ def _convert_bin_to_datelike_type(bins, dtype):
            datelike
     """
     if is_datetime64tz_dtype(dtype):
-        bins = to_datetime(bins.astype(np.int64), utc=True).tz_convert(dtype.tz)
+        bins = to_datetime(bins.astype(np.int64), utc=True).tz_convert(
+            dtype.tz
+        )
     elif is_datetime_or_timedelta_dtype(dtype):
         bins = Index(bins.astype(np.int64), dtype=dtype)
     return bins
 
 
-def _format_labels(bins, precision, right=True, include_lowest=False, dtype=None):
+def _format_labels(
+    bins, precision, right=True, include_lowest=False, dtype=None
+):
     """ based on the dtype, return our labels """
 
     closed = "right" if right else "left"
@@ -556,7 +566,9 @@ def _preprocess_for_cut(x):
     return x_is_series, series_index, name, x
 
 
-def _postprocess_for_cut(fac, bins, retbins, x_is_series, series_index, name, dtype):
+def _postprocess_for_cut(
+    fac, bins, retbins, x_is_series, series_index, name, dtype
+):
     """
     handles post processing for the cut method where
     we combine the index information if the originally passed

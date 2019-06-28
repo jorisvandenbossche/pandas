@@ -115,7 +115,8 @@ class TestDataFrameTimeSeriesMethods(TestData):
 
         res = df.diff()
         exp = DataFrame(
-            [[pd.NaT, np.nan], [pd.Timedelta("00:01:00"), 1]], columns=["time", "value"]
+            [[pd.NaT, np.nan], [pd.Timedelta("00:01:00"), 1]],
+            columns=["time", "value"],
         )
         assert_frame_equal(res, exp)
 
@@ -139,8 +140,12 @@ class TestDataFrameTimeSeriesMethods(TestData):
     def test_diff_axis(self):
         # GH 9727
         df = DataFrame([[1.0, 2.0], [3.0, 4.0]])
-        assert_frame_equal(df.diff(axis=1), DataFrame([[np.nan, 1.0], [np.nan, 1.0]]))
-        assert_frame_equal(df.diff(axis=0), DataFrame([[np.nan, np.nan], [2.0, 2.0]]))
+        assert_frame_equal(
+            df.diff(axis=1), DataFrame([[np.nan, 1.0], [np.nan, 1.0]])
+        )
+        assert_frame_equal(
+            df.diff(axis=0), DataFrame([[np.nan, np.nan], [2.0, 2.0]])
+        )
 
     def test_pct_change(self):
         rs = self.tsframe.pct_change(fill_method=None)
@@ -191,9 +196,15 @@ class TestDataFrameTimeSeriesMethods(TestData):
         )
         assert_frame_equal(rs_freq, rs_periods)
 
-        empty_ts = DataFrame(index=self.tsframe.index, columns=self.tsframe.columns)
-        rs_freq = empty_ts.pct_change(freq=freq, fill_method=fill_method, limit=limit)
-        rs_periods = empty_ts.pct_change(periods, fill_method=fill_method, limit=limit)
+        empty_ts = DataFrame(
+            index=self.tsframe.index, columns=self.tsframe.columns
+        )
+        rs_freq = empty_ts.pct_change(
+            freq=freq, fill_method=fill_method, limit=limit
+        )
+        rs_periods = empty_ts.pct_change(
+            periods, fill_method=fill_method, limit=limit
+        )
         assert_frame_equal(rs_freq, rs_periods)
 
     def test_frame_ctor_datetime64_column(self):
@@ -211,7 +222,9 @@ class TestDataFrameTimeSeriesMethods(TestData):
         assert np.issubdtype(df["A"].dtype, np.dtype("M8[ns]"))
 
     def test_frame_datetime64_pre1900_repr(self):
-        df = DataFrame({"year": date_range("1/1/1700", periods=50, freq="A-DEC")})
+        df = DataFrame(
+            {"year": date_range("1/1/1700", periods=50, freq="A-DEC")}
+        )
         # it works!
         repr(df)
 
@@ -470,7 +483,8 @@ class TestDataFrameTimeSeriesMethods(TestData):
         msg = "Truncate: 2000-01-06 00:00:00 must be after 2000-02-04 00:00:00"
         with pytest.raises(ValueError, match=msg):
             ts.truncate(
-                before=ts.index[-1] - ts.index.freq, after=ts.index[0] + ts.index.freq
+                before=ts.index[-1] - ts.index.freq,
+                after=ts.index[0] + ts.index.freq,
             )
 
     def test_truncate_copy(self):
@@ -482,14 +496,17 @@ class TestDataFrameTimeSeriesMethods(TestData):
     def test_truncate_nonsortedindex(self):
         # GH 17935
 
-        df = pd.DataFrame({"A": ["a", "b", "c", "d", "e"]}, index=[5, 3, 2, 9, 0])
+        df = pd.DataFrame(
+            {"A": ["a", "b", "c", "d", "e"]}, index=[5, 3, 2, 9, 0]
+        )
         msg = "truncate requires a sorted index"
         with pytest.raises(ValueError, match=msg):
             df.truncate(before=3, after=9)
 
         rng = pd.date_range("2011-01-01", "2012-01-01", freq="W")
         ts = pd.DataFrame(
-            {"A": np.random.randn(len(rng)), "B": np.random.randn(len(rng))}, index=rng
+            {"A": np.random.randn(len(rng)), "B": np.random.randn(len(rng))},
+            index=rng,
         )
         msg = "truncate requires a sorted index"
         with pytest.raises(ValueError, match=msg):
@@ -530,7 +547,11 @@ class TestDataFrameTimeSeriesMethods(TestData):
     def test_asfreq_datetimeindex(self):
         df = DataFrame(
             {"A": [1, 2, 3]},
-            index=[datetime(2011, 11, 1), datetime(2011, 11, 2), datetime(2011, 11, 3)],
+            index=[
+                datetime(2011, 11, 1),
+                datetime(2011, 11, 2),
+                datetime(2011, 11, 3),
+            ],
         )
         df = df.asfreq("B")
         assert isinstance(df.index, DatetimeIndex)
@@ -838,7 +859,9 @@ class TestDataFrameTimeSeriesMethods(TestData):
 
     def test_operation_on_NaT(self):
         # Both NaT and Timestamp are in DataFrame.
-        df = pd.DataFrame({"foo": [pd.NaT, pd.NaT, pd.Timestamp("2012-05-01")]})
+        df = pd.DataFrame(
+            {"foo": [pd.NaT, pd.NaT, pd.Timestamp("2012-05-01")]}
+        )
 
         res = df.min()
         exp = pd.Series([pd.Timestamp("2012-05-01")], index=["foo"])
@@ -901,7 +924,10 @@ class TestDataFrameTimeSeriesMethods(TestData):
         pts = df.to_period("M", axis=1)
         tm.assert_index_equal(pts.columns, exp.columns.asfreq("M"))
 
-        msg = "No axis named 2 for object type" " <class 'pandas.core.frame.DataFrame'>"
+        msg = (
+            "No axis named 2 for object type"
+            " <class 'pandas.core.frame.DataFrame'>"
+        )
         with pytest.raises(ValueError, match=msg):
             df.to_period(axis=2)
 

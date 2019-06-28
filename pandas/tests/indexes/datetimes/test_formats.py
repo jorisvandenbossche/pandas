@@ -14,7 +14,9 @@ def test_to_native_types():
     index = pd.date_range(freq="1D", periods=3, start="2017-01-01")
 
     # First, with no arguments.
-    expected = np.array(["2017-01-01", "2017-01-02", "2017-01-03"], dtype=object)
+    expected = np.array(
+        ["2017-01-01", "2017-01-02", "2017-01-03"], dtype=object
+    )
 
     result = index.to_native_types()
     tm.assert_numpy_array_equal(result, expected)
@@ -30,7 +32,9 @@ def test_to_native_types():
     tm.assert_numpy_array_equal(result, expected)
 
     # Make sure date formatting works
-    expected = np.array(["01-2017-01", "01-2017-02", "01-2017-03"], dtype=object)
+    expected = np.array(
+        ["01-2017-01", "01-2017-02", "01-2017-03"], dtype=object
+    )
 
     result = index.to_native_types(date_format="%m-%Y-%d")
     tm.assert_numpy_array_equal(result, expected)
@@ -65,7 +69,9 @@ class TestDatetimeIndexRendering:
         idxs.append(DatetimeIndex([], freq="D"))
         idxs.append(DatetimeIndex(["2011-01-01"], freq="D"))
         idxs.append(DatetimeIndex(["2011-01-01", "2011-01-02"], freq="D"))
-        idxs.append(DatetimeIndex(["2011-01-01", "2011-01-02", "2011-01-03"], freq="D"))
+        idxs.append(
+            DatetimeIndex(["2011-01-01", "2011-01-02", "2011-01-03"], freq="D")
+        )
         idxs.append(
             DatetimeIndex(
                 ["2011-01-01 09:00", "2011-01-01 10:00", "2011-01-01 11:00"],
@@ -75,16 +81,22 @@ class TestDatetimeIndexRendering:
         )
         idxs.append(
             DatetimeIndex(
-                ["2011-01-01 09:00", "2011-01-01 10:00", pd.NaT], tz="US/Eastern"
+                ["2011-01-01 09:00", "2011-01-01 10:00", pd.NaT],
+                tz="US/Eastern",
             )
         )
         idxs.append(
-            DatetimeIndex(["2011-01-01 09:00", "2011-01-01 10:00", pd.NaT], tz="UTC")
+            DatetimeIndex(
+                ["2011-01-01 09:00", "2011-01-01 10:00", pd.NaT], tz="UTC"
+            )
         )
 
         exp = []
         exp.append("""DatetimeIndex([], dtype='datetime64[ns]', freq='D')""")
-        exp.append("DatetimeIndex(['2011-01-01'], dtype='datetime64[ns]', " "freq='D')")
+        exp.append(
+            "DatetimeIndex(['2011-01-01'], dtype='datetime64[ns]', "
+            "freq='D')"
+        )
         exp.append(
             "DatetimeIndex(['2011-01-01', '2011-01-02'], "
             "dtype='datetime64[ns]', freq='D')"
@@ -119,7 +131,9 @@ class TestDatetimeIndexRendering:
         idx1 = DatetimeIndex([], freq="D")
         idx2 = DatetimeIndex(["2011-01-01"], freq="D")
         idx3 = DatetimeIndex(["2011-01-01", "2011-01-02"], freq="D")
-        idx4 = DatetimeIndex(["2011-01-01", "2011-01-02", "2011-01-03"], freq="D")
+        idx4 = DatetimeIndex(
+            ["2011-01-01", "2011-01-02", "2011-01-03"], freq="D"
+        )
         idx5 = DatetimeIndex(
             ["2011-01-01 09:00", "2011-01-01 10:00", "2011-01-01 11:00"],
             freq="H",
@@ -176,7 +190,9 @@ class TestDatetimeIndexRendering:
         idx1 = DatetimeIndex([], freq="D")
         idx2 = DatetimeIndex(["2011-01-01"], freq="D")
         idx3 = DatetimeIndex(["2011-01-01", "2011-01-02"], freq="D")
-        idx4 = DatetimeIndex(["2011-01-01", "2011-01-02", "2011-01-03"], freq="D")
+        idx4 = DatetimeIndex(
+            ["2011-01-01", "2011-01-02", "2011-01-03"], freq="D"
+        )
         idx5 = DatetimeIndex(
             ["2011-01-01 09:00", "2011-01-01 10:00", "2011-01-01 11:00"],
             freq="H",
@@ -203,7 +219,8 @@ class TestDatetimeIndexRendering:
         exp6 = """DatetimeIndex: 3 entries, 2011-01-01 09:00:00-05:00 to NaT"""
 
         for idx, expected in zip(
-            [idx1, idx2, idx3, idx4, idx5, idx6], [exp1, exp2, exp3, exp4, exp5, exp6]
+            [idx1, idx2, idx3, idx4, idx5, idx6],
+            [exp1, exp2, exp3, exp4, exp5, exp6],
         ):
             result = idx._summary()
             assert result == expected
@@ -221,19 +238,29 @@ class TestDatetimeIndexRendering:
         pd.bdate_range("1/1/2005", "1/1/2009", tz=pytz.utc)._summary()
 
     def test_dti_business_summary_dateutil(self):
-        pd.bdate_range("1/1/2005", "1/1/2009", tz=dateutil.tz.tzutc())._summary()
+        pd.bdate_range(
+            "1/1/2005", "1/1/2009", tz=dateutil.tz.tzutc()
+        )._summary()
 
     def test_dti_custom_business_repr(self):
         # only really care that it works
-        repr(pd.bdate_range(datetime(2009, 1, 1), datetime(2010, 1, 1), freq="C"))
+        repr(
+            pd.bdate_range(
+                datetime(2009, 1, 1), datetime(2010, 1, 1), freq="C"
+            )
+        )
 
     def test_dti_custom_business_summary(self):
-        rng = pd.bdate_range(datetime(2009, 1, 1), datetime(2010, 1, 1), freq="C")
+        rng = pd.bdate_range(
+            datetime(2009, 1, 1), datetime(2010, 1, 1), freq="C"
+        )
         rng._summary()
         rng[2:2]._summary()
 
     def test_dti_custom_business_summary_pytz(self):
-        pd.bdate_range("1/1/2005", "1/1/2009", freq="C", tz=pytz.utc)._summary()
+        pd.bdate_range(
+            "1/1/2005", "1/1/2009", freq="C", tz=pytz.utc
+        )._summary()
 
     def test_dti_custom_business_summary_dateutil(self):
         pd.bdate_range(

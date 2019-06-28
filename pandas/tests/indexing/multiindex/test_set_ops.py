@@ -7,7 +7,9 @@ from pandas.util import testing as tm
 class TestMultiIndexSetOps:
     def test_multiindex_symmetric_difference(self):
         # GH 13490
-        idx = MultiIndex.from_product([["a", "b"], ["A", "B"]], names=["a", "b"])
+        idx = MultiIndex.from_product(
+            [["a", "b"], ["A", "B"]], names=["a", "b"]
+        )
         result = idx ^ idx
         assert result.names == idx.names
 
@@ -34,7 +36,9 @@ class TestMultiIndexSetOps:
 
     def test_dataframe_insert_column_all_na(self):
         # GH #1534
-        mix = MultiIndex.from_tuples([("1a", "2a"), ("1a", "2b"), ("1a", "2c")])
+        mix = MultiIndex.from_tuples(
+            [("1a", "2a"), ("1a", "2b"), ("1a", "2c")]
+        )
         df = DataFrame([[1, 2], [3, 4], [5, 6]], index=mix)
         s = Series({(1, 1): 1, (1, 2): 2})
         df["new"] = s

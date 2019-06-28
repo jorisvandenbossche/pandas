@@ -5,7 +5,11 @@ import pytest
 import pandas as pd
 from pandas import DataFrame, read_json
 import pandas.util.testing as tm
-from pandas.util.testing import assert_frame_equal, assert_series_equal, ensure_clean
+from pandas.util.testing import (
+    assert_frame_equal,
+    assert_series_equal,
+    ensure_clean,
+)
 
 from pandas.io.json.json import JsonReader
 
@@ -31,13 +35,17 @@ def test_read_jsonl_unicode_chars():
     json = '{"a": "foo”", "b": "bar"}\n{"a": "foo", "b": "bar"}\n'
     json = StringIO(json)
     result = read_json(json, lines=True)
-    expected = DataFrame([["foo\u201d", "bar"], ["foo", "bar"]], columns=["a", "b"])
+    expected = DataFrame(
+        [["foo\u201d", "bar"], ["foo", "bar"]], columns=["a", "b"]
+    )
     assert_frame_equal(result, expected)
 
     # simulate string
     json = '{"a": "foo”", "b": "bar"}\n{"a": "foo", "b": "bar"}\n'
     result = read_json(json, lines=True)
-    expected = DataFrame([["foo\u201d", "bar"], ["foo", "bar"]], columns=["a", "b"])
+    expected = DataFrame(
+        [["foo\u201d", "bar"], ["foo", "bar"]], columns=["a", "b"]
+    )
     assert_frame_equal(result, expected)
 
 
@@ -69,7 +77,9 @@ def test_readjson_chunks(lines_json_df, chunksize):
     # GH17048: memory usage when lines=True
 
     unchunked = read_json(StringIO(lines_json_df), lines=True)
-    reader = read_json(StringIO(lines_json_df), lines=True, chunksize=chunksize)
+    reader = read_json(
+        StringIO(lines_json_df), lines=True, chunksize=chunksize
+    )
     chunked = pd.concat(reader)
 
     assert_frame_equal(chunked, unchunked)
@@ -89,7 +99,9 @@ def test_readjson_chunks_series():
     unchunked = pd.read_json(strio, lines=True, typ="Series")
 
     strio = StringIO(s.to_json(lines=True, orient="records"))
-    chunked = pd.concat(pd.read_json(strio, lines=True, typ="Series", chunksize=1))
+    chunked = pd.concat(
+        pd.read_json(strio, lines=True, typ="Series", chunksize=1)
+    )
 
     assert_series_equal(chunked, unchunked)
 
@@ -97,7 +109,9 @@ def test_readjson_chunks_series():
 def test_readjson_each_chunk(lines_json_df):
     # Other tests check that the final result of read_json(chunksize=True)
     # is correct. This checks the intermediate chunks.
-    chunks = list(pd.read_json(StringIO(lines_json_df), lines=True, chunksize=2))
+    chunks = list(
+        pd.read_json(StringIO(lines_json_df), lines=True, chunksize=2)
+    )
     assert chunks[0].shape == (2, 2)
     assert chunks[1].shape == (1, 2)
 

@@ -35,7 +35,9 @@ def test_contains(idx):
 @pytest.mark.skipif(not PYPY, reason="tuples cmp recursively on PyPy")
 def test_isin_nan_pypy():
     idx = MultiIndex.from_arrays([["foo", "bar"], [1.0, np.nan]])
-    tm.assert_numpy_array_equal(idx.isin([("bar", np.nan)]), np.array([False, True]))
+    tm.assert_numpy_array_equal(
+        idx.isin([("bar", np.nan)]), np.array([False, True])
+    )
     tm.assert_numpy_array_equal(
         idx.isin([("bar", float("nan"))]), np.array([False, True])
     )
@@ -59,7 +61,9 @@ def test_isin():
 @pytest.mark.skipif(PYPY, reason="tuples cmp recursively on PyPy")
 def test_isin_nan_not_pypy():
     idx = MultiIndex.from_arrays([["foo", "bar"], [1.0, np.nan]])
-    tm.assert_numpy_array_equal(idx.isin([("bar", np.nan)]), np.array([False, False]))
+    tm.assert_numpy_array_equal(
+        idx.isin([("bar", np.nan)]), np.array([False, False])
+    )
     tm.assert_numpy_array_equal(
         idx.isin([("bar", float("nan"))]), np.array([False, False])
     )
@@ -81,7 +85,10 @@ def test_isin_level_kwarg():
     msg = "Too many levels: Index has only 2 levels, not 6"
     with pytest.raises(IndexError, match=msg):
         idx.isin(vals_0, level=5)
-    msg = "Too many levels: Index has only 2 levels, -5 is not a valid level" " number"
+    msg = (
+        "Too many levels: Index has only 2 levels, -5 is not a valid level"
+        " number"
+    )
     with pytest.raises(IndexError, match=msg):
         idx.isin(vals_0, level=-5)
 

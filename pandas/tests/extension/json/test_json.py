@@ -85,7 +85,9 @@ class BaseJSON:
         if left.dtype.name == "json":
             assert left.dtype == right.dtype
             left = pd.Series(
-                JSONArray(left.values.astype(object)), index=left.index, name=left.name
+                JSONArray(left.values.astype(object)),
+                index=left.index,
+                name=left.name,
             )
             right = pd.Series(
                 JSONArray(right.values.astype(object)),

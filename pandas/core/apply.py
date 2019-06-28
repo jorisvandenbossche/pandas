@@ -99,7 +99,9 @@ class FrameApply:
             if reduce:
 
                 if result_type is not None:
-                    raise ValueError("cannot pass both reduce=True and result_type")
+                    raise ValueError(
+                        "cannot pass both reduce=True and result_type"
+                    )
 
                 result_type = "reduce"
 
@@ -146,7 +148,9 @@ class FrameApply:
 
         # dispatch to agg
         if is_list_like(self.f) or is_dict_like(self.f):
-            return self.obj.aggregate(self.f, axis=self.axis, *self.args, **self.kwds)
+            return self.obj.aggregate(
+                self.f, axis=self.axis, *self.args, **self.kwds
+            )
 
         # all empty
         if len(self.columns) == 0 and len(self.index) == 0:
@@ -168,7 +172,10 @@ class FrameApply:
             with np.errstate(all="ignore"):
                 results = self.obj._data.apply("apply", func=self.f)
             return self.obj._constructor(
-                data=results, index=self.index, columns=self.columns, copy=False
+                data=results,
+                index=self.index,
+                columns=self.columns,
+                copy=False,
             )
 
         # broadcasting
@@ -227,7 +234,9 @@ class FrameApply:
 
         # TODO: mixed type case
         if result.ndim == 2:
-            return self.obj._constructor(result, index=self.index, columns=self.columns)
+            return self.obj._constructor(
+                result, index=self.index, columns=self.columns
+            )
         else:
             return self.obj._constructor_sliced(result, index=self.agg_axis)
 
@@ -326,7 +335,9 @@ class FrameApply:
                     # make sure i is defined
                     if i is not None:
                         k = res_index[i]
-                        e.args = e.args + ("occurred at index %s" % pprint_thing(k),)
+                        e.args = e.args + (
+                            "occurred at index %s" % pprint_thing(k),
+                        )
                 raise
 
         self.results = results

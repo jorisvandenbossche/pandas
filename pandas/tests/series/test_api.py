@@ -144,7 +144,9 @@ class SharedWithSparse:
         self._assert_series_equal(result, expected)
 
         result = self.series_klass(d, index=["b", "c", "d", "a"])
-        expected = self.series_klass([1, 2, np.nan, 0], index=["b", "c", "d", "a"])
+        expected = self.series_klass(
+            [1, 2, np.nan, 0], index=["b", "c", "d", "a"]
+        )
         self._assert_series_equal(result, expected)
 
     def test_constructor_subclass_dict(self):
@@ -155,7 +157,9 @@ class SharedWithSparse:
 
     def test_constructor_ordereddict(self):
         # GH3283
-        data = OrderedDict(("col%s" % i, np.random.random()) for i in range(12))
+        data = OrderedDict(
+            ("col%s" % i, np.random.random()) for i in range(12)
+        )
 
         series = self.series_klass(data)
         expected = self.series_klass(list(data.values()), list(data.keys()))
@@ -173,7 +177,8 @@ class SharedWithSparse:
         _d = sorted(d.items())
         result = self.series_klass(d)
         expected = self.series_klass(
-            [x[1] for x in _d], index=pd.MultiIndex.from_tuples([x[0] for x in _d])
+            [x[1] for x in _d],
+            index=pd.MultiIndex.from_tuples([x[0] for x in _d]),
         )
         self._assert_series_equal(result, expected)
 
@@ -181,7 +186,8 @@ class SharedWithSparse:
         _d.insert(0, ("z", d["z"]))
         result = self.series_klass(d)
         expected = self.series_klass(
-            [x[1] for x in _d], index=pd.Index([x[0] for x in _d], tupleize_cols=False)
+            [x[1] for x in _d],
+            index=pd.Index([x[0] for x in _d], tupleize_cols=False),
         )
         result = result.reindex(index=expected.index)
         self._assert_series_equal(result, expected)
@@ -303,7 +309,11 @@ class TestSeriesMisc(TestData, SharedWithSparse):
         dir_s = dir(s)
         for i, x in enumerate(s.index.unique(level=0)):
             if i < 100:
-                assert not isinstance(x, str) or not x.isidentifier() or x in dir_s
+                assert (
+                    not isinstance(x, str)
+                    or not x.isidentifier()
+                    or x in dir_s
+                )
             else:
                 assert x not in dir_s
 
@@ -579,7 +589,9 @@ class TestCategoricalSeries:
     def test_cat_accessor_no_new_attributes(self):
         # https://github.com/pandas-dev/pandas/issues/10673
         c = Series(list("aabbcde")).astype("category")
-        with pytest.raises(AttributeError, match="You cannot add any new attribute"):
+        with pytest.raises(
+            AttributeError, match="You cannot add any new attribute"
+        ):
             c.cat.xlabel = "a"
 
     def test_cat_accessor_updates_on_inplace(self):
@@ -632,7 +644,9 @@ class TestCategoricalSeries:
         tm.assert_numpy_array_equal(s.__array__(), exp_values)
 
         # remove unused categories
-        s = Series(Categorical(["a", "b", "b", "a"], categories=["a", "b", "c"]))
+        s = Series(
+            Categorical(["a", "b", "b", "a"], categories=["a", "b", "c"])
+        )
         exp_categories = Index(["a", "b"])
         exp_values = np.array(["a", "b", "b", "a"], dtype=np.object_)
         s = s.cat.remove_unused_categories()
@@ -652,7 +666,9 @@ class TestCategoricalSeries:
         s = Series(Categorical(["a", "b", "c", "a"], ordered=True))
         result = s.cat.rename_categories(lambda x: x.upper())
         expected = Series(
-            Categorical(["A", "B", "C", "A"], categories=["A", "B", "C"], ordered=True)
+            Categorical(
+                ["A", "B", "C", "A"], categories=["A", "B", "C"], ordered=True
+            )
         )
         tm.assert_series_equal(result, expected)
 

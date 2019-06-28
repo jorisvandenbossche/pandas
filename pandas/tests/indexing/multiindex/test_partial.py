@@ -13,7 +13,9 @@ class TestMultiIndexPartial:
         # with single item
         l1 = [10, 20]
         l2 = ["a", "b"]
-        df = DataFrame(index=range(2), columns=MultiIndex.from_product([l1, l2]))
+        df = DataFrame(
+            index=range(2), columns=MultiIndex.from_product([l1, l2])
+        )
         expected = DataFrame(index=range(2), columns=l2)
         result = df[20]
         tm.assert_frame_equal(result, expected)
@@ -60,13 +62,17 @@ class TestMultiIndexPartial:
                 [0, 1, 0, 1, 0, 1, 0, 1],
             ],
         )
-        df = DataFrame(np.random.randn(8, 4), index=index, columns=list("abcd"))
+        df = DataFrame(
+            np.random.randn(8, 4), index=index, columns=list("abcd")
+        )
 
         result = df.xs(["foo", "one"])
         expected = df.loc["foo", "one"]
         tm.assert_frame_equal(result, expected)
 
-    def test_getitem_partial(self, multiindex_year_month_day_dataframe_random_data):
+    def test_getitem_partial(
+        self, multiindex_year_month_day_dataframe_random_data
+    ):
         ymd = multiindex_year_month_day_dataframe_random_data
         ymd = ymd.T
         result = ymd[2000, 2]
@@ -114,7 +120,9 @@ class TestMultiIndexPartial:
         with pytest.raises(KeyError, match=r"\('a', 'foo'\)"):
             df.loc[("a", "foo"), :]
 
-    def test_partial_set(self, multiindex_year_month_day_dataframe_random_data):
+    def test_partial_set(
+        self, multiindex_year_month_day_dataframe_random_data
+    ):
         # GH #397
         ymd = multiindex_year_month_day_dataframe_random_data
         df = ymd.copy()
@@ -138,7 +146,9 @@ class TestMultiIndexPartial:
     # ---------------------------------------------------------------------
     # AMBIGUOUS CASES!
 
-    def test_partial_loc_missing(self, multiindex_year_month_day_dataframe_random_data):
+    def test_partial_loc_missing(
+        self, multiindex_year_month_day_dataframe_random_data
+    ):
         pytest.skip("skipping for now")
 
         ymd = multiindex_year_month_day_dataframe_random_data

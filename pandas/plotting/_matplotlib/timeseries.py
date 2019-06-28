@@ -166,7 +166,9 @@ def _replot_ax(ax, freq, kwargs):
 
                 plotf = _plot_classes()[plotf]._plot
 
-            lines.append(plotf(ax, series.index._mpl_repr(), series.values, **kwds)[0])
+            lines.append(
+                plotf(ax, series.index._mpl_repr(), series.values, **kwds)[0]
+            )
             labels.append(pprint_thing(series.name))
 
     return lines, labels

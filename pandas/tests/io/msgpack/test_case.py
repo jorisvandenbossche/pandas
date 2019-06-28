@@ -5,7 +5,11 @@ from pandas.io.msgpack import packb, unpackb
 
 def check(length, obj):
     v = packb(obj)
-    assert len(v) == length, "%r length should be %r but get %r" % (obj, length, len(v))
+    assert len(v) == length, "%r length should be %r but get %r" % (
+        obj,
+        length,
+        len(v),
+    )
     assert unpackb(v, use_list=0) == obj
 
 
@@ -112,7 +116,10 @@ def test_match():
         ((), b"\x90"),
         (
             tuple(range(15)),
-            (b"\x9f\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09" b"\x0a\x0b\x0c\x0d\x0e"),
+            (
+                b"\x9f\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09"
+                b"\x0a\x0b\x0c\x0d\x0e"
+            ),
         ),
         (
             tuple(range(16)),

@@ -14,7 +14,8 @@ for dependency in hard_dependencies:
 
 if missing_dependencies:
     raise ImportError(
-        "Unable to import required dependencies:\n" + "\n".join(missing_dependencies)
+        "Unable to import required dependencies:\n"
+        + "\n".join(missing_dependencies)
     )
 del hard_dependencies, dependency, missing_dependencies
 
@@ -27,7 +28,11 @@ from pandas.compat.numpy import (
 )
 
 try:
-    from pandas._libs import hashtable as _hashtable, lib as _lib, tslib as _tslib
+    from pandas._libs import (
+        hashtable as _hashtable,
+        lib as _lib,
+        tslib as _tslib,
+    )
 except ImportError as e:  # pragma: no cover
     # hack but overkill to use re
     module = str(e).replace("cannot import name ", "")

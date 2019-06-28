@@ -46,7 +46,9 @@ class _IntegerDtype(ExtensionDtype):
 
     def __repr__(self):
         sign = "U" if self.is_unsigned_integer else ""
-        return "{sign}Int{size}Dtype()".format(sign=sign, size=8 * self.itemsize)
+        return "{sign}Int{size}Dtype()".format(
+            sign=sign, size=8 * self.itemsize
+        )
 
     @cache_readonly
     def is_signed_integer(self):
@@ -189,7 +191,9 @@ def coerce_to_array(values, dtype, mask=None, copy=False):
             "mixed-integer-float",
         ]:
             raise TypeError(
-                "{} cannot be converted to an IntegerDtype".format(values.dtype)
+                "{} cannot be converted to an IntegerDtype".format(
+                    values.dtype
+                )
             )
 
     elif is_bool_dtype(values) and is_integer_dtype(dtype):
@@ -300,7 +304,9 @@ class IntegerArray(ExtensionArray, ExtensionOpsMixin):
         return _dtypes[str(self._data.dtype)]
 
     def __init__(self, values, mask, copy=False):
-        if not (isinstance(values, np.ndarray) and is_integer_dtype(values.dtype)):
+        if not (
+            isinstance(values, np.ndarray) and is_integer_dtype(values.dtype)
+        ):
             raise TypeError(
                 "values should be integer numpy array. Use "
                 "the 'integer_array' function instead"
@@ -379,10 +385,15 @@ class IntegerArray(ExtensionArray, ExtensionOpsMixin):
         # to avoid upcasting
         data_fill_value = 1 if isna(fill_value) else fill_value
         result = take(
-            self._data, indexer, fill_value=data_fill_value, allow_fill=allow_fill
+            self._data,
+            indexer,
+            fill_value=data_fill_value,
+            allow_fill=allow_fill,
         )
 
-        mask = take(self._mask, indexer, fill_value=True, allow_fill=allow_fill)
+        mask = take(
+            self._mask, indexer, fill_value=True, allow_fill=allow_fill
+        )
 
         # if we are filling
         # we only fill where the indexer is null
@@ -520,7 +531,9 @@ class IntegerArray(ExtensionArray, ExtensionOpsMixin):
             # w/o passing the dtype
             array = np.append(array, [self._mask.sum()])
             index = Index(
-                np.concatenate([index.values, np.array([np.nan], dtype=object)]),
+                np.concatenate(
+                    [index.values, np.array([np.nan], dtype=object)]
+                ),
                 dtype=object,
             )
 
@@ -646,7 +659,9 @@ class IntegerArray(ExtensionArray, ExtensionOpsMixin):
                 return NotImplemented
 
             if getattr(other, "ndim", 0) > 1:
-                raise NotImplementedError("can only perform ops with 1-d structures")
+                raise NotImplementedError(
+                    "can only perform ops with 1-d structures"
+                )
 
             if isinstance(other, IntegerArray):
                 other, mask = other._data, other._mask
@@ -660,7 +675,9 @@ class IntegerArray(ExtensionArray, ExtensionOpsMixin):
                     other = other.item()
                 elif other.ndim == 1:
                     if not (is_float_dtype(other) or is_integer_dtype(other)):
-                        raise TypeError("can only perform ops with numeric values")
+                        raise TypeError(
+                            "can only perform ops with numeric values"
+                        )
             else:
                 if not (is_float(other) or is_integer(other)):
                     raise TypeError("can only perform ops with numeric values")

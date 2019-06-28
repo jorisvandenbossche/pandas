@@ -173,7 +173,13 @@ def test_difference(idx, sort):
     # name from non-empty array
     result = first.difference([("foo", "one")], sort=sort)
     expected = pd.MultiIndex.from_tuples(
-        [("bar", "one"), ("baz", "two"), ("foo", "two"), ("qux", "one"), ("qux", "two")]
+        [
+            ("bar", "one"),
+            ("baz", "two"),
+            ("foo", "two"),
+            ("qux", "one"),
+            ("qux", "two"),
+        ]
     )
     expected.names = first.names
     assert first.names == result.names
@@ -202,9 +208,13 @@ def test_difference_sort_special_true():
 
 def test_difference_sort_incomparable():
     # GH-24959
-    idx = pd.MultiIndex.from_product([[1, pd.Timestamp("2000"), 2], ["a", "b"]])
+    idx = pd.MultiIndex.from_product(
+        [[1, pd.Timestamp("2000"), 2], ["a", "b"]]
+    )
 
-    other = pd.MultiIndex.from_product([[3, pd.Timestamp("2000"), 4], ["c", "d"]])
+    other = pd.MultiIndex.from_product(
+        [[3, pd.Timestamp("2000"), 4], ["c", "d"]]
+    )
     # sort=None, the default
     # MultiIndex.difference deviates here from other difference
     # implementations in not catching the TypeError
@@ -220,8 +230,12 @@ def test_difference_sort_incomparable():
 def test_difference_sort_incomparable_true():
     # TODO decide on True behaviour
     # # sort=True, raises
-    idx = pd.MultiIndex.from_product([[1, pd.Timestamp("2000"), 2], ["a", "b"]])
-    other = pd.MultiIndex.from_product([[3, pd.Timestamp("2000"), 4], ["c", "d"]])
+    idx = pd.MultiIndex.from_product(
+        [[1, pd.Timestamp("2000"), 2], ["a", "b"]]
+    )
+    other = pd.MultiIndex.from_product(
+        [[3, pd.Timestamp("2000"), 4], ["c", "d"]]
+    )
 
     with pytest.raises(TypeError):
         idx.difference(other, sort=True)

@@ -75,7 +75,9 @@ def test_astype_no_copy():
     assert arr is not result
 
 
-@pytest.mark.parametrize("dtype", [dtypes.CategoricalDtype(), dtypes.IntervalDtype()])
+@pytest.mark.parametrize(
+    "dtype", [dtypes.CategoricalDtype(), dtypes.IntervalDtype()]
+)
 def test_is_extension_array_dtype(dtype):
     assert isinstance(dtype, dtypes.ExtensionDtype)
     assert is_extension_array_dtype(dtype)

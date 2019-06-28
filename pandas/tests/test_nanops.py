@@ -32,7 +32,9 @@ class TestnanopsDataFrame:
         self.arr_str = np.abs(self.arr_float).astype("S")
         self.arr_utf = np.abs(self.arr_float).astype("U")
         self.arr_date = np.random.randint(0, 20000, arr_shape).astype("M8[ns]")
-        self.arr_tdelta = np.random.randint(0, 20000, arr_shape).astype("m8[ns]")
+        self.arr_tdelta = np.random.randint(0, 20000, arr_shape).astype(
+            "m8[ns]"
+        )
 
         self.arr_nan = np.tile(np.nan, arr_shape)
         self.arr_float_nan = np.vstack([self.arr_float, self.arr_nan])
@@ -44,8 +46,12 @@ class TestnanopsDataFrame:
         self.arr_float_inf = np.vstack([self.arr_float, self.arr_inf])
 
         self.arr_nan_inf = np.vstack([self.arr_nan, self.arr_inf])
-        self.arr_float_nan_inf = np.vstack([self.arr_float, self.arr_nan, self.arr_inf])
-        self.arr_nan_nan_inf = np.vstack([self.arr_nan, self.arr_nan, self.arr_inf])
+        self.arr_float_nan_inf = np.vstack(
+            [self.arr_float, self.arr_nan, self.arr_inf]
+        )
+        self.arr_nan_nan_inf = np.vstack(
+            [self.arr_nan, self.arr_nan, self.arr_inf]
+        )
         self.arr_obj = np.vstack(
             [
                 self.arr_float.astype("O"),
@@ -61,10 +67,14 @@ class TestnanopsDataFrame:
 
         with np.errstate(invalid="ignore"):
             self.arr_nan_nanj = self.arr_nan + self.arr_nan * 1j
-            self.arr_complex_nan = np.vstack([self.arr_complex, self.arr_nan_nanj])
+            self.arr_complex_nan = np.vstack(
+                [self.arr_complex, self.arr_nan_nanj]
+            )
 
             self.arr_nan_infj = self.arr_inf * 1j
-            self.arr_complex_nan_infj = np.vstack([self.arr_complex, self.arr_nan_infj])
+            self.arr_complex_nan_infj = np.vstack(
+                [self.arr_complex, self.arr_nan_infj]
+            )
 
         self.arr_float_2d = self.arr_float[:, :, 0]
         self.arr_float1_2d = self.arr_float1[:, :, 0]
@@ -143,8 +153,12 @@ class TestnanopsDataFrame:
             # but nanops doesn't, so make that an exception
             elif targ.dtype.kind == "O":
                 raise
-            tm.assert_almost_equal(targ.real, res.real, check_dtype=check_dtype)
-            tm.assert_almost_equal(targ.imag, res.imag, check_dtype=check_dtype)
+            tm.assert_almost_equal(
+                targ.real, res.real, check_dtype=check_dtype
+            )
+            tm.assert_almost_equal(
+                targ.imag, res.imag, check_dtype=check_dtype
+            )
 
     def check_fun_data(
         self,
@@ -166,17 +180,27 @@ class TestnanopsDataFrame:
                     targ = targfunc(targartempval, axis=axis, **kwargs)
 
                 try:
-                    res = testfunc(testarval, axis=axis, skipna=skipna, **kwargs)
-                    self.check_results(targ, res, axis, check_dtype=check_dtype)
+                    res = testfunc(
+                        testarval, axis=axis, skipna=skipna, **kwargs
+                    )
+                    self.check_results(
+                        targ, res, axis, check_dtype=check_dtype
+                    )
                     if skipna:
                         res = testfunc(testarval, axis=axis, **kwargs)
-                        self.check_results(targ, res, axis, check_dtype=check_dtype)
+                        self.check_results(
+                            targ, res, axis, check_dtype=check_dtype
+                        )
                     if axis is None:
                         res = testfunc(testarval, skipna=skipna, **kwargs)
-                        self.check_results(targ, res, axis, check_dtype=check_dtype)
+                        self.check_results(
+                            targ, res, axis, check_dtype=check_dtype
+                        )
                     if skipna and axis is None:
                         res = testfunc(testarval, **kwargs)
-                        self.check_results(targ, res, axis, check_dtype=check_dtype)
+                        self.check_results(
+                            targ, res, axis, check_dtype=check_dtype
+                        )
                 except BaseException as exc:
                     exc.args += (
                         "axis: %s of %s" % (axis, testarval.ndim - 1),
@@ -253,7 +277,9 @@ class TestnanopsDataFrame:
         **kwargs
     ):
         self.check_fun(testfunc, targfunc, "arr_float", **kwargs)
-        self.check_fun(testfunc, targfunc, "arr_float_nan", "arr_float", **kwargs)
+        self.check_fun(
+            testfunc, targfunc, "arr_float_nan", "arr_float", **kwargs
+        )
         self.check_fun(testfunc, targfunc, "arr_int", **kwargs)
         self.check_fun(testfunc, targfunc, "arr_bool", **kwargs)
         objs = [
@@ -304,7 +330,9 @@ class TestnanopsDataFrame:
             # else
             if allow_obj == "convert":
                 targfunc = partial(
-                    self._badobj_wrap, func=targfunc, allow_complex=allow_complex
+                    self._badobj_wrap,
+                    func=targfunc,
+                    allow_complex=allow_complex,
                 )
             self.check_fun(testfunc, targfunc, "arr_obj", **kwargs)
 
@@ -456,13 +484,17 @@ class TestnanopsDataFrame:
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("ignore", RuntimeWarning)
             func = partial(self._minmax_wrap, func=np.min)
-            self.check_funs(nanops.nanmin, func, allow_str=False, allow_obj=False)
+            self.check_funs(
+                nanops.nanmin, func, allow_str=False, allow_obj=False
+            )
 
     def test_nanmax(self):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
             func = partial(self._minmax_wrap, func=np.max)
-            self.check_funs(nanops.nanmax, func, allow_str=False, allow_obj=False)
+            self.check_funs(
+                nanops.nanmax, func, allow_str=False, allow_obj=False
+            )
 
     def _argminmax_wrap(self, value, axis=None, func=None):
         res = func(value, axis)
@@ -496,7 +528,9 @@ class TestnanopsDataFrame:
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("ignore", RuntimeWarning)
             func = partial(self._argminmax_wrap, func=np.argmin)
-            self.check_funs(nanops.nanargmin, func, allow_str=False, allow_obj=False)
+            self.check_funs(
+                nanops.nanargmin, func, allow_str=False, allow_obj=False
+            )
 
     def _skew_kurt_wrap(self, values, axis=None, func=None):
         if not isinstance(values.dtype.type, np.floating):
@@ -562,7 +596,9 @@ class TestnanopsDataFrame:
         tm.assert_almost_equal(targ0, res00)
         tm.assert_almost_equal(targ0, res01)
 
-        res10 = checkfun(self.arr_float_nan_2d, self.arr_float1_nan_2d, **kwargs)
+        res10 = checkfun(
+            self.arr_float_nan_2d, self.arr_float1_nan_2d, **kwargs
+        )
         res11 = checkfun(
             self.arr_float_nan_2d,
             self.arr_float1_nan_2d,
@@ -576,7 +612,9 @@ class TestnanopsDataFrame:
         res20 = checkfun(self.arr_nan_2d, self.arr_float1_2d, **kwargs)
         res21 = checkfun(self.arr_float_2d, self.arr_nan_2d, **kwargs)
         res22 = checkfun(self.arr_nan_2d, self.arr_nan_2d, **kwargs)
-        res23 = checkfun(self.arr_float_nan_2d, self.arr_nan_float1_2d, **kwargs)
+        res23 = checkfun(
+            self.arr_float_nan_2d, self.arr_nan_float1_2d, **kwargs
+        )
         res24 = checkfun(
             self.arr_float_nan_2d,
             self.arr_nan_float1_2d,
@@ -607,7 +645,9 @@ class TestnanopsDataFrame:
         tm.assert_almost_equal(targ0, res00)
         tm.assert_almost_equal(targ0, res01)
 
-        res10 = checkfun(self.arr_float_nan_1d, self.arr_float1_nan_1d, **kwargs)
+        res10 = checkfun(
+            self.arr_float_nan_1d, self.arr_float1_nan_1d, **kwargs
+        )
         res11 = checkfun(
             self.arr_float_nan_1d,
             self.arr_float1_nan_1d,
@@ -621,7 +661,9 @@ class TestnanopsDataFrame:
         res20 = checkfun(self.arr_nan_1d, self.arr_float1_1d, **kwargs)
         res21 = checkfun(self.arr_float_1d, self.arr_nan_1d, **kwargs)
         res22 = checkfun(self.arr_nan_1d, self.arr_nan_1d, **kwargs)
-        res23 = checkfun(self.arr_float_nan_1d, self.arr_nan_float1_1d, **kwargs)
+        res23 = checkfun(
+            self.arr_float_nan_1d, self.arr_nan_float1_1d, **kwargs
+        )
         res24 = checkfun(
             self.arr_float_nan_1d,
             self.arr_nan_float1_1d,
@@ -643,19 +685,33 @@ class TestnanopsDataFrame:
 
     def test_nancorr(self):
         targ0 = np.corrcoef(self.arr_float_2d, self.arr_float1_2d)[0, 1]
-        targ1 = np.corrcoef(self.arr_float_2d.flat, self.arr_float1_2d.flat)[0, 1]
+        targ1 = np.corrcoef(self.arr_float_2d.flat, self.arr_float1_2d.flat)[
+            0, 1
+        ]
         self.check_nancorr_nancov_2d(nanops.nancorr, targ0, targ1)
         targ0 = np.corrcoef(self.arr_float_1d, self.arr_float1_1d)[0, 1]
-        targ1 = np.corrcoef(self.arr_float_1d.flat, self.arr_float1_1d.flat)[0, 1]
-        self.check_nancorr_nancov_1d(nanops.nancorr, targ0, targ1, method="pearson")
+        targ1 = np.corrcoef(self.arr_float_1d.flat, self.arr_float1_1d.flat)[
+            0, 1
+        ]
+        self.check_nancorr_nancov_1d(
+            nanops.nancorr, targ0, targ1, method="pearson"
+        )
 
     def test_nancorr_pearson(self):
         targ0 = np.corrcoef(self.arr_float_2d, self.arr_float1_2d)[0, 1]
-        targ1 = np.corrcoef(self.arr_float_2d.flat, self.arr_float1_2d.flat)[0, 1]
-        self.check_nancorr_nancov_2d(nanops.nancorr, targ0, targ1, method="pearson")
+        targ1 = np.corrcoef(self.arr_float_2d.flat, self.arr_float1_2d.flat)[
+            0, 1
+        ]
+        self.check_nancorr_nancov_2d(
+            nanops.nancorr, targ0, targ1, method="pearson"
+        )
         targ0 = np.corrcoef(self.arr_float_1d, self.arr_float1_1d)[0, 1]
-        targ1 = np.corrcoef(self.arr_float_1d.flat, self.arr_float1_1d.flat)[0, 1]
-        self.check_nancorr_nancov_1d(nanops.nancorr, targ0, targ1, method="pearson")
+        targ1 = np.corrcoef(self.arr_float_1d.flat, self.arr_float1_1d.flat)[
+            0, 1
+        ]
+        self.check_nancorr_nancov_1d(
+            nanops.nancorr, targ0, targ1, method="pearson"
+        )
 
     @td.skip_if_no_scipy
     def test_nancorr_kendall(self):
@@ -663,10 +719,14 @@ class TestnanopsDataFrame:
 
         targ0 = kendalltau(self.arr_float_2d, self.arr_float1_2d)[0]
         targ1 = kendalltau(self.arr_float_2d.flat, self.arr_float1_2d.flat)[0]
-        self.check_nancorr_nancov_2d(nanops.nancorr, targ0, targ1, method="kendall")
+        self.check_nancorr_nancov_2d(
+            nanops.nancorr, targ0, targ1, method="kendall"
+        )
         targ0 = kendalltau(self.arr_float_1d, self.arr_float1_1d)[0]
         targ1 = kendalltau(self.arr_float_1d.flat, self.arr_float1_1d.flat)[0]
-        self.check_nancorr_nancov_1d(nanops.nancorr, targ0, targ1, method="kendall")
+        self.check_nancorr_nancov_1d(
+            nanops.nancorr, targ0, targ1, method="kendall"
+        )
 
     @td.skip_if_no_scipy
     def test_nancorr_spearman(self):
@@ -674,10 +734,14 @@ class TestnanopsDataFrame:
 
         targ0 = spearmanr(self.arr_float_2d, self.arr_float1_2d)[0]
         targ1 = spearmanr(self.arr_float_2d.flat, self.arr_float1_2d.flat)[0]
-        self.check_nancorr_nancov_2d(nanops.nancorr, targ0, targ1, method="spearman")
+        self.check_nancorr_nancov_2d(
+            nanops.nancorr, targ0, targ1, method="spearman"
+        )
         targ0 = spearmanr(self.arr_float_1d, self.arr_float1_1d)[0]
         targ1 = spearmanr(self.arr_float_1d.flat, self.arr_float1_1d.flat)[0]
-        self.check_nancorr_nancov_1d(nanops.nancorr, targ0, targ1, method="spearman")
+        self.check_nancorr_nancov_1d(
+            nanops.nancorr, targ0, targ1, method="spearman"
+        )
 
     def test_nancov(self):
         targ0 = np.cov(self.arr_float_2d, self.arr_float1_2d)[0, 1]
@@ -931,14 +995,18 @@ class TestNanvarFixedValues:
     def test_nanvar_all_finite(self):
         samples = self.samples
         actual_variance = nanops.nanvar(samples)
-        tm.assert_almost_equal(actual_variance, self.variance, check_less_precise=2)
+        tm.assert_almost_equal(
+            actual_variance, self.variance, check_less_precise=2
+        )
 
     def test_nanvar_nans(self):
         samples = np.nan * np.ones(2 * self.samples.shape[0])
         samples[::2] = self.samples
 
         actual_variance = nanops.nanvar(samples, skipna=True)
-        tm.assert_almost_equal(actual_variance, self.variance, check_less_precise=2)
+        tm.assert_almost_equal(
+            actual_variance, self.variance, check_less_precise=2
+        )
 
         actual_variance = nanops.nanvar(samples, skipna=False)
         tm.assert_almost_equal(actual_variance, np.nan, check_less_precise=2)
@@ -948,7 +1016,9 @@ class TestNanvarFixedValues:
         samples[::2] = self.samples
 
         actual_std = nanops.nanstd(samples, skipna=True)
-        tm.assert_almost_equal(actual_std, self.variance ** 0.5, check_less_precise=2)
+        tm.assert_almost_equal(
+            actual_std, self.variance ** 0.5, check_less_precise=2
+        )
 
         actual_std = nanops.nanvar(samples, skipna=False)
         tm.assert_almost_equal(actual_std, np.nan, check_less_precise=2)
@@ -961,7 +1031,9 @@ class TestNanvarFixedValues:
 
         actual_variance = nanops.nanvar(samples, axis=1)
         tm.assert_almost_equal(
-            actual_variance, np.array([self.variance, 1.0 / 12]), check_less_precise=2
+            actual_variance,
+            np.array([self.variance, 1.0 / 12]),
+            check_less_precise=2,
         )
 
     def test_nanvar_ddof(self):
@@ -978,7 +1050,9 @@ class TestNanvarFixedValues:
         tm.assert_almost_equal(variance_1, var, check_less_precise=2)
 
         # The underestimated variance.
-        tm.assert_almost_equal(variance_0, (n - 1.0) / n * var, check_less_precise=2)
+        tm.assert_almost_equal(
+            variance_0, (n - 1.0) / n * var, check_less_precise=2
+        )
 
         # The overestimated variance.
         tm.assert_almost_equal(
@@ -1070,7 +1144,9 @@ class TestNanskewFixedValues:
         tm.assert_almost_equal(skew, self.actual_skew)
 
     def test_axis(self):
-        samples = np.vstack([self.samples, np.nan * np.ones(len(self.samples))])
+        samples = np.vstack(
+            [self.samples, np.nan * np.ones(len(self.samples))]
+        )
         skew = nanops.nanskew(samples, axis=1)
         tm.assert_almost_equal(skew, np.array([self.actual_skew, np.nan]))
 
@@ -1119,7 +1195,9 @@ class TestNankurtFixedValues:
         tm.assert_almost_equal(kurt, self.actual_kurt)
 
     def test_axis(self):
-        samples = np.vstack([self.samples, np.nan * np.ones(len(self.samples))])
+        samples = np.vstack(
+            [self.samples, np.nan * np.ones(len(self.samples))]
+        )
         kurt = nanops.nankurt(samples, axis=1)
         tm.assert_almost_equal(kurt, np.array([self.actual_kurt, np.nan]))
 

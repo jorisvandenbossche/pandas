@@ -150,7 +150,10 @@ class CSVFormatter:
             from pandas import Index
 
             self.data_index = Index(
-                [x.strftime(date_format) if notna(x) else "" for x in self.data_index]
+                [
+                    x.strftime(date_format) if notna(x) else ""
+                    for x in self.data_index
+                ]
             )
 
         self.nlevels = getattr(self.data_index, "nlevels", 1)
@@ -163,12 +166,16 @@ class CSVFormatter:
         """
         # GH21227 internal compression is not used when file-like passed.
         if self.compression and hasattr(self.path_or_buf, "write"):
-            msg = "compression has no effect when passing file-like " "object as input."
+            msg = (
+                "compression has no effect when passing file-like "
+                "object as input."
+            )
             warnings.warn(msg, RuntimeWarning, stacklevel=2)
 
         # when zip compression is called.
         is_zip = isinstance(self.path_or_buf, ZipFile) or (
-            not hasattr(self.path_or_buf, "write") and self.compression == "zip"
+            not hasattr(self.path_or_buf, "write")
+            and self.compression == "zip"
         )
 
         if is_zip:
@@ -236,7 +243,9 @@ class CSVFormatter:
         header = self.header
         encoded_labels = []
 
-        has_aliases = isinstance(header, (tuple, list, np.ndarray, ABCIndexClass))
+        has_aliases = isinstance(
+            header, (tuple, list, np.ndarray, ABCIndexClass)
+        )
         if not (has_aliases or self.header):
             return
         if has_aliases:
@@ -358,4 +367,6 @@ class CSVFormatter:
             quoting=self.quoting,
         )
 
-        libwriters.write_csv_rows(self.data, ix, self.nlevels, self.cols, self.writer)
+        libwriters.write_csv_rows(
+            self.data, ix, self.nlevels, self.cols, self.writer
+        )

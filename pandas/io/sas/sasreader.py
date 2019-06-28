@@ -57,13 +57,19 @@ def read_sas(
         from pandas.io.sas.sas_xport import XportReader
 
         reader = XportReader(
-            filepath_or_buffer, index=index, encoding=encoding, chunksize=chunksize
+            filepath_or_buffer,
+            index=index,
+            encoding=encoding,
+            chunksize=chunksize,
         )
     elif format.lower() == "sas7bdat":
         from pandas.io.sas.sas7bdat import SAS7BDATReader
 
         reader = SAS7BDATReader(
-            filepath_or_buffer, index=index, encoding=encoding, chunksize=chunksize
+            filepath_or_buffer,
+            index=index,
+            encoding=encoding,
+            chunksize=chunksize,
         )
     else:
         raise ValueError("unknown SAS format")

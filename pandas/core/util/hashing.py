@@ -85,7 +85,9 @@ def hash_pandas_object(
         hash_key = _default_hash_key
 
     if isinstance(obj, ABCMultiIndex):
-        return Series(hash_tuples(obj, encoding, hash_key), dtype="uint64", copy=False)
+        return Series(
+            hash_tuples(obj, encoding, hash_key), dtype="uint64", copy=False
+        )
 
     if isinstance(obj, ABCIndexClass):
         h = hash_array(obj.values, encoding, hash_key, categorize).astype(
@@ -166,13 +168,16 @@ def hash_tuples(vals, encoding="utf8", hash_key=None):
 
     # create a list-of-Categoricals
     vals = [
-        Categorical(vals.codes[level], vals.levels[level], ordered=False, fastpath=True)
+        Categorical(
+            vals.codes[level], vals.levels[level], ordered=False, fastpath=True
+        )
         for level in range(vals.nlevels)
     ]
 
     # hash the list-of-ndarrays
     hashes = (
-        _hash_categorical(cat, encoding=encoding, hash_key=hash_key) for cat in vals
+        _hash_categorical(cat, encoding=encoding, hash_key=hash_key)
+        for cat in vals
     )
     h = _combine_hash_arrays(hashes, len(vals))
     if is_tuple:
@@ -196,7 +201,9 @@ def hash_tuple(val, encoding="utf8", hash_key=None):
     hash
 
     """
-    hashes = (_hash_scalar(v, encoding=encoding, hash_key=hash_key) for v in val)
+    hashes = (
+        _hash_scalar(v, encoding=encoding, hash_key=hash_key) for v in val
+    )
 
     h = _combine_hash_arrays(hashes, len(val))[0]
 
@@ -301,7 +308,9 @@ def hash_array(vals, encoding="utf8", hash_key=None, categorize=True):
             from pandas import factorize, Categorical, Index
 
             codes, categories = factorize(vals, sort=False)
-            cat = Categorical(codes, Index(categories), ordered=False, fastpath=True)
+            cat = Categorical(
+                codes, Index(categories), ordered=False, fastpath=True
+            )
             return _hash_categorical(cat, encoding, hash_key)
 
         try:
@@ -345,4 +354,6 @@ def _hash_scalar(val, encoding="utf8", hash_key=None):
     dtype, val = infer_dtype_from_scalar(val)
     vals = np.array([val], dtype=dtype)
 
-    return hash_array(vals, hash_key=hash_key, encoding=encoding, categorize=False)
+    return hash_array(
+        vals, hash_key=hash_key, encoding=encoding, categorize=False
+    )

@@ -35,10 +35,14 @@ _mixed2 = DataFrame(
     }
 )
 _integer = DataFrame(
-    np.random.randint(1, 100, size=(10001, 4)), columns=list("ABCD"), dtype="int64"
+    np.random.randint(1, 100, size=(10001, 4)),
+    columns=list("ABCD"),
+    dtype="int64",
 )
 _integer2 = DataFrame(
-    np.random.randint(1, 100, size=(101, 4)), columns=list("ABCD"), dtype="int64"
+    np.random.randint(1, 100, size=(101, 4)),
+    columns=list("ABCD"),
+    dtype="int64",
 )
 
 
@@ -56,7 +60,9 @@ class TestExpressions:
     def teardown_method(self, method):
         expr._MIN_ELEMENTS = self._MIN_ELEMENTS
 
-    def run_arithmetic(self, df, other, assert_func, check_dtype=False, test_flex=True):
+    def run_arithmetic(
+        self, df, other, assert_func, check_dtype=False, test_flex=True
+    ):
         expr._MIN_ELEMENTS = 0
         operations = ["add", "sub", "mul", "mod", "truediv", "floordiv"]
         for arith in operations:
@@ -133,9 +139,15 @@ class TestExpressions:
                 pprint_thing("test_flex was %r" % test_flex)
                 raise
 
-    def run_frame(self, df, other, binary_comp=None, run_binary=True, **kwargs):
-        self.run_arithmetic(df, other, assert_frame_equal, test_flex=False, **kwargs)
-        self.run_arithmetic(df, other, assert_frame_equal, test_flex=True, **kwargs)
+    def run_frame(
+        self, df, other, binary_comp=None, run_binary=True, **kwargs
+    ):
+        self.run_arithmetic(
+            df, other, assert_frame_equal, test_flex=False, **kwargs
+        )
+        self.run_arithmetic(
+            df, other, assert_frame_equal, test_flex=True, **kwargs
+        )
         if run_binary:
             if binary_comp is None:
                 expr.set_use_numexpr(False)
@@ -149,8 +161,12 @@ class TestExpressions:
             )
 
     def run_series(self, ser, other, binary_comp=None, **kwargs):
-        self.run_arithmetic(ser, other, assert_series_equal, test_flex=False, **kwargs)
-        self.run_arithmetic(ser, other, assert_almost_equal, test_flex=True, **kwargs)
+        self.run_arithmetic(
+            ser, other, assert_series_equal, test_flex=False, **kwargs
+        )
+        self.run_arithmetic(
+            ser, other, assert_almost_equal, test_flex=True, **kwargs
+        )
         # series doesn't uses vec_compare instead of numexpr...
         # if binary_comp is None:
         #     binary_comp = other + 1
@@ -193,13 +209,17 @@ class TestExpressions:
     def test_mixed_arithmetic(self):
         self.run_arithmetic(self.mixed, self.mixed, assert_frame_equal)
         for col in self.mixed.columns:
-            self.run_arithmetic(self.mixed[col], self.mixed[col], assert_series_equal)
+            self.run_arithmetic(
+                self.mixed[col], self.mixed[col], assert_series_equal
+            )
 
     def test_integer_with_zeros(self):
         self.integer *= np.random.randint(0, 2, size=np.shape(self.integer))
         self.run_arithmetic(self.integer, self.integer, assert_frame_equal)
         self.run_arithmetic(
-            self.integer.iloc[:, 0], self.integer.iloc[:, 0], assert_series_equal
+            self.integer.iloc[:, 0],
+            self.integer.iloc[:, 0],
+            assert_series_equal,
         )
 
     def test_invalid(self):
@@ -231,7 +251,10 @@ class TestExpressions:
     def test_binary_ops(self):
         def testit():
 
-            for f, f2 in [(self.frame, self.frame2), (self.mixed, self.mixed2)]:
+            for f, f2 in [
+                (self.frame, self.frame2),
+                (self.mixed, self.mixed2),
+            ]:
 
                 for op, op_str in [
                     ("add", "+"),
@@ -249,18 +272,28 @@ class TestExpressions:
                     else:
                         op = getattr(operator, op, None)
                     if op is not None:
-                        result = expr._can_use_numexpr(op, op_str, f, f, "evaluate")
+                        result = expr._can_use_numexpr(
+                            op, op_str, f, f, "evaluate"
+                        )
                         assert result != f._is_mixed_type
 
-                        result = expr.evaluate(op, op_str, f, f, use_numexpr=True)
-                        expected = expr.evaluate(op, op_str, f, f, use_numexpr=False)
+                        result = expr.evaluate(
+                            op, op_str, f, f, use_numexpr=True
+                        )
+                        expected = expr.evaluate(
+                            op, op_str, f, f, use_numexpr=False
+                        )
 
                         if isinstance(result, DataFrame):
                             tm.assert_frame_equal(result, expected)
                         else:
-                            tm.assert_numpy_array_equal(result, expected.values)
+                            tm.assert_numpy_array_equal(
+                                result, expected.values
+                            )
 
-                        result = expr._can_use_numexpr(op, op_str, f2, f2, "evaluate")
+                        result = expr._can_use_numexpr(
+                            op, op_str, f2, f2, "evaluate"
+                        )
                         assert not result
 
         expr.set_use_numexpr(False)
@@ -273,7 +306,10 @@ class TestExpressions:
 
     def test_boolean_ops(self):
         def testit():
-            for f, f2 in [(self.frame, self.frame2), (self.mixed, self.mixed2)]:
+            for f, f2 in [
+                (self.frame, self.frame2),
+                (self.mixed, self.mixed2),
+            ]:
 
                 f11 = f
                 f12 = f + 1
@@ -292,17 +328,25 @@ class TestExpressions:
 
                     op = getattr(operator, op)
 
-                    result = expr._can_use_numexpr(op, op_str, f11, f12, "evaluate")
+                    result = expr._can_use_numexpr(
+                        op, op_str, f11, f12, "evaluate"
+                    )
                     assert result != f11._is_mixed_type
 
-                    result = expr.evaluate(op, op_str, f11, f12, use_numexpr=True)
-                    expected = expr.evaluate(op, op_str, f11, f12, use_numexpr=False)
+                    result = expr.evaluate(
+                        op, op_str, f11, f12, use_numexpr=True
+                    )
+                    expected = expr.evaluate(
+                        op, op_str, f11, f12, use_numexpr=False
+                    )
                     if isinstance(result, DataFrame):
                         tm.assert_frame_equal(result, expected)
                     else:
                         tm.assert_numpy_array_equal(result, expected.values)
 
-                    result = expr._can_use_numexpr(op, op_str, f21, f22, "evaluate")
+                    result = expr._can_use_numexpr(
+                        op, op_str, f21, f22, "evaluate"
+                    )
                     assert not result
 
         expr.set_use_numexpr(False)
@@ -334,7 +378,9 @@ class TestExpressions:
         testit()
 
     def test_bool_ops_raise_on_arithmetic(self):
-        df = DataFrame({"a": np.random.rand(10) > 0.5, "b": np.random.rand(10) > 0.5})
+        df = DataFrame(
+            {"a": np.random.rand(10) > 0.5, "b": np.random.rand(10) > 0.5}
+        )
         names = "truediv", "floordiv", "pow"
         ops = "/", "//", "**"
         msg = "operator %r not implemented for bool dtypes"
@@ -362,7 +408,9 @@ class TestExpressions:
 
     def test_bool_ops_warn_on_arithmetic(self):
         n = 10
-        df = DataFrame({"a": np.random.rand(n) > 0.5, "b": np.random.rand(n) > 0.5})
+        df = DataFrame(
+            {"a": np.random.rand(n) > 0.5, "b": np.random.rand(n) > 0.5}
+        )
         names = "add", "mul", "sub"
         ops = "+", "*", "-"
         subs = {"+": "|", "*": "&", "-": "^"}
@@ -411,9 +459,12 @@ class TestExpressions:
         [
             (
                 DataFrame(
-                    [[0, 1, 2, "aa"], [0, 1, 2, "aa"]], columns=["a", "b", "c", "dtype"]
+                    [[0, 1, 2, "aa"], [0, 1, 2, "aa"]],
+                    columns=["a", "b", "c", "dtype"],
                 ),
-                DataFrame([[False, False], [False, False]], columns=["a", "dtype"]),
+                DataFrame(
+                    [[False, False], [False, False]], columns=["a", "dtype"]
+                ),
             ),
             (
                 DataFrame(
@@ -429,5 +480,7 @@ class TestExpressions:
     )
     def test_bool_ops_column_name_dtype(self, test_input, expected):
         # GH 22383 - .ne fails if columns containing column name 'dtype'
-        result = test_input.loc[:, ["a", "dtype"]].ne(test_input.loc[:, ["a", "dtype"]])
+        result = test_input.loc[:, ["a", "dtype"]].ne(
+            test_input.loc[:, ["a", "dtype"]]
+        )
         assert_frame_equal(result, expected)

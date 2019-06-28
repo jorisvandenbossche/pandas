@@ -9,7 +9,11 @@ import pytz
 from pandas._libs.interval import Interval
 from pandas._libs.tslibs import NaT, Period, Timestamp, timezones
 
-from pandas.core.dtypes.generic import ABCCategoricalIndex, ABCDateOffset, ABCIndexClass
+from pandas.core.dtypes.generic import (
+    ABCCategoricalIndex,
+    ABCDateOffset,
+    ABCIndexClass,
+)
 
 from .base import ExtensionDtype
 from .inference import is_list_like
@@ -140,7 +144,9 @@ class PandasExtensionDtype(ExtensionDtype):
         return str(self)
 
     def __hash__(self):
-        raise NotImplementedError("sub-classes should implement an __hash__ " "method")
+        raise NotImplementedError(
+            "sub-classes should implement an __hash__ " "method"
+        )
 
     def __getstate__(self):
         # pickle support; we don't want to pickle the cache
@@ -303,7 +309,8 @@ class CategoricalDtype(PandasExtensionDtype, ExtensionDtype):
                     raise ValueError(msg.format(dtype=dtype))
             elif categories is not None or ordered is not None:
                 raise ValueError(
-                    "Cannot specify `categories` or `ordered` " "together with `dtype`."
+                    "Cannot specify `categories` or `ordered` "
+                    "together with `dtype`."
                 )
         elif is_categorical(values):
             # If no "dtype" was passed, use the one from "values", but honor
@@ -325,7 +332,9 @@ class CategoricalDtype(PandasExtensionDtype, ExtensionDtype):
             self.validate_ordered(ordered)
 
         if categories is not None:
-            categories = self.validate_categories(categories, fastpath=fastpath)
+            categories = self.validate_categories(
+                categories, fastpath=fastpath
+            )
 
         self._categories = categories
         self._ordered = ordered
@@ -431,7 +440,9 @@ class CategoricalDtype(PandasExtensionDtype, ExtensionDtype):
             )
         else:
             cat_array = [cat_array]
-        hashed = _combine_hash_arrays(iter(cat_array), num_items=len(cat_array))
+        hashed = _combine_hash_arrays(
+            iter(cat_array), num_items=len(cat_array)
+        )
         return np.bitwise_xor.reduce(hashed)
 
     @classmethod
@@ -1000,7 +1011,10 @@ class IntervalDtype(PandasExtensionDtype):
             msg = "a string needs to be passed, got type {typ}"
             raise TypeError(msg.format(typ=type(string)))
 
-        if string.lower() == "interval" or cls._match.search(string) is not None:
+        if (
+            string.lower() == "interval"
+            or cls._match.search(string) is not None
+        ):
             return cls(string)
 
         msg = (

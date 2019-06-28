@@ -359,7 +359,9 @@ class TestTake:
         expected.view(np.int64)[[2, 4], :] = iNaT
         tm.assert_almost_equal(result, expected)
 
-        result = algos.take_nd(arr, indexer, axis=0, fill_value=datetime(2007, 1, 1))
+        result = algos.take_nd(
+            arr, indexer, axis=0, fill_value=datetime(2007, 1, 1)
+        )
         result2 = np.empty_like(result)
         algos.take_nd(
             arr, indexer, out=result2, axis=0, fill_value=datetime(2007, 1, 1)
@@ -380,7 +382,9 @@ class TestTake:
         expected.view(np.int64)[:, [2, 4]] = iNaT
         tm.assert_almost_equal(result, expected)
 
-        result = algos.take_nd(arr, indexer, axis=1, fill_value=datetime(2007, 1, 1))
+        result = algos.take_nd(
+            arr, indexer, axis=1, fill_value=datetime(2007, 1, 1)
+        )
         result2 = np.empty_like(result)
         algos.take_nd(
             arr, indexer, out=result2, axis=1, fill_value=datetime(2007, 1, 1)
@@ -409,7 +413,9 @@ class TestTake:
         tm.assert_numpy_array_equal(result, expected)
 
         # allow_fill=True
-        result = algos.take(arr, [0, -1], axis=1, allow_fill=True, fill_value=0)
+        result = algos.take(
+            arr, [0, -1], axis=1, allow_fill=True, fill_value=0
+        )
         expected = np.array([[0, 0], [3, 0], [6, 0], [9, 0]])
         tm.assert_numpy_array_equal(result, expected)
 
@@ -450,7 +456,9 @@ class TestExtensionTake:
             algos.take(arr, [0], allow_fill=allow_fill)
 
     def test_take_na_empty(self):
-        result = algos.take(np.array([]), [-1, -1], allow_fill=True, fill_value=0.0)
+        result = algos.take(
+            np.array([]), [-1, -1], allow_fill=True, fill_value=0.0
+        )
         expected = np.array([0.0, 0.0])
         tm.assert_numpy_array_equal(result, expected)
 

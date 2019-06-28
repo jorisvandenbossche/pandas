@@ -13,7 +13,15 @@ from pandas.compat import is_platform_windows
 from pandas.errors import ParserError
 import pandas.util._test_decorators as td
 
-from pandas import DataFrame, Index, MultiIndex, Series, Timestamp, date_range, read_csv
+from pandas import (
+    DataFrame,
+    Index,
+    MultiIndex,
+    Series,
+    Timestamp,
+    date_range,
+    read_csv,
+)
 import pandas.util.testing as tm
 from pandas.util.testing import makeCustomDataframe as mkdf, network
 
@@ -144,8 +152,12 @@ class TestReadHtml:
 
     @pytest.mark.slow
     def test_banklist(self):
-        df1 = self.read_html(self.banklist_data, ".*Florida.*", attrs={"id": "table"})
-        df2 = self.read_html(self.banklist_data, "Metcalf Bank", attrs={"id": "table"})
+        df1 = self.read_html(
+            self.banklist_data, ".*Florida.*", attrs={"id": "table"}
+        )
+        df2 = self.read_html(
+            self.banklist_data, "Metcalf Bank", attrs={"id": "table"}
+        )
 
         assert_framelist_equal(df1, df2)
 
@@ -214,7 +226,9 @@ class TestReadHtml:
         assert_framelist_equal(df1, df2)
 
     def test_skiprows_ndarray(self):
-        df1 = self.read_html(self.spam_data, ".*Water.*", skiprows=np.arange(2))
+        df1 = self.read_html(
+            self.spam_data, ".*Water.*", skiprows=np.arange(2)
+        )
         df2 = self.read_html(self.spam_data, "Unit", skiprows=np.arange(2))
 
         assert_framelist_equal(df1, df2)
@@ -231,12 +245,16 @@ class TestReadHtml:
         assert_framelist_equal(df1, df2)
 
     def test_header_and_index_no_types(self):
-        df1 = self.read_html(self.spam_data, ".*Water.*", header=1, index_col=0)
+        df1 = self.read_html(
+            self.spam_data, ".*Water.*", header=1, index_col=0
+        )
         df2 = self.read_html(self.spam_data, "Unit", header=1, index_col=0)
         assert_framelist_equal(df1, df2)
 
     def test_header_and_index_with_types(self):
-        df1 = self.read_html(self.spam_data, ".*Water.*", header=1, index_col=0)
+        df1 = self.read_html(
+            self.spam_data, ".*Water.*", header=1, index_col=0
+        )
         df2 = self.read_html(self.spam_data, "Unit", header=1, index_col=0)
         assert_framelist_equal(df1, df2)
 
@@ -285,7 +303,9 @@ class TestReadHtml:
     def test_invalid_url(self):
         try:
             with pytest.raises(URLError):
-                self.read_html("http://www.a23950sdfa908sd.com", match=".*Water.*")
+                self.read_html(
+                    "http://www.a23950sdfa908sd.com", match=".*Water.*"
+                )
         except ValueError as e:
             assert "No tables found" in str(e)
 
@@ -293,7 +313,9 @@ class TestReadHtml:
     def test_file_url(self):
         url = self.banklist_data
         dfs = self.read_html(
-            file_path_to_url(os.path.abspath(url)), "First", attrs={"id": "table"}
+            file_path_to_url(os.path.abspath(url)),
+            "First",
+            attrs={"id": "table"},
         )
         assert isinstance(dfs, list)
         for df in dfs:
@@ -309,7 +331,11 @@ class TestReadHtml:
 
     def _bank_data(self, *args, **kwargs):
         return self.read_html(
-            self.banklist_data, "Metcalf", attrs={"id": "table"}, *args, **kwargs
+            self.banklist_data,
+            "Metcalf",
+            attrs={"id": "table"},
+            *args,
+            **kwargs
         )
 
     @pytest.mark.slow
@@ -331,7 +357,9 @@ class TestReadHtml:
     @pytest.mark.slow
     def test_multiindex_header_skiprows_tuples(self):
         with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
-            df = self._bank_data(header=[0, 1], skiprows=1, tupleize_cols=True)[0]
+            df = self._bank_data(
+                header=[0, 1], skiprows=1, tupleize_cols=True
+            )[0]
             assert isinstance(df.columns, Index)
 
     @pytest.mark.slow
@@ -379,7 +407,9 @@ class TestReadHtml:
     def test_thousands_macau_stats(self, datapath):
         all_non_nan_table_index = -2
         macau_data = datapath("io", "data", "macau.html")
-        dfs = self.read_html(macau_data, index_col=0, attrs={"class": "style1"})
+        dfs = self.read_html(
+            macau_data, index_col=0, attrs={"class": "style1"}
+        )
         df = dfs[all_non_nan_table_index]
 
         assert not any(s.isna().any() for _, s in df.iteritems())
@@ -536,7 +566,9 @@ class TestReadHtml:
         )
 
         data1 = data_template.format(footer="")
-        data2 = data_template.format(footer="<tr><td>footA</td><th>footB</th></tr>")
+        data2 = data_template.format(
+            footer="<tr><td>footA</td><th>footB</th></tr>"
+        )
 
         result1 = self.read_html(data1)[0]
         result2 = self.read_html(data2)[0]
@@ -569,7 +601,9 @@ class TestReadHtml:
 
     def test_nyse_wsj_commas_table(self, datapath):
         data = datapath("io", "data", "nyse_wsj.html")
-        df = self.read_html(data, index_col=0, header=0, attrs={"class": "mdcTable"})[0]
+        df = self.read_html(
+            data, index_col=0, header=0, attrs={"class": "mdcTable"}
+        )[0]
 
         expected = Index(
             [
@@ -594,7 +628,9 @@ class TestReadHtml:
             except AttributeError:
                 return x
 
-        df = self.read_html(self.banklist_data, "Metcalf", attrs={"id": "table"})[0]
+        df = self.read_html(
+            self.banklist_data, "Metcalf", attrs={"id": "table"}
+        )[0]
         ground_truth = read_csv(
             datapath("io", "data", "banklist.csv"),
             converters={"Updated Date": Timestamp, "Closing Date": Timestamp},
@@ -629,7 +665,9 @@ class TestReadHtml:
         gtnew = ground_truth.applymap(try_remove_ws)
         converted = dfnew._convert(datetime=True, numeric=True)
         date_cols = ["Closing Date", "Updated Date"]
-        converted[date_cols] = converted[date_cols]._convert(datetime=True, coerce=True)
+        converted[date_cols] = converted[date_cols]._convert(
+            datetime=True, coerce=True
+        )
         tm.assert_frame_equal(converted, gtnew)
 
     @pytest.mark.slow
@@ -639,7 +677,9 @@ class TestReadHtml:
             raw_text = f.read()
 
         assert gc in raw_text
-        df = self.read_html(self.banklist_data, "Gold Canyon", attrs={"id": "table"})[0]
+        df = self.read_html(
+            self.banklist_data, "Gold Canyon", attrs={"id": "table"}
+        )[0]
         assert gc in df.to_string()
 
     def test_different_number_of_cols(self):
@@ -761,7 +801,8 @@ class TestReadHtml:
         )[0]
 
         expected = DataFrame(
-            data=[["A", "B", "B", "Z", "C"]], columns=["X", "X.1", "Y", "Z", "W"]
+            data=[["A", "B", "B", "Z", "C"]],
+            columns=["X", "X.1", "Y", "Z", "W"],
         )
 
         tm.assert_frame_equal(result, expected)
@@ -791,7 +832,8 @@ class TestReadHtml:
         )[0]
 
         expected = DataFrame(
-            data=[["A", "B", "B", "B", "D"]], columns=["A", "B", "B.1", "B.2", "C"]
+            data=[["A", "B", "B", "B", "D"]],
+            columns=["A", "B", "B.1", "B.2", "C"],
         )
 
         tm.assert_frame_equal(result, expected)
@@ -863,7 +905,9 @@ class TestReadHtml:
         """
         )[0]
 
-        columns = MultiIndex(levels=[["A", "B"], ["a", "b"]], codes=[[0, 1], [0, 1]])
+        columns = MultiIndex(
+            levels=[["A", "B"], ["a", "b"]], codes=[[0, 1], [0, 1]]
+        )
         expected = DataFrame(data=[[1, 2]], columns=columns)
 
         tm.assert_frame_equal(result, expected)
@@ -1058,7 +1102,9 @@ class TestReadHtml:
         """
         )[0]
 
-        expected = DataFrame(data=[["a", "b"], [np.nan, np.nan]], columns=["A", "B"])
+        expected = DataFrame(
+            data=[["a", "b"], [np.nan, np.nan]], columns=["A", "B"]
+        )
 
         tm.assert_frame_equal(result, expected)
 
@@ -1078,7 +1124,9 @@ class TestReadHtml:
         """
         )[0]
 
-        columns = MultiIndex(levels=[["A", "B"], ["a", "b"]], codes=[[0, 1], [0, 1]])
+        columns = MultiIndex(
+            levels=[["A", "B"], ["a", "b"]], codes=[[0, 1], [0, 1]]
+        )
         expected = DataFrame(data=[[1, 2]], columns=columns)
 
         tm.assert_frame_equal(result, expected)
@@ -1086,7 +1134,11 @@ class TestReadHtml:
     def test_multiple_header_rows(self):
         # Issue #13434
         expected_df = DataFrame(
-            data=[("Hillary", 68, "D"), ("Bernie", 74, "D"), ("Donald", 69, "R")]
+            data=[
+                ("Hillary", 68, "D"),
+                ("Bernie", 74, "D"),
+                ("Donald", 69, "R"),
+            ]
         )
         expected_df.columns = [
             ["Unnamed: 0_level_0", "Age", "Party"],
@@ -1154,9 +1206,9 @@ class TestReadHtml:
             assert len(dfs) == 1  # Should not parse hidden table
 
     def test_encode(self, html_encoding_file):
-        _, encoding = os.path.splitext(os.path.basename(html_encoding_file))[0].split(
-            "_"
-        )
+        _, encoding = os.path.splitext(os.path.basename(html_encoding_file))[
+            0
+        ].split("_")
 
         try:
             with open(html_encoding_file, "rb") as fobj:
@@ -1198,7 +1250,9 @@ class TestReadHtml:
 
         assert self.read_html(bad)
 
-        with pytest.raises(ValueError, match="passed a non-rewindable file object"):
+        with pytest.raises(
+            ValueError, match="passed a non-rewindable file object"
+        ):
             self.read_html(bad)
 
     def test_parse_failure_rewinds(self):

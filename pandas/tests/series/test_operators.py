@@ -5,7 +5,15 @@ import numpy as np
 import pytest
 
 import pandas as pd
-from pandas import Categorical, DataFrame, Index, Series, bdate_range, date_range, isna
+from pandas import (
+    Categorical,
+    DataFrame,
+    Index,
+    Series,
+    bdate_range,
+    date_range,
+    isna,
+)
 from pandas.core import ops
 from pandas.core.indexes.base import InvalidIndexError
 import pandas.core.nanops as nanops
@@ -21,7 +29,9 @@ from .common import TestData
 
 
 class TestSeriesLogicalOps:
-    @pytest.mark.parametrize("bool_op", [operator.and_, operator.or_, operator.xor])
+    @pytest.mark.parametrize(
+        "bool_op", [operator.and_, operator.or_, operator.xor]
+    )
     def test_bool_operators_with_nas(self, bool_op):
         # boolean &, |, ^ should work with object arrays and propagate NAs
         ser = Series(bdate_range("1/1/2000", periods=10), dtype=object)
@@ -183,7 +193,9 @@ class TestSeriesLogicalOps:
         result = op(ser, idx1)
         assert_series_equal(result, expected)
 
-        expected = Series([op(ser[n], idx2[n]) for n in range(len(ser))], dtype=bool)
+        expected = Series(
+            [op(ser[n], idx2[n]) for n in range(len(ser))], dtype=bool
+        )
 
         result = op(ser, idx2)
         assert_series_equal(result, expected)
@@ -345,23 +357,33 @@ class TestSeriesLogicalOps:
         s1 = pd.Series([True, False, True], index=list("ABC"), name="x")
         s2 = pd.Series([True, True, False], index=list("ABD"), name="x")
 
-        exp = pd.Series([True, False, False, False], index=list("ABCD"), name="x")
+        exp = pd.Series(
+            [True, False, False, False], index=list("ABCD"), name="x"
+        )
         assert_series_equal(s1 & s2, exp)
         assert_series_equal(s2 & s1, exp)
 
         # True | np.nan => True
-        exp = pd.Series([True, True, True, False], index=list("ABCD"), name="x")
+        exp = pd.Series(
+            [True, True, True, False], index=list("ABCD"), name="x"
+        )
         assert_series_equal(s1 | s2, exp)
         # np.nan | True => np.nan, filled with False
-        exp = pd.Series([True, True, False, False], index=list("ABCD"), name="x")
+        exp = pd.Series(
+            [True, True, False, False], index=list("ABCD"), name="x"
+        )
         assert_series_equal(s2 | s1, exp)
 
         # DataFrame doesn't fill nan with False
-        exp = pd.DataFrame({"x": [True, False, np.nan, np.nan]}, index=list("ABCD"))
+        exp = pd.DataFrame(
+            {"x": [True, False, np.nan, np.nan]}, index=list("ABCD")
+        )
         assert_frame_equal(s1.to_frame() & s2.to_frame(), exp)
         assert_frame_equal(s2.to_frame() & s1.to_frame(), exp)
 
-        exp = pd.DataFrame({"x": [True, True, np.nan, np.nan]}, index=list("ABCD"))
+        exp = pd.DataFrame(
+            {"x": [True, True, np.nan, np.nan]}, index=list("ABCD")
+        )
         assert_frame_equal(s1.to_frame() | s2.to_frame(), exp)
         assert_frame_equal(s2.to_frame() | s1.to_frame(), exp)
 
@@ -369,22 +391,30 @@ class TestSeriesLogicalOps:
         s3 = pd.Series([True, False, True], index=list("ABC"), name="x")
         s4 = pd.Series([True, True, True, True], index=list("ABCD"), name="x")
 
-        exp = pd.Series([True, False, True, False], index=list("ABCD"), name="x")
+        exp = pd.Series(
+            [True, False, True, False], index=list("ABCD"), name="x"
+        )
         assert_series_equal(s3 & s4, exp)
         assert_series_equal(s4 & s3, exp)
 
         # np.nan | True => np.nan, filled with False
-        exp = pd.Series([True, True, True, False], index=list("ABCD"), name="x")
+        exp = pd.Series(
+            [True, True, True, False], index=list("ABCD"), name="x"
+        )
         assert_series_equal(s3 | s4, exp)
         # True | np.nan => True
         exp = pd.Series([True, True, True, True], index=list("ABCD"), name="x")
         assert_series_equal(s4 | s3, exp)
 
-        exp = pd.DataFrame({"x": [True, False, True, np.nan]}, index=list("ABCD"))
+        exp = pd.DataFrame(
+            {"x": [True, False, True, np.nan]}, index=list("ABCD")
+        )
         assert_frame_equal(s3.to_frame() & s4.to_frame(), exp)
         assert_frame_equal(s4.to_frame() & s3.to_frame(), exp)
 
-        exp = pd.DataFrame({"x": [True, True, True, np.nan]}, index=list("ABCD"))
+        exp = pd.DataFrame(
+            {"x": [True, True, True, np.nan]}, index=list("ABCD")
+        )
         assert_frame_equal(s3.to_frame() | s4.to_frame(), exp)
         assert_frame_equal(s4.to_frame() | s3.to_frame(), exp)
 
@@ -688,7 +718,9 @@ class TestSeriesOperators(TestData):
         int_ts = self.ts.astype(int)[:-5]
         added = self.ts + int_ts
         expected = Series(
-            self.ts.values[:-5] + int_ts.values, index=self.ts.index[:-5], name="ts"
+            self.ts.values[:-5] + int_ts.values,
+            index=self.ts.index[:-5],
+            name="ts",
         )
         tm.assert_series_equal(added[:-5], expected)
 
@@ -751,7 +783,8 @@ class TestSeriesOperators(TestData):
         from datetime import date
 
         s = Series(
-            [Decimal("1.3"), Decimal("2.3")], index=[date(2012, 1, 1), date(2012, 1, 2)]
+            [Decimal("1.3"), Decimal("2.3")],
+            index=[date(2012, 1, 1), date(2012, 1, 2)],
         )
 
         result = s + s.shift(1)

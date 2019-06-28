@@ -128,7 +128,8 @@ def test_drop_not_lexsorted():
 
     # and the not-lexsorted version
     df = pd.DataFrame(
-        columns=["a", "b", "c", "d"], data=[[1, "b1", "c1", 3], [1, "b2", "c2", 4]]
+        columns=["a", "b", "c", "d"],
+        data=[[1, "b1", "c1", 3], [1, "b2", "c2", 4]],
     )
     df = df.pivot_table(index="a", columns=["b", "c"], values="d")
     df = df.reset_index()
@@ -138,4 +139,6 @@ def test_drop_not_lexsorted():
     # compare the results
     tm.assert_index_equal(lexsorted_mi, not_lexsorted_mi)
     with tm.assert_produces_warning(PerformanceWarning):
-        tm.assert_index_equal(lexsorted_mi.drop("a"), not_lexsorted_mi.drop("a"))
+        tm.assert_index_equal(
+            lexsorted_mi.drop("a"), not_lexsorted_mi.drop("a")
+        )

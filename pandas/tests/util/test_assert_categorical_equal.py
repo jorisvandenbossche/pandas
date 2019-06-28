@@ -6,7 +6,10 @@ from pandas.util.testing import assert_categorical_equal
 
 @pytest.mark.parametrize(
     "c",
-    [Categorical([1, 2, 3, 4]), Categorical([1, 2, 3, 4], categories=[1, 2, 3, 4, 5])],
+    [
+        Categorical([1, 2, 3, 4]),
+        Categorical([1, 2, 3, 4], categories=[1, 2, 3, 4, 5]),
+    ],
 )
 def test_categorical_equal(c):
     assert_categorical_equal(c, c)

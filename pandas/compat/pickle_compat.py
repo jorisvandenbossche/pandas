@@ -57,7 +57,10 @@ def load_reduce(self):
 
 # If classes are moved, provide compat here.
 _class_locations_map = {
-    ("pandas.core.sparse.array", "SparseArray"): ("pandas.core.arrays", "SparseArray"),
+    ("pandas.core.sparse.array", "SparseArray"): (
+        "pandas.core.arrays",
+        "SparseArray",
+    ),
     # 15477
     #
     # TODO: When FrozenNDArray is removed, add
@@ -74,7 +77,10 @@ _class_locations_map = {
         "pandas.core.indexes.frozen",
         "FrozenNDArray",
     ),
-    ("pandas.core.base", "FrozenList"): ("pandas.core.indexes.frozen", "FrozenList"),
+    ("pandas.core.base", "FrozenList"): (
+        "pandas.core.indexes.frozen",
+        "FrozenList",
+    ),
     # 10890
     ("pandas.core.series", "TimeSeries"): ("pandas.core.series", "Series"),
     ("pandas.sparse.series", "SparseTimeSeries"): (
@@ -86,7 +92,10 @@ _class_locations_map = {
     ("pandas.tslib", "Timestamp"): ("pandas._libs.tslib", "Timestamp"),
     # 18543 moving period
     ("pandas._period", "Period"): ("pandas._libs.tslibs.period", "Period"),
-    ("pandas._libs.period", "Period"): ("pandas._libs.tslibs.period", "Period"),
+    ("pandas._libs.period", "Period"): (
+        "pandas._libs.tslibs.period",
+        "Period",
+    ),
     # 18014 moved __nat_unpickle from _libs.tslib-->_libs.tslibs.nattype
     ("pandas.tslib", "__nat_unpickle"): (
         "pandas._libs.tslibs.nattype",
@@ -109,14 +118,23 @@ _class_locations_map = {
         "pandas.core.sparse.frame",
         "SparseDataFrame",
     ),
-    ("pandas.indexes.base", "_new_Index"): ("pandas.core.indexes.base", "_new_Index"),
+    ("pandas.indexes.base", "_new_Index"): (
+        "pandas.core.indexes.base",
+        "_new_Index",
+    ),
     ("pandas.indexes.base", "Index"): ("pandas.core.indexes.base", "Index"),
     ("pandas.indexes.numeric", "Int64Index"): (
         "pandas.core.indexes.numeric",
         "Int64Index",
     ),
-    ("pandas.indexes.range", "RangeIndex"): ("pandas.core.indexes.range", "RangeIndex"),
-    ("pandas.indexes.multi", "MultiIndex"): ("pandas.core.indexes.multi", "MultiIndex"),
+    ("pandas.indexes.range", "RangeIndex"): (
+        "pandas.core.indexes.range",
+        "RangeIndex",
+    ),
+    ("pandas.indexes.multi", "MultiIndex"): (
+        "pandas.core.indexes.multi",
+        "MultiIndex",
+    ),
     ("pandas.tseries.index", "_new_DatetimeIndex"): (
         "pandas.core.indexes.datetimes",
         "_new_DatetimeIndex",
@@ -130,7 +148,10 @@ _class_locations_map = {
         "PeriodIndex",
     ),
     # 19269, arrays moving
-    ("pandas.core.categorical", "Categorical"): ("pandas.core.arrays", "Categorical"),
+    ("pandas.core.categorical", "Categorical"): (
+        "pandas.core.arrays",
+        "Categorical",
+    ),
     # 19939, add timedeltaindex, float64index compat from 15998 move
     ("pandas.tseries.tdi", "TimedeltaIndex"): (
         "pandas.core.indexes.timedeltas",

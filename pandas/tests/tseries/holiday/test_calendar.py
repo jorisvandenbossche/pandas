@@ -16,7 +16,8 @@ from pandas.tseries.holiday import (
 
 
 @pytest.mark.parametrize(
-    "transform", [lambda x: x, lambda x: x.strftime("%Y-%m-%d"), lambda x: Timestamp(x)]
+    "transform",
+    [lambda x: x, lambda x: x.strftime("%Y-%m-%d"), lambda x: Timestamp(x)],
 )
 def test_calendar(transform):
     start_date = datetime(2012, 1, 1)

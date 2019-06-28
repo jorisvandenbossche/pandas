@@ -114,7 +114,11 @@ def test_getitem_multiple():
 def test_groupby_resample_on_api_with_getitem():
     # GH 17813
     df = pd.DataFrame(
-        {"id": list("aabbb"), "date": pd.date_range("1-1-2016", periods=5), "data": 1}
+        {
+            "id": list("aabbb"),
+            "date": pd.date_range("1-1-2016", periods=5),
+            "data": 1,
+        }
     )
     exp = df.set_index("date").groupby("id").resample("2D")["data"].sum()
     result = df.groupby("id").resample("2D", on="date")["data"].sum()
@@ -231,7 +235,9 @@ def test_apply_with_mutated_index():
 def test_resample_groupby_with_label():
     # GH 13235
     index = date_range("2000-01-01", freq="2D", periods=5)
-    df = DataFrame(index=index, data={"col0": [0, 0, 1, 1, 2], "col1": [1, 1, 1, 1, 1]})
+    df = DataFrame(
+        index=index, data={"col0": [0, 0, 1, 1, 2], "col1": [1, 1, 1, 1, 1]}
+    )
     result = df.groupby("col0").resample("1W", label="left").sum()
 
     mi = [

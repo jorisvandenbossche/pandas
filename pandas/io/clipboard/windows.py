@@ -158,7 +158,9 @@ def init_windows_clipboard():
                     # the object must have been allocated using the
                     # function with the GMEM_MOVEABLE flag.
                     count = wcslen(text) + 1
-                    handle = safeGlobalAlloc(GMEM_MOVEABLE, count * sizeof(c_wchar))
+                    handle = safeGlobalAlloc(
+                        GMEM_MOVEABLE, count * sizeof(c_wchar)
+                    )
                     locked_handle = safeGlobalLock(handle)
 
                     ctypes.memmove(

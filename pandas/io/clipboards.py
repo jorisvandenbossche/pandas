@@ -27,7 +27,9 @@ def read_clipboard(sep=r"\s+", **kwargs):  # pragma: no cover
     # only utf-8 is valid for passed value because that's what clipboard
     # supports
     if encoding is not None and encoding.lower().replace("-", "") != "utf8":
-        raise NotImplementedError("reading from clipboard only supports utf-8 encoding")
+        raise NotImplementedError(
+            "reading from clipboard only supports utf-8 encoding"
+        )
 
     from pandas.io.clipboard import clipboard_get
     from pandas.io.parsers import read_csv
@@ -36,7 +38,9 @@ def read_clipboard(sep=r"\s+", **kwargs):  # pragma: no cover
 
     # Try to decode (if needed, as "text" might already be a string here).
     try:
-        text = text.decode(kwargs.get("encoding") or get_option("display.encoding"))
+        text = text.decode(
+            kwargs.get("encoding") or get_option("display.encoding")
+        )
     except AttributeError:
         pass
 
@@ -121,7 +125,8 @@ def to_clipboard(obj, excel=True, sep=None, **kwargs):  # pragma: no cover
             return
         except TypeError:
             warnings.warn(
-                "to_clipboard in excel mode requires a single " "character separator."
+                "to_clipboard in excel mode requires a single "
+                "character separator."
             )
     elif sep is not None:
         warnings.warn("to_clipboard with excel=False ignores the sep argument")

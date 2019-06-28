@@ -76,7 +76,9 @@ def test_zip_error_invalid_zip(parser_and_data):
 
     with tm.ensure_clean() as path:
         with open(path, "wb") as f:
-            with pytest.raises(zipfile.BadZipfile, match="File is not a zip file"):
+            with pytest.raises(
+                zipfile.BadZipfile, match="File is not a zip file"
+            ):
                 parser.read_csv(f, compression="zip")
 
 
@@ -89,7 +91,9 @@ def test_compression(parser_and_data, compression_only, buffer, filename):
     filename = filename if filename is None else filename.format(ext=ext)
 
     if filename and buffer:
-        pytest.skip("Cannot deduce compression from " "buffer of compressed data.")
+        pytest.skip(
+            "Cannot deduce compression from " "buffer of compressed data."
+        )
 
     with tm.ensure_clean(filename=filename) as path:
         tm.write_to_compressed(compress_type, path, data)
@@ -128,7 +132,9 @@ def test_compression_utf16_encoding(all_parsers, csv_dir_path):
     parser = all_parsers
     path = os.path.join(csv_dir_path, "utf16_ex_small.zip")
 
-    result = parser.read_csv(path, encoding="utf-16", compression="zip", sep="\t")
+    result = parser.read_csv(
+        path, encoding="utf-16", compression="zip", sep="\t"
+    )
     expected = pd.DataFrame(
         {
             "Country": ["Venezuela", "Venezuela"],
@@ -144,7 +150,9 @@ def test_invalid_compression(all_parsers, invalid_compression):
     parser = all_parsers
     compress_kwargs = dict(compression=invalid_compression)
 
-    msg = "Unrecognized compression " "type: {compression}".format(**compress_kwargs)
+    msg = "Unrecognized compression " "type: {compression}".format(
+        **compress_kwargs
+    )
 
     with pytest.raises(ValueError, match=msg):
         parser.read_csv("test_file.zip", **compress_kwargs)

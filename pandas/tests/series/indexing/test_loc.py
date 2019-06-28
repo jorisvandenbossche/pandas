@@ -15,7 +15,9 @@ def test_loc_uint64(val, expected):
 
 def test_loc_getitem(test_data):
     inds = test_data.series.index[[3, 4, 7]]
-    assert_series_equal(test_data.series.loc[inds], test_data.series.reindex(inds))
+    assert_series_equal(
+        test_data.series.loc[inds], test_data.series.reindex(inds)
+    )
     assert_series_equal(test_data.series.iloc[5::2], test_data.series[5::2])
 
     # slice with indices
@@ -140,7 +142,8 @@ def test_basic_setitem_with_labels(test_data):
     # GH12089
     # with tz for values
     s = Series(
-        pd.date_range("2011-01-01", periods=3, tz="US/Eastern"), index=["a", "b", "c"]
+        pd.date_range("2011-01-01", periods=3, tz="US/Eastern"),
+        index=["a", "b", "c"],
     )
     s2 = s.copy()
     expected = Timestamp("2011-01-03", tz="US/Eastern")

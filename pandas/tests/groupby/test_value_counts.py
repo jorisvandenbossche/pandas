@@ -58,7 +58,9 @@ def test_series_groupby_value_counts(df, keys, bins, n, m):
         df.index = MultiIndex.from_arrays(arr, names=df.index.names)
         return df
 
-    for isort, normalize, sort, ascending, dropna in product((False, True), repeat=5):
+    for isort, normalize, sort, ascending, dropna in product(
+        (False, True), repeat=5
+    ):
 
         kwargs = dict(
             normalize=normalize,

@@ -20,7 +20,9 @@ class TestSAS7BDAT:
         self.data = []
         self.test_ix = [list(range(1, 16)), [16]]
         for j in 1, 2:
-            fname = os.path.join(self.dirpath, "test_sas7bdat_{j}.csv".format(j=j))
+            fname = os.path.join(
+                self.dirpath, "test_sas7bdat_{j}.csv".format(j=j)
+            )
             df = pd.read_csv(fname)
             epoch = pd.datetime(1960, 1, 1)
             t1 = pd.to_timedelta(df["Column4"], unit="d")
@@ -37,7 +39,9 @@ class TestSAS7BDAT:
         for j in 0, 1:
             df0 = self.data[j]
             for k in self.test_ix[j]:
-                fname = os.path.join(self.dirpath, "test{k}.sas7bdat".format(k=k))
+                fname = os.path.join(
+                    self.dirpath, "test{k}.sas7bdat".format(k=k)
+                )
                 df = pd.read_sas(fname, encoding="utf-8")
                 tm.assert_frame_equal(df, df0)
 
@@ -45,7 +49,9 @@ class TestSAS7BDAT:
         for j in 0, 1:
             df0 = self.data[j]
             for k in self.test_ix[j]:
-                fname = os.path.join(self.dirpath, "test{k}.sas7bdat".format(k=k))
+                fname = os.path.join(
+                    self.dirpath, "test{k}.sas7bdat".format(k=k)
+                )
                 with open(fname, "rb") as f:
                     byts = f.read()
                 buf = io.BytesIO(byts)
@@ -60,7 +66,9 @@ class TestSAS7BDAT:
         for j in 0, 1:
             df0 = self.data[j]
             for k in self.test_ix[j]:
-                fname = os.path.join(self.dirpath, "test{k}.sas7bdat".format(k=k))
+                fname = os.path.join(
+                    self.dirpath, "test{k}.sas7bdat".format(k=k)
+                )
                 rdr = pd.read_sas(fname, iterator=True, encoding="utf-8")
                 df = rdr.read(2)
                 tm.assert_frame_equal(df, df0.iloc[0:2, :])
@@ -75,7 +83,9 @@ class TestSAS7BDAT:
         for j in 0, 1:
             df0 = self.data[j]
             for k in self.test_ix[j]:
-                fname = Path(os.path.join(self.dirpath, "test{k}.sas7bdat".format(k=k)))
+                fname = Path(
+                    os.path.join(self.dirpath, "test{k}.sas7bdat".format(k=k))
+                )
                 df = pd.read_sas(fname, encoding="utf-8")
                 tm.assert_frame_equal(df, df0)
 
@@ -97,7 +107,9 @@ class TestSAS7BDAT:
         for j in 0, 1:
             for k in self.test_ix[j]:
                 for chunksize in 3, 5, 10, 11:
-                    fname = os.path.join(self.dirpath, "test{k}.sas7bdat".format(k=k))
+                    fname = os.path.join(
+                        self.dirpath, "test{k}.sas7bdat".format(k=k)
+                    )
                     rdr = pd.read_sas(fname, chunksize=10, encoding="utf-8")
                     y = 0
                     for x in rdr:
@@ -109,7 +121,9 @@ class TestSAS7BDAT:
         # github #14734
         k = self.test_ix[0][0]
         fname = os.path.join(self.dirpath, "test{k}.sas7bdat".format(k=k))
-        rdr = pd.read_sas(fname, format="sas7bdat", iterator=True, encoding="utf-8")
+        rdr = pd.read_sas(
+            fname, format="sas7bdat", iterator=True, encoding="utf-8"
+        )
         d1 = rdr.read(rdr.row_count + 20)
         rdr.close()
 

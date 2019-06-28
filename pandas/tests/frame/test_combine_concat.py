@@ -13,7 +13,9 @@ class TestDataFrameConcatCommon:
     def test_concat_multiple_frames_dtypes(self):
 
         # GH 2759
-        A = DataFrame(data=np.ones((10, 2)), columns=["foo", "bar"], dtype=np.float64)
+        A = DataFrame(
+            data=np.ones((10, 2)), columns=["foo", "bar"], dtype=np.float64
+        )
         B = DataFrame(data=np.ones((10, 2)), dtype=np.float32)
         results = pd.concat((A, B), axis=1).get_dtype_counts()
         expected = Series(dict(float64=2, float32=2))
@@ -127,7 +129,9 @@ class TestDataFrameConcatCommon:
         assert_frame_equal(results, expected)
 
     def test_append_series_dict(self):
-        df = DataFrame(np.random.randn(5, 4), columns=["foo", "bar", "baz", "qux"])
+        df = DataFrame(
+            np.random.randn(5, 4), columns=["foo", "bar", "baz", "qux"]
+        )
 
         series = df.loc[4]
         msg = "Indexes have overlapping values"
@@ -163,7 +167,9 @@ class TestDataFrameConcatCommon:
         assert_frame_equal(result, expected)
 
     def test_append_list_of_series_dicts(self):
-        df = DataFrame(np.random.randn(5, 4), columns=["foo", "bar", "baz", "qux"])
+        df = DataFrame(
+            np.random.randn(5, 4), columns=["foo", "bar", "baz", "qux"]
+        )
 
         dicts = [x.to_dict() for idx, x in df.iterrows()]
 
@@ -185,7 +191,9 @@ class TestDataFrameConcatCommon:
         # exercise the conditional branch in append method where the data
         # to be appended is a list and does not contain all columns that are in
         # the target DataFrame
-        df = DataFrame(np.random.randn(5, 4), columns=["foo", "bar", "baz", "qux"])
+        df = DataFrame(
+            np.random.randn(5, 4), columns=["foo", "bar", "baz", "qux"]
+        )
 
         dicts = [{"foo": 9}, {"bar": 10}]
         with tm.assert_produces_warning(None):
@@ -274,15 +282,27 @@ class TestDataFrameConcatCommon:
 
     def test_update(self):
         df = DataFrame(
-            [[1.5, np.nan, 3.0], [1.5, np.nan, 3.0], [1.5, np.nan, 3], [1.5, np.nan, 3]]
+            [
+                [1.5, np.nan, 3.0],
+                [1.5, np.nan, 3.0],
+                [1.5, np.nan, 3],
+                [1.5, np.nan, 3],
+            ]
         )
 
-        other = DataFrame([[3.6, 2.0, np.nan], [np.nan, np.nan, 7]], index=[1, 3])
+        other = DataFrame(
+            [[3.6, 2.0, np.nan], [np.nan, np.nan, 7]], index=[1, 3]
+        )
 
         df.update(other)
 
         expected = DataFrame(
-            [[1.5, np.nan, 3], [3.6, 2, 3], [1.5, np.nan, 3], [1.5, np.nan, 7.0]]
+            [
+                [1.5, np.nan, 3],
+                [3.6, 2, 3],
+                [1.5, np.nan, 3],
+                [1.5, np.nan, 7.0],
+            ]
         )
         assert_frame_equal(df, expected)
 
@@ -305,29 +325,53 @@ class TestDataFrameConcatCommon:
 
     def test_update_nooverwrite(self):
         df = DataFrame(
-            [[1.5, np.nan, 3.0], [1.5, np.nan, 3.0], [1.5, np.nan, 3], [1.5, np.nan, 3]]
+            [
+                [1.5, np.nan, 3.0],
+                [1.5, np.nan, 3.0],
+                [1.5, np.nan, 3],
+                [1.5, np.nan, 3],
+            ]
         )
 
-        other = DataFrame([[3.6, 2.0, np.nan], [np.nan, np.nan, 7]], index=[1, 3])
+        other = DataFrame(
+            [[3.6, 2.0, np.nan], [np.nan, np.nan, 7]], index=[1, 3]
+        )
 
         df.update(other, overwrite=False)
 
         expected = DataFrame(
-            [[1.5, np.nan, 3], [1.5, 2, 3], [1.5, np.nan, 3], [1.5, np.nan, 3.0]]
+            [
+                [1.5, np.nan, 3],
+                [1.5, 2, 3],
+                [1.5, np.nan, 3],
+                [1.5, np.nan, 3.0],
+            ]
         )
         assert_frame_equal(df, expected)
 
     def test_update_filtered(self):
         df = DataFrame(
-            [[1.5, np.nan, 3.0], [1.5, np.nan, 3.0], [1.5, np.nan, 3], [1.5, np.nan, 3]]
+            [
+                [1.5, np.nan, 3.0],
+                [1.5, np.nan, 3.0],
+                [1.5, np.nan, 3],
+                [1.5, np.nan, 3],
+            ]
         )
 
-        other = DataFrame([[3.6, 2.0, np.nan], [np.nan, np.nan, 7]], index=[1, 3])
+        other = DataFrame(
+            [[3.6, 2.0, np.nan], [np.nan, np.nan, 7]], index=[1, 3]
+        )
 
         df.update(other, filter_func=lambda x: x > 2)
 
         expected = DataFrame(
-            [[1.5, np.nan, 3], [1.5, np.nan, 3], [1.5, np.nan, 3], [1.5, np.nan, 7.0]]
+            [
+                [1.5, np.nan, 3],
+                [1.5, np.nan, 3],
+                [1.5, np.nan, 3],
+                [1.5, np.nan, 7.0],
+            ]
         )
         assert_frame_equal(df, expected)
 
@@ -335,8 +379,16 @@ class TestDataFrameConcatCommon:
         "bad_kwarg, exception, msg",
         [
             # errors must be 'ignore' or 'raise'
-            ({"errors": "something"}, ValueError, "The parameter errors must.*"),
-            ({"join": "inner"}, NotImplementedError, "Only left join is supported"),
+            (
+                {"errors": "something"},
+                ValueError,
+                "The parameter errors must.*",
+            ),
+            (
+                {"join": "inner"},
+                NotImplementedError,
+                "Only left join is supported",
+            ),
         ],
     )
     def test_update_raise_bad_parameter(self, bad_kwarg, exception, msg):
@@ -346,10 +398,17 @@ class TestDataFrameConcatCommon:
 
     def test_update_raise_on_overlap(self):
         df = DataFrame(
-            [[1.5, 1, 3.0], [1.5, np.nan, 3.0], [1.5, np.nan, 3], [1.5, np.nan, 3]]
+            [
+                [1.5, 1, 3.0],
+                [1.5, np.nan, 3.0],
+                [1.5, np.nan, 3],
+                [1.5, np.nan, 3],
+            ]
         )
 
-        other = DataFrame([[2.0, np.nan], [np.nan, 7]], index=[1, 3], columns=[1, 2])
+        other = DataFrame(
+            [[2.0, np.nan], [np.nan, 7]], index=[1, 3], columns=[1, 2]
+        )
         with pytest.raises(ValueError, match="Data overlaps"):
             df.update(other, errors="raise")
 
@@ -438,7 +497,9 @@ class TestDataFrameConcatCommon:
 
         # these must be the same results (but columns are flipped)
         assert_frame_equal(df1.join(df2, how="left"), exp)
-        assert_frame_equal(df2.join(df1, how="right"), exp[["value2", "value1"]])
+        assert_frame_equal(
+            df2.join(df1, how="right"), exp[["value2", "value1"]]
+        )
 
         exp_idx = pd.MultiIndex.from_product(
             [["a", "b"], ["x", "y", "z"]], names=["first", "second"]
@@ -457,7 +518,9 @@ class TestDataFrameConcatCommon:
         )
 
         assert_frame_equal(df1.join(df2, how="right"), exp)
-        assert_frame_equal(df2.join(df1, how="left"), exp[["value2", "value1"]])
+        assert_frame_equal(
+            df2.join(df1, how="left"), exp[["value2", "value1"]]
+        )
 
     def test_concat_named_keys(self):
         # GH 14252
@@ -466,7 +529,9 @@ class TestDataFrameConcatCommon:
         concatted_named_from_keys = pd.concat([df, df], keys=index)
         expected_named = pd.DataFrame(
             {"foo": [1, 2, 1, 2], "bar": [0.1, 0.2, 0.1, 0.2]},
-            index=pd.MultiIndex.from_product((["a", "b"], [0, 1]), names=["baz", None]),
+            index=pd.MultiIndex.from_product(
+                (["a", "b"], [0, 1]), names=["baz", None]
+            ),
         )
         assert_frame_equal(concatted_named_from_keys, expected_named)
 
@@ -479,7 +544,9 @@ class TestDataFrameConcatCommon:
         concatted_unnamed = pd.concat([df, df], keys=index_no_name)
         expected_unnamed = pd.DataFrame(
             {"foo": [1, 2, 1, 2], "bar": [0.1, 0.2, 0.1, 0.2]},
-            index=pd.MultiIndex.from_product((["a", "b"], [0, 1]), names=[None, None]),
+            index=pd.MultiIndex.from_product(
+                (["a", "b"], [0, 1]), names=[None, None]
+            ),
         )
         assert_frame_equal(concatted_unnamed, expected_unnamed)
 
@@ -489,7 +556,9 @@ class TestDataFrameConcatCommon:
         df2 = pd.DataFrame({"A": [0.3, 0.4]}, index=range(2))
 
         # Index/row/0 DataFrame
-        expected_index = pd.DataFrame({"A": [0.1, 0.2, 0.3, 0.4]}, index=[0, 1, 0, 1])
+        expected_index = pd.DataFrame(
+            {"A": [0.1, 0.2, 0.3, 0.4]}, index=[0, 1, 0, 1]
+        )
 
         concatted_index = pd.concat([df1, df2], axis="index")
         assert_frame_equal(concatted_index, expected_index)
@@ -515,7 +584,9 @@ class TestDataFrameConcatCommon:
         series2 = pd.Series([0.3, 0.4])
 
         # Index/row/0 Series
-        expected_index_series = pd.Series([0.1, 0.2, 0.3, 0.4], index=[0, 1, 0, 1])
+        expected_index_series = pd.Series(
+            [0.1, 0.2, 0.3, 0.4], index=[0, 1, 0, 1]
+        )
 
         concatted_index_series = pd.concat([series1, series2], axis="index")
         assert_series_equal(concatted_index_series, expected_index_series)
@@ -531,7 +602,9 @@ class TestDataFrameConcatCommon:
             [[0.1, 0.3], [0.2, 0.4]], index=[0, 1], columns=[0, 1]
         )
 
-        concatted_columns_series = pd.concat([series1, series2], axis="columns")
+        concatted_columns_series = pd.concat(
+            [series1, series2], axis="columns"
+        )
         assert_frame_equal(concatted_columns_series, expected_columns_series)
 
         concatted_1_series = pd.concat([series1, series2], axis=1)
@@ -557,7 +630,8 @@ class TestDataFrameConcatCommon:
             {"col": [0, 1, 7, 8]},
             dtype="int32",
             index=pd.MultiIndex.from_tuples(
-                [("A0", "B0"), ("A0", "B1"), ("A2", "B1"), ("A2", "B2")], names=[1, 2]
+                [("A0", "B0"), ("A0", "B1"), ("A2", "B1"), ("A2", "B2")],
+                names=[1, 2],
             ),
         )
         tm.assert_frame_equal(result, expected)
@@ -686,7 +760,10 @@ class TestDataFrameCombineFirst:
 
         # doc example
         df1 = DataFrame(
-            {"A": [1.0, np.nan, 3.0, 5.0, np.nan], "B": [np.nan, 2.0, 3.0, np.nan, 6.0]}
+            {
+                "A": [1.0, np.nan, 3.0, 5.0, np.nan],
+                "B": [np.nan, 2.0, 3.0, np.nan, 6.0],
+            }
         )
 
         df2 = DataFrame(
@@ -697,14 +774,18 @@ class TestDataFrameCombineFirst:
         )
 
         result = df1.combine_first(df2)
-        expected = DataFrame({"A": [1, 2, 3, 5, 3, 7.0], "B": [np.nan, 2, 3, 4, 6, 8]})
+        expected = DataFrame(
+            {"A": [1, 2, 3, 5, 3, 7.0], "B": [np.nan, 2, 3, 4, 6, 8]}
+        )
         assert_frame_equal(result, expected)
 
         # GH3552, return object dtype with bools
         df1 = DataFrame(
             [[np.nan, 3.0, True], [-4.6, np.nan, True], [np.nan, 7.0, False]]
         )
-        df2 = DataFrame([[-42.6, np.nan, True], [-5.0, 1.6, False]], index=[1, 2])
+        df2 = DataFrame(
+            [[-42.6, np.nan, True], [-5.0, 1.6, False]], index=[1, 2]
+        )
 
         result = df1.combine_first(df2)[2]
         expected = Series([True, True, False], name=2)
@@ -712,7 +793,13 @@ class TestDataFrameCombineFirst:
 
         # GH 3593, converting datetime64[ns] incorrectly
         df0 = DataFrame(
-            {"a": [datetime(2000, 1, 1), datetime(2000, 1, 2), datetime(2000, 1, 3)]}
+            {
+                "a": [
+                    datetime(2000, 1, 1),
+                    datetime(2000, 1, 2),
+                    datetime(2000, 1, 3),
+                ]
+            }
         )
         df1 = DataFrame({"a": [None, None, None]})
         df2 = df1.combine_first(df0)
@@ -722,7 +809,13 @@ class TestDataFrameCombineFirst:
         assert_frame_equal(df2, df0)
 
         df0 = DataFrame(
-            {"a": [datetime(2000, 1, 1), datetime(2000, 1, 2), datetime(2000, 1, 3)]}
+            {
+                "a": [
+                    datetime(2000, 1, 1),
+                    datetime(2000, 1, 2),
+                    datetime(2000, 1, 3),
+                ]
+            }
         )
         df1 = DataFrame({"a": [datetime(2000, 1, 2), None, None]})
         df2 = df1.combine_first(df0)
@@ -735,7 +828,9 @@ class TestDataFrameCombineFirst:
 
     def test_combine_first_align_nan(self):
         # GH 7509 (not fixed)
-        dfa = pd.DataFrame([[pd.Timestamp("2011-01-01"), 2]], columns=["a", "b"])
+        dfa = pd.DataFrame(
+            [[pd.Timestamp("2011-01-01"), 2]], columns=["a", "b"]
+        )
         dfb = pd.DataFrame([[4], [5]], columns=["b"])
         assert dfa["a"].dtype == "datetime64[ns]"
         assert dfa["b"].dtype == "int64"
@@ -751,7 +846,9 @@ class TestDataFrameCombineFirst:
         assert res["b"].dtype == "float64"
 
         res = dfa.iloc[:0].combine_first(dfb)
-        exp = pd.DataFrame({"a": [np.nan, np.nan], "b": [4, 5]}, columns=["a", "b"])
+        exp = pd.DataFrame(
+            {"a": [np.nan, np.nan], "b": [4, 5]}, columns=["a", "b"]
+        )
         tm.assert_frame_equal(res, exp)
         # ToDo: this must be datetime64
         assert res["a"].dtype == "float64"
@@ -863,21 +960,26 @@ class TestDataFrameCombineFirst:
         assert res["TD"].dtype == "timedelta64[ns]"
 
     def test_combine_first_period(self):
-        data1 = pd.PeriodIndex(["2011-01", "NaT", "2011-03", "2011-04"], freq="M")
+        data1 = pd.PeriodIndex(
+            ["2011-01", "NaT", "2011-03", "2011-04"], freq="M"
+        )
         df1 = pd.DataFrame({"P": data1}, index=[1, 3, 5, 7])
         data2 = pd.PeriodIndex(["2012-01-01", "2012-02", "2012-03"], freq="M")
         df2 = pd.DataFrame({"P": data2}, index=[2, 4, 5])
 
         res = df1.combine_first(df2)
         exp_dts = pd.PeriodIndex(
-            ["2011-01", "2012-01", "NaT", "2012-02", "2011-03", "2011-04"], freq="M"
+            ["2011-01", "2012-01", "NaT", "2012-02", "2011-03", "2011-04"],
+            freq="M",
         )
         exp = pd.DataFrame({"P": exp_dts}, index=[1, 2, 3, 4, 5, 7])
         tm.assert_frame_equal(res, exp)
         assert res["P"].dtype == data1.dtype
 
         # different freq
-        dts2 = pd.PeriodIndex(["2012-01-01", "2012-01-02", "2012-01-03"], freq="D")
+        dts2 = pd.PeriodIndex(
+            ["2012-01-01", "2012-01-02", "2012-01-03"], freq="D"
+        )
         df2 = pd.DataFrame({"P": dts2}, index=[2, 4, 5])
 
         res = df1.combine_first(df2)
@@ -941,9 +1043,13 @@ class TestDataFrameUpdate:
         tm.assert_frame_equal(df1, expected)
 
         # test 2
-        df1 = DataFrame({"A": [1.0, None, 3], "B": date_range("2000", periods=3)})
+        df1 = DataFrame(
+            {"A": [1.0, None, 3], "B": date_range("2000", periods=3)}
+        )
         df2 = DataFrame({"A": [None, 2, 3]})
-        expected = DataFrame({"A": [1.0, 2, 3], "B": date_range("2000", periods=3)})
+        expected = DataFrame(
+            {"A": [1.0, 2, 3], "B": date_range("2000", periods=3)}
+        )
         df1.update(df2, overwrite=False)
 
         tm.assert_frame_equal(df1, expected)

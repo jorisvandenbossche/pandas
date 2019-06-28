@@ -46,16 +46,26 @@ def df(request):
     data_type = request.param
 
     if data_type == "delims":
-        return pd.DataFrame({"a": ['"a,\t"b|c', "d\tef´"], "b": ["hi'j", "k''lm"]})
+        return pd.DataFrame(
+            {"a": ['"a,\t"b|c', "d\tef´"], "b": ["hi'j", "k''lm"]}
+        )
     elif data_type == "utf8":
         return pd.DataFrame({"a": ["µasd", "Ωœ∑´"], "b": ["øπ∆˚¬", "œ∑´®"]})
     elif data_type == "utf16":
         return pd.DataFrame(
-            {"a": ["\U0001f44d\U0001f44d", "\U0001f44d\U0001f44d"], "b": ["abc", "def"]}
+            {
+                "a": ["\U0001f44d\U0001f44d", "\U0001f44d\U0001f44d"],
+                "b": ["abc", "def"],
+            }
         )
     elif data_type == "string":
         return mkdf(
-            5, 3, c_idx_type="s", r_idx_type="i", c_idx_names=[None], r_idx_names=[None]
+            5,
+            3,
+            c_idx_type="s",
+            r_idx_type="i",
+            c_idx_names=[None],
+            r_idx_names=[None],
         )
     elif data_type == "long":
         max_rows = get_option("display.max_rows")
@@ -69,7 +79,9 @@ def df(request):
             r_idx_names=[None],
         )
     elif data_type == "nonascii":
-        return pd.DataFrame({"en": "in English".split(), "es": "en español".split()})
+        return pd.DataFrame(
+            {"en": "in English".split(), "es": "en español".split()}
+        )
     elif data_type == "colwidth":
         _cw = get_option("display.max_colwidth") + 1
         return mkdf(
@@ -83,7 +95,11 @@ def df(request):
         )
     elif data_type == "mixed":
         return DataFrame(
-            {"a": np.arange(1.0, 6.0) + 0.01, "b": np.arange(1, 6), "c": list("abcde")}
+            {
+                "a": np.arange(1.0, 6.0) + 0.01,
+                "b": np.arange(1, 6),
+                "c": list("abcde"),
+            }
         )
     elif data_type == "float":
         return mkdf(
@@ -150,12 +166,18 @@ def test_mock_clipboard(mock_clipboard):
 
 @pytest.mark.single
 @pytest.mark.clipboard
-@pytest.mark.skipif(not _DEPS_INSTALLED, reason="clipboard primitives not installed")
+@pytest.mark.skipif(
+    not _DEPS_INSTALLED, reason="clipboard primitives not installed"
+)
 @pytest.mark.usefixtures("mock_clipboard")
 class TestClipboard:
-    def check_round_trip_frame(self, data, excel=None, sep=None, encoding=None):
+    def check_round_trip_frame(
+        self, data, excel=None, sep=None, encoding=None
+    ):
         data.to_clipboard(excel=excel, sep=sep, encoding=encoding)
-        result = read_clipboard(sep=sep or "\t", index_col=0, encoding=encoding)
+        result = read_clipboard(
+            sep=sep or "\t", index_col=0, encoding=encoding
+        )
         tm.assert_frame_equal(data, result, check_dtype=False)
 
     # Test that default arguments copy as tab delimited
@@ -189,7 +211,9 @@ class TestClipboard:
     # delimited and excel="True"
     @pytest.mark.parametrize("sep", ["\t", None, "default"])
     @pytest.mark.parametrize("excel", [True, None, "default"])
-    def test_clipboard_copy_tabs_default(self, sep, excel, df, request, mock_clipboard):
+    def test_clipboard_copy_tabs_default(
+        self, sep, excel, df, request, mock_clipboard
+    ):
         kwargs = build_kwargs(sep, excel)
         df.to_clipboard(**kwargs)
         assert mock_clipboard[request.node.name] == df.to_csv(sep="\t")
@@ -258,7 +282,9 @@ class TestClipboard:
 
 @pytest.mark.single
 @pytest.mark.clipboard
-@pytest.mark.skipif(not _DEPS_INSTALLED, reason="clipboard primitives not installed")
+@pytest.mark.skipif(
+    not _DEPS_INSTALLED, reason="clipboard primitives not installed"
+)
 @pytest.mark.parametrize("data", ["\U0001f44d...", "Ωœ∑´...", "abcd..."])
 def test_raw_roundtrip(data):
     # PR #25040 wide unicode wasn't copied correctly on PY3 on windows

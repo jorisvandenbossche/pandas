@@ -6,7 +6,15 @@ import numpy as np
 import pytest
 
 import pandas as pd
-from pandas import DataFrame, Index, NaT, Series, Timedelta, Timestamp, bdate_range
+from pandas import (
+    DataFrame,
+    Index,
+    NaT,
+    Series,
+    Timedelta,
+    Timestamp,
+    bdate_range,
+)
 from pandas.core.groupby.groupby import DataError
 import pandas.util.testing as tm
 
@@ -78,13 +86,17 @@ def test_cython_agg_boolean():
 
 
 def test_cython_agg_nothing_to_agg():
-    frame = DataFrame({"a": np.random.randint(0, 5, 50), "b": ["foo", "bar"] * 25})
+    frame = DataFrame(
+        {"a": np.random.randint(0, 5, 50), "b": ["foo", "bar"] * 25}
+    )
     msg = "No numeric types to aggregate"
 
     with pytest.raises(DataError, match=msg):
         frame.groupby("a")["b"].mean()
 
-    frame = DataFrame({"a": np.random.randint(0, 5, 50), "b": ["foo", "bar"] * 25})
+    frame = DataFrame(
+        {"a": np.random.randint(0, 5, 50), "b": ["foo", "bar"] * 25}
+    )
     with pytest.raises(DataError, match=msg):
         frame[["b"]].groupby(frame["a"]).mean()
 
@@ -195,9 +207,9 @@ def test_cython_agg_empty_buckets_nanops(observed):
     df = pd.DataFrame([11, 12, 13], columns=["a"])
     grps = range(0, 25, 5)
     # add / sum
-    result = df.groupby(pd.cut(df["a"], grps), observed=observed)._cython_agg_general(
-        "add"
-    )
+    result = df.groupby(
+        pd.cut(df["a"], grps), observed=observed
+    )._cython_agg_general("add")
     intervals = pd.interval_range(0, 20, freq=5)
     expected = pd.DataFrame(
         {"a": [0, 0, 36, 0]},
@@ -209,9 +221,9 @@ def test_cython_agg_empty_buckets_nanops(observed):
     tm.assert_frame_equal(result, expected)
 
     # prod
-    result = df.groupby(pd.cut(df["a"], grps), observed=observed)._cython_agg_general(
-        "prod"
-    )
+    result = df.groupby(
+        pd.cut(df["a"], grps), observed=observed
+    )._cython_agg_general("prod")
     expected = pd.DataFrame(
         {"a": [1, 1, 1716, 1]},
         index=pd.CategoricalIndex(intervals, name="a", ordered=True),
@@ -224,7 +236,11 @@ def test_cython_agg_empty_buckets_nanops(observed):
 
 @pytest.mark.parametrize("op", ["first", "last", "max", "min"])
 @pytest.mark.parametrize(
-    "data", [Timestamp("2016-10-14 21:00:44.557"), Timedelta("17088 days 21:00:44.557")]
+    "data",
+    [
+        Timestamp("2016-10-14 21:00:44.557"),
+        Timedelta("17088 days 21:00:44.557"),
+    ],
 )
 def test_cython_with_timestamp_and_nat(op, data):
     # https://github.com/pandas-dev/pandas/issues/19526

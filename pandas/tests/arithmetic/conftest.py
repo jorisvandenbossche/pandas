@@ -30,7 +30,9 @@ zeros = [
     for box_cls in [pd.Index, np.array]
     for dtype in [np.int64, np.uint64, np.float64]
 ]
-zeros.extend([np.array(0, dtype=dtype) for dtype in [np.int64, np.uint64, np.float64]])
+zeros.extend(
+    [np.array(0, dtype=dtype) for dtype in [np.int64, np.uint64, np.float64]]
+)
 zeros.extend([0, 0.0])
 
 
@@ -186,7 +188,11 @@ def box(request):
 
 
 @pytest.fixture(
-    params=[pd.Index, pd.Series, pytest.param(pd.DataFrame, marks=pytest.mark.xfail)],
+    params=[
+        pd.Index,
+        pd.Series,
+        pytest.param(pd.DataFrame, marks=pytest.mark.xfail),
+    ],
     ids=id_func,
 )
 def box_df_fail(request):
@@ -214,7 +220,9 @@ def box_transpose_fail(request):
     return request.param
 
 
-@pytest.fixture(params=[pd.Index, pd.Series, pd.DataFrame, tm.to_array], ids=id_func)
+@pytest.fixture(
+    params=[pd.Index, pd.Series, pd.DataFrame, tm.to_array], ids=id_func
+)
 def box_with_array(request):
     """
     Fixture to test behavior for Index, Series, DataFrame, and pandas Array

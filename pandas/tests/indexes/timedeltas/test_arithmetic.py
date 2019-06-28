@@ -54,9 +54,13 @@ class TestTimedeltaIndexArithmetic:
         # GH#9903
         idx = pd.TimedeltaIndex(["5 hours", "6 hours", "9 hours"], name="xxx")
         tm.assert_index_equal(idx.shift(0, freq="T"), idx)
-        exp = pd.TimedeltaIndex(["05:03:00", "06:03:00", "9:03:00"], name="xxx")
+        exp = pd.TimedeltaIndex(
+            ["05:03:00", "06:03:00", "9:03:00"], name="xxx"
+        )
         tm.assert_index_equal(idx.shift(3, freq="T"), exp)
-        exp = pd.TimedeltaIndex(["04:57:00", "05:57:00", "8:57:00"], name="xxx")
+        exp = pd.TimedeltaIndex(
+            ["04:57:00", "05:57:00", "8:57:00"], name="xxx"
+        )
         tm.assert_index_equal(idx.shift(-3, freq="T"), exp)
 
     def test_tdi_shift_int(self):
@@ -190,7 +194,9 @@ class TestTimedeltaIndexArithmetic:
     def test_tdi_iadd_timedeltalike(self, delta):
         # only test adding/sub offsets as + is now numeric
         rng = timedelta_range("1 days", "10 days")
-        expected = timedelta_range("1 days 02:00:00", "10 days 02:00:00", freq="D")
+        expected = timedelta_range(
+            "1 days 02:00:00", "10 days 02:00:00", freq="D"
+        )
         rng += delta
         tm.assert_index_equal(rng, expected)
 
@@ -216,7 +222,8 @@ class TestTimedeltaIndexArithmetic:
         with pytest.raises(TypeError, match=msg):
             td + np.array([1])
         msg = (
-            r"unsupported operand type\(s\) for \+: 'numpy.ndarray' and" " 'Timedelta'"
+            r"unsupported operand type\(s\) for \+: 'numpy.ndarray' and"
+            " 'Timedelta'"
         )
         with pytest.raises(TypeError, match=msg):
             np.array([1]) + td
@@ -227,7 +234,10 @@ class TestTimedeltaIndexArithmetic:
         msg = r"unsupported operand type\(s\) for -: 'Timedelta' and 'int'"
         with pytest.raises(TypeError, match=msg):
             td - np.array([1])
-        msg = r"unsupported operand type\(s\) for -: 'numpy.ndarray' and" " 'Timedelta'"
+        msg = (
+            r"unsupported operand type\(s\) for -: 'numpy.ndarray' and"
+            " 'Timedelta'"
+        )
         with pytest.raises(TypeError, match=msg):
             np.array([1]) - td
 
@@ -243,8 +253,12 @@ class TestTimedeltaIndexArithmetic:
         with pytest.raises(TypeError, match=msg):
             other * td
 
-        tm.assert_numpy_array_equal(td / other, np.array([1], dtype=np.float64))
-        tm.assert_numpy_array_equal(other / td, np.array([1], dtype=np.float64))
+        tm.assert_numpy_array_equal(
+            td / other, np.array([1], dtype=np.float64)
+        )
+        tm.assert_numpy_array_equal(
+            other / td, np.array([1], dtype=np.float64)
+        )
 
         # timedelta, datetime
         other = pd.to_datetime(["2000-01-01"]).values

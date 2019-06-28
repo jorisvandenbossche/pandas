@@ -44,13 +44,17 @@ class TestDataFrameGroupByPlots(TestPlotBase):
     def test_hist_single_row(self):
         # GH10214
         bins = np.arange(80, 100 + 2, 1)
-        df = DataFrame({"Name": ["AAA", "BBB"], "ByCol": [1, 2], "Mark": [85, 89]})
+        df = DataFrame(
+            {"Name": ["AAA", "BBB"], "ByCol": [1, 2], "Mark": [85, 89]}
+        )
         df["Mark"].hist(by=df["ByCol"], bins=bins)
         df = DataFrame({"Name": ["AAA"], "ByCol": [1], "Mark": [85]})
         df["Mark"].hist(by=df["ByCol"], bins=bins)
 
     def test_plot_submethod_works(self):
-        df = DataFrame({"x": [1, 2, 3, 4, 5], "y": [1, 2, 3, 2, 1], "z": list("ababa")})
+        df = DataFrame(
+            {"x": [1, 2, 3, 4, 5], "y": [1, 2, 3, 2, 1], "z": list("ababa")}
+        )
         df.groupby("z").plot.scatter("x", "y")
         tm.close()
         df.groupby("z")["x"].plot.line()
@@ -58,7 +62,9 @@ class TestDataFrameGroupByPlots(TestPlotBase):
 
     def test_plot_kwargs(self):
 
-        df = DataFrame({"x": [1, 2, 3, 4, 5], "y": [1, 2, 3, 2, 1], "z": list("ababa")})
+        df = DataFrame(
+            {"x": [1, 2, 3, 4, 5], "y": [1, 2, 3, 2, 1], "z": list("ababa")}
+        )
 
         res = df.groupby("z").plot(kind="scatter", x="x", y="y")
         # check that a scatter plot is effectively plotted: the axes should

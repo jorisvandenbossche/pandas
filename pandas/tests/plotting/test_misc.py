@@ -72,26 +72,36 @@ class TestDataFramePlots(TestPlotBase):
         # we are plotting multiples on a sub-plot
         with tm.assert_produces_warning(UserWarning):
             axes = _check_plot_works(
-                scatter_matrix, filterwarnings="always", frame=df, range_padding=0.1
+                scatter_matrix,
+                filterwarnings="always",
+                frame=df,
+                range_padding=0.1,
             )
         axes0_labels = axes[0][0].yaxis.get_majorticklabels()
 
         # GH 5662
         expected = ["-2", "0", "2"]
         self._check_text_labels(axes0_labels, expected)
-        self._check_ticks_props(axes, xlabelsize=8, xrot=90, ylabelsize=8, yrot=0)
+        self._check_ticks_props(
+            axes, xlabelsize=8, xrot=90, ylabelsize=8, yrot=0
+        )
 
         df[0] = (df[0] - 2) / 3
 
         # we are plotting multiples on a sub-plot
         with tm.assert_produces_warning(UserWarning):
             axes = _check_plot_works(
-                scatter_matrix, filterwarnings="always", frame=df, range_padding=0.1
+                scatter_matrix,
+                filterwarnings="always",
+                frame=df,
+                range_padding=0.1,
             )
         axes0_labels = axes[0][0].yaxis.get_majorticklabels()
         expected = ["-1.0", "-0.5", "0.0"]
         self._check_text_labels(axes0_labels, expected)
-        self._check_ticks_props(axes, xlabelsize=8, xrot=90, ylabelsize=8, yrot=0)
+        self._check_ticks_props(
+            axes, xlabelsize=8, xrot=90, ylabelsize=8, yrot=0
+        )
 
     @pytest.mark.slow
     def test_andrews_curves(self, iris):
@@ -163,7 +173,9 @@ class TestDataFramePlots(TestPlotBase):
         )
 
         colors = ["b", "g", "r"]
-        df = DataFrame({"A": [1, 2, 3], "B": [1, 2, 3], "C": [1, 2, 3], "Name": colors})
+        df = DataFrame(
+            {"A": [1, 2, 3], "B": [1, 2, 3], "C": [1, 2, 3], "Name": colors}
+        )
         ax = andrews_curves(df, "Name", color=colors)
         handles, labels = ax.get_legend_handles_labels()
         self._check_colors(handles, linecolors=colors)
@@ -178,7 +190,9 @@ class TestDataFramePlots(TestPlotBase):
 
         df = iris
 
-        ax = _check_plot_works(parallel_coordinates, frame=df, class_column="Name")
+        ax = _check_plot_works(
+            parallel_coordinates, frame=df, class_column="Name"
+        )
         nlines = len(ax.get_lines())
         nxticks = len(ax.xaxis.get_ticklabels())
 
@@ -199,7 +213,10 @@ class TestDataFramePlots(TestPlotBase):
         )
 
         ax = _check_plot_works(
-            parallel_coordinates, frame=df, class_column="Name", colormap=cm.jet
+            parallel_coordinates,
+            frame=df,
+            class_column="Name",
+            colormap=cm.jet,
         )
         cmaps = [cm.jet(n) for n in np.linspace(0, 1, df["Name"].nunique())]
         self._check_colors(
@@ -212,7 +229,9 @@ class TestDataFramePlots(TestPlotBase):
         assert len(ax.get_lines()) == (nlines - nxticks)
 
         colors = ["b", "g", "r"]
-        df = DataFrame({"A": [1, 2, 3], "B": [1, 2, 3], "C": [1, 2, 3], "Name": colors})
+        df = DataFrame(
+            {"A": [1, 2, 3], "B": [1, 2, 3], "C": [1, 2, 3], "Name": colors}
+        )
         ax = parallel_coordinates(df, "Name", color=colors)
         handles, labels = ax.get_legend_handles_labels()
         self._check_colors(handles, linecolors=colors)
@@ -241,7 +260,9 @@ class TestDataFramePlots(TestPlotBase):
         color_label_tuples = zip(
             [polyline.get_color() for polyline in polylines], labels
         )
-        ordered_color_label_tuples = sorted(color_label_tuples, key=lambda x: x[1])
+        ordered_color_label_tuples = sorted(
+            color_label_tuples, key=lambda x: x[1]
+        )
         prev_next_tupels = zip(
             [i for i in ordered_color_label_tuples[0:-1]],
             [i for i in ordered_color_label_tuples[1:]],
@@ -259,24 +280,39 @@ class TestDataFramePlots(TestPlotBase):
         _check_plot_works(radviz, frame=df, class_column="Name")
 
         rgba = ("#556270", "#4ECDC4", "#C7F464")
-        ax = _check_plot_works(radviz, frame=df, class_column="Name", color=rgba)
+        ax = _check_plot_works(
+            radviz, frame=df, class_column="Name", color=rgba
+        )
         # skip Circle drawn as ticks
         patches = [p for p in ax.patches[:20] if p.get_label() != ""]
-        self._check_colors(patches[:10], facecolors=rgba, mapping=df["Name"][:10])
+        self._check_colors(
+            patches[:10], facecolors=rgba, mapping=df["Name"][:10]
+        )
 
         cnames = ["dodgerblue", "aquamarine", "seagreen"]
         _check_plot_works(radviz, frame=df, class_column="Name", color=cnames)
         patches = [p for p in ax.patches[:20] if p.get_label() != ""]
         self._check_colors(patches, facecolors=cnames, mapping=df["Name"][:10])
 
-        _check_plot_works(radviz, frame=df, class_column="Name", colormap=cm.jet)
+        _check_plot_works(
+            radviz, frame=df, class_column="Name", colormap=cm.jet
+        )
         cmaps = [cm.jet(n) for n in np.linspace(0, 1, df["Name"].nunique())]
         patches = [p for p in ax.patches[:20] if p.get_label() != ""]
         self._check_colors(patches, facecolors=cmaps, mapping=df["Name"][:10])
 
-        colors = [[0.0, 0.0, 1.0, 1.0], [0.0, 0.5, 1.0, 1.0], [1.0, 0.0, 0.0, 1.0]]
+        colors = [
+            [0.0, 0.0, 1.0, 1.0],
+            [0.0, 0.5, 1.0, 1.0],
+            [1.0, 0.0, 0.0, 1.0],
+        ]
         df = DataFrame(
-            {"A": [1, 2, 3], "B": [2, 1, 3], "C": [3, 2, 1], "Name": ["b", "g", "r"]}
+            {
+                "A": [1, 2, 3],
+                "B": [2, 1, 3],
+                "C": [3, 2, 1],
+                "Name": ["b", "g", "r"],
+            }
         )
         ax = radviz(df, "Name", color=colors)
         handles, labels = ax.get_legend_handles_labels()

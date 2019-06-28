@@ -146,9 +146,13 @@ class TestDatetimeArray:
         result = arr.astype(DatetimeTZDtype(tz="US/Central"), copy=False)
         assert result is arr
 
-    @pytest.mark.parametrize("dtype", [int, np.int32, np.int64, "uint32", "uint64"])
+    @pytest.mark.parametrize(
+        "dtype", [int, np.int32, np.int64, "uint32", "uint64"]
+    )
     def test_astype_int(self, dtype):
-        arr = DatetimeArray._from_sequence([pd.Timestamp("2000"), pd.Timestamp("2001")])
+        arr = DatetimeArray._from_sequence(
+            [pd.Timestamp("2000"), pd.Timestamp("2001")]
+        )
         result = arr.astype(dtype)
 
         if np.dtype(dtype).kind == "u":
@@ -167,7 +171,9 @@ class TestDatetimeArray:
 
     def test_setitem_different_tz_raises(self):
         data = np.array([1, 2, 3], dtype="M8[ns]")
-        arr = DatetimeArray(data, copy=False, dtype=DatetimeTZDtype(tz="US/Central"))
+        arr = DatetimeArray(
+            data, copy=False, dtype=DatetimeTZDtype(tz="US/Central")
+        )
         with pytest.raises(ValueError, match="None"):
             arr[0] = pd.Timestamp("2000")
 
@@ -175,7 +181,9 @@ class TestDatetimeArray:
             arr[0] = pd.Timestamp("2000", tz="US/Eastern")
 
     def test_setitem_clears_freq(self):
-        a = DatetimeArray(pd.date_range("2000", periods=2, freq="D", tz="US/Central"))
+        a = DatetimeArray(
+            pd.date_range("2000", periods=2, freq="D", tz="US/Central")
+        )
         a[0] = pd.Timestamp("2000", tz="US/Central")
         assert a.freq is None
 
@@ -211,7 +219,9 @@ class TestDatetimeArray:
 
         fill_val = dti[1] if method == "pad" else dti[3]
         expected = DatetimeArray._from_sequence(
-            [dti[0], dti[1], fill_val, dti[3], dti[4]], freq=None, tz="US/Central"
+            [dti[0], dti[1], fill_val, dti[3], dti[4]],
+            freq=None,
+            tz="US/Central",
         )
 
         result = arr.fillna(method=method)
@@ -248,7 +258,8 @@ class TestDatetimeArray:
     def test_array_interface(self):
         data = DatetimeArray(pd.date_range("2017", periods=2))
         expected = np.array(
-            ["2017-01-01T00:00:00", "2017-01-02T00:00:00"], dtype="datetime64[ns]"
+            ["2017-01-01T00:00:00", "2017-01-02T00:00:00"],
+            dtype="datetime64[ns]",
         )
 
         result = np.asarray(data)
@@ -256,7 +267,10 @@ class TestDatetimeArray:
 
         result = np.asarray(data, dtype=object)
         expected = np.array(
-            [pd.Timestamp("2017-01-01T00:00:00"), pd.Timestamp("2017-01-02T00:00:00")],
+            [
+                pd.Timestamp("2017-01-01T00:00:00"),
+                pd.Timestamp("2017-01-02T00:00:00"),
+            ],
             dtype=object,
         )
         tm.assert_numpy_array_equal(result, expected)
@@ -270,7 +284,9 @@ class TestSequenceToDT64NS:
 
     def test_tz_dtype_matches(self):
         arr = DatetimeArray._from_sequence(["2000"], tz="US/Central")
-        result, _, _ = sequence_to_dt64ns(arr, dtype=DatetimeTZDtype(tz="US/Central"))
+        result, _, _ = sequence_to_dt64ns(
+            arr, dtype=DatetimeTZDtype(tz="US/Central")
+        )
         tm.assert_numpy_array_equal(arr._data, result)
 
 

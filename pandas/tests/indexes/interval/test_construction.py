@@ -80,7 +80,9 @@ class Base:
             result = constructor(dtype=dtype, **result_kwargs)
             tm.assert_index_equal(result, expected)
 
-    @pytest.mark.parametrize("breaks", [[np.nan] * 2, [np.nan] * 4, [np.nan] * 50])
+    @pytest.mark.parametrize(
+        "breaks", [[np.nan] * 2, [np.nan] * 4, [np.nan] * 50]
+    )
     def test_constructor_nan(self, constructor, breaks, closed):
         # GH 18421
         result_kwargs = self.get_kwargs_from_breaks(breaks)
@@ -134,7 +136,9 @@ class Base:
         with pytest.raises(TypeError, match=msg):
             constructor(**self.get_kwargs_from_breaks(breaks))
 
-    @pytest.mark.parametrize("cat_constructor", [Categorical, CategoricalIndex])
+    @pytest.mark.parametrize(
+        "cat_constructor", [Categorical, CategoricalIndex]
+    )
     def test_constructor_categorical_valid(self, constructor, cat_constructor):
         # GH 21243/21253
         if isinstance(constructor, partial) and constructor.func is Index:
@@ -214,7 +218,8 @@ class TestFromArrays(Base):
             IntervalIndex.from_arrays(left, right)
 
     @pytest.mark.parametrize(
-        "left_subtype, right_subtype", [(np.int64, np.float64), (np.float64, np.int64)]
+        "left_subtype, right_subtype",
+        [(np.int64, np.float64), (np.float64, np.int64)],
     )
     def test_mixed_float_int(self, left_subtype, right_subtype):
         """mixed int/float left/right results in float for both sides"""
@@ -378,11 +383,17 @@ class TestClassConstructors(Base):
             ([], "both"),
             ([np.nan, np.nan], "neither"),
             (
-                [Interval(0, 3, closed="neither"), Interval(2, 5, closed="neither")],
+                [
+                    Interval(0, 3, closed="neither"),
+                    Interval(2, 5, closed="neither"),
+                ],
                 "left",
             ),
             (
-                [Interval(0, 3, closed="left"), Interval(2, 5, closed="right")],
+                [
+                    Interval(0, 3, closed="left"),
+                    Interval(2, 5, closed="right"),
+                ],
                 "neither",
             ),
             (IntervalIndex.from_breaks(range(5), closed="both"), "right"),
@@ -421,7 +432,9 @@ class TestFromIntervals(TestClassConstructors):
     @pytest.fixture
     def constructor(self):
         def from_intervals_ignore_warnings(*args, **kwargs):
-            with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
+            with tm.assert_produces_warning(
+                FutureWarning, check_stacklevel=False
+            ):
                 return IntervalIndex.from_intervals(*args, **kwargs)
 
         return from_intervals_ignore_warnings

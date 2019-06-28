@@ -50,7 +50,9 @@ class TestPack:
     def testPackUnicode(self):
         test_data = ["", "abcd", ["defgh"], "Русский текст"]
         for td in test_data:
-            re = unpackb(packb(td, encoding="utf-8"), use_list=1, encoding="utf-8")
+            re = unpackb(
+                packb(td, encoding="utf-8"), use_list=1, encoding="utf-8"
+            )
             assert re == td
             packer = Packer(encoding="utf-8")
             data = packer.pack(td)
@@ -60,7 +62,9 @@ class TestPack:
     def testPackUTF32(self):
         test_data = ["", "abcd", ["defgh"], "Русский текст"]
         for td in test_data:
-            re = unpackb(packb(td, encoding="utf-32"), use_list=1, encoding="utf-32")
+            re = unpackb(
+                packb(td, encoding="utf-32"), use_list=1, encoding="utf-32"
+            )
             assert re == td
 
     def testPackBytes(self):
@@ -70,7 +74,10 @@ class TestPack:
 
     def testIgnoreUnicodeErrors(self):
         re = unpackb(
-            packb(b"abc\xeddef"), encoding="utf-8", unicode_errors="ignore", use_list=1
+            packb(b"abc\xeddef"),
+            encoding="utf-8",
+            unicode_errors="ignore",
+            use_list=1,
         )
         assert re == "abcdef"
 
@@ -108,8 +115,12 @@ class TestPack:
         assert re == b"abc"
 
     def testPackFloat(self):
-        assert packb(1.0, use_single_float=True) == b"\xca" + struct.pack(">f", 1.0)
-        assert packb(1.0, use_single_float=False) == b"\xcb" + struct.pack(">d", 1.0)
+        assert packb(1.0, use_single_float=True) == b"\xca" + struct.pack(
+            ">f", 1.0
+        )
+        assert packb(1.0, use_single_float=False) == b"\xcb" + struct.pack(
+            ">d", 1.0
+        )
 
     def testArraySize(self, sizes=[0, 5, 50, 1000]):
         bio = BytesIO()
@@ -161,7 +172,9 @@ class TestPack:
         def pair_hook(seq):
             return list(seq)
 
-        assert unpackb(packb(od), object_pairs_hook=pair_hook, use_list=1) == seq
+        assert (
+            unpackb(packb(od), object_pairs_hook=pair_hook, use_list=1) == seq
+        )
 
     def test_pairlist(self):
         pairlist = [(b"a", 1), (2, b"b"), (b"foo", b"bar")]

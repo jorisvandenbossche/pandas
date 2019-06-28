@@ -71,7 +71,9 @@ class BaseDtypeTests(BaseExtensionTests):
         if dtype.name == "Int64":
             expected = pd.Series([True, True, False, True], index=list("ABCD"))
         else:
-            expected = pd.Series([True, True, False, False], index=list("ABCD"))
+            expected = pd.Series(
+                [True, True, False, False], index=list("ABCD")
+            )
 
         # XXX: This should probably be *fixed* not ignored.
         # See libops.scalar_compare

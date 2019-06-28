@@ -67,7 +67,8 @@ class TestSeriesDtypes:
         # GH18243 - Assert .get_ftype_counts is deprecated
         with tm.assert_produces_warning(FutureWarning):
             tm.assert_series_equal(
-                datetime_series.get_ftype_counts(), Series(1, ["float64:dense"])
+                datetime_series.get_ftype_counts(),
+                Series(1, ["float64:dense"]),
             )
 
     @pytest.mark.parametrize("value", [np.nan, np.inf])
@@ -143,8 +144,17 @@ class TestSeriesDtypes:
     @pytest.mark.parametrize(
         "series",
         [
-            Series([string.digits * 10, tm.rands(63), tm.rands(64), tm.rands(1000)]),
-            Series([string.digits * 10, tm.rands(63), tm.rands(64), np.nan, 1.0]),
+            Series(
+                [
+                    string.digits * 10,
+                    tm.rands(63),
+                    tm.rands(64),
+                    tm.rands(1000),
+                ]
+            ),
+            Series(
+                [string.digits * 10, tm.rands(63), tm.rands(64), np.nan, 1.0]
+            ),
         ],
     )
     def test_astype_str_map(self, dtype, series):
@@ -209,7 +219,9 @@ class TestSeriesDtypes:
 
         dt2 = dtype_class({"abc": "float64"})
         result = s.astype(dt2)
-        expected = Series([0.0, 2.0, 4.0, 6.0, 8.0], dtype="float64", name="abc")
+        expected = Series(
+            [0.0, 2.0, 4.0, 6.0, 8.0], dtype="float64", name="abc"
+        )
         tm.assert_series_equal(result, expected)
 
         dt3 = dtype_class({"abc": str, "def": str})
@@ -252,14 +264,19 @@ class TestSeriesDtypes:
         res = s.astype("category")
         tm.assert_series_equal(res, exp)
 
-        df = DataFrame({"cats": [1, 2, 3, 4, 5, 6], "vals": [1, 2, 3, 4, 5, 6]})
+        df = DataFrame(
+            {"cats": [1, 2, 3, 4, 5, 6], "vals": [1, 2, 3, 4, 5, 6]}
+        )
         cats = Categorical([1, 2, 3, 4, 5, 6])
         exp_df = DataFrame({"cats": cats, "vals": [1, 2, 3, 4, 5, 6]})
         df["cats"] = df["cats"].astype("category")
         tm.assert_frame_equal(exp_df, df)
 
         df = DataFrame(
-            {"cats": ["a", "b", "b", "a", "a", "d"], "vals": [1, 2, 3, 4, 5, 6]}
+            {
+                "cats": ["a", "b", "b", "a", "a", "d"],
+                "vals": [1, 2, 3, 4, 5, 6],
+            }
         )
         cats = Categorical(["a", "b", "b", "a", "a", "d"])
         exp_df = DataFrame({"cats": cats, "vals": [1, 2, 3, 4, 5, 6]})
@@ -293,7 +310,10 @@ class TestSeriesDtypes:
         expected = s
         tm.assert_series_equal(s.astype("category"), expected)
         tm.assert_series_equal(s.astype(CategoricalDtype()), expected)
-        msg = r"could not convert string to float|" r"invalid literal for float\(\)"
+        msg = (
+            r"could not convert string to float|"
+            r"invalid literal for float\(\)"
+        )
         with pytest.raises(ValueError, match=msg):
             s.astype("float64")
 
@@ -307,7 +327,9 @@ class TestSeriesDtypes:
         # object don't sort correctly, so just compare that we have the same
         # values
         def cmp(a, b):
-            tm.assert_almost_equal(np.sort(np.unique(a)), np.sort(np.unique(b)))
+            tm.assert_almost_equal(
+                np.sort(np.unique(a)), np.sort(np.unique(b))
+            )
 
         expected = Series(np.array(s.values), name="value_group")
         cmp(s.astype("object"), expected)
@@ -370,7 +392,9 @@ class TestSeriesDtypes:
         tm.assert_series_equal(result, expected)
 
         with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
-            result = s.astype("category", categories=list("adc"), ordered=dtype_ordered)
+            result = s.astype(
+                "category", categories=list("adc"), ordered=dtype_ordered
+            )
         tm.assert_series_equal(result, expected)
 
         if dtype_ordered is False:
@@ -391,7 +415,9 @@ class TestSeriesDtypes:
 
         result = s.astype(CategoricalDtype(["a", "b", "c"], ordered=False))
         expected = Series(
-            Categorical(["a", "b", "a"], categories=["a", "b", "c"], ordered=False)
+            Categorical(
+                ["a", "b", "a"], categories=["a", "b", "c"], ordered=False
+            )
         )
         tm.assert_series_equal(result, expected)
         tm.assert_index_equal(result.cat.categories, Index(["a", "b", "c"]))
@@ -505,7 +531,9 @@ class TestSeriesDtypes:
         tm.assert_series_equal(actual, expected)
 
         # only soft conversions, unconvertable pass thru unchanged
-        actual = Series(np.array([1, 2, 3, None, "a"], dtype="O")).infer_objects()
+        actual = Series(
+            np.array([1, 2, 3, None, "a"], dtype="O")
+        ).infer_objects()
         expected = Series([1, 2, 3, None, "a"])
 
         assert actual.dtype == "object"

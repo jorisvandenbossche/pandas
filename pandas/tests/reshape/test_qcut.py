@@ -126,7 +126,9 @@ def test_qcut_return_intervals():
     exp_levels = np.array(
         [Interval(-0.001, 2.664), Interval(2.664, 5.328), Interval(5.328, 8)]
     )
-    exp = Series(exp_levels.take([0, 0, 0, 1, 1, 1, 2, 2, 2])).astype(CDT(ordered=True))
+    exp = Series(exp_levels.take([0, 0, 0, 1, 1, 1, 2, 2, 2])).astype(
+        CDT(ordered=True)
+    )
     tm.assert_series_equal(res, exp)
 
 
@@ -153,7 +155,8 @@ def test_qcut_duplicates_bin(kwargs, msg):
 
 
 @pytest.mark.parametrize(
-    "data,start,end", [(9.0, 8.999, 9.0), (0.0, -0.001, 0.0), (-9.0, -9.001, -9.0)]
+    "data,start,end",
+    [(9.0, 8.999, 9.0), (0.0, -0.001, 0.0), (-9.0, -9.001, -9.0)],
 )
 @pytest.mark.parametrize("length", [1, 2])
 @pytest.mark.parametrize("labels", [None, False])
@@ -163,7 +166,9 @@ def test_single_quantile(data, start, end, length, labels):
     result = qcut(ser, 1, labels=labels)
 
     if labels is None:
-        intervals = IntervalIndex([Interval(start, end)] * length, closed="right")
+        intervals = IntervalIndex(
+            [Interval(start, end)] * length, closed="right"
+        )
         expected = Series(intervals).astype(CDT(ordered=True))
     else:
         expected = Series([0] * length)

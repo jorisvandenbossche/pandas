@@ -112,10 +112,14 @@ class LatexFormatter(TableFormatter):
             )
 
         if not self.longtable:
-            buf.write("\\begin{{tabular}}{{{fmt}}}\n".format(fmt=column_format))
+            buf.write(
+                "\\begin{{tabular}}{{{fmt}}}\n".format(fmt=column_format)
+            )
             buf.write("\\toprule\n")
         else:
-            buf.write("\\begin{{longtable}}{{{fmt}}}\n".format(fmt=column_format))
+            buf.write(
+                "\\begin{{longtable}}{{{fmt}}}\n".format(fmt=column_format)
+            )
             buf.write("\\toprule\n")
 
         ilevels = self.frame.index.nlevels
@@ -172,7 +176,12 @@ class LatexFormatter(TableFormatter):
             if i < clevels and self.fmt.header and self.multicolumn:
                 # sum up columns to multicolumns
                 crow = self._format_multicolumn(crow, ilevels)
-            if i >= nlevels and self.fmt.index and self.multirow and ilevels > 1:
+            if (
+                i >= nlevels
+                and self.fmt.index
+                and self.multirow
+                and ilevels > 1
+            ):
                 # sum up rows to multirows
                 crow = self._format_multirow(crow, ilevels, i, strrows)
             buf.write(" & ".join(crow))
@@ -205,7 +214,9 @@ class LatexFormatter(TableFormatter):
             if ncol > 1:
                 row2.append(
                     "\\multicolumn{{{ncol:d}}}{{{fmt:s}}}{{{txt:s}}}".format(
-                        ncol=ncol, fmt=self.multicolumn_format, txt=coltext.strip()
+                        ncol=ncol,
+                        fmt=self.multicolumn_format,
+                        txt=coltext.strip(),
                     )
                 )
             # don't modify where not needed
@@ -260,6 +271,8 @@ class LatexFormatter(TableFormatter):
         """
         for cl in self.clinebuf:
             if cl[0] == i:
-                buf.write("\\cline{{{cl:d}-{icol:d}}}\n".format(cl=cl[1], icol=icol))
+                buf.write(
+                    "\\cline{{{cl:d}-{icol:d}}}\n".format(cl=cl[1], icol=icol)
+                )
         # remove entries that have been written to buffer
         self.clinebuf = [x for x in self.clinebuf if x[0] != i]

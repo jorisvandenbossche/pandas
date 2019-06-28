@@ -198,8 +198,12 @@ class TestTimedeltaAdditionSubtraction:
 
     def test_td_sub_timedeltalike_object_dtype_array(self):
         # GH#21980
-        arr = np.array([Timestamp("20130101 9:01"), Timestamp("20121230 9:02")])
-        exp = np.array([Timestamp("20121231 9:01"), Timestamp("20121229 9:02")])
+        arr = np.array(
+            [Timestamp("20130101 9:01"), Timestamp("20121230 9:02")]
+        )
+        exp = np.array(
+            [Timestamp("20121231 9:01"), Timestamp("20121229 9:02")]
+        )
         res = arr - Timedelta("1D")
         tm.assert_numpy_array_equal(res, exp)
 
@@ -227,8 +231,12 @@ class TestTimedeltaAdditionSubtraction:
     @pytest.mark.parametrize("op", [operator.add, ops.radd])
     def test_td_add_timedeltalike_object_dtype_array(self, op):
         # GH#21980
-        arr = np.array([Timestamp("20130101 9:01"), Timestamp("20121230 9:02")])
-        exp = np.array([Timestamp("20130102 9:01"), Timestamp("20121231 9:02")])
+        arr = np.array(
+            [Timestamp("20130101 9:01"), Timestamp("20121230 9:02")]
+        )
+        exp = np.array(
+            [Timestamp("20130102 9:01"), Timestamp("20121231 9:02")]
+        )
         res = op(arr, Timedelta("1D"))
         tm.assert_numpy_array_equal(res, exp)
 
@@ -403,7 +411,9 @@ class TestTimedeltaMultiplicationDivision:
         expected = np.array([3], dtype=np.int64)
         tm.assert_numpy_array_equal(res, expected)
 
-        res = (10 * td) // np.array([scalar.to_timedelta64(), np.timedelta64("NaT")])
+        res = (10 * td) // np.array(
+            [scalar.to_timedelta64(), np.timedelta64("NaT")]
+        )
         expected = np.array([10, np.nan])
         tm.assert_numpy_array_equal(res, expected)
 

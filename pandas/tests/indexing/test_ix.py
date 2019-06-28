@@ -44,7 +44,9 @@ class TestIX:
 
         df = DataFrame({"a": [0, 1, 2], "b": [0, 1, 2]})
         with catch_warnings(record=True):
-            df["a"].ix[[0, 1, 2]] = -df["a"].ix[[0, 1, 2]].astype("float64") + 0.5
+            df["a"].ix[[0, 1, 2]] = (
+                -df["a"].ix[[0, 1, 2]].astype("float64") + 0.5
+            )
         expected = DataFrame({"a": [0.5, -0.5, -1.5], "b": [0, 1, 2]})
         tm.assert_frame_equal(df, expected)
 
@@ -183,7 +185,9 @@ class TestIX:
 
     def test_ix_weird_slicing(self):
         # http://stackoverflow.com/q/17056560/1240268
-        df = DataFrame({"one": [1, 2, 3, np.nan, np.nan], "two": [1, 2, 3, 4, 5]})
+        df = DataFrame(
+            {"one": [1, 2, 3, np.nan, np.nan], "two": [1, 2, 3, 4, 5]}
+        )
         df.loc[df["one"] > 1, "two"] = -df["two"]
 
         expected = DataFrame(
@@ -204,7 +208,9 @@ class TestIX:
         tm.assert_series_equal(df.B, orig + 1)
 
         # GH 3668, mixed frame with series value
-        df = DataFrame({"x": np.arange(10), "y": np.arange(10, 20), "z": "bar"})
+        df = DataFrame(
+            {"x": np.arange(10), "y": np.arange(10, 20), "z": "bar"}
+        )
         expected = df.copy()
 
         for i in range(5):
@@ -225,7 +231,9 @@ class TestIX:
         df = DataFrame({"a": list(range(4))})
         df["b"] = np.nan
         df.loc[[1, 3], "b"] = [100, -100]
-        expected = DataFrame({"a": [0, 1, 2, 3], "b": [np.nan, 100, np.nan, -100]})
+        expected = DataFrame(
+            {"a": [0, 1, 2, 3], "b": [np.nan, 100, np.nan, -100]}
+        )
         tm.assert_frame_equal(df, expected)
 
         # ok, but chained assignments are dangerous
@@ -264,12 +272,20 @@ class TestIX:
     def test_ix_slicing_strings(self):
         # see gh-3836
         data = {
-            "Classification": ["SA EQUITY CFD", "bbb", "SA EQUITY", "SA SSF", "aaa"],
+            "Classification": [
+                "SA EQUITY CFD",
+                "bbb",
+                "SA EQUITY",
+                "SA SSF",
+                "aaa",
+            ],
             "Random": [1, 2, 3, 4, 5],
             "X": ["correct", "wrong", "correct", "correct", "wrong"],
         }
         df = DataFrame(data)
-        x = df[~df.Classification.isin(["SA EQUITY CFD", "SA EQUITY", "SA SSF"])]
+        x = df[
+            ~df.Classification.isin(["SA EQUITY CFD", "SA EQUITY", "SA SSF"])
+        ]
         with catch_warnings(record=True):
             df.ix[x.index, "X"] = df["Classification"]
 
@@ -283,7 +299,13 @@ class TestIX:
                     4: "aaa",
                 },
                 "Random": {0: 1, 1: 2, 2: 3, 3: 4, 4: 5},
-                "X": {0: "correct", 1: "bbb", 2: "correct", 3: "correct", 4: "aaa"},
+                "X": {
+                    0: "correct",
+                    1: "bbb",
+                    2: "correct",
+                    3: "correct",
+                    4: "aaa",
+                },
             }
         )  # bug was 4: 'bbb'
 
@@ -332,7 +354,10 @@ class TestIX:
             )
             # horizontal empty
             tm.assert_frame_equal(
-                df.ix[[]], df.iloc[:0, :], check_index_type=True, check_column_type=True
+                df.ix[[]],
+                df.iloc[:0, :],
+                check_index_type=True,
+                check_column_type=True,
             )
 
     def test_ix_duplicate_returns_series(self):

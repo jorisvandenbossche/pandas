@@ -105,7 +105,9 @@ def test_nth():
     assert_frame_equal(g.nth(-3), df.loc[[]].set_index("A"))
     assert_series_equal(g.B.nth(0), df.set_index("A").B.iloc[[0, 2]])
     assert_series_equal(g.B.nth(1), df.set_index("A").B.iloc[[1]])
-    assert_frame_equal(g[["B"]].nth(0), df.loc[[0, 2], ["A", "B"]].set_index("A"))
+    assert_frame_equal(
+        g[["B"]].nth(0), df.loc[[0, 2], ["A", "B"]].set_index("A")
+    )
 
     exp = df.set_index("A")
     assert_frame_equal(g.nth(0, dropna="any"), exp.iloc[[1, 2]])
@@ -180,15 +182,21 @@ def test_nth():
     assert_series_equal(result, expected)
 
     # test multiple nth values
-    df = DataFrame([[1, np.nan], [1, 3], [1, 4], [5, 6], [5, 7]], columns=["A", "B"])
+    df = DataFrame(
+        [[1, np.nan], [1, 3], [1, 4], [5, 6], [5, 7]], columns=["A", "B"]
+    )
     g = df.groupby("A")
 
     assert_frame_equal(g.nth(0), df.iloc[[0, 3]].set_index("A"))
     assert_frame_equal(g.nth([0]), df.iloc[[0, 3]].set_index("A"))
     assert_frame_equal(g.nth([0, 1]), df.iloc[[0, 1, 3, 4]].set_index("A"))
     assert_frame_equal(g.nth([0, -1]), df.iloc[[0, 2, 3, 4]].set_index("A"))
-    assert_frame_equal(g.nth([0, 1, 2]), df.iloc[[0, 1, 2, 3, 4]].set_index("A"))
-    assert_frame_equal(g.nth([0, 1, -1]), df.iloc[[0, 1, 2, 3, 4]].set_index("A"))
+    assert_frame_equal(
+        g.nth([0, 1, 2]), df.iloc[[0, 1, 2, 3, 4]].set_index("A")
+    )
+    assert_frame_equal(
+        g.nth([0, 1, -1]), df.iloc[[0, 1, 2, 3, 4]].set_index("A")
+    )
     assert_frame_equal(g.nth([2]), df.iloc[[2]].set_index("A"))
     assert_frame_equal(g.nth([3, 4]), df.loc[[]].set_index("A"))
 
@@ -312,7 +320,9 @@ def test_first_last_tz_multi_column(method, ts, alpha):
         {
             "group": [1, 1, 2],
             "category_string": pd.Series(list("abc")).astype("category"),
-            "datetimetz": pd.date_range("20130101", periods=3, tz="US/Eastern"),
+            "datetimetz": pd.date_range(
+                "20130101", periods=3, tz="US/Eastern"
+            ),
         }
     )
     result = getattr(df.groupby("group"), method)()
@@ -483,18 +493,28 @@ def test_nth_column_order():
     # GH 20760
     # Check that nth preserves column order
     df = DataFrame(
-        [[1, "b", 100], [1, "a", 50], [1, "a", np.nan], [2, "c", 200], [2, "d", 150]],
+        [
+            [1, "b", 100],
+            [1, "a", 50],
+            [1, "a", np.nan],
+            [2, "c", 200],
+            [2, "d", 150],
+        ],
         columns=["A", "C", "B"],
     )
     result = df.groupby("A").nth(0)
     expected = DataFrame(
-        [["b", 100.0], ["c", 200.0]], columns=["C", "B"], index=Index([1, 2], name="A")
+        [["b", 100.0], ["c", 200.0]],
+        columns=["C", "B"],
+        index=Index([1, 2], name="A"),
     )
     assert_frame_equal(result, expected)
 
     result = df.groupby("A").nth(-1, dropna="any")
     expected = DataFrame(
-        [["a", 50.0], ["d", 150.0]], columns=["C", "B"], index=Index([1, 2], name="A")
+        [["a", 50.0], ["d", 150.0]],
+        columns=["C", "B"],
+        index=Index([1, 2], name="A"),
     )
     assert_frame_equal(result, expected)
 
@@ -503,12 +523,20 @@ def test_nth_column_order():
 def test_nth_nan_in_grouper(dropna):
     # GH 26011
     df = DataFrame(
-        [[np.nan, 0, 1], ["abc", 2, 3], [np.nan, 4, 5], ["def", 6, 7], [np.nan, 8, 9]],
+        [
+            [np.nan, 0, 1],
+            ["abc", 2, 3],
+            [np.nan, 4, 5],
+            ["def", 6, 7],
+            [np.nan, 8, 9],
+        ],
         columns=list("abc"),
     )
     result = df.groupby("a").nth(0, dropna=dropna)
     expected = pd.DataFrame(
-        [[2, 3], [6, 7]], columns=list("bc"), index=Index(["abc", "def"], name="a")
+        [[2, 3], [6, 7]],
+        columns=list("bc"),
+        index=Index(["abc", "def"], name="a"),
     )
 
     assert_frame_equal(result, expected)

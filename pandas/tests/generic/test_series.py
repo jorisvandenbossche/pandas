@@ -104,7 +104,12 @@ class TestSeries(Generic):
 
         msg = "The truth value of a Series is ambiguous"
         # single item nan to raise
-        for s in [Series([np.nan]), Series([pd.NaT]), Series([True]), Series([False])]:
+        for s in [
+            Series([np.nan]),
+            Series([pd.NaT]),
+            Series([True]),
+            Series([False]),
+        ]:
             with pytest.raises(ValueError, match=msg):
                 bool(s)
 
@@ -166,7 +171,11 @@ class TestSeries(Generic):
             for name in self._metadata:
                 if method == "concat" and name == "filename":
                     value = "+".join(
-                        [getattr(o, name) for o in other.objs if getattr(o, name, None)]
+                        [
+                            getattr(o, name)
+                            for o in other.objs
+                            if getattr(o, name, None)
+                        ]
                     )
                     object.__setattr__(self, name, value)
                 else:
@@ -218,7 +227,10 @@ class TestSeries(Generic):
 
         # idempotency
         assert_series_equal(
-            result.to_series(), s, check_index_type=False, check_categorical=True
+            result.to_series(),
+            s,
+            check_index_type=False,
+            check_categorical=True,
         )
 
     @td.skip_if_no("xarray", min_version="0.7.0")
@@ -262,7 +274,9 @@ class TestSeries(Generic):
         # GH22397
         assert s.shift(shift_size) is not s
 
-    @pytest.mark.parametrize("move_by_freq", [pd.Timedelta("1D"), pd.Timedelta("1M")])
+    @pytest.mark.parametrize(
+        "move_by_freq", [pd.Timedelta("1D"), pd.Timedelta("1M")]
+    )
     def test_datetime_shift_always_copy(self, move_by_freq):
         # GH22397
         s = pd.Series(range(5), index=pd.date_range("2017", periods=5))

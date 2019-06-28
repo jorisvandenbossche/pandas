@@ -56,7 +56,9 @@ class TestTimedeltaIndexOps(Ops):
         for obj in [idx, Series(idx)]:
             tm.assert_series_equal(obj.value_counts(), expected)
 
-        exp_idx = TimedeltaIndex(["1 days 09:00:00", "1 days 08:00:00", pd.NaT])
+        exp_idx = TimedeltaIndex(
+            ["1 days 09:00:00", "1 days 08:00:00", pd.NaT]
+        )
         expected = Series([3, 2, 1], index=exp_idx)
 
         for obj in [idx, Series(idx)]:
@@ -89,8 +91,12 @@ class TestTimedeltaIndexOps(Ops):
 
     def test_order(self):
         # GH 10295
-        idx1 = TimedeltaIndex(["1 day", "2 day", "3 day"], freq="D", name="idx")
-        idx2 = TimedeltaIndex(["1 hour", "2 hour", "3 hour"], freq="H", name="idx")
+        idx1 = TimedeltaIndex(
+            ["1 day", "2 day", "3 day"], freq="D", name="idx"
+        )
+        idx2 = TimedeltaIndex(
+            ["1 hour", "2 hour", "3 hour"], freq="H", name="idx"
+        )
 
         for idx in [idx1, idx2]:
             ordered = idx.sort_values()
@@ -105,10 +111,14 @@ class TestTimedeltaIndexOps(Ops):
 
             ordered, indexer = idx.sort_values(return_indexer=True)
             tm.assert_index_equal(ordered, idx)
-            tm.assert_numpy_array_equal(indexer, np.array([0, 1, 2]), check_dtype=False)
+            tm.assert_numpy_array_equal(
+                indexer, np.array([0, 1, 2]), check_dtype=False
+            )
             assert ordered.freq == idx.freq
 
-            ordered, indexer = idx.sort_values(return_indexer=True, ascending=False)
+            ordered, indexer = idx.sort_values(
+                return_indexer=True, ascending=False
+            )
             tm.assert_index_equal(ordered, idx[::-1])
             assert ordered.freq == expected.freq
             assert ordered.freq.n == -1
@@ -149,7 +159,9 @@ class TestTimedeltaIndexOps(Ops):
             tm.assert_numpy_array_equal(indexer, exp, check_dtype=False)
             assert ordered.freq is None
 
-            ordered, indexer = idx.sort_values(return_indexer=True, ascending=False)
+            ordered, indexer = idx.sort_values(
+                return_indexer=True, ascending=False
+            )
             tm.assert_index_equal(ordered, expected[::-1])
 
             exp = np.array([2, 1, 3, 4, 0])
@@ -244,7 +256,9 @@ class TestTimedeltaIndexOps(Ops):
 
         tm.assert_numpy_array_equal(idx._isnan, np.array([False, True]))
         assert idx.hasnans is True
-        tm.assert_numpy_array_equal(idx._nan_idxs, np.array([1], dtype=np.intp))
+        tm.assert_numpy_array_equal(
+            idx._nan_idxs, np.array([1], dtype=np.intp)
+        )
 
     def test_equals(self):
         # GH 13107

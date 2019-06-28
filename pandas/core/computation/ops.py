@@ -74,7 +74,9 @@ class Term(StringMixin):
         self.env = env
         self.side = side
         tname = str(name)
-        self.is_local = tname.startswith(_LOCAL_TAG) or tname in _DEFAULT_GLOBALS
+        self.is_local = (
+            tname.startswith(_LOCAL_TAG) or tname in _DEFAULT_GLOBALS
+        )
         self._value = self._resolve_name()
         self.encoding = encoding
 
@@ -97,7 +99,8 @@ class Term(StringMixin):
 
         if hasattr(res, "ndim") and res.ndim > 2:
             raise NotImplementedError(
-                "N-dimensional objects, where N > 2," " are not supported with eval"
+                "N-dimensional objects, where N > 2,"
+                " are not supported with eval"
             )
         return res
 
@@ -281,7 +284,15 @@ _bool_ops_funcs = op.and_, op.or_, op.and_, op.or_
 _bool_ops_dict = dict(zip(_bool_ops_syms, _bool_ops_funcs))
 
 _arith_ops_syms = "+", "-", "*", "/", "**", "//", "%"
-_arith_ops_funcs = (op.add, op.sub, op.mul, op.truediv, op.pow, op.floordiv, op.mod)
+_arith_ops_funcs = (
+    op.add,
+    op.sub,
+    op.mul,
+    op.truediv,
+    op.pow,
+    op.floordiv,
+    op.mod,
+)
 _arith_ops_dict = dict(zip(_arith_ops_syms, _arith_ops_funcs))
 
 _special_case_arith_ops_syms = "**", "//", "%"
@@ -493,7 +504,9 @@ class Div(BinOp):
         if not isnumeric(lhs.return_type) or not isnumeric(rhs.return_type):
             raise TypeError(
                 "unsupported operand type(s) for {0}:"
-                " '{1}' and '{2}'".format(self.op, lhs.return_type, rhs.return_type)
+                " '{1}' and '{2}'".format(
+                    self.op, lhs.return_type, rhs.return_type
+                )
             )
 
         # do not upcast float32s to float64 un-necessarily
@@ -571,7 +584,10 @@ class MathCall(Op):
 
 class FuncNode:
     def __init__(self, name):
-        from pandas.core.computation.check import _NUMEXPR_INSTALLED, _NUMEXPR_VERSION
+        from pandas.core.computation.check import (
+            _NUMEXPR_INSTALLED,
+            _NUMEXPR_VERSION,
+        )
 
         if name not in _mathops or (
             _NUMEXPR_INSTALLED

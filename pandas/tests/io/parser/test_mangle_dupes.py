@@ -20,7 +20,9 @@ def test_basic(all_parsers, kwargs):
     data = "a,a,b,b,b\n1,2,3,4,5"
     result = parser.read_csv(StringIO(data), sep=",", **kwargs)
 
-    expected = DataFrame([[1, 2, 3, 4, 5]], columns=["a", "a.1", "b", "b.1", "b.2"])
+    expected = DataFrame(
+        [[1, 2, 3, 4, 5]], columns=["a", "a.1", "b", "b.1", "b.2"]
+    )
     tm.assert_frame_equal(result, expected)
 
 
@@ -50,12 +52,22 @@ def test_basic_names_warn(all_parsers):
 @pytest.mark.parametrize(
     "data,expected",
     [
-        ("a,a,a.1\n1,2,3", DataFrame([[1, 2, 3]], columns=["a", "a.1", "a.1.1"])),
+        (
+            "a,a,a.1\n1,2,3",
+            DataFrame([[1, 2, 3]], columns=["a", "a.1", "a.1.1"]),
+        ),
         (
             "a,a,a.1,a.1.1,a.1.1.1,a.1.1.1.1\n1,2,3,4,5,6",
             DataFrame(
                 [[1, 2, 3, 4, 5, 6]],
-                columns=["a", "a.1", "a.1.1", "a.1.1.1", "a.1.1.1.1", "a.1.1.1.1.1"],
+                columns=[
+                    "a",
+                    "a.1",
+                    "a.1.1",
+                    "a.1.1.1",
+                    "a.1.1.1.1",
+                    "a.1.1.1.1.1",
+                ],
             ),
         ),
         (
@@ -82,15 +94,26 @@ def test_thorough_mangle_columns(all_parsers, data, expected):
             "a,b,b\n1,2,3",
             ["a.1", "a.1", "a.1.1"],
             DataFrame(
-                [["a", "b", "b"], ["1", "2", "3"]], columns=["a.1", "a.1.1", "a.1.1.1"]
+                [["a", "b", "b"], ["1", "2", "3"]],
+                columns=["a.1", "a.1.1", "a.1.1.1"],
             ),
         ),
         (
             "a,b,c,d,e,f\n1,2,3,4,5,6",
             ["a", "a", "a.1", "a.1.1", "a.1.1.1", "a.1.1.1.1"],
             DataFrame(
-                [["a", "b", "c", "d", "e", "f"], ["1", "2", "3", "4", "5", "6"]],
-                columns=["a", "a.1", "a.1.1", "a.1.1.1", "a.1.1.1.1", "a.1.1.1.1.1"],
+                [
+                    ["a", "b", "c", "d", "e", "f"],
+                    ["1", "2", "3", "4", "5", "6"],
+                ],
+                columns=[
+                    "a",
+                    "a.1",
+                    "a.1.1",
+                    "a.1.1.1",
+                    "a.1.1.1.1",
+                    "a.1.1.1.1.1",
+                ],
             ),
         ),
         (

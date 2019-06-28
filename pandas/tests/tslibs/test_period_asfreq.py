@@ -31,7 +31,9 @@ from pandas._libs.tslibs.period import period_asfreq, period_ordinal
     ],
 )
 def test_intra_day_conversion_factors(freq1, freq2, expected):
-    assert period_asfreq(1, get_freq(freq1), get_freq(freq2), False) == expected
+    assert (
+        period_asfreq(1, get_freq(freq1), get_freq(freq2), False) == expected
+    )
 
 
 @pytest.mark.parametrize(
@@ -39,7 +41,9 @@ def test_intra_day_conversion_factors(freq1, freq2, expected):
 )
 def test_period_ordinal_start_values(freq, expected):
     # information for Jan. 1, 1970.
-    assert period_ordinal(1970, 1, 1, 0, 0, 0, 0, 0, get_freq(freq)) == expected
+    assert (
+        period_ordinal(1970, 1, 1, 0, 0, 0, 0, 0, get_freq(freq)) == expected
+    )
 
 
 @pytest.mark.parametrize(

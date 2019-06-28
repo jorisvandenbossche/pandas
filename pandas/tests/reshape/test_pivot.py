@@ -85,7 +85,11 @@ class TestPivotTable:
         index = ["A", "B"]
         columns = "C"
         table = pivot_table(
-            self.data, values="D", index=index, columns=columns, observed=observed
+            self.data,
+            values="D",
+            index=index,
+            columns=columns,
+            observed=observed,
         )
 
         table2 = self.data.pivot_table(
@@ -106,17 +110,27 @@ class TestPivotTable:
         else:
             assert table.columns.name == columns[0]
 
-        expected = self.data.groupby(index + [columns])["D"].agg(np.mean).unstack()
+        expected = (
+            self.data.groupby(index + [columns])["D"].agg(np.mean).unstack()
+        )
         tm.assert_frame_equal(table, expected)
 
     def test_pivot_table_categorical_observed_equal(self, observed):
         # issue #24923
         df = pd.DataFrame(
-            {"col1": list("abcde"), "col2": list("fghij"), "col3": [1, 2, 3, 4, 5]}
+            {
+                "col1": list("abcde"),
+                "col2": list("fghij"),
+                "col3": [1, 2, 3, 4, 5],
+            }
         )
 
         expected = df.pivot_table(
-            index="col1", values="col3", columns="col2", aggfunc=np.sum, fill_value=0
+            index="col1",
+            values="col3",
+            columns="col2",
+            aggfunc=np.sum,
+            fill_value=0,
         )
 
         expected.index = expected.index.astype("category")
@@ -138,7 +152,11 @@ class TestPivotTable:
 
     def test_pivot_table_nocols(self):
         df = DataFrame(
-            {"rows": ["a", "b", "c"], "cols": ["x", "y", "z"], "values": [1, 2, 3]}
+            {
+                "rows": ["a", "b", "c"],
+                "cols": ["x", "y", "z"],
+                "values": [1, 2, 3],
+            }
         )
         rs = df.pivot_table(columns="cols", aggfunc=np.sum)
         xp = df.pivot_table(index="cols", aggfunc=np.sum).T
@@ -194,7 +212,9 @@ class TestPivotTable:
             ["c", "d", "c", "d"], categories=["c", "d", "y"], ordered=True
         )
         df = DataFrame({"A": cat1, "B": cat2, "values": [1, 2, 3, 4]})
-        result = pd.pivot_table(df, values="values", index=["A", "B"], dropna=True)
+        result = pd.pivot_table(
+            df, values="values", index=["A", "B"], dropna=True
+        )
 
         exp_index = pd.MultiIndex.from_arrays([cat1, cat2], names=["A", "B"])
         expected = DataFrame({"values": [1, 2, 3, 4]}, index=exp_index)
@@ -213,9 +233,13 @@ class TestPivotTable:
         )
 
         df["A"] = df["A"].astype(CDT(categories, ordered=False))
-        result = df.pivot_table(index="B", columns="A", values="C", dropna=dropna)
+        result = df.pivot_table(
+            index="B", columns="A", values="C", dropna=dropna
+        )
         expected_columns = Series(["a", "b", "c"], name="A")
-        expected_columns = expected_columns.astype(CDT(categories, ordered=False))
+        expected_columns = expected_columns.astype(
+            CDT(categories, ordered=False)
+        )
         expected_index = Series([1, 2, 3], name="B")
         expected = DataFrame(
             [[0, 3, 6], [1, 4, 7], [2, 5, 8]],
@@ -224,7 +248,9 @@ class TestPivotTable:
         )
         if not dropna:
             # add back the non observed to compare
-            expected = expected.reindex(columns=Categorical(categories)).astype("float")
+            expected = expected.reindex(
+                columns=Categorical(categories)
+            ).astype("float")
 
         tm.assert_frame_equal(result, expected)
 
@@ -283,17 +309,25 @@ class TestPivotTable:
         # GH 25814
         df = DataFrame({"A": interval_values, "B": 1})
         result = df.pivot_table(index="A", values="B", dropna=dropna)
-        expected = DataFrame({"B": 1}, index=Index(interval_values.unique(), name="A"))
+        expected = DataFrame(
+            {"B": 1}, index=Index(interval_values.unique(), name="A")
+        )
         tm.assert_frame_equal(result, expected)
 
     def test_pass_array(self):
-        result = self.data.pivot_table("D", index=self.data.A, columns=self.data.C)
+        result = self.data.pivot_table(
+            "D", index=self.data.A, columns=self.data.C
+        )
         expected = self.data.pivot_table("D", index="A", columns="C")
         tm.assert_frame_equal(result, expected)
 
     def test_pass_function(self):
-        result = self.data.pivot_table("D", index=lambda x: x // 5, columns=self.data.C)
-        expected = self.data.pivot_table("D", index=self.data.index // 5, columns="C")
+        result = self.data.pivot_table(
+            "D", index=lambda x: x // 5, columns=self.data.C
+        )
+        expected = self.data.pivot_table(
+            "D", index=self.data.index // 5, columns="C"
+        )
         tm.assert_frame_equal(result, expected)
 
     def test_pivot_table_multiple(self):
@@ -316,7 +350,12 @@ class TestPivotTable:
         assert f.dtypes["v"] == "int64"
 
         z = pivot_table(
-            f, values="v", index=["a"], columns=["i"], fill_value=0, aggfunc=np.sum
+            f,
+            values="v",
+            index=["a"],
+            columns=["i"],
+            fill_value=0,
+            aggfunc=np.sum,
         )
         result = z.get_dtype_counts()
         expected = Series(dict(int64=2))
@@ -333,7 +372,12 @@ class TestPivotTable:
         assert f.dtypes["v"] == "float64"
 
         z = pivot_table(
-            f, values="v", index=["a"], columns=["i"], fill_value=0, aggfunc=np.mean
+            f,
+            values="v",
+            index=["a"],
+            columns=["i"],
+            fill_value=0,
+            aggfunc=np.mean,
         )
         result = z.get_dtype_counts()
         expected = Series(dict(float64=2))
@@ -360,7 +404,9 @@ class TestPivotTable:
 
         result = dict(df_res.dtypes)
         expected = {
-            col: np.dtype("O") if col[0].startswith("b") else np.dtype("float64")
+            col: np.dtype("O")
+            if col[0].startswith("b")
+            else np.dtype("float64")
             for col in df_res
         }
         assert result == expected
@@ -368,7 +414,13 @@ class TestPivotTable:
     def test_pivot_no_values(self):
         # GH 14380
         idx = pd.DatetimeIndex(
-            ["2011-01-01", "2011-02-01", "2011-01-02", "2011-01-01", "2011-01-02"]
+            [
+                "2011-01-01",
+                "2011-02-01",
+                "2011-01-02",
+                "2011-01-01",
+                "2011-01-02",
+            ]
         )
         df = pd.DataFrame({"A": [1, 2, 3, 4, 5]}, index=idx)
         res = df.pivot_table(index=df.index.month, columns=df.index.day)
@@ -389,7 +441,9 @@ class TestPivotTable:
         res = df.pivot_table(
             index=df.index.month, columns=pd.Grouper(key="dt", freq="M")
         )
-        exp_columns = pd.MultiIndex.from_tuples([("A", pd.Timestamp("2011-01-31"))])
+        exp_columns = pd.MultiIndex.from_tuples(
+            [("A", pd.Timestamp("2011-01-31"))]
+        )
         exp_columns.names = [None, "dt"]
         exp = pd.DataFrame([3.25, 2.0], index=[1, 2], columns=exp_columns)
         tm.assert_frame_equal(res, exp)
@@ -404,16 +458,27 @@ class TestPivotTable:
 
     def test_pivot_multi_values(self):
         result = pivot_table(
-            self.data, values=["D", "E"], index="A", columns=["B", "C"], fill_value=0
+            self.data,
+            values=["D", "E"],
+            index="A",
+            columns=["B", "C"],
+            fill_value=0,
         )
         expected = pivot_table(
-            self.data.drop(["F"], axis=1), index="A", columns=["B", "C"], fill_value=0
+            self.data.drop(["F"], axis=1),
+            index="A",
+            columns=["B", "C"],
+            fill_value=0,
         )
         tm.assert_frame_equal(result, expected)
 
     def test_pivot_multi_functions(self):
         f = lambda func: pivot_table(
-            self.data, values=["D", "E"], index=["A", "B"], columns="C", aggfunc=func
+            self.data,
+            values=["D", "E"],
+            index=["A", "B"],
+            columns="C",
+            aggfunc=func,
         )
         result = f([np.mean, np.std])
         means = f(np.mean)
@@ -517,13 +582,17 @@ class TestPivotTable:
 
         exp_col1 = Index(["data1", "data1", "data2", "data2"])
         exp_col2 = pd.DatetimeIndex(
-            ["2014/01/01 09:00", "2014/01/02 09:00"] * 2, name="dt2", tz="Asia/Tokyo"
+            ["2014/01/01 09:00", "2014/01/02 09:00"] * 2,
+            name="dt2",
+            tz="Asia/Tokyo",
         )
         exp_col = pd.MultiIndex.from_arrays([exp_col1, exp_col2])
         expected = DataFrame(
             [[0, 2, 0, 2], [1, 3, 1, 3]],
             index=pd.DatetimeIndex(
-                ["2013/01/01 09:00", "2013/01/02 09:00"], name="dt1", tz="US/Pacific"
+                ["2013/01/01 09:00", "2013/01/02 09:00"],
+                name="dt1",
+                tz="US/Pacific",
             ),
             columns=exp_col,
         )
@@ -537,10 +606,14 @@ class TestPivotTable:
         expected = DataFrame(
             [[0, 2], [1, 3]],
             index=pd.DatetimeIndex(
-                ["2013/01/01 09:00", "2013/01/02 09:00"], name="dt1", tz="US/Pacific"
+                ["2013/01/01 09:00", "2013/01/02 09:00"],
+                name="dt1",
+                tz="US/Pacific",
             ),
             columns=pd.DatetimeIndex(
-                ["2014/01/01 09:00", "2014/01/02 09:00"], name="dt2", tz="Asia/Tokyo"
+                ["2014/01/01 09:00", "2014/01/02 09:00"],
+                name="dt2",
+                tz="Asia/Tokyo",
             ),
         )
 
@@ -572,11 +645,15 @@ class TestPivotTable:
         )
 
         exp_col1 = Index(["data1", "data1", "data2", "data2"])
-        exp_col2 = pd.PeriodIndex(["2013-01", "2013-02"] * 2, name="p2", freq="M")
+        exp_col2 = pd.PeriodIndex(
+            ["2013-01", "2013-02"] * 2, name="p2", freq="M"
+        )
         exp_col = pd.MultiIndex.from_arrays([exp_col1, exp_col2])
         expected = DataFrame(
             [[0, 2, 0, 2], [1, 3, 1, 3]],
-            index=pd.PeriodIndex(["2013-01-01", "2013-01-02"], name="p1", freq="D"),
+            index=pd.PeriodIndex(
+                ["2013-01-01", "2013-01-02"], name="p1", freq="D"
+            ),
             columns=exp_col,
         )
         if method:
@@ -587,8 +664,12 @@ class TestPivotTable:
 
         expected = DataFrame(
             [[0, 2], [1, 3]],
-            index=pd.PeriodIndex(["2013-01-01", "2013-01-02"], name="p1", freq="D"),
-            columns=pd.PeriodIndex(["2013-01", "2013-02"], name="p2", freq="M"),
+            index=pd.PeriodIndex(
+                ["2013-01-01", "2013-01-02"], name="p1", freq="D"
+            ),
+            columns=pd.PeriodIndex(
+                ["2013-01", "2013-02"], name="p2", freq="M"
+            ),
         )
         if method:
             pv = df.pivot(index="p1", columns="p2", values="data1")
@@ -629,7 +710,9 @@ class TestPivotTable:
             codes=[[0, 0, 0, 1, 1, 1], [0, 1, 2, 0, 1, 2]],
             names=[None, "bar"],
         )
-        expected = DataFrame(data=data, index=index, columns=columns, dtype="object")
+        expected = DataFrame(
+            data=data, index=index, columns=columns, dtype="object"
+        )
         tm.assert_frame_equal(result, expected)
 
     @pytest.mark.parametrize(
@@ -672,11 +755,14 @@ class TestPivotTable:
             codes=[[0, 0, 1, 1], [0, 1, 0, 1]],
             names=[None, "foo"],
         )
-        expected = DataFrame(data=data, index=index, columns=columns, dtype="object")
+        expected = DataFrame(
+            data=data, index=index, columns=columns, dtype="object"
+        )
         tm.assert_frame_equal(result, expected)
 
     @pytest.mark.xfail(
-        reason="MultiIndexed unstack with tuple names fails" "with KeyError GH#19966"
+        reason="MultiIndexed unstack with tuple names fails"
+        "with KeyError GH#19966"
     )
     @pytest.mark.parametrize("method", [True, False])
     def test_pivot_with_multiindex(self, method):
@@ -737,11 +823,17 @@ class TestPivotTable:
 
     def test_margins(self):
         def _check_output(
-            result, values_col, index=["A", "B"], columns=["C"], margins_col="All"
+            result,
+            values_col,
+            index=["A", "B"],
+            columns=["C"],
+            margins_col="All",
         ):
             col_margins = result.loc[result.index[:-1], margins_col]
             expected_col_margins = self.data.groupby(index)[values_col].mean()
-            tm.assert_series_equal(col_margins, expected_col_margins, check_names=False)
+            tm.assert_series_equal(
+                col_margins, expected_col_margins, check_names=False
+            )
             assert col_margins.name == margins_col
 
             result = result.sort_index()
@@ -759,7 +851,11 @@ class TestPivotTable:
 
         # column specified
         result = self.data.pivot_table(
-            values="D", index=["A", "B"], columns="C", margins=True, aggfunc=np.mean
+            values="D",
+            index=["A", "B"],
+            columns="C",
+            margins=True,
+            aggfunc=np.mean,
         )
         _check_output(result, "D")
 
@@ -785,7 +881,9 @@ class TestPivotTable:
 
         # to help with a buglet
         self.data.columns = [k * 2 for k in self.data.columns]
-        table = self.data.pivot_table(index=["AA", "BB"], margins=True, aggfunc=np.mean)
+        table = self.data.pivot_table(
+            index=["AA", "BB"], margins=True, aggfunc=np.mean
+        )
         for value_col in table.columns:
             totals = table.loc[("All", ""), value_col]
             assert totals == self.data[value_col].mean()
@@ -796,7 +894,9 @@ class TestPivotTable:
         )
         assert isinstance(rtable, Series)
 
-        table = self.data.pivot_table(index=["AA", "BB"], margins=True, aggfunc="mean")
+        table = self.data.pivot_table(
+            index=["AA", "BB"], margins=True, aggfunc="mean"
+        )
         for item in ["DD", "EE", "FF"]:
             totals = table.loc[("All", ""), item]
             assert totals == self.data[item].mean()
@@ -810,7 +910,8 @@ class TestPivotTable:
         mi_val = list(product(["bar", "foo"], ["one", "two"])) + [("All", "")]
         mi = MultiIndex.from_tuples(mi_val, names=("A", "B"))
         expected = DataFrame(
-            {"dull": [12, 21, 3, 9, 45], "shiny": [33, 0, 36, 51, 120]}, index=mi
+            {"dull": [12, 21, 3, 9, 45], "shiny": [33, 0, 36, 51, 120]},
+            index=mi,
         ).rename_axis("C", axis=1)
         expected["All"] = expected["dull"] + expected["shiny"]
 
@@ -825,7 +926,9 @@ class TestPivotTable:
 
         tm.assert_frame_equal(expected, result)
 
-    @pytest.mark.xfail(reason="GH#17035 (len of floats is casted back to " "floats)")
+    @pytest.mark.xfail(
+        reason="GH#17035 (len of floats is casted back to " "floats)"
+    )
     def test_margins_dtype_len(self):
         mi_val = list(product(["bar", "foo"], ["one", "two"])) + [("All", "")]
         mi = MultiIndex.from_tuples(mi_val, names=("A", "B"))
@@ -862,7 +965,9 @@ class TestPivotTable:
         table = df.pivot_table(values=4, index=[0, 1, 3], columns=[2])
 
         df2 = df.rename(columns=str)
-        table2 = df2.pivot_table(values="4", index=["0", "1", "3"], columns=["2"])
+        table2 = df2.pivot_table(
+            values="4", index=["0", "1", "3"], columns=["2"]
+        )
 
         tm.assert_frame_equal(table, table2, check_names=False)
 
@@ -970,13 +1075,27 @@ class TestPivotTable:
     def test_margins_no_values_two_row_two_cols(self):
         # Regression test on pivot table: no values passed but rows and cols
         # are multi-indexed
-        self.data["D"] = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"]
+        self.data["D"] = [
+            "a",
+            "b",
+            "c",
+            "d",
+            "e",
+            "f",
+            "g",
+            "h",
+            "i",
+            "j",
+            "k",
+        ]
         result = self.data[["A", "B", "C", "D"]].pivot_table(
             index=["A", "B"], columns=["C", "D"], aggfunc=len, margins=True
         )
         assert result.All.tolist() == [3.0, 1.0, 4.0, 3.0, 11.0]
 
-    @pytest.mark.parametrize("margin_name", ["foo", "one", 666, None, ["a", "b"]])
+    @pytest.mark.parametrize(
+        "margin_name", ["foo", "one", 666, None, ["a", "b"]]
+    )
     def test_pivot_table_with_margins_set_margin_name(self, margin_name):
         # see gh-3335
         msg = (
@@ -1256,7 +1375,20 @@ class TestPivotTable:
         idx = MultiIndex.from_tuples(tuples, names=["Date", "PayDay"])
         expected = DataFrame(
             np.array(
-                [3, np.nan, 6, np.nan, 1, np.nan, 9, np.nan, 9, np.nan, np.nan, 3]
+                [
+                    3,
+                    np.nan,
+                    6,
+                    np.nan,
+                    1,
+                    np.nan,
+                    9,
+                    np.nan,
+                    9,
+                    np.nan,
+                    np.nan,
+                    3,
+                ]
             ).reshape(6, 2),
             index=idx,
             columns=["A", "B"],
@@ -1265,7 +1397,10 @@ class TestPivotTable:
 
         result = pivot_table(
             df,
-            index=[Grouper(freq="M", key="Date"), Grouper(freq="M", key="PayDay")],
+            index=[
+                Grouper(freq="M", key="Date"),
+                Grouper(freq="M", key="PayDay"),
+            ],
             columns=["Branch"],
             values="Quantity",
             aggfunc=np.sum,
@@ -1275,7 +1410,10 @@ class TestPivotTable:
         result = pivot_table(
             df,
             index=["Branch"],
-            columns=[Grouper(freq="M", key="Date"), Grouper(freq="M", key="PayDay")],
+            columns=[
+                Grouper(freq="M", key="Date"),
+                Grouper(freq="M", key="PayDay"),
+            ],
             values="Quantity",
             aggfunc=np.sum,
         )
@@ -1311,18 +1449,28 @@ class TestPivotTable:
         df["dt2"] = df["dt2"].apply(lambda d: pd.Timestamp(d, tz="Asia/Tokyo"))
 
         exp_idx = pd.DatetimeIndex(
-            ["2011-07-19 07:00:00", "2011-07-19 08:00:00", "2011-07-19 09:00:00"],
+            [
+                "2011-07-19 07:00:00",
+                "2011-07-19 08:00:00",
+                "2011-07-19 09:00:00",
+            ],
             tz="US/Pacific",
             name="dt1",
         )
         exp_col1 = Index(["value1", "value1"])
         exp_col2 = Index(["a", "b"], name="label")
         exp_col = MultiIndex.from_arrays([exp_col1, exp_col2])
-        expected = DataFrame([[0, 3], [1, 4], [2, 5]], index=exp_idx, columns=exp_col)
-        result = pivot_table(df, index=["dt1"], columns=["label"], values=["value1"])
+        expected = DataFrame(
+            [[0, 3], [1, 4], [2, 5]], index=exp_idx, columns=exp_col
+        )
+        result = pivot_table(
+            df, index=["dt1"], columns=["label"], values=["value1"]
+        )
         tm.assert_frame_equal(result, expected)
 
-        exp_col1 = Index(["sum", "sum", "sum", "sum", "mean", "mean", "mean", "mean"])
+        exp_col1 = Index(
+            ["sum", "sum", "sum", "sum", "mean", "mean", "mean", "mean"]
+        )
         exp_col2 = Index(["value1", "value1", "value2", "value2"] * 2)
         exp_col3 = pd.DatetimeIndex(
             ["2013-01-01 15:00:00", "2013-02-01 15:00:00"] * 4,
@@ -1395,7 +1543,10 @@ class TestPivotTable:
         tm.assert_frame_equal(result, expected)
 
         result = pivot_table(
-            df, index=df["dt2"].dt.month, columns=df["dt1"].dt.hour, values="value1"
+            df,
+            index=df["dt2"].dt.month,
+            columns=df["dt1"].dt.hour,
+            values="value1",
         )
 
         expected = DataFrame(
@@ -1416,7 +1567,9 @@ class TestPivotTable:
             [[7, 7, 8, 8, 9, 9], [1, 2] * 3], names=["dt1", "dt2"]
         )
         expected = DataFrame(
-            np.array([[0, 3, 1, 4, 2, 5]], dtype="int64"), index=[2013], columns=exp_col
+            np.array([[0, 3, 1, 4, 2, 5]], dtype="int64"),
+            index=[2013],
+            columns=exp_col,
         )
         tm.assert_frame_equal(result, expected)
 
@@ -1428,7 +1581,10 @@ class TestPivotTable:
         )
         expected = DataFrame(
             np.array(
-                [[0, 3, 1, np.nan, 2, np.nan], [np.nan, np.nan, np.nan, 4, np.nan, 5]]
+                [
+                    [0, 3, 1, np.nan, 2, np.nan],
+                    [np.nan, np.nan, np.nan, 4, np.nan, 5],
+                ]
             ),
             index=["X", "Y"],
             columns=exp_col,
@@ -1507,7 +1663,9 @@ class TestPivotTable:
             margins_name=margins_name,
             aggfunc=[np.mean, max],
         )
-        ix = pd.Index(["bacon", "cheese", margins_name], dtype="object", name="item")
+        ix = pd.Index(
+            ["bacon", "cheese", margins_name], dtype="object", name="item"
+        )
         tups = [
             ("mean", "cost", "M"),
             ("mean", "cost", "T"),
@@ -1520,7 +1678,9 @@ class TestPivotTable:
         expected = pd.DataFrame(table.values, index=ix, columns=cols)
         tm.assert_frame_equal(table, expected)
 
-    @pytest.mark.xfail(reason="GH#17035 (np.mean of ints is casted back to " "ints)")
+    @pytest.mark.xfail(
+        reason="GH#17035 (np.mean of ints is casted back to " "ints)"
+    )
     def test_categorical_margins(self, observed):
         # GH 10989
         df = pd.DataFrame(
@@ -1534,7 +1694,9 @@ class TestPivotTable:
         table = df.pivot_table("x", "y", "z", dropna=observed, margins=True)
         tm.assert_frame_equal(table, expected)
 
-    @pytest.mark.xfail(reason="GH#17035 (np.mean of ints is casted back to " "ints)")
+    @pytest.mark.xfail(
+        reason="GH#17035 (np.mean of ints is casted back to " "ints)"
+    )
     def test_categorical_margins_category(self, observed):
         df = pd.DataFrame(
             {"x": np.arange(8), "y": np.arange(8) // 4, "z": np.arange(8) % 2}
@@ -1552,7 +1714,11 @@ class TestPivotTable:
     def test_categorical_aggfunc(self, observed):
         # GH 9534
         df = pd.DataFrame(
-            {"C1": ["A", "B", "C", "C"], "C2": ["a", "a", "b", "b"], "V": [1, 2, 3, 4]}
+            {
+                "C1": ["A", "B", "C", "C"],
+                "C2": ["a", "a", "b", "b"],
+                "V": [1, 2, 3, 4],
+            }
         )
         df["C1"] = df["C1"].astype("category")
         result = df.pivot_table(
@@ -1560,7 +1726,10 @@ class TestPivotTable:
         )
 
         expected_index = pd.CategoricalIndex(
-            ["A", "B", "C"], categories=["A", "B", "C"], ordered=False, name="C1"
+            ["A", "B", "C"],
+            categories=["A", "B", "C"],
+            ordered=False,
+            name="C1",
         )
         expected_columns = pd.Index(["a", "b"], name="C2")
         expected_data = np.array([[1.0, np.nan], [1.0, np.nan], [np.nan, 2.0]])
@@ -1617,15 +1786,21 @@ class TestPivotTable:
         # pivot_table always returns a DataFrame
         # when values is not list like and columns is None
         # and aggfunc is not instance of list
-        df = DataFrame({"col1": [3, 4, 5], "col2": ["C", "D", "E"], "col3": [1, 3, 9]})
+        df = DataFrame(
+            {"col1": [3, 4, 5], "col2": ["C", "D", "E"], "col3": [1, 3, 9]}
+        )
 
         result = df.pivot_table("col1", index=["col3", "col2"], aggfunc=np.sum)
-        m = MultiIndex.from_arrays([[1, 3, 9], ["C", "D", "E"]], names=["col3", "col2"])
+        m = MultiIndex.from_arrays(
+            [[1, 3, 9], ["C", "D", "E"]], names=["col3", "col2"]
+        )
         expected = DataFrame([3, 4, 5], index=m, columns=["col1"])
 
         tm.assert_frame_equal(result, expected)
 
-        result = df.pivot_table("col1", index="col3", columns="col2", aggfunc=np.sum)
+        result = df.pivot_table(
+            "col1", index="col3", columns="col2", aggfunc=np.sum
+        )
         expected = DataFrame(
             [[3, np.NaN, np.NaN], [np.NaN, 4, np.NaN], [np.NaN, np.NaN, 5]],
             index=Index([1, 3, 9], name="col3"),
@@ -1636,7 +1811,9 @@ class TestPivotTable:
 
         result = df.pivot_table("col1", index="col3", aggfunc=[np.sum])
         m = MultiIndex.from_arrays([["sum"], ["col1"]])
-        expected = DataFrame([3, 4, 5], index=Index([1, 3, 9], name="col3"), columns=m)
+        expected = DataFrame(
+            [3, 4, 5], index=Index([1, 3, 9], name="col3"), columns=m
+        )
 
         tm.assert_frame_equal(result, expected)
 
@@ -1688,15 +1865,22 @@ class TestPivotTable:
 
         result = pivot_table(data, index="A", columns="B", aggfunc="sum")
         mi = MultiIndex(
-            levels=[["C"], ["one", "two"]], codes=[[0, 0], [0, 1]], names=[None, "B"]
+            levels=[["C"], ["one", "two"]],
+            codes=[[0, 0], [0, 1]],
+            names=[None, "B"],
         )
         expected = DataFrame(
-            {("C", "one"): {"bar": 15, "foo": 13}, ("C", "two"): {"bar": 7, "foo": 20}},
+            {
+                ("C", "one"): {"bar": 15, "foo": 13},
+                ("C", "two"): {"bar": 7, "foo": 20},
+            },
             columns=mi,
         ).rename_axis("A")
         tm.assert_frame_equal(result, expected)
 
-        result = pivot_table(data, index="A", columns="B", aggfunc=["sum", "mean"])
+        result = pivot_table(
+            data, index="A", columns="B", aggfunc=["sum", "mean"]
+        )
         mi = MultiIndex(
             levels=[["sum", "mean"], ["C"], ["one", "two"]],
             codes=[[0, 0, 1, 1], [0, 0, 0, 0], [0, 1, 0, 1]],
@@ -1728,14 +1912,20 @@ class TestPivotTable:
         # GH #18713
         # for consistency purposes
         result = pivot_table(self.data, index="A", columns="B", aggfunc=f)
-        expected = pivot_table(self.data, index="A", columns="B", aggfunc=f_numpy)
+        expected = pivot_table(
+            self.data, index="A", columns="B", aggfunc=f_numpy
+        )
         tm.assert_frame_equal(result, expected)
 
     @pytest.mark.slow
     def test_pivot_number_of_levels_larger_than_int32(self):
         # GH 20601
         df = DataFrame(
-            {"ind1": np.arange(2 ** 16), "ind2": np.arange(2 ** 16), "count": 0}
+            {
+                "ind1": np.arange(2 ** 16),
+                "ind2": np.arange(2 ** 16),
+                "count": 0,
+            }
         )
 
         msg = "Unstacked DataFrame is too big, causing int32 overflow"
@@ -1764,7 +1954,10 @@ class TestPivotTable:
             return np.nan
 
         result = pd.pivot_table(
-            df, columns="fruit", aggfunc=[ret_sum, ret_none, ret_one], dropna=dropna
+            df,
+            columns="fruit",
+            aggfunc=[ret_sum, ret_none, ret_one],
+            dropna=dropna,
         )
 
         data = [[3, 1, np.nan, np.nan, 1, 1], [13, 6, np.nan, np.nan, 1, 1]]
@@ -1782,10 +1975,16 @@ class TestPivotTable:
     def test_pivot_table_aggfunc_scalar_dropna(self, dropna):
         # GH 22159
         df = pd.DataFrame(
-            {"A": ["one", "two", "one"], "x": [3, np.nan, 2], "y": [1, np.nan, np.nan]}
+            {
+                "A": ["one", "two", "one"],
+                "x": [3, np.nan, 2],
+                "y": [1, np.nan, np.nan],
+            }
         )
 
-        result = pd.pivot_table(df, columns="A", aggfunc=np.mean, dropna=dropna)
+        result = pd.pivot_table(
+            df, columns="A", aggfunc=np.mean, dropna=dropna
+        )
 
         data = [[2.5, np.nan], [1, np.nan]]
         col = pd.Index(["one", "two"], name="A")
@@ -1859,7 +2058,9 @@ class TestCrosstab:
 
         result = crosstab(df["A"], [df["B"], df["C"]])
         expected = df.groupby(["A", "B", "C"]).size()
-        expected = expected.unstack("B").unstack("C").fillna(0).astype(np.int64)
+        expected = (
+            expected.unstack("B").unstack("C").fillna(0).astype(np.int64)
+        )
         tm.assert_frame_equal(result, expected)
 
         result = crosstab([df["B"], df["C"]], df["A"])
@@ -1912,7 +2113,9 @@ class TestCrosstab:
 
         df = DataFrame({"a": a, "b": b, "c": c})
 
-        result = crosstab(a, [b, c], rownames=["a"], colnames=("b", "c"), margins=True)
+        result = crosstab(
+            a, [b, c], rownames=["a"], colnames=("b", "c"), margins=True
+        )
 
         assert result.index.names == ("a",)
         assert result.columns.names == ["b", "c"]
@@ -1992,7 +2195,12 @@ class TestCrosstab:
         values = np.random.randn(100)
 
         table = crosstab(
-            [a, b], c, values, aggfunc=np.sum, rownames=["foo", "bar"], colnames=["baz"]
+            [a, b],
+            c,
+            values,
+            aggfunc=np.sum,
+            rownames=["foo", "bar"],
+            colnames=["baz"],
         )
 
         df = DataFrame({"foo": a, "bar": b, "baz": c, "values": values})
@@ -2004,14 +2212,26 @@ class TestCrosstab:
 
     def test_crosstab_dropna(self):
         # GH 3820
-        a = np.array(["foo", "foo", "foo", "bar", "bar", "foo", "foo"], dtype=object)
-        b = np.array(["one", "one", "two", "one", "two", "two", "two"], dtype=object)
-        c = np.array(
-            ["dull", "dull", "dull", "dull", "dull", "shiny", "shiny"], dtype=object
+        a = np.array(
+            ["foo", "foo", "foo", "bar", "bar", "foo", "foo"], dtype=object
         )
-        res = pd.crosstab(a, [b, c], rownames=["a"], colnames=["b", "c"], dropna=False)
+        b = np.array(
+            ["one", "one", "two", "one", "two", "two", "two"], dtype=object
+        )
+        c = np.array(
+            ["dull", "dull", "dull", "dull", "dull", "shiny", "shiny"],
+            dtype=object,
+        )
+        res = pd.crosstab(
+            a, [b, c], rownames=["a"], colnames=["b", "c"], dropna=False
+        )
         m = MultiIndex.from_tuples(
-            [("one", "dull"), ("one", "shiny"), ("two", "dull"), ("two", "shiny")],
+            [
+                ("one", "dull"),
+                ("one", "shiny"),
+                ("two", "dull"),
+                ("two", "shiny"),
+            ],
             names=["b", "c"],
         )
         tm.assert_index_equal(res.columns, m)
@@ -2032,7 +2252,9 @@ class TestCrosstab:
         # pivot_table counts null into margin ('All')
         # when margins=true and dropna=true
 
-        df = pd.DataFrame({"a": [1, 2, 2, 2, 2, np.nan], "b": [3, 3, 4, 4, 4, 4]})
+        df = pd.DataFrame(
+            {"a": [1, 2, 2, 2, 2, np.nan], "b": [3, 3, 4, 4, 4, 4]}
+        )
         actual = pd.crosstab(df.a, df.b, margins=True, dropna=True)
         expected = pd.DataFrame([[1, 0, 1], [1, 3, 4], [2, 3, 5]])
         expected.index = Index([1.0, 2.0, "All"], name="a")
@@ -2040,7 +2262,10 @@ class TestCrosstab:
         tm.assert_frame_equal(actual, expected)
 
         df = DataFrame(
-            {"a": [1, np.nan, np.nan, np.nan, 2, np.nan], "b": [3, np.nan, 4, 4, 4, 4]}
+            {
+                "a": [1, np.nan, np.nan, np.nan, 2, np.nan],
+                "b": [3, np.nan, 4, 4, 4, 4],
+            }
         )
         actual = pd.crosstab(df.a, df.b, margins=True, dropna=True)
         expected = pd.DataFrame([[1, 0, 1], [0, 1, 1], [1, 1, 2]])
@@ -2049,7 +2274,10 @@ class TestCrosstab:
         tm.assert_frame_equal(actual, expected)
 
         df = DataFrame(
-            {"a": [1, np.nan, np.nan, np.nan, np.nan, 2], "b": [3, 3, 4, 4, 4, 4]}
+            {
+                "a": [1, np.nan, np.nan, np.nan, np.nan, 2],
+                "b": [3, 3, 4, 4, 4, 4],
+            }
         )
         actual = pd.crosstab(df.a, df.b, margins=True, dropna=True)
         expected = pd.DataFrame([[1, 0, 1], [0, 1, 1], [1, 1, 2]])
@@ -2060,7 +2288,9 @@ class TestCrosstab:
         # GH 12642
         # _add_margins raises KeyError: Level None not found
         # when margins=True and dropna=False
-        df = pd.DataFrame({"a": [1, 2, 2, 2, 2, np.nan], "b": [3, 3, 4, 4, 4, 4]})
+        df = pd.DataFrame(
+            {"a": [1, 2, 2, 2, 2, np.nan], "b": [3, 3, 4, 4, 4, 4]}
+        )
         actual = pd.crosstab(df.a, df.b, margins=True, dropna=False)
         expected = pd.DataFrame([[1, 0, 1], [1, 3, 4], [2, 4, 6]])
         expected.index = Index([1.0, 2.0, "All"], name="a")
@@ -2068,7 +2298,10 @@ class TestCrosstab:
         tm.assert_frame_equal(actual, expected)
 
         df = DataFrame(
-            {"a": [1, np.nan, np.nan, np.nan, 2, np.nan], "b": [3, np.nan, 4, 4, 4, 4]}
+            {
+                "a": [1, np.nan, np.nan, np.nan, 2, np.nan],
+                "b": [3, np.nan, 4, 4, 4, 4],
+            }
         )
         actual = pd.crosstab(df.a, df.b, margins=True, dropna=False)
         expected = pd.DataFrame([[1, 0, 1], [0, 1, 1], [1, 4, 6]])
@@ -2076,14 +2309,24 @@ class TestCrosstab:
         expected.columns = Index([3.0, 4.0, "All"], name="b")
         tm.assert_frame_equal(actual, expected)
 
-        a = np.array(["foo", "foo", "foo", "bar", "bar", "foo", "foo"], dtype=object)
-        b = np.array(["one", "one", "two", "one", "two", np.nan, "two"], dtype=object)
+        a = np.array(
+            ["foo", "foo", "foo", "bar", "bar", "foo", "foo"], dtype=object
+        )
+        b = np.array(
+            ["one", "one", "two", "one", "two", np.nan, "two"], dtype=object
+        )
         c = np.array(
-            ["dull", "dull", "dull", "dull", "dull", "shiny", "shiny"], dtype=object
+            ["dull", "dull", "dull", "dull", "dull", "shiny", "shiny"],
+            dtype=object,
         )
 
         actual = pd.crosstab(
-            a, [b, c], rownames=["a"], colnames=["b", "c"], margins=True, dropna=False
+            a,
+            [b, c],
+            rownames=["a"],
+            colnames=["b", "c"],
+            margins=True,
+            dropna=False,
         )
         m = MultiIndex.from_arrays(
             [
@@ -2099,10 +2342,18 @@ class TestCrosstab:
         tm.assert_frame_equal(actual, expected)
 
         actual = pd.crosstab(
-            [a, b], c, rownames=["a", "b"], colnames=["c"], margins=True, dropna=False
+            [a, b],
+            c,
+            rownames=["a", "b"],
+            colnames=["c"],
+            margins=True,
+            dropna=False,
         )
         m = MultiIndex.from_arrays(
-            [["bar", "bar", "foo", "foo", "All"], ["one", "two", "one", "two", ""]],
+            [
+                ["bar", "bar", "foo", "foo", "All"],
+                ["one", "two", "one", "two", ""],
+            ],
             names=["a", "b"],
         )
         expected = DataFrame(
@@ -2112,10 +2363,18 @@ class TestCrosstab:
         tm.assert_frame_equal(actual, expected)
 
         actual = pd.crosstab(
-            [a, b], c, rownames=["a", "b"], colnames=["c"], margins=True, dropna=True
+            [a, b],
+            c,
+            rownames=["a", "b"],
+            colnames=["c"],
+            margins=True,
+            dropna=True,
         )
         m = MultiIndex.from_arrays(
-            [["bar", "bar", "foo", "foo", "All"], ["one", "two", "one", "two", ""]],
+            [
+                ["bar", "bar", "foo", "foo", "All"],
+                ["one", "two", "one", "two", ""],
+            ],
             names=["a", "b"],
         )
         expected = DataFrame(
@@ -2127,22 +2386,38 @@ class TestCrosstab:
     def test_crosstab_normalize(self):
         # Issue 12578
         df = pd.DataFrame(
-            {"a": [1, 2, 2, 2, 2], "b": [3, 3, 4, 4, 4], "c": [1, 1, np.nan, 1, 1]}
+            {
+                "a": [1, 2, 2, 2, 2],
+                "b": [3, 3, 4, 4, 4],
+                "c": [1, 1, np.nan, 1, 1],
+            }
         )
 
         rindex = pd.Index([1, 2], name="a")
         cindex = pd.Index([3, 4], name="b")
-        full_normal = pd.DataFrame([[0.2, 0], [0.2, 0.6]], index=rindex, columns=cindex)
+        full_normal = pd.DataFrame(
+            [[0.2, 0], [0.2, 0.6]], index=rindex, columns=cindex
+        )
         row_normal = pd.DataFrame(
             [[1.0, 0], [0.25, 0.75]], index=rindex, columns=cindex
         )
-        col_normal = pd.DataFrame([[0.5, 0], [0.5, 1.0]], index=rindex, columns=cindex)
+        col_normal = pd.DataFrame(
+            [[0.5, 0], [0.5, 1.0]], index=rindex, columns=cindex
+        )
 
         # Check all normalize args
-        tm.assert_frame_equal(pd.crosstab(df.a, df.b, normalize="all"), full_normal)
-        tm.assert_frame_equal(pd.crosstab(df.a, df.b, normalize=True), full_normal)
-        tm.assert_frame_equal(pd.crosstab(df.a, df.b, normalize="index"), row_normal)
-        tm.assert_frame_equal(pd.crosstab(df.a, df.b, normalize="columns"), col_normal)
+        tm.assert_frame_equal(
+            pd.crosstab(df.a, df.b, normalize="all"), full_normal
+        )
+        tm.assert_frame_equal(
+            pd.crosstab(df.a, df.b, normalize=True), full_normal
+        )
+        tm.assert_frame_equal(
+            pd.crosstab(df.a, df.b, normalize="index"), row_normal
+        )
+        tm.assert_frame_equal(
+            pd.crosstab(df.a, df.b, normalize="columns"), col_normal
+        )
         tm.assert_frame_equal(
             pd.crosstab(df.a, df.b, normalize=1),
             pd.crosstab(df.a, df.b, normalize="columns"),
@@ -2169,19 +2444,22 @@ class TestCrosstab:
             columns=pd.Index([3, 4, "All"], name="b", dtype="object"),
         )
         tm.assert_frame_equal(
-            pd.crosstab(df.a, df.b, normalize="index", margins=True), row_normal_margins
+            pd.crosstab(df.a, df.b, normalize="index", margins=True),
+            row_normal_margins,
         )
         tm.assert_frame_equal(
             pd.crosstab(df.a, df.b, normalize="columns", margins=True),
             col_normal_margins,
         )
         tm.assert_frame_equal(
-            pd.crosstab(df.a, df.b, normalize=True, margins=True), all_normal_margins
+            pd.crosstab(df.a, df.b, normalize=True, margins=True),
+            all_normal_margins,
         )
 
         # Test arrays
         pd.crosstab(
-            [np.array([1, 1, 2, 2]), np.array([1, 2, 1, 2])], np.array([1, 2, 1, 2])
+            [np.array([1, 1, 2, 2]), np.array([1, 2, 1, 2])],
+            np.array([1, 2, 1, 2]),
         )
 
         # Test with aggfunc
@@ -2196,7 +2474,11 @@ class TestCrosstab:
         tm.assert_frame_equal(test_case, norm_counts)
 
         df = pd.DataFrame(
-            {"a": [1, 2, 2, 2, 2], "b": [3, 3, 4, 4, 4], "c": [0, 4, np.nan, 3, 3]}
+            {
+                "a": [1, 2, 2, 2, 2],
+                "b": [3, 3, 4, 4, 4],
+                "c": [0, 4, np.nan, 3, 3],
+            }
         )
 
         norm_sum = pd.DataFrame(
@@ -2246,7 +2528,11 @@ class TestCrosstab:
         # Issue 12578
 
         df = pd.DataFrame(
-            {"a": [1, 2, 2, 2, 2], "b": [3, 3, 4, 4, 4], "c": [1, 1, np.nan, 1, 1]}
+            {
+                "a": [1, 2, 2, 2, 2],
+                "b": [3, 3, 4, 4, 4],
+                "c": [1, 1, np.nan, 1, 1],
+            }
         )
 
         error = "values cannot be used without an aggfunc."
@@ -2273,11 +2559,20 @@ class TestCrosstab:
         df = pd.DataFrame(
             {
                 "MAKE": ["Honda", "Acura", "Tesla", "Honda", "Honda", "Acura"],
-                "MODEL": ["Sedan", "Sedan", "Electric", "Pickup", "Sedan", "Sedan"],
+                "MODEL": [
+                    "Sedan",
+                    "Sedan",
+                    "Electric",
+                    "Pickup",
+                    "Sedan",
+                    "Sedan",
+                ],
             }
         )
         categories = ["Sedan", "Electric", "Pickup"]
-        df["MODEL"] = df["MODEL"].astype("category").cat.set_categories(categories)
+        df["MODEL"] = (
+            df["MODEL"].astype("category").cat.set_categories(categories)
+        )
         result = pd.crosstab(df["MAKE"], df["MODEL"])
 
         expected_index = pd.Index(["Acura", "Honda", "Tesla"], name="MAKE")
@@ -2310,10 +2605,15 @@ class TestCrosstab:
         )
         expected_index = pd.MultiIndex(
             levels=[["All", "one", "three", "two"], ["", "A", "B", "C"]],
-            codes=[[1, 1, 1, 2, 2, 2, 3, 3, 3, 0], [1, 2, 3, 1, 2, 3, 1, 2, 3, 0]],
+            codes=[
+                [1, 1, 1, 2, 2, 2, 3, 3, 3, 0],
+                [1, 2, 3, 1, 2, 3, 1, 2, 3, 0],
+            ],
             names=["A", "B"],
         )
-        expected_column = pd.Index(["bar", "foo", "All"], dtype="object", name="C")
+        expected_column = pd.Index(
+            ["bar", "foo", "All"], dtype="object", name="C"
+        )
         expected_data = np.array(
             [
                 [2.0, 2.0, 4.0],
@@ -2340,7 +2640,9 @@ class TestCrosstab:
         result = pd.crosstab(s, s)
         expected_index = pd.Index(range(3), name="foo")
         expected = pd.DataFrame(
-            np.eye(3, dtype=np.int64), index=expected_index, columns=expected_index
+            np.eye(3, dtype=np.int64),
+            index=expected_index,
+            columns=expected_index,
         )
         tm.assert_frame_equal(result, expected)
 
@@ -2356,7 +2658,9 @@ class TestCrosstab:
         tm.assert_frame_equal(result, expected)
 
     def test_crosstab_unsorted_order(self):
-        df = pd.DataFrame({"b": [3, 1, 2], "a": [5, 4, 6]}, index=["C", "A", "B"])
+        df = pd.DataFrame(
+            {"b": [3, 1, 2], "a": [5, 4, 6]}, index=["C", "A", "B"]
+        )
         result = pd.crosstab(df.index, [df.b, df.a])
         e_idx = pd.Index(["A", "B", "C"], name="row_0")
         e_columns = pd.MultiIndex.from_tuples(

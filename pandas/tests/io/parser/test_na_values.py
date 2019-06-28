@@ -73,7 +73,9 @@ def test_non_string_na_values(all_parsers, data, na_values):
     # see gh-3611: with an odd float format, we can't match
     # the string "999.0" exactly but still need float matching
     parser = all_parsers
-    expected = DataFrame([[np.nan, 1.2], [2.0, np.nan], [3.0, 4.5]], columns=["A", "B"])
+    expected = DataFrame(
+        [[np.nan, 1.2], [2.0, np.nan], [3.0, 4.5]], columns=["A", "B"]
+    )
 
     result = parser.read_csv(StringIO(data), na_values=na_values)
     tm.assert_frame_equal(result, expected)
@@ -134,7 +136,8 @@ ignore,this,row
 7,8,NaN
 """
     expected = DataFrame(
-        [[1.0, np.nan, 3], [np.nan, 5, np.nan], [7, 8, np.nan]], columns=["A", "B", "C"]
+        [[1.0, np.nan, 3], [np.nan, 5, np.nan], [7, 8, np.nan]],
+        columns=["A", "B", "C"],
     )
     result = parser.read_csv(StringIO(data), na_values=na_values, skiprows=[1])
     tm.assert_frame_equal(result, expected)
@@ -164,7 +167,9 @@ bar,foo,foo
 foo,bar,NA
 bar,foo,foo"""
     parser = all_parsers
-    df = parser.read_csv(StringIO(data), na_values={"A": ["foo"], "B": ["bar"]})
+    df = parser.read_csv(
+        StringIO(data), na_values={"A": ["foo"], "B": ["bar"]}
+    )
     expected = DataFrame(
         {
             "A": [np.nan, "bar", np.nan, "bar"],
@@ -180,7 +185,9 @@ bar,foo,foo"""
     [
         (
             [0],
-            DataFrame({"b": [np.nan], "c": [1], "d": [5]}, index=Index([0], name="a")),
+            DataFrame(
+                {"b": [np.nan], "c": [1], "d": [5]}, index=Index([0], name="a")
+            ),
         ),
         (
             [0, 2],
@@ -204,7 +211,9 @@ a,b,c,d
 0,NA,1,5
 """
     parser = all_parsers
-    result = parser.read_csv(StringIO(data), na_values=set(), index_col=index_col)
+    result = parser.read_csv(
+        StringIO(data), na_values=set(), index_col=index_col
+    )
     tm.assert_frame_equal(result, expected)
 
 
@@ -217,7 +226,15 @@ a,b,c,d
                 {
                     "A": ["a", "b", np.nan, "d", "e", np.nan, "g"],
                     "B": [1, 2, 3, 4, 5, 6, 7],
-                    "C": ["one", "two", "three", np.nan, "five", np.nan, "seven"],
+                    "C": [
+                        "one",
+                        "two",
+                        "three",
+                        np.nan,
+                        "five",
+                        np.nan,
+                        "seven",
+                    ],
                 }
             ),
         ),
@@ -247,7 +264,15 @@ a,b,c,d
                 {
                     "A": ["a", "b", np.nan, "d", "e", np.nan, "g"],
                     "B": [1, 2, 3, 4, 5, 6, 7],
-                    "C": ["one", "two", "three", np.nan, "five", np.nan, "seven"],
+                    "C": [
+                        "one",
+                        "two",
+                        "three",
+                        np.nan,
+                        "five",
+                        np.nan,
+                        "seven",
+                    ],
                 }
             ),
         ),
@@ -312,13 +337,17 @@ def test_no_keep_default_na_dict_na_scalar_values(all_parsers):
     # Scalar values shouldn't cause the parsing to crash or fail.
     data = "a,b\n1,2"
     parser = all_parsers
-    df = parser.read_csv(StringIO(data), na_values={"b": 2}, keep_default_na=False)
+    df = parser.read_csv(
+        StringIO(data), na_values={"b": 2}, keep_default_na=False
+    )
     expected = DataFrame({"a": [1], "b": [np.nan]})
     tm.assert_frame_equal(df, expected)
 
 
 @pytest.mark.parametrize("col_zero_na_values", [113125, "113125"])
-def test_no_keep_default_na_dict_na_values_diff_reprs(all_parsers, col_zero_na_values):
+def test_no_keep_default_na_dict_na_values_diff_reprs(
+    all_parsers, col_zero_na_values
+):
     # see gh-19227
     data = """\
 113125,"blah","/blaha",kjsdkj,412.166,225.874,214.008
@@ -361,7 +390,9 @@ nan,B
 3,C
 """
     parser = all_parsers
-    result = parser.read_csv(StringIO(data), na_values=["B"], na_filter=na_filter)
+    result = parser.read_csv(
+        StringIO(data), na_values=["B"], na_filter=na_filter
+    )
 
     expected = DataFrame(row_data, columns=["A", "B"])
     tm.assert_frame_equal(result, expected)
@@ -446,8 +477,16 @@ def test_na_values_dict_col_index(all_parsers):
             dict(na_values=[2 ** 63]),
             DataFrame([str(2 ** 63), str(2 ** 63 + 1)]),
         ),
-        (str(2 ** 63) + ",1" + "\n,2", dict(), DataFrame([[str(2 ** 63), 1], ["", 2]])),
-        (str(2 ** 63) + "\n1", dict(na_values=[2 ** 63]), DataFrame([np.nan, 1])),
+        (
+            str(2 ** 63) + ",1" + "\n,2",
+            dict(),
+            DataFrame([[str(2 ** 63), 1], ["", 2]]),
+        ),
+        (
+            str(2 ** 63) + "\n1",
+            dict(na_values=[2 ** 63]),
+            DataFrame([np.nan, 1]),
+        ),
     ],
 )
 def test_na_values_uint64(all_parsers, data, kwargs, expected):
@@ -463,7 +502,9 @@ def test_empty_na_values_no_default_with_index(all_parsers):
     parser = all_parsers
     expected = DataFrame({"1": [2]}, index=Index(["b"], name="a"))
 
-    result = parser.read_csv(StringIO(data), index_col=0, keep_default_na=False)
+    result = parser.read_csv(
+        StringIO(data), index_col=0, keep_default_na=False
+    )
     tm.assert_frame_equal(result, expected)
 
 
@@ -477,8 +518,12 @@ def test_no_na_filter_on_index(all_parsers, na_filter, index_data):
     parser = all_parsers
     data = "a,b,c\n1,,3\n4,5,6"
 
-    expected = DataFrame({"a": [1, 4], "c": [3, 6]}, index=Index(index_data, name="b"))
-    result = parser.read_csv(StringIO(data), index_col=[1], na_filter=na_filter)
+    expected = DataFrame(
+        {"a": [1, 4], "c": [3, 6]}, index=Index(index_data, name="b")
+    )
+    result = parser.read_csv(
+        StringIO(data), index_col=[1], na_filter=na_filter
+    )
     tm.assert_frame_equal(result, expected)
 
 
@@ -488,9 +533,12 @@ def test_inf_na_values_with_int_index(all_parsers):
     data = "idx,col1,col2\n1,3,4\n2,inf,-inf"
 
     # Don't fail with OverflowError with inf's and integer index column.
-    out = parser.read_csv(StringIO(data), index_col=[0], na_values=["inf", "-inf"])
+    out = parser.read_csv(
+        StringIO(data), index_col=[0], na_values=["inf", "-inf"]
+    )
     expected = DataFrame(
-        {"col1": [3, np.nan], "col2": [4, np.nan]}, index=Index([1, 2], name="idx")
+        {"col1": [3, np.nan], "col2": [4, np.nan]},
+        index=Index([1, 2], name="idx"),
     )
     tm.assert_frame_equal(out, expected)
 

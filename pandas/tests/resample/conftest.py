@@ -100,7 +100,9 @@ def _index_name():
 def index(_index_factory, _index_start, _index_end, _index_freq, _index_name):
     """Fixture for parametrization of date_range, period_range and
     timedelta_range indexes"""
-    return _index_factory(_index_start, _index_end, freq=_index_freq, name=_index_name)
+    return _index_factory(
+        _index_start, _index_end, freq=_index_freq, name=_index_name
+    )
 
 
 @pytest.fixture

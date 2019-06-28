@@ -8,7 +8,9 @@ class _XlwtWriter(ExcelWriter):
     engine = "xlwt"
     supported_extensions = (".xls",)
 
-    def __init__(self, path, engine=None, encoding=None, mode="w", **engine_kwargs):
+    def __init__(
+        self, path, engine=None, encoding=None, mode="w", **engine_kwargs
+    ):
         # Use the xlwt module as the Excel writer.
         import xlwt
 
@@ -77,7 +79,9 @@ class _XlwtWriter(ExcelWriter):
                 wks.write(startrow + cell.row, startcol + cell.col, val, style)
 
     @classmethod
-    def _style_to_xlwt(cls, item, firstlevel=True, field_sep=",", line_sep=";"):
+    def _style_to_xlwt(
+        cls, item, firstlevel=True, field_sep=",", line_sep=";"
+    ):
         """helper which recursively generate an xlwt easy style string
         for example:
 
@@ -95,14 +99,18 @@ class _XlwtWriter(ExcelWriter):
         if hasattr(item, "items"):
             if firstlevel:
                 it = [
-                    "{key}: {val}".format(key=key, val=cls._style_to_xlwt(value, False))
+                    "{key}: {val}".format(
+                        key=key, val=cls._style_to_xlwt(value, False)
+                    )
                     for key, value in item.items()
                 ]
                 out = "{sep} ".format(sep=(line_sep).join(it))
                 return out
             else:
                 it = [
-                    "{key} {val}".format(key=key, val=cls._style_to_xlwt(value, False))
+                    "{key} {val}".format(
+                        key=key, val=cls._style_to_xlwt(value, False)
+                    )
                     for key, value in item.items()
                 ]
                 out = "{sep} ".format(sep=(field_sep).join(it))

@@ -11,7 +11,11 @@ import pandas as pd
 from pandas.api.extensions import register_extension_dtype
 from pandas.api.types import is_scalar
 from pandas.core.arrays import PandasArray, integer_array, period_array
-from pandas.tests.extension.decimal import DecimalArray, DecimalDtype, to_decimal
+from pandas.tests.extension.decimal import (
+    DecimalArray,
+    DecimalDtype,
+    to_decimal,
+)
 import pandas.util.testing as tm
 
 
@@ -112,9 +116,17 @@ import pandas.util.testing as tm
         ([0, 1], "Sparse[int64]", pd.SparseArray([0, 1], dtype="int64")),
         # IntegerNA
         ([1, None], "Int16", integer_array([1, None], dtype="Int16")),
-        (pd.Series([1, 2]), None, PandasArray(np.array([1, 2], dtype=np.int64))),
+        (
+            pd.Series([1, 2]),
+            None,
+            PandasArray(np.array([1, 2], dtype=np.int64)),
+        ),
         # Index
-        (pd.Index([1, 2]), None, PandasArray(np.array([1, 2], dtype=np.int64))),
+        (
+            pd.Index([1, 2]),
+            None,
+            PandasArray(np.array([1, 2], dtype=np.int64)),
+        ),
         # Series[EA] returns the EA
         (
             pd.Series(pd.Categorical(["a", "b"], categories=["a", "b", "c"])),
@@ -122,7 +134,11 @@ import pandas.util.testing as tm
             pd.Categorical(["a", "b"], categories=["a", "b", "c"]),
         ),
         # "3rd party" EAs work
-        ([decimal.Decimal(0), decimal.Decimal(1)], "decimal", to_decimal([0, 1])),
+        (
+            [decimal.Decimal(0), decimal.Decimal(1)],
+            "decimal",
+            to_decimal([0, 1]),
+        ),
         # pass an ExtensionArray, but a different dtype
         (
             period_array(["2000", "2001"], freq="D"),
@@ -238,7 +254,9 @@ def test_array_inference_fails(data):
     tm.assert_extension_array_equal(result, expected)
 
 
-@pytest.mark.parametrize("data", [np.array([[1, 2], [3, 4]]), [[1, 2], [3, 4]]])
+@pytest.mark.parametrize(
+    "data", [np.array([[1, 2], [3, 4]]), [[1, 2], [3, 4]]]
+)
 def test_nd_raises(data):
     with pytest.raises(ValueError, match="PandasArray must be 1-dimensional"):
         pd.array(data)
@@ -338,7 +356,9 @@ class TestArrayAnalytics:
                 pd.Timestamp("20120102"),
             ],
             [
-                pd.date_range("20120101", periods=10, freq="2D", tz="Asia/Hong_Kong"),
+                pd.date_range(
+                    "20120101", periods=10, freq="2D", tz="Asia/Hong_Kong"
+                ),
                 pd.Timestamp("20120102", tz="Asia/Hong_Kong"),
             ],
             [

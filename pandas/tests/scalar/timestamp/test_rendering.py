@@ -14,12 +14,18 @@ class TestTimestampRendering:
     if LooseVersion(dateutil.__version__) >= LooseVersion("2.6.0"):
         timezones = ["UTC", "Asia/Tokyo", "US/Eastern", "dateutil/US/Pacific"]
     else:
-        timezones = ["UTC", "Asia/Tokyo", "US/Eastern", "dateutil/America/Los_Angeles"]
+        timezones = [
+            "UTC",
+            "Asia/Tokyo",
+            "US/Eastern",
+            "dateutil/America/Los_Angeles",
+        ]
 
     @pytest.mark.parametrize("tz", timezones)
     @pytest.mark.parametrize("freq", ["D", "M", "S", "N"])
     @pytest.mark.parametrize(
-        "date", ["2014-03-07", "2014-01-01 09:00", "2014-01-01 00:00:00.000000001"]
+        "date",
+        ["2014-03-07", "2014-01-01 09:00", "2014-01-01 00:00:00.000000001"],
     )
     def test_repr(self, date, freq, tz):
         # avoid to match with timezone name
@@ -77,7 +83,10 @@ class TestTimestampRendering:
 
     def test_pprint(self):
         # GH#12622
-        nested_obj = {"foo": 1, "bar": [{"w": {"a": Timestamp("2011-01-01")}}] * 10}
+        nested_obj = {
+            "foo": 1,
+            "bar": [{"w": {"a": Timestamp("2011-01-01")}}] * 10,
+        }
         result = pprint.pformat(nested_obj, width=50)
         expected = r"""{'bar': [{'w': {'a': Timestamp('2011-01-01 00:00:00')}},
          {'w': {'a': Timestamp('2011-01-01 00:00:00')}},

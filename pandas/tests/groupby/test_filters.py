@@ -12,8 +12,12 @@ def test_filter_series():
     expected_even = pd.Series([20, 22, 24], index=[2, 4, 5])
     grouper = s.apply(lambda x: x % 2)
     grouped = s.groupby(grouper)
-    tm.assert_series_equal(grouped.filter(lambda x: x.mean() < 10), expected_odd)
-    tm.assert_series_equal(grouped.filter(lambda x: x.mean() > 10), expected_even)
+    tm.assert_series_equal(
+        grouped.filter(lambda x: x.mean() < 10), expected_odd
+    )
+    tm.assert_series_equal(
+        grouped.filter(lambda x: x.mean() > 10), expected_even
+    )
     # Test dropna=False.
     tm.assert_series_equal(
         grouped.filter(lambda x: x.mean() < 10, dropna=False),
@@ -31,8 +35,12 @@ def test_filter_single_column_df():
     expected_even = pd.DataFrame([20, 22, 24], index=[2, 4, 5])
     grouper = df[0].apply(lambda x: x % 2)
     grouped = df.groupby(grouper)
-    tm.assert_frame_equal(grouped.filter(lambda x: x.mean() < 10), expected_odd)
-    tm.assert_frame_equal(grouped.filter(lambda x: x.mean() > 10), expected_even)
+    tm.assert_frame_equal(
+        grouped.filter(lambda x: x.mean() < 10), expected_odd
+    )
+    tm.assert_frame_equal(
+        grouped.filter(lambda x: x.mean() > 10), expected_even
+    )
     # Test dropna=False.
     tm.assert_frame_equal(
         grouped.filter(lambda x: x.mean() < 10, dropna=False),
@@ -59,7 +67,9 @@ def test_filter_mixed_df():
     grouper = df["A"].apply(lambda x: x % 2)
     grouped = df.groupby(grouper)
     expected = pd.DataFrame({"A": [12, 12], "B": ["b", "c"]}, index=[1, 2])
-    tm.assert_frame_equal(grouped.filter(lambda x: x["A"].sum() > 10), expected)
+    tm.assert_frame_equal(
+        grouped.filter(lambda x: x["A"].sum() > 10), expected
+    )
 
 
 def test_filter_out_all_groups():
@@ -70,7 +80,9 @@ def test_filter_out_all_groups():
     df = pd.DataFrame({"A": [1, 12, 12, 1], "B": "a b c d".split()})
     grouper = df["A"].apply(lambda x: x % 2)
     grouped = df.groupby(grouper)
-    tm.assert_frame_equal(grouped.filter(lambda x: x["A"].sum() > 1000), df.loc[[]])
+    tm.assert_frame_equal(
+        grouped.filter(lambda x: x["A"].sum() > 1000), df.loc[[]]
+    )
 
 
 def test_filter_out_no_groups():
@@ -119,14 +131,18 @@ def test_filter_condition_raises():
 def test_filter_with_axis_in_groupby():
     # issue 11041
     index = pd.MultiIndex.from_product([range(10), [0, 1]])
-    data = pd.DataFrame(np.arange(100).reshape(-1, 20), columns=index, dtype="int64")
+    data = pd.DataFrame(
+        np.arange(100).reshape(-1, 20), columns=index, dtype="int64"
+    )
     result = data.groupby(level=0, axis=1).filter(lambda x: x.iloc[0, 0] > 10)
     expected = data.iloc[:, 12:20]
     tm.assert_frame_equal(result, expected)
 
 
 def test_filter_bad_shapes():
-    df = DataFrame({"A": np.arange(8), "B": list("aabbbbcc"), "C": np.arange(8)})
+    df = DataFrame(
+        {"A": np.arange(8), "B": list("aabbbbcc"), "C": np.arange(8)}
+    )
     s = df["B"]
     g_df = df.groupby("B")
     g_s = s.groupby(s)
@@ -157,7 +173,9 @@ def test_filter_bad_shapes():
 
 
 def test_filter_nan_is_false():
-    df = DataFrame({"A": np.arange(8), "B": list("aabbbbcc"), "C": np.arange(8)})
+    df = DataFrame(
+        {"A": np.arange(8), "B": list("aabbbbcc"), "C": np.arange(8)}
+    )
     s = df["B"]
     g_df = df.groupby(df["B"])
     g_s = s.groupby(s)
@@ -204,27 +222,35 @@ def test_filter_against_workaround():
 
     # Group by ints; filter on floats.
     grouped = df.groupby("ints")
-    old_way = df[grouped.floats.transform(lambda x: x.mean() > N / 20).astype("bool")]
+    old_way = df[
+        grouped.floats.transform(lambda x: x.mean() > N / 20).astype("bool")
+    ]
     new_way = grouped.filter(lambda x: x["floats"].mean() > N / 20)
     tm.assert_frame_equal(new_way, old_way)
 
     # Group by floats (rounded); filter on strings.
     grouper = df.floats.apply(lambda x: np.round(x, -1))
     grouped = df.groupby(grouper)
-    old_way = df[grouped.letters.transform(lambda x: len(x) < N / 10).astype("bool")]
+    old_way = df[
+        grouped.letters.transform(lambda x: len(x) < N / 10).astype("bool")
+    ]
     new_way = grouped.filter(lambda x: len(x.letters) < N / 10)
     tm.assert_frame_equal(new_way, old_way)
 
     # Group by strings; filter on ints.
     grouped = df.groupby("letters")
-    old_way = df[grouped.ints.transform(lambda x: x.mean() > N / 20).astype("bool")]
+    old_way = df[
+        grouped.ints.transform(lambda x: x.mean() > N / 20).astype("bool")
+    ]
     new_way = grouped.filter(lambda x: x["ints"].mean() > N / 20)
     tm.assert_frame_equal(new_way, old_way)
 
 
 def test_filter_using_len():
     # BUG GH4447
-    df = DataFrame({"A": np.arange(8), "B": list("aabbbbcc"), "C": np.arange(8)})
+    df = DataFrame(
+        {"A": np.arange(8), "B": list("aabbbbcc"), "C": np.arange(8)}
+    )
     grouped = df.groupby("B")
     actual = grouped.filter(lambda x: len(x) > 2)
     expected = DataFrame(
@@ -252,7 +278,10 @@ def test_filter_using_len():
 def test_filter_maintains_ordering():
     # Simple case: index is sequential. #4621
     df = DataFrame(
-        {"pid": [1, 1, 1, 2, 2, 3, 3, 3], "tag": [23, 45, 62, 24, 45, 34, 25, 62]}
+        {
+            "pid": [1, 1, 1, 2, 2, 3, 3, 3],
+            "tag": [23, 45, 62, 24, 45, 34, 25, 62],
+        }
     )
     s = df["pid"]
     grouped = df.groupby("tag")
@@ -328,7 +357,10 @@ def test_filter_and_transform_with_non_unique_int_index():
     # GH4620
     index = [1, 1, 1, 2, 1, 1, 0, 1]
     df = DataFrame(
-        {"pid": [1, 1, 1, 2, 2, 3, 3, 3], "tag": [23, 45, 62, 24, 45, 34, 25, 62]},
+        {
+            "pid": [1, 1, 1, 2, 2, 3, 3, 3],
+            "tag": [23, 45, 62, 24, 45, 34, 25, 62],
+        },
         index=index,
     )
     grouped_df = df.groupby("tag")
@@ -371,7 +403,10 @@ def test_filter_and_transform_with_multiple_non_unique_int_index():
     # GH4620
     index = [1, 1, 1, 2, 0, 0, 0, 1]
     df = DataFrame(
-        {"pid": [1, 1, 1, 2, 2, 3, 3, 3], "tag": [23, 45, 62, 24, 45, 34, 25, 62]},
+        {
+            "pid": [1, 1, 1, 2, 2, 3, 3, 3],
+            "tag": [23, 45, 62, 24, 45, 34, 25, 62],
+        },
         index=index,
     )
     grouped_df = df.groupby("tag")
@@ -414,7 +449,10 @@ def test_filter_and_transform_with_non_unique_float_index():
     # GH4620
     index = np.array([1, 1, 1, 2, 1, 1, 0, 1], dtype=float)
     df = DataFrame(
-        {"pid": [1, 1, 1, 2, 2, 3, 3, 3], "tag": [23, 45, 62, 24, 45, 34, 25, 62]},
+        {
+            "pid": [1, 1, 1, 2, 2, 3, 3, 3],
+            "tag": [23, 45, 62, 24, 45, 34, 25, 62],
+        },
         index=index,
     )
     grouped_df = df.groupby("tag")
@@ -460,7 +498,10 @@ def test_filter_and_transform_with_non_unique_timestamp_index():
     t2 = Timestamp("2013-11-30 00:05:00")
     index = [t1, t1, t1, t2, t1, t1, t0, t1]
     df = DataFrame(
-        {"pid": [1, 1, 1, 2, 2, 3, 3, 3], "tag": [23, 45, 62, 24, 45, 34, 25, 62]},
+        {
+            "pid": [1, 1, 1, 2, 2, 3, 3, 3],
+            "tag": [23, 45, 62, 24, 45, 34, 25, 62],
+        },
         index=index,
     )
     grouped_df = df.groupby("tag")
@@ -503,7 +544,10 @@ def test_filter_and_transform_with_non_unique_string_index():
     # GH4620
     index = list("bbbcbbab")
     df = DataFrame(
-        {"pid": [1, 1, 1, 2, 2, 3, 3, 3], "tag": [23, 45, 62, 24, 45, 34, 25, 62]},
+        {
+            "pid": [1, 1, 1, 2, 2, 3, 3, 3],
+            "tag": [23, 45, 62, 24, 45, 34, 25, 62],
+        },
         index=index,
     )
     grouped_df = df.groupby("tag")

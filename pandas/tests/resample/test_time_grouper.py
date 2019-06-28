@@ -11,7 +11,9 @@ from pandas.core.indexes.datetimes import date_range
 import pandas.util.testing as tm
 from pandas.util.testing import assert_frame_equal, assert_series_equal
 
-test_series = Series(np.random.randn(1000), index=date_range("1/1/2000", periods=1000))
+test_series = Series(
+    np.random.randn(1000), index=date_range("1/1/2000", periods=1000)
+)
 
 
 def test_apply():
@@ -142,7 +144,9 @@ def test_aggregate_normal(resample_method):
 
     expected = getattr(normal_grouped, resample_method)()
     dt_result = getattr(dt_grouped, resample_method)()
-    expected.index = date_range(start="2013-01-01", freq="D", periods=5, name="key")
+    expected.index = date_range(
+        start="2013-01-01", freq="D", periods=5, name="key"
+    )
     tm.assert_equal(expected, dt_result)
 
     # if TimeGrouper is used included, 'nth' doesn't work yet
@@ -169,7 +173,9 @@ def test_aggregate_normal(resample_method):
     ],
 )
 def test_resample_entirly_nat_window(method, method_args, unit):
-    s = pd.Series([0] * 2 + [np.nan] * 2, index=pd.date_range("2017", periods=4))
+    s = pd.Series(
+        [0] * 2 + [np.nan] * 2, index=pd.date_range("2017", periods=4)
+    )
     result = methodcaller(method, **method_args)(s.resample("2d"))
     expected = pd.Series(
         [0.0, unit], index=pd.to_datetime(["2017-01-01", "2017-01-03"])
@@ -206,10 +212,14 @@ def test_aggregate_with_nat(func, fill_value):
     normal_result = getattr(normal_grouped, func)()
     dt_result = getattr(dt_grouped, func)()
 
-    pad = DataFrame([[fill_value] * 4], index=[3], columns=["A", "B", "C", "D"])
+    pad = DataFrame(
+        [[fill_value] * 4], index=[3], columns=["A", "B", "C", "D"]
+    )
     expected = normal_result.append(pad)
     expected = expected.sort_index()
-    expected.index = date_range(start="2013-01-01", freq="D", periods=5, name="key")
+    expected.index = date_range(
+        start="2013-01-01", freq="D", periods=5, name="key"
+    )
     assert_frame_equal(expected, dt_result)
     assert dt_result.index.name == "key"
 
@@ -239,7 +249,9 @@ def test_aggregate_with_nat_size():
     pad = Series([0], index=[3])
     expected = normal_result.append(pad)
     expected = expected.sort_index()
-    expected.index = date_range(start="2013-01-01", freq="D", periods=5, name="key")
+    expected.index = date_range(
+        start="2013-01-01", freq="D", periods=5, name="key"
+    )
     assert_series_equal(expected, dt_result)
     assert dt_result.index.name == "key"
 

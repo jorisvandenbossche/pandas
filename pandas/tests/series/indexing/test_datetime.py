@@ -36,7 +36,8 @@ def test_fancy_getitem():
     with pytest.raises(KeyError, match=r"^'2009-1-3'$"):
         s["2009-1-3"]
     assert_series_equal(
-        s["3/6/2009":"2009-06-05"], s[datetime(2009, 3, 6) : datetime(2009, 6, 5)]
+        s["3/6/2009":"2009-06-05"],
+        s[datetime(2009, 3, 6) : datetime(2009, 6, 5)],
     )
 
 
@@ -74,7 +75,9 @@ def test_dti_snap(name, tz):
     )
 
     result = dti.snap(freq="W-MON")
-    expected = date_range("12/31/2001", "1/7/2002", name=name, tz=tz, freq="w-mon")
+    expected = date_range(
+        "12/31/2001", "1/7/2002", name=name, tz=tz, freq="w-mon"
+    )
     expected = expected.repeat([3, 4])
     tm.assert_index_equal(result, expected)
     assert result.tz == expected.tz
@@ -126,7 +129,9 @@ def test_series_set_value():
 
 @pytest.mark.slow
 def test_slice_locs_indexerror():
-    times = [datetime(2000, 1, 1) + timedelta(minutes=i * 10) for i in range(100000)]
+    times = [
+        datetime(2000, 1, 1) + timedelta(minutes=i * 10) for i in range(100000)
+    ]
     s = Series(range(100000), times)
     s.loc[datetime(1900, 1, 1) : datetime(2100, 1, 1)]
 
@@ -500,7 +505,8 @@ def test_index_unique(dups):
     assert idx.nunique(dropna=False) == 21
 
     arr = [
-        Timestamp("2013-06-09 02:42:28") + timedelta(seconds=t) for t in range(20)
+        Timestamp("2013-06-09 02:42:28") + timedelta(seconds=t)
+        for t in range(20)
     ] + [NaT]
     idx = DatetimeIndex(arr * 3)
     tm.assert_index_equal(idx.unique(), DatetimeIndex(arr))
@@ -543,7 +549,9 @@ def test_duplicate_dates_indexing(dups):
 
 
 def test_range_slice():
-    idx = DatetimeIndex(["1/1/2000", "1/2/2000", "1/2/2000", "1/3/2000", "1/4/2000"])
+    idx = DatetimeIndex(
+        ["1/1/2000", "1/2/2000", "1/2/2000", "1/3/2000", "1/4/2000"]
+    )
 
     ts = Series(np.random.randn(len(idx)), index=idx)
 
@@ -674,12 +682,16 @@ def test_indexing():
     assert_series_equal(expected, result)
 
     # GH3546 (not including times on the last day)
-    idx = date_range(start="2013-05-31 00:00", end="2013-05-31 23:00", freq="H")
+    idx = date_range(
+        start="2013-05-31 00:00", end="2013-05-31 23:00", freq="H"
+    )
     ts = Series(range(len(idx)), index=idx)
     expected = ts["2013-05"]
     assert_series_equal(expected, ts)
 
-    idx = date_range(start="2013-05-31 00:00", end="2013-05-31 23:59", freq="S")
+    idx = date_range(
+        start="2013-05-31 00:00", end="2013-05-31 23:59", freq="S"
+    )
     ts = Series(range(len(idx)), index=idx)
     expected = ts["2013-05"]
     assert_series_equal(expected, ts)
@@ -696,7 +708,9 @@ def test_indexing():
     df = DataFrame(
         np.random.rand(5, 5),
         columns=["open", "high", "low", "close", "volume"],
-        index=date_range("2012-01-02 18:01:00", periods=5, tz="US/Central", freq="s"),
+        index=date_range(
+            "2012-01-02 18:01:00", periods=5, tz="US/Central", freq="s"
+        ),
     )
     expected = df.loc[[df.index[2]]]
 

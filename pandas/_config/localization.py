@@ -108,7 +108,9 @@ def _default_locale_getter():
     return raw_locales
 
 
-def get_locales(prefix=None, normalize=True, locale_getter=_default_locale_getter):
+def get_locales(
+    prefix=None, normalize=True, locale_getter=_default_locale_getter
+):
     """
     Get all the locales that are available on the system.
 

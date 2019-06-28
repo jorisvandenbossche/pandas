@@ -49,7 +49,8 @@ def to_json(
 
     if not index and orient not in ["split", "table"]:
         raise ValueError(
-            "'index=False' is only valid when 'orient' is " "'split' or 'table'"
+            "'index=False' is only valid when 'orient' is "
+            "'split' or 'table'"
         )
 
     path_or_buf = _stringify_path(path_or_buf)
@@ -196,7 +197,10 @@ class FrameWriter(Writer):
         """
         Try to format axes if they are datelike.
         """
-        if not self.obj.index.is_unique and self.orient in ("index", "columns"):
+        if not self.obj.index.is_unique and self.orient in (
+            "index",
+            "columns",
+        ):
             raise ValueError(
                 "DataFrame index must be unique for orient="
                 "'{orient}'.".format(orient=self.orient)
@@ -270,7 +274,9 @@ class JSONTableWriter(FrameWriter):
             msg = (
                 "Trying to write with `orient='table'` and "
                 "`date_format='{fmt}'`. Table Schema requires dates "
-                "to be formatted with `date_format='iso'`".format(fmt=date_format)
+                "to be formatted with `date_format='iso'`".format(
+                    fmt=date_format
+                )
             )
             raise ValueError(msg)
 
@@ -278,7 +284,9 @@ class JSONTableWriter(FrameWriter):
 
         # NotImplemented on a column MultiIndex
         if obj.ndim == 2 and isinstance(obj.columns, MultiIndex):
-            raise NotImplementedError("orient='table' is not supported for MultiIndex")
+            raise NotImplementedError(
+                "orient='table' is not supported for MultiIndex"
+            )
 
         # TODO: Do this timedelta properly in objToJSON.c See GH #15137
         if (
@@ -697,7 +705,9 @@ class JsonReader(BaseIterator):
             obj = concat(self)
         elif self.lines:
             data = ensure_str(self.data)
-            obj = self._get_object_parser(self._combine_lines(data.split("\n")))
+            obj = self._get_object_parser(
+                self._combine_lines(data.split("\n"))
+            )
         else:
             obj = self._get_object_parser(self.data)
         self.close()
@@ -796,7 +806,9 @@ class Parser:
             date_unit = date_unit.lower()
             if date_unit not in self._STAMP_UNITS:
                 raise ValueError(
-                    "date_unit must be one of {units}".format(units=self._STAMP_UNITS)
+                    "date_unit must be one of {units}".format(
+                        units=self._STAMP_UNITS
+                    )
                 )
             self.min_stamp = self._MIN_STAMPS[date_unit]
         else:
@@ -846,7 +858,10 @@ class Parser:
         """
         for axis in self.obj._AXIS_NUMBERS.keys():
             new_axis, result = self._try_convert_data(
-                axis, self.obj._get_axis(axis), use_dtypes=False, convert_dates=True
+                axis,
+                self.obj._get_axis(axis),
+                use_dtypes=False,
+                convert_dates=True,
             )
             if result:
                 setattr(self.obj, axis, new_axis)
@@ -854,7 +869,9 @@ class Parser:
     def _try_convert_types(self):
         raise AbstractMethodError(self)
 
-    def _try_convert_data(self, name, data, use_dtypes=True, convert_dates=True):
+    def _try_convert_data(
+        self, name, data, use_dtypes=True, convert_dates=True
+    ):
         """
         Try to parse a ndarray like into a column by inferring dtype.
         """
@@ -868,7 +885,9 @@ class Parser:
             else:
                 # dtype to force
                 dtype = (
-                    self.dtype.get(name) if isinstance(self.dtype, dict) else self.dtype
+                    self.dtype.get(name)
+                    if isinstance(self.dtype, dict)
+                    else self.dtype
                 )
                 if dtype is not None:
                     try:
@@ -960,7 +979,9 @@ class Parser:
         date_units = (self.date_unit,) if self.date_unit else self._STAMP_UNITS
         for date_unit in date_units:
             try:
-                new_data = to_datetime(new_data, errors="raise", unit=date_unit)
+                new_data = to_datetime(
+                    new_data, errors="raise", unit=date_unit
+                )
             except ValueError:
                 continue
             except Exception:
@@ -983,12 +1004,16 @@ class SeriesParser(Parser):
         if orient == "split":
             decoded = {
                 str(k): v
-                for k, v in loads(json, precise_float=self.precise_float).items()
+                for k, v in loads(
+                    json, precise_float=self.precise_float
+                ).items()
             }
             self.check_keys_split(decoded)
             self.obj = Series(dtype=None, **decoded)
         else:
-            self.obj = Series(loads(json, precise_float=self.precise_float), dtype=None)
+            self.obj = Series(
+                loads(json, precise_float=self.precise_float), dtype=None
+            )
 
     def _parse_numpy(self):
 
@@ -1013,7 +1038,12 @@ class SeriesParser(Parser):
             )
         else:
             self.obj = Series(
-                loads(json, dtype=None, numpy=True, precise_float=self.precise_float)
+                loads(
+                    json,
+                    dtype=None,
+                    numpy=True,
+                    precise_float=self.precise_float,
+                )
             )
 
     def _try_convert_types(self):
@@ -1055,7 +1085,12 @@ class FrameParser(Parser):
             self.obj = DataFrame(**decoded)
         elif orient == "values":
             self.obj = DataFrame(
-                loads(json, dtype=None, numpy=True, precise_float=self.precise_float)
+                loads(
+                    json,
+                    dtype=None,
+                    numpy=True,
+                    precise_float=self.precise_float,
+                )
             )
         else:
             self.obj = DataFrame(
@@ -1080,7 +1115,9 @@ class FrameParser(Parser):
         elif orient == "split":
             decoded = {
                 str(k): v
-                for k, v in loads(json, precise_float=self.precise_float).items()
+                for k, v in loads(
+                    json, precise_float=self.precise_float
+                ).items()
             }
             self.check_keys_split(decoded)
             self.obj = DataFrame(dtype=None, **decoded)
@@ -1089,7 +1126,9 @@ class FrameParser(Parser):
                 loads(json, precise_float=self.precise_float), dtype=None
             ).T
         elif orient == "table":
-            self.obj = parse_table_schema(json, precise_float=self.precise_float)
+            self.obj = parse_table_schema(
+                json, precise_float=self.precise_float
+            )
         else:
             self.obj = DataFrame(
                 loads(json, precise_float=self.precise_float), dtype=None
@@ -1162,6 +1201,7 @@ class FrameParser(Parser):
         self._process_converter(
             lambda col, c: self._try_convert_to_date(c),
             lambda col, c: (
-                (self.keep_default_dates and is_ok(col)) or col in convert_dates
+                (self.keep_default_dates and is_ok(col))
+                or col in convert_dates
             ),
         )

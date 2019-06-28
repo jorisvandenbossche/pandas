@@ -35,20 +35,28 @@ class TestGetItem:
             assert result.freq == expected.freq
 
             result = idx[-20:-5:3]
-            expected = timedelta_range("12 day", "24 day", freq="3D", name="idx")
+            expected = timedelta_range(
+                "12 day", "24 day", freq="3D", name="idx"
+            )
             tm.assert_index_equal(result, expected)
             assert result.freq == expected.freq
 
             result = idx[4::-1]
             expected = TimedeltaIndex(
-                ["5 day", "4 day", "3 day", "2 day", "1 day"], freq="-1D", name="idx"
+                ["5 day", "4 day", "3 day", "2 day", "1 day"],
+                freq="-1D",
+                name="idx",
             )
             tm.assert_index_equal(result, expected)
             assert result.freq == expected.freq
 
     @pytest.mark.parametrize(
         "key",
-        [pd.Timestamp("1970-01-01"), pd.Timestamp("1970-01-02"), datetime(1970, 1, 1)],
+        [
+            pd.Timestamp("1970-01-01"),
+            pd.Timestamp("1970-01-02"),
+            datetime(1970, 1, 1),
+        ],
     )
     def test_timestamp_invalid_key(self, key):
         # GH#20464
@@ -85,7 +93,9 @@ class TestTake:
             assert result.freq == expected.freq
 
             result = idx.take([7, 4, 1])
-            expected = timedelta_range("8 day", "2 day", freq="-3D", name="idx")
+            expected = timedelta_range(
+                "8 day", "2 day", freq="-3D", name="idx"
+            )
             tm.assert_index_equal(result, expected)
             assert result.freq == expected.freq
 
@@ -143,7 +153,9 @@ class TestTake:
         tm.assert_index_equal(result, expected)
 
         # allow_fill=False
-        result = idx.take(np.array([1, 0, -1]), allow_fill=False, fill_value=True)
+        result = idx.take(
+            np.array([1, 0, -1]), allow_fill=False, fill_value=True
+        )
         expected = TimedeltaIndex(["2 days", "1 days", "3 days"], name="xxx")
         tm.assert_index_equal(result, expected)
 
@@ -172,7 +184,12 @@ class TestTimedeltaIndex:
         # insertion of non-datetime should coerce to object index
         result = idx.insert(1, "inserted")
         expected = Index(
-            [Timedelta("4day"), "inserted", Timedelta("1day"), Timedelta("2day")],
+            [
+                Timedelta("4day"),
+                "inserted",
+                Timedelta("1day"),
+                Timedelta("2day"),
+            ],
             name="idx",
         )
         assert not isinstance(result, TimedeltaIndex)
@@ -188,19 +205,34 @@ class TestTimedeltaIndex:
             freq="s",
         )
         expected_3 = TimedeltaIndex(
-            ["1day 00:00:01", "1day 00:00:02", "1day 00:00:03", "1day 00:00:04"],
+            [
+                "1day 00:00:01",
+                "1day 00:00:02",
+                "1day 00:00:03",
+                "1day 00:00:04",
+            ],
             name="idx",
             freq="s",
         )
 
         # reset freq to None
         expected_1_nofreq = TimedeltaIndex(
-            ["1day 00:00:01", "1day 00:00:01", "1day 00:00:02", "1day 00:00:03"],
+            [
+                "1day 00:00:01",
+                "1day 00:00:01",
+                "1day 00:00:02",
+                "1day 00:00:03",
+            ],
             name="idx",
             freq=None,
         )
         expected_3_nofreq = TimedeltaIndex(
-            ["1day 00:00:01", "1day 00:00:02", "1day 00:00:03", "1day 00:00:05"],
+            [
+                "1day 00:00:01",
+                "1day 00:00:02",
+                "1day 00:00:03",
+                "1day 00:00:05",
+            ],
             name="idx",
             freq=None,
         )
@@ -229,8 +261,12 @@ class TestTimedeltaIndex:
         idx = timedelta_range(start="1 Days", periods=5, freq="D", name="idx")
 
         # prserve freq
-        expected_0 = timedelta_range(start="2 Days", periods=4, freq="D", name="idx")
-        expected_4 = timedelta_range(start="1 Days", periods=4, freq="D", name="idx")
+        expected_0 = timedelta_range(
+            start="2 Days", periods=4, freq="D", name="idx"
+        )
+        expected_4 = timedelta_range(
+            start="1 Days", periods=4, freq="D", name="idx"
+        )
 
         # reset freq to None
         expected_1 = TimedeltaIndex(
@@ -258,12 +294,18 @@ class TestTimedeltaIndex:
         idx = timedelta_range(start="1 days", periods=10, freq="D", name="idx")
 
         # prserve freq
-        expected_0_2 = timedelta_range(start="4 days", periods=7, freq="D", name="idx")
-        expected_7_9 = timedelta_range(start="1 days", periods=7, freq="D", name="idx")
+        expected_0_2 = timedelta_range(
+            start="4 days", periods=7, freq="D", name="idx"
+        )
+        expected_7_9 = timedelta_range(
+            start="1 days", periods=7, freq="D", name="idx"
+        )
 
         # reset freq to None
         expected_3_5 = TimedeltaIndex(
-            ["1 d", "2 d", "3 d", "7 d", "8 d", "9 d", "10d"], freq=None, name="idx"
+            ["1 d", "2 d", "3 d", "7 d", "8 d", "9 d", "10d"],
+            freq=None,
+            name="idx",
         )
 
         cases = {
@@ -291,7 +333,9 @@ class TestTimedeltaIndex:
             assert idx.get_loc(str(idx[1]), method) == 1
 
         assert idx.get_loc(idx[1], "pad", tolerance=Timedelta(0)) == 1
-        assert idx.get_loc(idx[1], "pad", tolerance=np.timedelta64(0, "s")) == 1
+        assert (
+            idx.get_loc(idx[1], "pad", tolerance=np.timedelta64(0, "s")) == 1
+        )
         assert idx.get_loc(idx[1], "pad", tolerance=timedelta(0)) == 1
 
         with pytest.raises(ValueError, match="unit abbreviation w/o a number"):
@@ -335,10 +379,12 @@ class TestTimedeltaIndex:
             idx.get_indexer(target, "pad"), np.array([-1, 0, 1], dtype=np.intp)
         )
         tm.assert_numpy_array_equal(
-            idx.get_indexer(target, "backfill"), np.array([0, 1, 2], dtype=np.intp)
+            idx.get_indexer(target, "backfill"),
+            np.array([0, 1, 2], dtype=np.intp),
         )
         tm.assert_numpy_array_equal(
-            idx.get_indexer(target, "nearest"), np.array([0, 1, 1], dtype=np.intp)
+            idx.get_indexer(target, "nearest"),
+            np.array([0, 1, 1], dtype=np.intp),
         )
 
         res = idx.get_indexer(target, "nearest", tolerance=Timedelta("1 hour"))

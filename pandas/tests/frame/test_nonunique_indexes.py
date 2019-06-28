@@ -27,10 +27,13 @@ class TestDataFrameNonuniqueIndexes(TestData):
 
         idx = date_range("20130101", periods=4, freq="Q-NOV")
         df = DataFrame(
-            [[1, 1, 1, 5], [1, 1, 2, 5], [2, 1, 3, 5]], columns=["a", "a", "a", "a"]
+            [[1, 1, 1, 5], [1, 1, 2, 5], [2, 1, 3, 5]],
+            columns=["a", "a", "a", "a"],
         )
         df.columns = idx
-        expected = DataFrame([[1, 1, 1, 5], [1, 1, 2, 5], [2, 1, 3, 5]], columns=idx)
+        expected = DataFrame(
+            [[1, 1, 1, 5], [1, 1, 2, 5], [2, 1, 3, 5]], columns=idx
+        )
         check(df, expected)
 
         # insert
@@ -50,7 +53,11 @@ class TestDataFrameNonuniqueIndexes(TestData):
         # insert same dtype
         df["foo2"] = 3
         expected = DataFrame(
-            [[1, 1, 1, 5, "bah", 3], [1, 1, 2, 5, "bah", 3], [2, 1, 3, 5, "bah", 3]],
+            [
+                [1, 1, 1, 5, "bah", 3],
+                [1, 1, 2, 5, "bah", 3],
+                [2, 1, 3, 5, "bah", 3],
+            ],
             columns=["foo", "bar", "foo", "hello", "string", "foo2"],
         )
         check(df, expected)
@@ -58,7 +65,11 @@ class TestDataFrameNonuniqueIndexes(TestData):
         # set (non-dup)
         df["foo2"] = 4
         expected = DataFrame(
-            [[1, 1, 1, 5, "bah", 4], [1, 1, 2, 5, "bah", 4], [2, 1, 3, 5, "bah", 4]],
+            [
+                [1, 1, 1, 5, "bah", 4],
+                [1, 1, 2, 5, "bah", 4],
+                [2, 1, 3, 5, "bah", 4],
+            ],
             columns=["foo", "bar", "foo", "hello", "string", "foo2"],
         )
         check(df, expected)
@@ -91,7 +102,11 @@ class TestDataFrameNonuniqueIndexes(TestData):
         # insert
         df.insert(2, "new_col", 5.0)
         expected = DataFrame(
-            [[1, 1, 5.0, "bah", 3], [1, 2, 5.0, "bah", 3], [2, 3, 5.0, "bah", 3]],
+            [
+                [1, 1, 5.0, "bah", 3],
+                [1, 2, 5.0, "bah", 3],
+                [2, 3, 5.0, "bah", 3],
+            ],
             columns=["foo", "foo", "new_col", "string", "foo2"],
         )
         check(df, expected)
@@ -134,7 +149,9 @@ class TestDataFrameNonuniqueIndexes(TestData):
         check(df, expected)
 
         result = df["foo"]
-        expected = DataFrame([[1, 1.0], [1, 2.0], [2, 3.0]], columns=["foo", "foo"])
+        expected = DataFrame(
+            [[1, 1.0], [1, 2.0], [2, 3.0]], columns=["foo", "foo"]
+        )
         check(result, expected)
 
         # multiple replacements
@@ -151,7 +168,8 @@ class TestDataFrameNonuniqueIndexes(TestData):
 
         del df["foo"]
         expected = DataFrame(
-            [[1, 5, 7.0], [1, 5, 7.0], [1, 5, 7.0]], columns=["bar", "hello", "foo2"]
+            [[1, 5, 7.0], [1, 5, 7.0], [1, 5, 7.0]],
+            columns=["bar", "hello", "foo2"],
         )
         check(df, expected)
 
@@ -183,7 +201,9 @@ class TestDataFrameNonuniqueIndexes(TestData):
         )
 
         k = pd.merge(df4, df5, how="inner", left_index=True, right_index=True)
-        result = k.rename(columns={"TClose_x": "TClose", "TClose_y": "QT_Close"})
+        result = k.rename(
+            columns={"TClose_x": "TClose", "TClose_y": "QT_Close"}
+        )
         str(result)
         result.dtypes
 
@@ -321,26 +341,36 @@ class TestDataFrameNonuniqueIndexes(TestData):
         # GH 4879
         dups = ["A", "A", "C", "D"]
         df = DataFrame(
-            np.arange(12).reshape(3, 4), columns=["A", "B", "C", "D"], dtype="float64"
+            np.arange(12).reshape(3, 4),
+            columns=["A", "B", "C", "D"],
+            dtype="float64",
         )
         expected = df[df.C > 6]
         expected.columns = dups
-        df = DataFrame(np.arange(12).reshape(3, 4), columns=dups, dtype="float64")
+        df = DataFrame(
+            np.arange(12).reshape(3, 4), columns=dups, dtype="float64"
+        )
         result = df[df.C > 6]
         check(result, expected)
 
         # where
         df = DataFrame(
-            np.arange(12).reshape(3, 4), columns=["A", "B", "C", "D"], dtype="float64"
+            np.arange(12).reshape(3, 4),
+            columns=["A", "B", "C", "D"],
+            dtype="float64",
         )
         expected = df[df > 6]
         expected.columns = dups
-        df = DataFrame(np.arange(12).reshape(3, 4), columns=dups, dtype="float64")
+        df = DataFrame(
+            np.arange(12).reshape(3, 4), columns=dups, dtype="float64"
+        )
         result = df[df > 6]
         check(result, expected)
 
         # boolean with the duplicate raises
-        df = DataFrame(np.arange(12).reshape(3, 4), columns=dups, dtype="float64")
+        df = DataFrame(
+            np.arange(12).reshape(3, 4), columns=dups, dtype="float64"
+        )
         msg = "cannot reindex from a duplicate axis"
         with pytest.raises(ValueError, match=msg):
             df[df.A > 6]
@@ -354,8 +384,12 @@ class TestDataFrameNonuniqueIndexes(TestData):
         assert_frame_equal(result, expected)
 
         # equality
-        df1 = DataFrame([[1, 2], [2, np.nan], [3, 4], [4, 4]], columns=["A", "B"])
-        df2 = DataFrame([[0, 1], [2, 4], [2, np.nan], [4, 5]], columns=["A", "A"])
+        df1 = DataFrame(
+            [[1, 2], [2, np.nan], [3, 4], [4, 4]], columns=["A", "B"]
+        )
+        df2 = DataFrame(
+            [[0, 1], [2, 4], [2, np.nan], [4, 5]], columns=["A", "A"]
+        )
 
         # not-comparing like-labelled
         msg = "Can only compare identically-labeled DataFrame objects"
@@ -375,11 +409,17 @@ class TestDataFrameNonuniqueIndexes(TestData):
         dfbool = DataFrame(
             {
                 "one": Series([True, True, False], index=["a", "b", "c"]),
-                "two": Series([False, False, True, False], index=["a", "b", "c", "d"]),
-                "three": Series([False, True, True, True], index=["a", "b", "c", "d"]),
+                "two": Series(
+                    [False, False, True, False], index=["a", "b", "c", "d"]
+                ),
+                "three": Series(
+                    [False, True, True, True], index=["a", "b", "c", "d"]
+                ),
             }
         )
-        expected = pd.concat([dfbool["one"], dfbool["three"], dfbool["one"]], axis=1)
+        expected = pd.concat(
+            [dfbool["one"], dfbool["three"], dfbool["one"]], axis=1
+        )
         result = dfbool[["one", "three", "one"]]
         check(result, expected)
 
@@ -407,7 +447,10 @@ class TestDataFrameNonuniqueIndexes(TestData):
         # GH 8363
         # datetime ops with a non-unique index
         df = DataFrame(
-            {"A": np.arange(5, dtype="int64"), "B": np.arange(1, 6, dtype="int64")},
+            {
+                "A": np.arange(5, dtype="int64"),
+                "B": np.arange(1, 6, dtype="int64"),
+            },
             index=[2, 2, 3, 3, 4],
         )
         result = df.B - df.A
@@ -463,16 +506,24 @@ class TestDataFrameNonuniqueIndexes(TestData):
         df = DataFrame([[1, 2, "foo", "bar"]], columns=["a", "a", "a", "a"])
         df.columns = ["a", "a.1", "a.2", "a.3"]
         str(df)
-        expected = DataFrame([[1, 2, "foo", "bar"]], columns=["a", "a.1", "a.2", "a.3"])
+        expected = DataFrame(
+            [[1, 2, "foo", "bar"]], columns=["a", "a.1", "a.2", "a.3"]
+        )
         assert_frame_equal(df, expected)
 
         # dups across blocks
         df_float = DataFrame(np.random.randn(10, 3), dtype="float64")
         df_int = DataFrame(np.random.randn(10, 3), dtype="int64")
-        df_bool = DataFrame(True, index=df_float.index, columns=df_float.columns)
-        df_object = DataFrame("foo", index=df_float.index, columns=df_float.columns)
+        df_bool = DataFrame(
+            True, index=df_float.index, columns=df_float.columns
+        )
+        df_object = DataFrame(
+            "foo", index=df_float.index, columns=df_float.columns
+        )
         df_dt = DataFrame(
-            pd.Timestamp("20010101"), index=df_float.index, columns=df_float.columns
+            pd.Timestamp("20010101"),
+            index=df_float.index,
+            columns=df_float.columns,
         )
         df = pd.concat([df_float, df_int, df_bool, df_object, df_dt], axis=1)
 
@@ -492,7 +543,8 @@ class TestDataFrameNonuniqueIndexes(TestData):
 
     def test_values_duplicates(self):
         df = DataFrame(
-            [[1, 2, "a", "b"], [1, 2, "a", "b"]], columns=["one", "one", "two", "two"]
+            [[1, 2, "a", "b"], [1, 2, "a", "b"]],
+            columns=["one", "one", "two", "two"],
         )
 
         result = df.values
@@ -523,6 +575,7 @@ class TestDataFrameNonuniqueIndexes(TestData):
         df.insert(0, "A", ["d", "e", "f"], allow_duplicates=True)
         df.insert(0, "A", ["a", "b", "c"], allow_duplicates=True)
         exp = pd.DataFrame(
-            [["a", "d", "g"], ["b", "e", "h"], ["c", "f", "i"]], columns=["A", "A", "A"]
+            [["a", "d", "g"], ["b", "e", "h"], ["c", "f", "i"]],
+            columns=["A", "A", "A"],
         )
         assert_frame_equal(df, exp)

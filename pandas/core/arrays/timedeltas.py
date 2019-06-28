@@ -264,13 +264,17 @@ class TimedeltaArray(dtl.DatetimeLikeArrayMixin, dtl.TimelikeOps):
         return result
 
     @classmethod
-    def _from_sequence(cls, data, dtype=_TD_DTYPE, copy=False, freq=None, unit=None):
+    def _from_sequence(
+        cls, data, dtype=_TD_DTYPE, copy=False, freq=None, unit=None
+    ):
         if dtype:
             _validate_td64_dtype(dtype)
         freq, freq_infer = dtl.maybe_infer_freq(freq)
 
         data, inferred_freq = sequence_to_td64ns(data, copy=copy, unit=unit)
-        freq, freq_infer = dtl.validate_inferred_freq(freq, inferred_freq, freq_infer)
+        freq, freq_infer = dtl.validate_inferred_freq(
+            freq, inferred_freq, freq_infer
+        )
 
         result = cls._simple_new(data, freq=freq)
 
@@ -290,7 +294,9 @@ class TimedeltaArray(dtl.DatetimeLikeArrayMixin, dtl.TimelikeOps):
 
         periods = dtl.validate_periods(periods)
         if freq is None and any(x is None for x in [periods, start, end]):
-            raise ValueError("Must provide freq argument if no data is " "supplied")
+            raise ValueError(
+                "Must provide freq argument if no data is " "supplied"
+            )
 
         if com.count_not_none(start, end, periods, freq) != 3:
             raise ValueError(
@@ -307,7 +313,8 @@ class TimedeltaArray(dtl.DatetimeLikeArrayMixin, dtl.TimelikeOps):
         if start is None and end is None:
             if closed is not None:
                 raise ValueError(
-                    "Closed has to be None if not both of start" "and end are defined"
+                    "Closed has to be None if not both of start"
+                    "and end are defined"
                 )
 
         left_closed, right_closed = dtl.validate_endpoints(closed)
@@ -867,12 +874,14 @@ class TimedeltaArray(dtl.DatetimeLikeArrayMixin, dtl.TimelikeOps):
     microseconds = _field_accessor(
         "microseconds",
         "microseconds",
-        "Number of microseconds (>= 0 and less " "than 1 second) for each element.",
+        "Number of microseconds (>= 0 and less "
+        "than 1 second) for each element.",
     )
     nanoseconds = _field_accessor(
         "nanoseconds",
         "nanoseconds",
-        "Number of nanoseconds (>= 0 and less " "than 1 microsecond) for each element.",
+        "Number of nanoseconds (>= 0 and less "
+        "than 1 microsecond) for each element.",
     )
 
     @property
@@ -1131,7 +1140,8 @@ def _generate_regular_range(start, end, periods, offset):
         b = e - periods * stride
     else:
         raise ValueError(
-            "at least 'start' or 'end' should be specified " "if a 'period' is given."
+            "at least 'start' or 'end' should be specified "
+            "if a 'period' is given."
         )
 
     data = np.arange(b, e, stride, dtype=np.int64)

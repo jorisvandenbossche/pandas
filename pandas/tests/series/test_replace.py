@@ -24,7 +24,9 @@ class TestSeriesReplace(TestData):
         ser[ser == 0.0] = np.nan
         tm.assert_series_equal(rs, ser)
 
-        ser = pd.Series(np.fabs(np.random.randn(N)), tm.makeDateIndex(N), dtype=object)
+        ser = pd.Series(
+            np.fabs(np.random.randn(N)), tm.makeDateIndex(N), dtype=object
+        )
         ser[:5] = np.nan
         ser[6:10] = "foo"
         ser[20:30] = "bar"
@@ -98,9 +100,13 @@ class TestSeriesReplace(TestData):
         ser = pd.Series(pd.date_range("20130101", periods=5))
         expected = ser.copy()
         expected.loc[2] = pd.Timestamp("20120101")
-        result = ser.replace({pd.Timestamp("20130103"): pd.Timestamp("20120101")})
+        result = ser.replace(
+            {pd.Timestamp("20130103"): pd.Timestamp("20120101")}
+        )
         tm.assert_series_equal(result, expected)
-        result = ser.replace(pd.Timestamp("20130103"), pd.Timestamp("20120101"))
+        result = ser.replace(
+            pd.Timestamp("20130103"), pd.Timestamp("20120101")
+        )
         tm.assert_series_equal(result, expected)
 
         # GH 11792: Test with replacing NaT in a list with tz data
@@ -183,7 +189,9 @@ class TestSeriesReplace(TestData):
             .to_series()
             .reset_index(drop=True)
         )
-        result = dr.astype(object).replace([dr[0], dr[1], dr[2]], [1.0, 2, "a"])
+        result = dr.astype(object).replace(
+            [dr[0], dr[1], dr[2]], [1.0, 2, "a"]
+        )
         expected = pd.Series([1.0, 2, "a"] + dr[3:].tolist(), dtype=object)
         tm.assert_series_equal(result, expected)
 
@@ -212,7 +220,9 @@ class TestSeriesReplace(TestData):
 
     def test_replace2(self):
         N = 100
-        ser = pd.Series(np.fabs(np.random.randn(N)), tm.makeDateIndex(N), dtype=object)
+        ser = pd.Series(
+            np.fabs(np.random.randn(N)), tm.makeDateIndex(N), dtype=object
+        )
         ser[:5] = np.nan
         ser[6:10] = "foo"
         ser[20:30] = "bar"

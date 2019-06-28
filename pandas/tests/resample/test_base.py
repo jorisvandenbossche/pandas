@@ -25,7 +25,12 @@ from pandas.util.testing import (
 # in this module we override the fixture values defined in conftest.py
 # tuples of '_index_factory,_series_name,_index_start,_index_end'
 DATE_RANGE = (date_range, "dti", datetime(2005, 1, 1), datetime(2005, 1, 10))
-PERIOD_RANGE = (period_range, "pi", datetime(2005, 1, 1), datetime(2005, 1, 10))
+PERIOD_RANGE = (
+    period_range,
+    "pi",
+    datetime(2005, 1, 1),
+    datetime(2005, 1, 10),
+)
 TIMEDELTA_RANGE = (timedelta_range, "tdi", "1 day", "10 day")
 
 all_ts = pytest.mark.parametrize(
@@ -45,7 +50,8 @@ def create_index(_index_factory):
 
 @pytest.mark.parametrize("freq", ["2D", "1H"])
 @pytest.mark.parametrize(
-    "_index_factory,_series_name,_index_start,_index_end", [DATE_RANGE, TIMEDELTA_RANGE]
+    "_index_factory,_series_name,_index_start,_index_end",
+    [DATE_RANGE, TIMEDELTA_RANGE],
 )
 def test_asfreq(series_and_frame, freq, create_index):
     obj = series_and_frame
@@ -57,7 +63,8 @@ def test_asfreq(series_and_frame, freq, create_index):
 
 
 @pytest.mark.parametrize(
-    "_index_factory,_series_name,_index_start,_index_end", [DATE_RANGE, TIMEDELTA_RANGE]
+    "_index_factory,_series_name,_index_start,_index_end",
+    [DATE_RANGE, TIMEDELTA_RANGE],
 )
 def test_asfreq_fill_value(series, create_index):
     # test for fill value during resampling, issue 3715
@@ -82,7 +89,8 @@ def test_resample_interpolate(frame):
     # # 12925
     df = frame
     assert_frame_equal(
-        df.resample("1T").asfreq().interpolate(), df.resample("1T").interpolate()
+        df.resample("1T").asfreq().interpolate(),
+        df.resample("1T").interpolate(),
     )
 
 
@@ -143,7 +151,9 @@ def test_resample_empty_dataframe(empty_frame, freq, resample_method):
 
 
 @pytest.mark.parametrize("index", tm.all_timeseries_index_generator(0))
-@pytest.mark.parametrize("dtype", [np.float, np.int, np.object, "datetime64[ns]"])
+@pytest.mark.parametrize(
+    "dtype", [np.float, np.int, np.object, "datetime64[ns]"]
+)
 def test_resample_empty_dtypes(index, dtype, resample_method):
 
     # Empty series were sometimes causing a segfault (for the functions
@@ -162,8 +172,12 @@ def test_resample_empty_dtypes(index, dtype, resample_method):
 def test_resample_loffset_arg_type(frame, create_index):
     # GH 13218, 15002
     df = frame
-    expected_means = [df.values[i : i + 2].mean() for i in range(0, len(df.values), 2)]
-    expected_index = create_index(df.index[0], periods=len(df.index) / 2, freq="2D")
+    expected_means = [
+        df.values[i : i + 2].mean() for i in range(0, len(df.values), 2)
+    ]
+    expected_index = create_index(
+        df.index[0], periods=len(df.index) / 2, freq="2D"
+    )
 
     # loffset coerces PeriodIndex to DateTimeIndex
     if isinstance(expected_index, PeriodIndex):

@@ -81,7 +81,10 @@ def _get_series_result_type(result, objs=None):
     # concat Series with axis 1
     if isinstance(result, dict):
         # concat Series with axis 1
-        if all(isinstance(c, (SparseSeries, SparseDataFrame)) for c in result.values()):
+        if all(
+            isinstance(c, (SparseSeries, SparseDataFrame))
+            for c in result.values()
+        ):
             return SparseDataFrame
         else:
             return DataFrame
@@ -97,12 +100,16 @@ def _get_frame_result_type(result, objs):
     otherwise, return 1st obj
     """
 
-    if result.blocks and (any(isinstance(obj, ABCSparseDataFrame) for obj in objs)):
+    if result.blocks and (
+        any(isinstance(obj, ABCSparseDataFrame) for obj in objs)
+    ):
         from pandas.core.sparse.api import SparseDataFrame
 
         return SparseDataFrame
     else:
-        return next(obj for obj in objs if not isinstance(obj, ABCSparseDataFrame))
+        return next(
+            obj for obj in objs if not isinstance(obj, ABCSparseDataFrame)
+        )
 
 
 def _concat_compat(to_concat, axis=0):
@@ -164,7 +171,9 @@ def _concat_compat(to_concat, axis=0):
         typs = get_dtype_kinds(to_concat)
         if len(typs) != 1:
 
-            if not len(typs - {"i", "u", "f"}) or not len(typs - {"bool", "i", "u"}):
+            if not len(typs - {"i", "u", "f"}) or not len(
+                typs - {"bool", "i", "u"}
+            ):
                 # let numpy coerce
                 pass
             else:
@@ -351,11 +360,15 @@ def union_categoricals(to_union, sort_categories=False, ignore_order=False):
         categories = first.categories
         ordered = first.ordered
 
-        if all(first.categories.equals(other.categories) for other in to_union[1:]):
+        if all(
+            first.categories.equals(other.categories) for other in to_union[1:]
+        ):
             new_codes = np.concatenate([c.codes for c in to_union])
         else:
             codes = [first.codes] + [
-                _recode_for_categories(other.codes, other.categories, first.categories)
+                _recode_for_categories(
+                    other.codes, other.categories, first.categories
+                )
                 for other in to_union[1:]
             ]
             new_codes = np.concatenate(codes)
@@ -380,13 +393,17 @@ def union_categoricals(to_union, sort_categories=False, ignore_order=False):
             categories = categories.sort_values()
 
         new_codes = [
-            _recode_for_categories(c.codes, c.categories, categories) for c in to_union
+            _recode_for_categories(c.codes, c.categories, categories)
+            for c in to_union
         ]
         new_codes = np.concatenate(new_codes)
     else:
         # ordered - to show a proper error message
         if all(c.ordered for c in to_union):
-            msg = "to union ordered Categoricals, " "all categories must be the same"
+            msg = (
+                "to union ordered Categoricals, "
+                "all categories must be the same"
+            )
             raise TypeError(msg)
         else:
             raise TypeError("Categorical.ordered must be the same")
@@ -394,7 +411,9 @@ def union_categoricals(to_union, sort_categories=False, ignore_order=False):
     if ignore_order:
         ordered = False
 
-    return Categorical(new_codes, categories=categories, ordered=ordered, fastpath=True)
+    return Categorical(
+        new_codes, categories=categories, ordered=ordered, fastpath=True
+    )
 
 
 def _concatenate_2d(to_concat, axis):
@@ -441,9 +460,9 @@ def _concat_datetime(to_concat, axis=0, typs=None):
             return _concat_datetimetz(to_concat)
 
     elif "timedelta" in typs:
-        return _concatenate_2d([x.view(np.int64) for x in to_concat], axis=axis).view(
-            _TD_DTYPE
-        )
+        return _concatenate_2d(
+            [x.view(np.int64) for x in to_concat], axis=axis
+        ).view(_TD_DTYPE)
 
     elif any(typ.startswith("period") for typ in typs):
         assert len(typs) == 1
@@ -461,7 +480,9 @@ def _convert_datetimelike_to_object(x):
             x = np.asarray(x.astype(object))
         else:
             shape = x.shape
-            x = tslib.ints_to_pydatetime(x.view(np.int64).ravel(), box="timestamp")
+            x = tslib.ints_to_pydatetime(
+                x.view(np.int64).ravel(), box="timestamp"
+            )
             x = x.reshape(shape)
 
     elif x.dtype == _TD_DTYPE:
@@ -502,8 +523,15 @@ def _concat_index_asobject(to_concat, name=None):
     from pandas import Index
     from pandas.core.arrays import ExtensionArray
 
-    klasses = (ABCDatetimeIndex, ABCTimedeltaIndex, ABCPeriodIndex, ExtensionArray)
-    to_concat = [x.astype(object) if isinstance(x, klasses) else x for x in to_concat]
+    klasses = (
+        ABCDatetimeIndex,
+        ABCTimedeltaIndex,
+        ABCPeriodIndex,
+        ExtensionArray,
+    )
+    to_concat = [
+        x.astype(object) if isinstance(x, klasses) else x for x in to_concat
+    ]
 
     self = to_concat[0]
     attribs = self._get_attributes_dict()
@@ -532,7 +560,9 @@ def _concat_sparse(to_concat, axis=0, typs=None):
 
     from pandas.core.arrays import SparseArray
 
-    fill_values = [x.fill_value for x in to_concat if isinstance(x, SparseArray)]
+    fill_values = [
+        x.fill_value for x in to_concat if isinstance(x, SparseArray)
+    ]
     fill_value = fill_values[0]
 
     # TODO: Fix join unit generation so we aren't passed this.

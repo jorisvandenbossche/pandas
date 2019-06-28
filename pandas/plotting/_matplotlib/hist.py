@@ -11,7 +11,11 @@ import pandas.core.common as com
 from pandas.io.formats.printing import pprint_thing
 from pandas.plotting._matplotlib import converter
 from pandas.plotting._matplotlib.core import LinePlot, MPLPlot
-from pandas.plotting._matplotlib.tools import _flatten, _set_ticks_props, _subplots
+from pandas.plotting._matplotlib.tools import (
+    _flatten,
+    _set_ticks_props,
+    _subplots,
+)
 
 
 class HistPlot(LinePlot):
@@ -57,7 +61,9 @@ class HistPlot(LinePlot):
         y = y[~isna(y)]
 
         base = np.zeros(len(bins) - 1)
-        bottom = bottom + cls._get_stacked_values(ax, stacking_id, base, kwds["label"])
+        bottom = bottom + cls._get_stacked_values(
+            ax, stacking_id, base, kwds["label"]
+        )
         # ignore style
         n, bins, patches = ax.hist(y, bins=bins, bottom=bottom, **kwds)
         cls._update_stacker(ax, stacking_id, n)
@@ -80,7 +86,9 @@ class HistPlot(LinePlot):
                 kwds["style"] = style
 
             kwds = self._make_plot_keywords(kwds, y)
-            artists = self._plot(ax, y, column_num=i, stacking_id=stacking_id, **kwds)
+            artists = self._plot(
+                ax, y, column_num=i, stacking_id=stacking_id, **kwds
+            )
             self._add_legend_handle(artists[0], label, index=i)
 
     def _make_plot_keywords(self, kwds, y):
@@ -184,7 +192,8 @@ def _grouped_plot(
     if figsize == "default":
         # allowed to specify mpl default with 'default'
         warnings.warn(
-            "figsize='default' is deprecated. Specify figure " "size by tuple instead",
+            "figsize='default' is deprecated. Specify figure "
+            "size by tuple instead",
             FutureWarning,
             stacklevel=5,
         )
@@ -196,7 +205,12 @@ def _grouped_plot(
 
     naxes = len(grouped)
     fig, axes = _subplots(
-        naxes=naxes, figsize=figsize, sharex=sharex, sharey=sharey, ax=ax, layout=layout
+        naxes=naxes,
+        figsize=figsize,
+        sharex=sharex,
+        sharey=sharey,
+        ax=ax,
+        layout=layout,
     )
 
     _axes = _flatten(axes)
@@ -272,7 +286,11 @@ def _grouped_hist(
     )
 
     _set_ticks_props(
-        axes, xlabelsize=xlabelsize, xrot=xrot, ylabelsize=ylabelsize, yrot=yrot
+        axes,
+        xlabelsize=xlabelsize,
+        xrot=xrot,
+        ylabelsize=ylabelsize,
+        yrot=yrot,
     )
 
     fig.subplots_adjust(
@@ -303,9 +321,12 @@ def hist_series(
             )
         # hack until the plotting interface is a bit more unified
         fig = kwds.pop(
-            "figure", plt.gcf() if plt.get_fignums() else plt.figure(figsize=figsize)
+            "figure",
+            plt.gcf() if plt.get_fignums() else plt.figure(figsize=figsize),
         )
-        if figsize is not None and tuple(figsize) != tuple(fig.get_size_inches()):
+        if figsize is not None and tuple(figsize) != tuple(
+            fig.get_size_inches()
+        ):
             fig.set_size_inches(*figsize, forward=True)
         if ax is None:
             ax = fig.gca()
@@ -318,7 +339,11 @@ def hist_series(
         axes = np.array([ax])
 
         _set_ticks_props(
-            axes, xlabelsize=xlabelsize, xrot=xrot, ylabelsize=ylabelsize, yrot=yrot
+            axes,
+            xlabelsize=xlabelsize,
+            xrot=xrot,
+            ylabelsize=ylabelsize,
+            yrot=yrot,
         )
 
     else:
@@ -394,7 +419,9 @@ def hist_frame(
     naxes = len(data.columns)
 
     if naxes == 0:
-        raise ValueError("hist method requires numerical columns, " "nothing to plot.")
+        raise ValueError(
+            "hist method requires numerical columns, " "nothing to plot."
+        )
 
     fig, axes = _subplots(
         naxes=naxes,
@@ -414,7 +441,11 @@ def hist_frame(
         ax.grid(grid)
 
     _set_ticks_props(
-        axes, xlabelsize=xlabelsize, xrot=xrot, ylabelsize=ylabelsize, yrot=yrot
+        axes,
+        xlabelsize=xlabelsize,
+        xrot=xrot,
+        ylabelsize=ylabelsize,
+        yrot=yrot,
     )
     fig.subplots_adjust(wspace=0.3, hspace=0.3)
 

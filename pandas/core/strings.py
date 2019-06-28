@@ -37,7 +37,10 @@ _cpython_optimized_encoders = (
     "mbcs",
     "ascii",
 )
-_cpython_optimized_decoders = _cpython_optimized_encoders + ("utf-16", "utf-32")
+_cpython_optimized_decoders = _cpython_optimized_encoders + (
+    "utf-16",
+    "utf-32",
+)
 
 _shared_docs = dict()  # type: Dict[str, str]
 
@@ -603,7 +606,8 @@ def str_replace(arr, pat, repl, n=-1, case=None, flags=0, regex=True):
         if is_compiled_re:
             if (case is not None) or (flags != 0):
                 raise ValueError(
-                    "case and flags cannot be set" " when pat is a compiled regex"
+                    "case and flags cannot be set"
+                    " when pat is a compiled regex"
                 )
         else:
             # not a compiled regex
@@ -623,10 +627,13 @@ def str_replace(arr, pat, repl, n=-1, case=None, flags=0, regex=True):
     else:
         if is_compiled_re:
             raise ValueError(
-                "Cannot use a compiled regex as replacement " "pattern with regex=False"
+                "Cannot use a compiled regex as replacement "
+                "pattern with regex=False"
             )
         if callable(repl):
-            raise ValueError("Cannot use a callable replacement when " "regex=False")
+            raise ValueError(
+                "Cannot use a callable replacement when " "regex=False"
+            )
         f = lambda x: x.replace(pat, repl, n)
 
     return _na_map(f, arr)
@@ -1007,16 +1014,22 @@ def str_extractall(arr, pat, flags=0):
             for match_i, match_tuple in enumerate(regex.findall(subject)):
                 if isinstance(match_tuple, str):
                     match_tuple = (match_tuple,)
-                na_tuple = [np.NaN if group == "" else group for group in match_tuple]
+                na_tuple = [
+                    np.NaN if group == "" else group for group in match_tuple
+                ]
                 match_list.append(na_tuple)
                 result_key = tuple(subject_key + (match_i,))
                 index_list.append(result_key)
 
     from pandas import MultiIndex
 
-    index = MultiIndex.from_tuples(index_list, names=arr.index.names + ["match"])
+    index = MultiIndex.from_tuples(
+        index_list, names=arr.index.names + ["match"]
+    )
 
-    result = arr._constructor_expanddim(match_list, index=index, columns=columns)
+    result = arr._constructor_expanddim(
+        match_list, index=index, columns=columns
+    )
     return result
 
 
@@ -1823,9 +1836,13 @@ def forbid_nonstring_types(forbidden, name=None):
     # deal with None
     forbidden = [] if forbidden is None else forbidden
 
-    allowed_types = {"string", "empty", "bytes", "mixed", "mixed-integer"} - set(
-        forbidden
-    )
+    allowed_types = {
+        "string",
+        "empty",
+        "bytes",
+        "mixed",
+        "mixed-integer",
+    } - set(forbidden)
 
     def _forbid_nonstring_types(func):
         func_name = func.__name__ if name is None else name
@@ -1848,7 +1865,9 @@ def forbid_nonstring_types(forbidden, name=None):
     return _forbid_nonstring_types
 
 
-def _noarg_wrapper(f, name=None, docstring=None, forbidden_types=["bytes"], **kargs):
+def _noarg_wrapper(
+    f, name=None, docstring=None, forbidden_types=["bytes"], **kargs
+):
     @forbid_nonstring_types(forbidden_types, name=name)
     def wrapper(self):
         result = _na_map(f, self._parent, **kargs)
@@ -1961,7 +1980,9 @@ class StringMethods(NoNewAttributesMixin):
         inferred_dtype = lib.infer_dtype(values, skipna=True)
 
         if inferred_dtype not in allowed_types:
-            raise AttributeError("Can only use .str accessor with string " "values!")
+            raise AttributeError(
+                "Can only use .str accessor with string " "values!"
+            )
         return inferred_dtype
 
     def __getitem__(self, key):
@@ -1992,7 +2013,9 @@ class StringMethods(NoNewAttributesMixin):
         if use_codes and self._is_categorical:
             # if self._orig is a CategoricalIndex, there is no .cat-accessor
             result = take_1d(
-                result, Series(self._orig, copy=False).cat.codes, fill_value=fill_value
+                result,
+                Series(self._orig, copy=False).cat.codes,
+                fill_value=fill_value,
             )
 
         if not hasattr(result, "ndim") or not hasattr(result, "dtype"):
@@ -2018,7 +2041,8 @@ class StringMethods(NoNewAttributesMixin):
                 # propagate nan values to match longest sequence (GH 18450)
                 max_len = max(len(x) for x in result)
                 result = [
-                    x * max_len if len(x) == 0 or x[0] is np.nan else x for x in result
+                    x * max_len if len(x) == 0 or x[0] is np.nan else x
+                    for x in result
                 ]
 
         if not isinstance(expand, bool):
@@ -2103,12 +2127,16 @@ class StringMethods(NoNewAttributesMixin):
             warn = not others.index.equals(idx)
             # only reconstruct Series when absolutely necessary
             los = [
-                Series(others.values, index=idx) if ignore_index and warn else others
+                Series(others.values, index=idx)
+                if ignore_index and warn
+                else others
             ]
             return (los, warn)
         elif isinstance(others, Index):
             warn = not others.equals(idx)
-            los = [Series(others.values, index=(idx if ignore_index else others))]
+            los = [
+                Series(others.values, index=(idx if ignore_index else others))
+            ]
             return (los, warn)
         elif isinstance(others, DataFrame):
             warn = not others.index.equals(idx)
@@ -2144,7 +2172,9 @@ class StringMethods(NoNewAttributesMixin):
                     ):
                         depr_warn = True
 
-                    if not isinstance(nxt, (DataFrame, Series, Index, np.ndarray)):
+                    if not isinstance(
+                        nxt, (DataFrame, Series, Index, np.ndarray)
+                    ):
                         # safety for non-persistent list-likes (e.g. iterators)
                         # do not map indexed/typed objects; info needed below
                         nxt = list(nxt)
@@ -2164,7 +2194,9 @@ class StringMethods(NoNewAttributesMixin):
                     if not is_legal or isinstance(nxt, DataFrame):
                         raise TypeError(err_msg)
 
-                    nxt, wnx = self._get_series_list(nxt, ignore_index=ignore_index)
+                    nxt, wnx = self._get_series_list(
+                        nxt, ignore_index=ignore_index
+                    )
                     los = los + nxt
                     join_warn = join_warn or wnx
 
@@ -2342,7 +2374,9 @@ class StringMethods(NoNewAttributesMixin):
 
         try:
             # turn anything in "others" into lists of Series
-            others, warn = self._get_series_list(others, ignore_index=(join is None))
+            others, warn = self._get_series_list(
+                others, ignore_index=(join is None)
+            )
         except ValueError:  # do not catch TypeError raised by _get_series_list
             if join is None:
                 raise ValueError(
@@ -2400,11 +2434,14 @@ class StringMethods(NoNewAttributesMixin):
             np.putmask(result, union_mask, np.nan)
 
             not_masked = ~union_mask
-            result[not_masked] = cat_safe([x[not_masked] for x in all_cols], sep)
+            result[not_masked] = cat_safe(
+                [x[not_masked] for x in all_cols], sep
+            )
         elif na_rep is not None and union_mask.any():
             # fill NaNs with na_rep in case there are actually any NaNs
             all_cols = [
-                np.where(nm, na_rep, col) for nm, col in zip(na_masks, all_cols)
+                np.where(nm, na_rep, col)
+                for nm, col in zip(na_masks, all_cols)
             ]
             result = cat_safe(all_cols, sep)
         else:
@@ -2552,7 +2589,9 @@ class StringMethods(NoNewAttributesMixin):
     0    1    1    2
     """
 
-    @Appender(_shared_docs["str_split"] % {"side": "beginning", "method": "split"})
+    @Appender(
+        _shared_docs["str_split"] % {"side": "beginning", "method": "split"}
+    )
     @forbid_nonstring_types(["bytes"])
     def split(self, pat=None, n=-1, expand=False):
         result = str_split(self._parent, pat, n=n)
@@ -2655,7 +2694,8 @@ class StringMethods(NoNewAttributesMixin):
             "side": "first",
             "return": "3 elements containing the string itself, followed by two "
             "empty strings",
-            "also": "rpartition : Split the string at the last occurrence of " "`sep`.",
+            "also": "rpartition : Split the string at the last occurrence of "
+            "`sep`.",
         }
     )
     @deprecate_kwarg(old_arg_name="pat", new_arg_name="sep")
@@ -2671,7 +2711,8 @@ class StringMethods(NoNewAttributesMixin):
             "side": "last",
             "return": "3 elements containing two empty strings, followed by the "
             "string itself",
-            "also": "partition : Split the string at the first occurrence of " "`sep`.",
+            "also": "partition : Split the string at the first occurrence of "
+            "`sep`.",
         }
     )
     @deprecate_kwarg(old_arg_name="pat", new_arg_name="sep")
@@ -2745,7 +2786,9 @@ class StringMethods(NoNewAttributesMixin):
     filled : Series/Index of objects
     """
 
-    @Appender(_shared_docs["str_pad"] % dict(side="left and right", method="center"))
+    @Appender(
+        _shared_docs["str_pad"] % dict(side="left and right", method="center")
+    )
     @forbid_nonstring_types(["bytes"])
     def center(self, width, fillchar=" "):
         return self.pad(width, side="both", fillchar=fillchar)
@@ -2913,20 +2956,25 @@ class StringMethods(NoNewAttributesMixin):
     """
 
     @Appender(
-        _shared_docs["str_strip"] % dict(side="left and right sides", method="strip")
+        _shared_docs["str_strip"]
+        % dict(side="left and right sides", method="strip")
     )
     @forbid_nonstring_types(["bytes"])
     def strip(self, to_strip=None):
         result = str_strip(self._parent, to_strip, side="both")
         return self._wrap_result(result)
 
-    @Appender(_shared_docs["str_strip"] % dict(side="left side", method="lstrip"))
+    @Appender(
+        _shared_docs["str_strip"] % dict(side="left side", method="lstrip")
+    )
     @forbid_nonstring_types(["bytes"])
     def lstrip(self, to_strip=None):
         result = str_strip(self._parent, to_strip, side="left")
         return self._wrap_result(result)
 
-    @Appender(_shared_docs["str_strip"] % dict(side="right side", method="rstrip"))
+    @Appender(
+        _shared_docs["str_strip"] % dict(side="right side", method="rstrip")
+    )
     @forbid_nonstring_types(["bytes"])
     def rstrip(self, to_strip=None):
         result = str_strip(self._parent, to_strip, side="right")
@@ -2946,7 +2994,10 @@ class StringMethods(NoNewAttributesMixin):
         data = self._orig.astype(str) if self._is_categorical else self._parent
         result, name = str_get_dummies(data, sep)
         return self._wrap_result(
-            result, use_codes=(not self._is_categorical), name=name, expand=True
+            result,
+            use_codes=(not self._is_categorical),
+            name=name,
+            expand=True,
         )
 
     @copy(str_translate)
@@ -3018,7 +3069,9 @@ class StringMethods(NoNewAttributesMixin):
     )
     @forbid_nonstring_types(["bytes"])
     def rfind(self, sub, start=0, end=None):
-        result = str_find(self._parent, sub, start=start, end=end, side="right")
+        result = str_find(
+            self._parent, sub, start=start, end=end, side="right"
+        )
         return self._wrap_result(result)
 
     @forbid_nonstring_types(["bytes"])
@@ -3080,7 +3133,9 @@ class StringMethods(NoNewAttributesMixin):
     )
     @forbid_nonstring_types(["bytes"])
     def index(self, sub, start=0, end=None):
-        result = str_index(self._parent, sub, start=start, end=end, side="left")
+        result = str_index(
+            self._parent, sub, start=start, end=end, side="left"
+        )
         return self._wrap_result(result)
 
     @Appender(
@@ -3094,7 +3149,9 @@ class StringMethods(NoNewAttributesMixin):
     )
     @forbid_nonstring_types(["bytes"])
     def rindex(self, sub, start=0, end=None):
-        result = str_index(self._parent, sub, start=start, end=end, side="right")
+        result = str_index(
+            self._parent, sub, start=start, end=end, side="right"
+        )
         return self._wrap_result(result)
 
     _shared_docs[
@@ -3224,7 +3281,9 @@ class StringMethods(NoNewAttributesMixin):
     _doc_args["capitalize"] = dict(
         type="be capitalized", method="capitalize", version=""
     )
-    _doc_args["swapcase"] = dict(type="be swapcased", method="swapcase", version="")
+    _doc_args["swapcase"] = dict(
+        type="be swapcased", method="swapcase", version=""
+    )
     _doc_args["casefold"] = dict(
         type="be casefolded",
         method="casefold",

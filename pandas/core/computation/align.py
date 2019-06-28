@@ -28,13 +28,18 @@ def _align_core_single_unary_op(term):
 
 
 def _zip_axes_from_type(typ, new_axes):
-    axes = {ax_name: new_axes[ax_ind] for ax_ind, ax_name in typ._AXIS_NAMES.items()}
+    axes = {
+        ax_name: new_axes[ax_ind]
+        for ax_ind, ax_name in typ._AXIS_NAMES.items()
+    }
     return axes
 
 
 def _any_pandas_objects(terms):
     """Check a sequence of terms for instances of PandasObject."""
-    return any(isinstance(term.value, pd.core.generic.PandasObject) for term in terms)
+    return any(
+        isinstance(term.value, pd.core.generic.PandasObject) for term in terms
+    )
 
 
 def _filter_special_cases(f):
@@ -57,7 +62,9 @@ def _filter_special_cases(f):
 
 @_filter_special_cases
 def _align_core(terms):
-    term_index = [i for i, term in enumerate(terms) if hasattr(term.value, "axes")]
+    term_index = [
+        i for i, term in enumerate(terms) if hasattr(term.value, "axes")
+    ]
     term_dims = [terms[i].value.ndim for i in term_index]
     ndims = pd.Series(dict(zip(term_index, term_dims)))
 
@@ -157,7 +164,9 @@ def _reconstruct_object(typ, obj, axes, dtype):
 
     res_t = np.result_type(obj.dtype, dtype)
 
-    if not isinstance(typ, partial) and issubclass(typ, pd.core.generic.PandasObject):
+    if not isinstance(typ, partial) and issubclass(
+        typ, pd.core.generic.PandasObject
+    ):
         return typ(obj, dtype=res_t, **axes)
 
     # special case for pathological things like ~True/~False

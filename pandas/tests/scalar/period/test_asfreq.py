@@ -1,6 +1,9 @@
 import pytest
 
-from pandas._libs.tslibs.frequencies import INVALID_FREQ_ERR_MSG, _period_code_map
+from pandas._libs.tslibs.frequencies import (
+    INVALID_FREQ_ERR_MSG,
+    _period_code_map,
+)
 from pandas.errors import OutOfBoundsDatetime
 
 from pandas import Period, offsets
@@ -31,7 +34,8 @@ class TestFreqConversion:
         assert week2.asfreq("D", "S") <= per2
 
     @pytest.mark.xfail(
-        reason="GH#19643 period_helper asfreq functions fail " "to check for overflows"
+        reason="GH#19643 period_helper asfreq functions fail "
+        "to check for overflows"
     )
     def test_to_timestamp_out_of_bounds(self):
         # GH#19643, currently gives Timestamp('1754-08-30 22:43:41.128654848')
@@ -69,7 +73,9 @@ class TestFreqConversion:
         ival_A_to_D_start = Period(freq="D", year=2007, month=1, day=1)
         ival_A_to_D_end = Period(freq="D", year=2007, month=12, day=31)
         ival_A_to_H_start = Period(freq="H", year=2007, month=1, day=1, hour=0)
-        ival_A_to_H_end = Period(freq="H", year=2007, month=12, day=31, hour=23)
+        ival_A_to_H_end = Period(
+            freq="H", year=2007, month=12, day=31, hour=23
+        )
         ival_A_to_T_start = Period(
             freq="Min", year=2007, month=1, day=1, hour=0, minute=0
         )
@@ -80,7 +86,13 @@ class TestFreqConversion:
             freq="S", year=2007, month=1, day=1, hour=0, minute=0, second=0
         )
         ival_A_to_S_end = Period(
-            freq="S", year=2007, month=12, day=31, hour=23, minute=59, second=59
+            freq="S",
+            year=2007,
+            month=12,
+            day=31,
+            hour=23,
+            minute=59,
+            second=59,
         )
 
         ival_AJAN_to_D_end = Period(freq="D", year=2007, month=1, day=31)
@@ -494,12 +506,24 @@ class TestFreqConversion:
         # frequency conversion tests: from Hourly Frequency"
 
         ival_H = Period(freq="H", year=2007, month=1, day=1, hour=0)
-        ival_H_end_of_year = Period(freq="H", year=2007, month=12, day=31, hour=23)
-        ival_H_end_of_quarter = Period(freq="H", year=2007, month=3, day=31, hour=23)
-        ival_H_end_of_month = Period(freq="H", year=2007, month=1, day=31, hour=23)
-        ival_H_end_of_week = Period(freq="H", year=2007, month=1, day=7, hour=23)
-        ival_H_end_of_day = Period(freq="H", year=2007, month=1, day=1, hour=23)
-        ival_H_end_of_bus = Period(freq="H", year=2007, month=1, day=1, hour=23)
+        ival_H_end_of_year = Period(
+            freq="H", year=2007, month=12, day=31, hour=23
+        )
+        ival_H_end_of_quarter = Period(
+            freq="H", year=2007, month=3, day=31, hour=23
+        )
+        ival_H_end_of_month = Period(
+            freq="H", year=2007, month=1, day=31, hour=23
+        )
+        ival_H_end_of_week = Period(
+            freq="H", year=2007, month=1, day=7, hour=23
+        )
+        ival_H_end_of_day = Period(
+            freq="H", year=2007, month=1, day=1, hour=23
+        )
+        ival_H_end_of_bus = Period(
+            freq="H", year=2007, month=1, day=1, hour=23
+        )
 
         ival_H_to_A = Period(freq="A", year=2007)
         ival_H_to_Q = Period(freq="Q", year=2007, quarter=1)
@@ -544,7 +568,9 @@ class TestFreqConversion:
     def test_conv_minutely(self):
         # frequency conversion tests: from Minutely Frequency"
 
-        ival_T = Period(freq="Min", year=2007, month=1, day=1, hour=0, minute=0)
+        ival_T = Period(
+            freq="Min", year=2007, month=1, day=1, hour=0, minute=0
+        )
         ival_T_end_of_year = Period(
             freq="Min", year=2007, month=12, day=31, hour=23, minute=59
         )
@@ -605,9 +631,17 @@ class TestFreqConversion:
     def test_conv_secondly(self):
         # frequency conversion tests: from Secondly Frequency"
 
-        ival_S = Period(freq="S", year=2007, month=1, day=1, hour=0, minute=0, second=0)
+        ival_S = Period(
+            freq="S", year=2007, month=1, day=1, hour=0, minute=0, second=0
+        )
         ival_S_end_of_year = Period(
-            freq="S", year=2007, month=12, day=31, hour=23, minute=59, second=59
+            freq="S",
+            year=2007,
+            month=12,
+            day=31,
+            hour=23,
+            minute=59,
+            second=59,
         )
         ival_S_end_of_quarter = Period(
             freq="S", year=2007, month=3, day=31, hour=23, minute=59, second=59
@@ -638,7 +672,9 @@ class TestFreqConversion:
         ival_S_to_D = Period(freq="D", year=2007, month=1, day=1)
         ival_S_to_B = Period(freq="B", year=2007, month=1, day=1)
         ival_S_to_H = Period(freq="H", year=2007, month=1, day=1, hour=0)
-        ival_S_to_T = Period(freq="Min", year=2007, month=1, day=1, hour=0, minute=0)
+        ival_S_to_T = Period(
+            freq="Min", year=2007, month=1, day=1, hour=0, minute=0
+        )
 
         assert ival_S.asfreq("A") == ival_S_to_A
         assert ival_S_end_of_year.asfreq("A") == ival_S_to_A

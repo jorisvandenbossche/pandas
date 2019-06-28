@@ -10,7 +10,9 @@ class TestMergeOrdered:
     def setup_method(self, method):
         self.left = DataFrame({"key": ["a", "c", "e"], "lvalue": [1, 2.0, 3]})
 
-        self.right = DataFrame({"key": ["b", "c", "d", "f"], "rvalue": [1, 2, 3.0, 4]})
+        self.right = DataFrame(
+            {"key": ["b", "c", "d", "f"], "rvalue": [1, 2, 3.0, 4]}
+        )
 
     def test_basic(self):
         result = merge_ordered(self.left, self.right, on="key")
@@ -25,7 +27,9 @@ class TestMergeOrdered:
         assert_frame_equal(result, expected)
 
     def test_ffill(self):
-        result = merge_ordered(self.left, self.right, on="key", fill_method="ffill")
+        result = merge_ordered(
+            self.left, self.right, on="key", fill_method="ffill"
+        )
         expected = DataFrame(
             {
                 "key": ["a", "b", "c", "d", "e", "f"],
@@ -103,7 +107,9 @@ class TestMergeOrdered:
 
         right = DataFrame({"key": ["b", "c", "d"], "rvalue": [1, 2, 3]})
 
-        result = merge_ordered(left, right, fill_method="ffill", left_by="group")
+        result = merge_ordered(
+            left, right, fill_method="ffill", left_by="group"
+        )
 
         expected = DataFrame(
             {

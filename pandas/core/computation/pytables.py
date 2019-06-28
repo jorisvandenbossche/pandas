@@ -24,8 +24,12 @@ from pandas.io.formats.printing import pprint_thing, pprint_thing_encoded
 class Scope(expr.Scope):
     __slots__ = ("queryables",)
 
-    def __init__(self, level, global_dict=None, local_dict=None, queryables=None):
-        super().__init__(level + 1, global_dict=global_dict, local_dict=local_dict)
+    def __init__(
+        self, level, global_dict=None, local_dict=None, queryables=None
+    ):
+        super().__init__(
+            level + 1, global_dict=global_dict, local_dict=local_dict
+        )
         self.queryables = queryables or dict()
 
 
@@ -42,7 +46,9 @@ class Term(ops.Term):
         # must be a queryables
         if self.side == "left":
             if self.name not in self.env.queryables:
-                raise NameError("name {name!r} is not defined".format(name=self.name))
+                raise NameError(
+                    "name {name!r} is not defined".format(name=self.name)
+                )
             return self.name
 
         # resolve the rhs (and allow it to be None)
@@ -100,7 +106,9 @@ class BinOp(ops.BinOp):
                     return right
 
             elif isinstance(left, FilterBinOp):
-                if isinstance(left, FilterBinOp) and isinstance(right, FilterBinOp):
+                if isinstance(left, FilterBinOp) and isinstance(
+                    right, FilterBinOp
+                ):
                     k = JointFilterBinOp
                 elif isinstance(left, k):
                     return left
@@ -108,7 +116,11 @@ class BinOp(ops.BinOp):
                     return right
 
             return k(
-                self.op, left, right, queryables=self.queryables, encoding=self.encoding
+                self.op,
+                left,
+                right,
+                queryables=self.queryables,
+                encoding=self.encoding,
             ).evaluate()
 
         left, right = self.lhs, self.rhs
@@ -235,7 +247,9 @@ class BinOp(ops.BinOp):
 class FilterBinOp(BinOp):
     def __str__(self):
         return pprint_thing(
-            "[Filter : [{lhs}] -> [{op}]".format(lhs=self.filter[0], op=self.filter[1])
+            "[Filter : [{lhs}] -> [{op}]".format(
+                lhs=self.filter[0], op=self.filter[1]
+            )
         )
 
     def invert(self):
@@ -253,7 +267,9 @@ class FilterBinOp(BinOp):
     def evaluate(self):
 
         if not self.is_valid:
-            raise ValueError("query term is not valid [{slf}]".format(slf=self))
+            raise ValueError(
+                "query term is not valid [{slf}]".format(slf=self)
+            )
 
         rhs = self.conform(self.rhs)
         values = [TermValue(v, v, self.kind).value for v in rhs]
@@ -300,7 +316,9 @@ class JointFilterBinOp(FilterBinOp):
 
 class ConditionBinOp(BinOp):
     def __str__(self):
-        return pprint_thing("[Condition : [{cond}]]".format(cond=self.condition))
+        return pprint_thing(
+            "[Condition : [{cond}]]".format(cond=self.condition)
+        )
 
     def invert(self):
         """ invert the condition """
@@ -318,7 +336,9 @@ class ConditionBinOp(BinOp):
     def evaluate(self):
 
         if not self.is_valid:
-            raise ValueError("query term is not valid [{slf}]".format(slf=self))
+            raise ValueError(
+                "query term is not valid [{slf}]".format(slf=self)
+            )
 
         # convert values if we are in the table
         if not self.is_in_table:
@@ -447,7 +467,9 @@ class ExprVisitor(BaseExprVisitor):
                 if isinstance(value, ast.Name) and value.id == attr:
                     return resolved
 
-        raise ValueError("Invalid Attribute context {name}".format(name=ctx.__name__))
+        raise ValueError(
+            "Invalid Attribute context {name}".format(name=ctx.__name__)
+        )
 
     def translate_In(self, op):
         return ast.Eq() if isinstance(op, ast.In) else op

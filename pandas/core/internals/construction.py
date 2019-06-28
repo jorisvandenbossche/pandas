@@ -148,9 +148,9 @@ def init_ndarray(values, index, columns, dtype=None, copy=False):
 
     # we could have a categorical type passed or coerced to 'category'
     # recast this to an arrays_to_mgr
-    if is_categorical_dtype(getattr(values, "dtype", None)) or is_categorical_dtype(
-        dtype
-    ):
+    if is_categorical_dtype(
+        getattr(values, "dtype", None)
+    ) or is_categorical_dtype(dtype):
 
         if not hasattr(values, "dtype"):
             values = prep_ndarray(values, copy=copy)
@@ -201,7 +201,8 @@ def init_ndarray(values, index, columns, dtype=None, copy=False):
 
             # TODO: What about re-joining object columns?
             block_values = [
-                make_block(dvals_list[n], placement=[n]) for n in range(len(dvals_list))
+                make_block(dvals_list[n], placement=[n])
+                for n in range(len(dvals_list))
             ]
 
         else:
@@ -239,7 +240,9 @@ def init_dict(data, index, columns, dtype=None):
                 nan_dtype = object
             else:
                 nan_dtype = dtype
-            val = construct_1d_arraylike_from_scalar(np.nan, len(index), nan_dtype)
+            val = construct_1d_arraylike_from_scalar(
+                np.nan, len(index), nan_dtype
+            )
             arrays.loc[missing] = [val] * missing.sum()
 
     else:
@@ -249,10 +252,12 @@ def init_dict(data, index, columns, dtype=None):
         # GH#24096 need copy to be deep for datetime64tz case
         # TODO: See if we can avoid these copies
         arrays = [
-            arr if not isinstance(arr, ABCIndexClass) else arr._data for arr in arrays
+            arr if not isinstance(arr, ABCIndexClass) else arr._data
+            for arr in arrays
         ]
         arrays = [
-            arr if not is_datetime64tz_dtype(arr) else arr.copy() for arr in arrays
+            arr if not is_datetime64tz_dtype(arr) else arr.copy()
+            for arr in arrays
         ]
     return arrays_to_mgr(arrays, data_names, index, columns, dtype=dtype)
 
@@ -352,7 +357,9 @@ def extract_index(data):
                 raw_lengths.append(len(val))
 
         if not indexes and not raw_lengths:
-            raise ValueError("If using all scalar values, you must pass" " an index")
+            raise ValueError(
+                "If using all scalar values, you must pass" " an index"
+            )
 
         if have_series or have_dicts:
             index = _union_indexes(indexes)
@@ -364,14 +371,17 @@ def extract_index(data):
 
             if have_dicts:
                 raise ValueError(
-                    "Mixing dicts with non-Series may lead to " "ambiguous ordering."
+                    "Mixing dicts with non-Series may lead to "
+                    "ambiguous ordering."
                 )
 
             if have_series:
                 if lengths[0] != len(index):
                     msg = (
                         "array length {length} does not match index "
-                        "length {idx_len}".format(length=lengths[0], idx_len=len(index))
+                        "length {idx_len}".format(
+                            length=lengths[0], idx_len=len(index)
+                        )
                     )
                     raise ValueError(msg)
             else:
@@ -456,7 +466,9 @@ def to_arrays(data, columns, coerce_float=False, dtype=None):
                 return [[]] * len(columns), columns
         return [], []  # columns if columns is not None else []
     if isinstance(data[0], (list, tuple)):
-        return _list_to_arrays(data, columns, coerce_float=coerce_float, dtype=dtype)
+        return _list_to_arrays(
+            data, columns, coerce_float=coerce_float, dtype=dtype
+        )
     elif isinstance(data[0], abc.Mapping):
         return _list_of_dict_to_arrays(
             data, columns, coerce_float=coerce_float, dtype=dtype
@@ -480,7 +492,9 @@ def to_arrays(data, columns, coerce_float=False, dtype=None):
     else:
         # last ditch effort
         data = [tuple(x) for x in data]
-        return _list_to_arrays(data, columns, coerce_float=coerce_float, dtype=dtype)
+        return _list_to_arrays(
+            data, columns, coerce_float=coerce_float, dtype=dtype
+        )
 
 
 def _list_to_arrays(data, columns, coerce_float=False, dtype=None):
@@ -601,7 +615,9 @@ def sanitize_index(data, index, copy=False):
     return data
 
 
-def sanitize_array(data, index, dtype=None, copy=False, raise_cast_failure=False):
+def sanitize_array(
+    data, index, dtype=None, copy=False, raise_cast_failure=False
+):
     """
     Sanitize input data to an ndarray, copy if specified, coerce to the
     dtype if specified.
@@ -668,7 +684,9 @@ def sanitize_array(data, index, dtype=None, copy=False, raise_cast_failure=False
     elif isinstance(data, (list, tuple)) and len(data) > 0:
         if dtype is not None:
             try:
-                subarr = _try_cast(data, False, dtype, copy, raise_cast_failure)
+                subarr = _try_cast(
+                    data, False, dtype, copy, raise_cast_failure
+                )
             except Exception:
                 if raise_cast_failure:  # pragma: no cover
                     raise
@@ -701,7 +719,9 @@ def sanitize_array(data, index, dtype=None, copy=False, raise_cast_failure=False
                 # need to possibly convert the value here
                 value = maybe_cast_to_datetime(value, dtype)
 
-            subarr = construct_1d_arraylike_from_scalar(value, len(index), dtype)
+            subarr = construct_1d_arraylike_from_scalar(
+                value, len(index), dtype
+            )
 
         else:
             return subarr.item()
@@ -766,7 +786,9 @@ def _try_cast(arr, take_fast_path, dtype, copy, raise_cast_failure):
         ):
             subarr = construct_1d_object_array_from_listlike(subarr)
         elif not is_extension_type(subarr):
-            subarr = construct_1d_ndarray_preserving_na(subarr, dtype, copy=copy)
+            subarr = construct_1d_ndarray_preserving_na(
+                subarr, dtype, copy=copy
+            )
     except OutOfBoundsDatetime:
         # in case of out of bound datetime64 -> always raise
         raise

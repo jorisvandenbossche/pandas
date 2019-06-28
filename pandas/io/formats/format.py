@@ -126,7 +126,9 @@ return_docstring = """
 
 
 class CategoricalFormatter:
-    def __init__(self, categorical, buf=None, length=True, na_rep="NaN", footer=True):
+    def __init__(
+        self, categorical, buf=None, length=True, na_rep="NaN", footer=True
+    ):
         self.categorical = categorical
         self.buf = buf if buf is not None else StringIO("")
         self.na_rep = na_rep
@@ -152,7 +154,10 @@ class CategoricalFormatter:
 
     def _get_formatted_values(self):
         return format_array(
-            self.categorical.get_values(), None, float_format=None, na_rep=self.na_rep
+            self.categorical.get_values(),
+            None,
+            float_format=None,
+            na_rep=self.na_rep,
         )
 
     def to_string(self):
@@ -221,7 +226,9 @@ class SeriesFormatter:
                 series = series.iloc[:max_rows]
             else:
                 row_num = max_rows // 2
-                series = concat((series.iloc[:row_num], series.iloc[-row_num:]))
+                series = concat(
+                    (series.iloc[:row_num], series.iloc[-row_num:])
+                )
             self.tr_row_num = row_num
         else:
             self.tr_row_num = None
@@ -241,10 +248,14 @@ class SeriesFormatter:
 
             series_name = pprint_thing(name, escape_chars=("\t", "\r", "\n"))
             footer += (
-                ("Name: {sname}".format(sname=series_name)) if name is not None else ""
+                ("Name: {sname}".format(sname=series_name))
+                if name is not None
+                else ""
             )
 
-        if self.length is True or (self.length == "truncate" and self.truncate_v):
+        if self.length is True or (
+            self.length == "truncate" and self.truncate_v
+        ):
             if footer:
                 footer += ", "
             footer += "Length: {length}".format(length=len(self.series))
@@ -281,7 +292,10 @@ class SeriesFormatter:
     def _get_formatted_values(self):
         values_to_format = self.tr_series._formatting_values()
         return format_array(
-            values_to_format, None, float_format=self.float_format, na_rep=self.na_rep
+            values_to_format,
+            None,
+            float_format=self.float_format,
+            na_rep=self.na_rep,
         )
 
     def to_string(self):
@@ -335,7 +349,9 @@ class TextAdjustment:
         return justify(texts, max_len, mode=mode)
 
     def adjoin(self, space, *lists, **kwargs):
-        return adjoin(space, *lists, strlen=self.len, justfunc=self.justify, **kwargs)
+        return adjoin(
+            space, *lists, strlen=self.len, justfunc=self.justify, **kwargs
+        )
 
 
 class EastAsianTextAdjustment(TextAdjustment):
@@ -359,7 +375,8 @@ class EastAsianTextAdjustment(TextAdjustment):
             return len(text)
 
         return sum(
-            self._EAW_MAP.get(east_asian_width(c), self.ambiguous_width) for c in text
+            self._EAW_MAP.get(east_asian_width(c), self.ambiguous_width)
+            for c in text
         )
 
     def justify(self, texts, max_len, mode="right"):
@@ -464,7 +481,9 @@ class DataFrameFormatter(TableFormatter):
         self.line_width = line_width
         self.max_rows = max_rows
         self.max_cols = max_cols
-        self.max_rows_displayed = min(max_rows or len(self.frame), len(self.frame))
+        self.max_rows_displayed = min(
+            max_rows or len(self.frame), len(self.frame)
+        )
         self.show_dimensions = show_dimensions
         self.table_id = table_id
         self.render_links = render_links
@@ -505,7 +524,9 @@ class DataFrameFormatter(TableFormatter):
                 prompt_row = 1
                 if self.show_dimensions:
                     show_dimension_rows = 3
-                n_add_rows = self.header + dot_row + show_dimension_rows + prompt_row
+                n_add_rows = (
+                    self.header + dot_row + show_dimension_rows + prompt_row
+                )
                 # rows available to fill with actual data
                 max_rows_adj = self.h - n_add_rows
                 self.max_rows_adj = max_rows_adj
@@ -547,7 +568,9 @@ class DataFrameFormatter(TableFormatter):
                 frame = frame.iloc[:max_rows, :]
             else:
                 row_num = max_rows_adj // 2
-                frame = concat((frame.iloc[:row_num, :], frame.iloc[-row_num:, :]))
+                frame = concat(
+                    (frame.iloc[:row_num, :], frame.iloc[-row_num:, :])
+                )
             self.tr_row_num = row_num
         else:
             self.tr_row_num = None
@@ -584,7 +607,8 @@ class DataFrameFormatter(TableFormatter):
                         (
                             "Writing {ncols} cols but got {nalias} "
                             "aliases".format(
-                                ncols=len(self.columns), nalias=len(self.header)
+                                ncols=len(self.columns),
+                                nalias=len(self.header),
                             )
                         )
                     )
@@ -604,10 +628,15 @@ class DataFrameFormatter(TableFormatter):
                 )
                 fmt_values = self._format_col(i)
                 fmt_values = _make_fixed_width(
-                    fmt_values, self.justify, minimum=header_colwidth, adj=self.adj
+                    fmt_values,
+                    self.justify,
+                    minimum=header_colwidth,
+                    adj=self.adj,
                 )
 
-                max_len = max(max(self.adj.len(x) for x in fmt_values), header_colwidth)
+                max_len = max(
+                    max(self.adj.len(x) for x in fmt_values), header_colwidth
+                )
                 cheader = self.adj.justify(cheader, max_len, mode=self.justify)
                 stringified.append(cheader + fmt_values)
 
@@ -679,7 +708,9 @@ class DataFrameFormatter(TableFormatter):
                 dif = max_len - self.w
                 # '+ 1' to avoid too wide repr (GH PR #17023)
                 adj_dif = dif + 1
-                col_lens = Series([Series(ele).apply(len).max() for ele in strcols])
+                col_lens = Series(
+                    [Series(ele).apply(len).max() for ele in strcols]
+                )
                 n_cols = len(col_lens)
                 counter = 0
                 while adj_dif > 0 and n_cols > 1:
@@ -717,10 +748,14 @@ class DataFrameFormatter(TableFormatter):
         strcols = list(strcols)
         if self.index:
             idx = strcols.pop(0)
-            lwidth -= np.array([self.adj.len(x) for x in idx]).max() + adjoin_width
+            lwidth -= (
+                np.array([self.adj.len(x) for x in idx]).max() + adjoin_width
+            )
 
         col_widths = [
-            np.array([self.adj.len(x) for x in col]).max() if len(col) > 0 else 0
+            np.array([self.adj.len(x) for x in col]).max()
+            if len(col) > 0
+            else 0
             for col in strcols
         ]
         col_bins = _binify(col_widths, lwidth)
@@ -781,7 +816,9 @@ class DataFrameFormatter(TableFormatter):
             with codecs.open(self.buf, "w", encoding=encoding) as f:
                 latex_renderer.write_result(f)
         else:
-            raise TypeError("buf is not a file name and it has no write " "method")
+            raise TypeError(
+                "buf is not a file name and it has no write " "method"
+            )
 
     def _format_col(self, i):
         frame = self.tr_frame
@@ -823,7 +860,9 @@ class DataFrameFormatter(TableFormatter):
             with open(self.buf, "w") as f:
                 buffer_put_lines(f, html)
         else:
-            raise TypeError("buf is not a file name and it has no write " " method")
+            raise TypeError(
+                "buf is not a file name and it has no write " " method"
+            )
 
     def _get_formatted_column_labels(self, frame):
         from pandas.core.index import _sparsify
@@ -860,7 +899,11 @@ class DataFrameFormatter(TableFormatter):
             dtypes = self.frame.dtypes
             need_leadsp = dict(zip(fmt_columns, map(is_numeric_dtype, dtypes)))
             str_columns = [
-                [" " + x if not self._get_formatter(i) and need_leadsp[x] else x]
+                [
+                    " " + x
+                    if not self._get_formatter(i) and need_leadsp[x]
+                    else x
+                ]
                 for i, (col, x) in enumerate(zip(columns, fmt_columns))
             ]
         # self.str_columns = str_columns
@@ -897,12 +940,17 @@ class DataFrameFormatter(TableFormatter):
                 formatter=fmt,
             )
         else:
-            fmt_index = [index.format(name=self.show_row_idx_names, formatter=fmt)]
+            fmt_index = [
+                index.format(name=self.show_row_idx_names, formatter=fmt)
+            ]
 
         fmt_index = [
             tuple(
                 _make_fixed_width(
-                    list(x), justify="left", minimum=(self.col_space or 0), adj=self.adj
+                    list(x),
+                    justify="left",
+                    minimum=(self.col_space or 0),
+                    adj=self.adj,
                 )
             )
             for x in fmt_index
@@ -912,7 +960,9 @@ class DataFrameFormatter(TableFormatter):
 
         # empty space for columns
         if self.show_col_idx_names:
-            col_header = ["{x}".format(x=x) for x in self._get_column_name_list()]
+            col_header = [
+                "{x}".format(x=x) for x in self._get_column_name_list()
+            ]
         else:
             col_header = [""] * columns.nlevels
 
@@ -925,7 +975,9 @@ class DataFrameFormatter(TableFormatter):
         names = []
         columns = self.frame.columns
         if isinstance(columns, ABCMultiIndex):
-            names.extend("" if name is None else name for name in columns.names)
+            names.extend(
+                "" if name is None else name for name in columns.names
+            )
         else:
             names.append("" if columns.name is None else columns.name)
         return names
@@ -1255,7 +1307,9 @@ class FloatArrayFormatter(GenericArrayFormatter):
             ).any()
 
         if has_small_values or (too_long and has_large_values):
-            float_format = partial("{value: .{digits:d}e}".format, digits=self.digits)
+            float_format = partial(
+                "{value: .{digits:d}e}".format, digits=self.digits
+            )
             formatted_values = format_values_with(float_format)
 
         return formatted_values
@@ -1294,7 +1348,9 @@ class Datetime64Formatter(GenericArrayFormatter):
 
         fmt_values = format_array_from_datetime(
             values.asi8.ravel(),
-            format=_get_format_datetime64_from_values(values, self.date_format),
+            format=_get_format_datetime64_from_values(
+                values, self.date_format
+            ),
             na_rep=self.nat_rep,
         ).reshape(values.shape)
         return fmt_values.tolist()
@@ -1384,7 +1440,9 @@ def format_percentiles(percentiles):
 
     # Least precision that keeps percentiles unique after rounding
     prec = -np.floor(
-        np.log10(np.min(np.ediff1d(unique_pcts, to_begin=to_begin, to_end=to_end)))
+        np.log10(
+            np.min(np.ediff1d(unique_pcts, to_begin=to_begin, to_end=to_end))
+        )
     ).astype(int)
     prec = max(1, prec)
     out = np.empty_like(percentiles, dtype=object)
@@ -1405,7 +1463,10 @@ def _is_dates_only(values):
     consider_values = values_int != iNaT
     one_day_nanos = 86400 * 1e9
     even_days = (
-        np.logical_and(consider_values, values_int % int(one_day_nanos) != 0).sum() == 0
+        np.logical_and(
+            consider_values, values_int % int(one_day_nanos) != 0
+        ).sum()
+        == 0
     )
     if even_days:
         return True
@@ -1504,10 +1565,14 @@ def _get_format_timedelta64(values, nat_rep="NaT", box=False):
 
     one_day_nanos = 86400 * 1e9
     even_days = (
-        np.logical_and(consider_values, values_int % one_day_nanos != 0).sum() == 0
+        np.logical_and(consider_values, values_int % one_day_nanos != 0).sum()
+        == 0
     )
     all_sub_day = (
-        np.logical_and(consider_values, np.abs(values_int) >= one_day_nanos).sum() == 0
+        np.logical_and(
+            consider_values, np.abs(values_int) >= one_day_nanos
+        ).sum()
+        == 0
     )
 
     if even_days:
@@ -1598,7 +1663,9 @@ def _trim_zeros_float(str_floats, na_rep="NaN"):
         trimmed = [x[:-1] if _is_number(x) else x for x in trimmed]
 
     # leave one 0 after the decimal points if need be.
-    return [x + "0" if x.endswith(".") and _is_number(x) else x for x in trimmed]
+    return [
+        x + "0" if x.endswith(".") and _is_number(x) else x for x in trimmed
+    ]
 
 
 def _has_names(index):
@@ -1700,7 +1767,9 @@ class EngFormatter:
         if self.accuracy is None:  # pragma: no cover
             format_str = "{mant: g}{prefix}"
         else:
-            format_str = "{{mant: .{acc:d}f}}{{prefix}}".format(acc=self.accuracy)
+            format_str = "{{mant: .{acc:d}f}}{{prefix}}".format(
+                acc=self.accuracy
+            )
 
         formatted = format_str.format(mant=mant, prefix=prefix)
 

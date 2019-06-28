@@ -82,7 +82,9 @@ class Generic:
     def test_get_numeric_data(self):
 
         n = 4
-        kwargs = {self._typ._AXIS_NAMES[i]: list(range(n)) for i in range(self._ndim)}
+        kwargs = {
+            self._typ._AXIS_NAMES[i]: list(range(n)) for i in range(self._ndim)
+        }
 
         # get the numeric data
         o = self._construct(n, **kwargs)
@@ -321,7 +323,8 @@ class Generic:
         for test in range(10):
             seed = np.random.randint(0, 100)
             self._compare(
-                o.sample(n=4, random_state=seed), o.sample(n=4, random_state=seed)
+                o.sample(n=4, random_state=seed),
+                o.sample(n=4, random_state=seed),
             )
             self._compare(
                 o.sample(frac=0.7, random_state=seed),
@@ -418,12 +421,16 @@ class Generic:
         # Check np.nan are replaced by zeros.
         weights_with_nan = [np.nan] * 10
         weights_with_nan[5] = 0.5
-        self._compare(o.sample(n=1, axis=0, weights=weights_with_nan), o.iloc[5:6])
+        self._compare(
+            o.sample(n=1, axis=0, weights=weights_with_nan), o.iloc[5:6]
+        )
 
         # Check None are also replaced by zeros.
         weights_with_None = [None] * 10
         weights_with_None[5] = 0.5
-        self._compare(o.sample(n=1, axis=0, weights=weights_with_None), o.iloc[5:6])
+        self._compare(
+            o.sample(n=1, axis=0, weights=weights_with_None), o.iloc[5:6]
+        )
 
     def test_size_compat(self):
         # GH8846
@@ -537,7 +544,9 @@ class Generic:
                 super(DataFrame, df).fillna(value=0, inplace=value)
 
             with pytest.raises(ValueError):
-                super(DataFrame, df).replace(to_replace=1, value=7, inplace=value)
+                super(DataFrame, df).replace(
+                    to_replace=1, value=7, inplace=value
+                )
 
             with pytest.raises(ValueError):
                 super(DataFrame, df).interpolate(inplace=value)
@@ -569,10 +578,30 @@ class Generic:
             (1, "ffill", 1, [np.nan, np.nan, np.nan, 1, 1, 1.5, 0, np.nan]),
             (1, "bfill", None, [np.nan, 0, 0, 1, 1, 1.5, np.nan, np.nan]),
             (1, "bfill", 1, [np.nan, np.nan, 0, 1, 1, 1.5, np.nan, np.nan]),
-            (-1, "ffill", None, [np.nan, np.nan, -0.5, -0.5, -0.6, 0, 0, np.nan]),
-            (-1, "ffill", 1, [np.nan, np.nan, -0.5, -0.5, -0.6, 0, np.nan, np.nan]),
-            (-1, "bfill", None, [0, 0, -0.5, -0.5, -0.6, np.nan, np.nan, np.nan]),
-            (-1, "bfill", 1, [np.nan, 0, -0.5, -0.5, -0.6, np.nan, np.nan, np.nan]),
+            (
+                -1,
+                "ffill",
+                None,
+                [np.nan, np.nan, -0.5, -0.5, -0.6, 0, 0, np.nan],
+            ),
+            (
+                -1,
+                "ffill",
+                1,
+                [np.nan, np.nan, -0.5, -0.5, -0.6, 0, np.nan, np.nan],
+            ),
+            (
+                -1,
+                "bfill",
+                None,
+                [0, 0, -0.5, -0.5, -0.6, np.nan, np.nan, np.nan],
+            ),
+            (
+                -1,
+                "bfill",
+                1,
+                [np.nan, 0, -0.5, -0.5, -0.6, np.nan, np.nan, np.nan],
+            ),
         ],
     )
     def test_pct_change(self, periods, fill_method, limit, exp):
@@ -624,7 +653,9 @@ class TestNDFrame:
         # Check that re-normalizes weights that don't sum to one.
         weights_less_than_1 = [0] * 10
         weights_less_than_1[0] = 0.5
-        tm.assert_frame_equal(df.sample(n=1, weights=weights_less_than_1), df.iloc[:1])
+        tm.assert_frame_equal(
+            df.sample(n=1, weights=weights_less_than_1), df.iloc[:1]
+        )
 
         ###
         # Test axis argument
@@ -639,13 +670,18 @@ class TestNDFrame:
 
         # Different axis arg types
         assert_frame_equal(
-            df.sample(n=1, axis="columns", weights=second_column_weight), df[["col2"]]
+            df.sample(n=1, axis="columns", weights=second_column_weight),
+            df[["col2"]],
         )
 
         weight = [0] * 10
         weight[5] = 0.5
-        assert_frame_equal(df.sample(n=1, axis="rows", weights=weight), df.iloc[5:6])
-        assert_frame_equal(df.sample(n=1, axis="index", weights=weight), df.iloc[5:6])
+        assert_frame_equal(
+            df.sample(n=1, axis="rows", weights=weight), df.iloc[5:6]
+        )
+        assert_frame_equal(
+            df.sample(n=1, axis="index", weights=weight), df.iloc[5:6]
+        )
 
         # Check out of range axis values
         with pytest.raises(ValueError):
@@ -667,18 +703,25 @@ class TestNDFrame:
         easy_weight_list[2] = 1
 
         df = pd.DataFrame(
-            {"col1": range(10, 20), "col2": range(20, 30), "colString": ["a"] * 10}
+            {
+                "col1": range(10, 20),
+                "col2": range(20, 30),
+                "colString": ["a"] * 10,
+            }
         )
         sample1 = df.sample(n=1, axis=1, weights=easy_weight_list)
         assert_frame_equal(sample1, df[["colString"]])
 
         # Test default axes
         assert_frame_equal(
-            df.sample(n=3, random_state=42), df.sample(n=3, axis=0, random_state=42)
+            df.sample(n=3, random_state=42),
+            df.sample(n=3, axis=0, random_state=42),
         )
 
         # Test that function aligns weights with frame
-        df = DataFrame({"col1": [5, 6, 7], "col2": ["a", "b", "c"]}, index=[9, 5, 3])
+        df = DataFrame(
+            {"col1": [5, 6, 7], "col2": ["a", "b", "c"]}, index=[9, 5, 3]
+        )
         s = Series([1, 0, 0], index=[3, 5, 9])
         assert_frame_equal(df.loc[[3]], df.sample(1, weights=s))
 
@@ -698,7 +741,11 @@ class TestNDFrame:
 
     def test_squeeze(self):
         # noop
-        for s in [tm.makeFloatSeries(), tm.makeStringSeries(), tm.makeObjectSeries()]:
+        for s in [
+            tm.makeFloatSeries(),
+            tm.makeStringSeries(),
+            tm.makeObjectSeries(),
+        ]:
             tm.assert_series_equal(s.squeeze(), s)
         for df in [tm.makeTimeDataFrame()]:
             tm.assert_frame_equal(df.squeeze(), df)
@@ -724,10 +771,16 @@ class TestNDFrame:
         tm.assert_series_equal(df.squeeze(axis=1), df.iloc[:, 0])
         tm.assert_series_equal(df.squeeze(axis="columns"), df.iloc[:, 0])
         assert df.squeeze() == df.iloc[0, 0]
-        msg = "No axis named 2 for object type <class" " 'pandas.core.frame.DataFrame'>"
+        msg = (
+            "No axis named 2 for object type <class"
+            " 'pandas.core.frame.DataFrame'>"
+        )
         with pytest.raises(ValueError, match=msg):
             df.squeeze(axis=2)
-        msg = "No axis named x for object type <class" " 'pandas.core.frame.DataFrame'>"
+        msg = (
+            "No axis named x for object type <class"
+            " 'pandas.core.frame.DataFrame'>"
+        )
         with pytest.raises(ValueError, match=msg):
             df.squeeze(axis="x")
 
@@ -742,7 +795,11 @@ class TestNDFrame:
         tm.assert_series_equal(np.squeeze(df), df["A"])
 
     def test_transpose(self):
-        for s in [tm.makeFloatSeries(), tm.makeStringSeries(), tm.makeObjectSeries()]:
+        for s in [
+            tm.makeFloatSeries(),
+            tm.makeStringSeries(),
+            tm.makeObjectSeries(),
+        ]:
             # calls implementation in pandas/core/base.py
             tm.assert_series_equal(s.transpose(), s)
         for df in [tm.makeTimeDataFrame()]:
@@ -765,10 +822,16 @@ class TestNDFrame:
 
     def test_take(self):
         indices = [1, 5, -2, 6, 3, -1]
-        for s in [tm.makeFloatSeries(), tm.makeStringSeries(), tm.makeObjectSeries()]:
+        for s in [
+            tm.makeFloatSeries(),
+            tm.makeStringSeries(),
+            tm.makeObjectSeries(),
+        ]:
             out = s.take(indices)
             expected = Series(
-                data=s.values.take(indices), index=s.index.take(indices), dtype=s.dtype
+                data=s.values.take(indices),
+                index=s.index.take(indices),
+                dtype=s.dtype,
             )
             tm.assert_series_equal(out, expected)
         for df in [tm.makeTimeDataFrame()]:
@@ -822,7 +885,9 @@ class TestNDFrame:
         # Add object dtype column with nans
         index = np.random.random(10)
         df1 = DataFrame(np.random.random(10), index=index, columns=["floats"])
-        df1["text"] = "the sky is so blue. we could use more chocolate.".split()
+        df1[
+            "text"
+        ] = "the sky is so blue. we could use more chocolate.".split()
         df1["start"] = date_range("2000-1-1", periods=10, freq="T")
         df1["end"] = date_range("2000-1-1", periods=10, freq="D")
         df1["diff"] = df1["end"] - df1["start"]
@@ -925,7 +990,9 @@ class TestNDFrame:
         for v in values:
             assert obj._get_axis_number(v) == box._get_axis_number(v)
             assert obj._get_axis_name(v) == box._get_axis_name(v)
-            assert obj._get_block_manager_axis(v) == box._get_block_manager_axis(v)
+            assert obj._get_block_manager_axis(
+                v
+            ) == box._get_block_manager_axis(v)
 
     def test_deprecated_to_dense(self):
         # GH 26557: DEPR

@@ -15,7 +15,8 @@ def offset_types(request):
     params=[
         getattr(offsets, o)
         for o in offsets.__all__
-        if issubclass(getattr(offsets, o), offsets.MonthOffset) and o != "MonthOffset"
+        if issubclass(getattr(offsets, o), offsets.MonthOffset)
+        and o != "MonthOffset"
     ]
 )
 def month_classes(request):

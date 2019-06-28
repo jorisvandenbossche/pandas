@@ -366,18 +366,24 @@ def test_reindex_categorical():
     s = Series(["a", "b", "c"], dtype="category")
     result = s.reindex(index)
     expected = Series(
-        Categorical(values=[np.nan, np.nan, np.nan], categories=["a", "b", "c"])
+        Categorical(
+            values=[np.nan, np.nan, np.nan], categories=["a", "b", "c"]
+        )
     )
     expected.index = index
     tm.assert_series_equal(result, expected)
 
     # partial reindexing
-    expected = Series(Categorical(values=["b", "c"], categories=["a", "b", "c"]))
+    expected = Series(
+        Categorical(values=["b", "c"], categories=["a", "b", "c"])
+    )
     expected.index = [1, 2]
     result = s.reindex([1, 2])
     tm.assert_series_equal(result, expected)
 
-    expected = Series(Categorical(values=["c", np.nan], categories=["a", "b", "c"]))
+    expected = Series(
+        Categorical(values=["c", np.nan], categories=["a", "b", "c"])
+    )
     expected.index = [2, 3]
     result = s.reindex([2, 3])
     tm.assert_series_equal(result, expected)
@@ -509,10 +515,19 @@ def test_drop_unique_and_non_unique_index(
         (range(3), list("abc"), "bc", 0, KeyError, "not found in axis"),
         # bad axis
         (range(3), list("abc"), ("a",), 0, KeyError, "not found in axis"),
-        (range(3), list("abc"), "one", "columns", ValueError, "No axis named columns"),
+        (
+            range(3),
+            list("abc"),
+            "one",
+            "columns",
+            ValueError,
+            "No axis named columns",
+        ),
     ],
 )
-def test_drop_exception_raised(data, index, drop_labels, axis, error_type, error_desc):
+def test_drop_exception_raised(
+    data, index, drop_labels, axis, error_type, error_desc
+):
 
     with pytest.raises(error_type, match=error_desc):
         Series(data, index=index).drop(drop_labels, axis=axis)

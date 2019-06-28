@@ -57,7 +57,13 @@ class TestGetItem:
 
             result = idx[4::-1]
             expected = DatetimeIndex(
-                ["2011-01-05", "2011-01-04", "2011-01-03", "2011-01-02", "2011-01-01"],
+                [
+                    "2011-01-05",
+                    "2011-01-04",
+                    "2011-01-03",
+                    "2011-01-02",
+                    "2011-01-01",
+                ],
                 freq="-1D",
                 tz=idx.tz,
                 name="idx",
@@ -248,7 +254,9 @@ class TestTake:
 
     def test_take_fill_value(self):
         # GH#12631
-        idx = pd.DatetimeIndex(["2011-01-01", "2011-02-01", "2011-03-01"], name="xxx")
+        idx = pd.DatetimeIndex(
+            ["2011-01-01", "2011-02-01", "2011-03-01"], name="xxx"
+        )
         result = idx.take(np.array([1, 0, -1]))
         expected = pd.DatetimeIndex(
             ["2011-02-01", "2011-01-01", "2011-03-01"], name="xxx"
@@ -257,11 +265,15 @@ class TestTake:
 
         # fill_value
         result = idx.take(np.array([1, 0, -1]), fill_value=True)
-        expected = pd.DatetimeIndex(["2011-02-01", "2011-01-01", "NaT"], name="xxx")
+        expected = pd.DatetimeIndex(
+            ["2011-02-01", "2011-01-01", "NaT"], name="xxx"
+        )
         tm.assert_index_equal(result, expected)
 
         # allow_fill=False
-        result = idx.take(np.array([1, 0, -1]), allow_fill=False, fill_value=True)
+        result = idx.take(
+            np.array([1, 0, -1]), allow_fill=False, fill_value=True
+        )
         expected = pd.DatetimeIndex(
             ["2011-02-01", "2011-01-01", "2011-03-01"], name="xxx"
         )
@@ -281,11 +293,15 @@ class TestTake:
 
     def test_take_fill_value_with_timezone(self):
         idx = pd.DatetimeIndex(
-            ["2011-01-01", "2011-02-01", "2011-03-01"], name="xxx", tz="US/Eastern"
+            ["2011-01-01", "2011-02-01", "2011-03-01"],
+            name="xxx",
+            tz="US/Eastern",
         )
         result = idx.take(np.array([1, 0, -1]))
         expected = pd.DatetimeIndex(
-            ["2011-02-01", "2011-01-01", "2011-03-01"], name="xxx", tz="US/Eastern"
+            ["2011-02-01", "2011-01-01", "2011-03-01"],
+            name="xxx",
+            tz="US/Eastern",
         )
         tm.assert_index_equal(result, expected)
 
@@ -297,9 +313,13 @@ class TestTake:
         tm.assert_index_equal(result, expected)
 
         # allow_fill=False
-        result = idx.take(np.array([1, 0, -1]), allow_fill=False, fill_value=True)
+        result = idx.take(
+            np.array([1, 0, -1]), allow_fill=False, fill_value=True
+        )
         expected = pd.DatetimeIndex(
-            ["2011-02-01", "2011-01-01", "2011-03-01"], name="xxx", tz="US/Eastern"
+            ["2011-02-01", "2011-01-01", "2011-03-01"],
+            name="xxx",
+            tz="US/Eastern",
         )
         tm.assert_index_equal(result, expected)
 
@@ -327,11 +347,14 @@ class TestDatetimeIndex:
         tm.assert_index_equal(res, expected)
 
     def test_insert(self):
-        idx = DatetimeIndex(["2000-01-04", "2000-01-01", "2000-01-02"], name="idx")
+        idx = DatetimeIndex(
+            ["2000-01-04", "2000-01-01", "2000-01-02"], name="idx"
+        )
 
         result = idx.insert(2, datetime(2000, 1, 5))
         exp = DatetimeIndex(
-            ["2000-01-04", "2000-01-01", "2000-01-05", "2000-01-02"], name="idx"
+            ["2000-01-04", "2000-01-01", "2000-01-05", "2000-01-02"],
+            name="idx",
         )
         tm.assert_index_equal(result, exp)
 
@@ -402,7 +425,9 @@ class TestDatetimeIndex:
         assert result.freq is None
 
         # see gh-7299
-        idx = date_range("1/1/2000", periods=3, freq="D", tz="Asia/Tokyo", name="idx")
+        idx = date_range(
+            "1/1/2000", periods=3, freq="D", tz="Asia/Tokyo", name="idx"
+        )
         with pytest.raises(ValueError):
             idx.insert(3, pd.Timestamp("2000-01-04"))
         with pytest.raises(ValueError):
@@ -410,10 +435,14 @@ class TestDatetimeIndex:
         with pytest.raises(ValueError):
             idx.insert(3, pd.Timestamp("2000-01-04", tz="US/Eastern"))
         with pytest.raises(ValueError):
-            idx.insert(3, datetime(2000, 1, 4, tzinfo=pytz.timezone("US/Eastern")))
+            idx.insert(
+                3, datetime(2000, 1, 4, tzinfo=pytz.timezone("US/Eastern"))
+            )
 
         for tz in ["US/Pacific", "Asia/Singapore"]:
-            idx = date_range("1/1/2000 09:00", periods=6, freq="H", tz=tz, name="idx")
+            idx = date_range(
+                "1/1/2000 09:00", periods=6, freq="H", tz=tz, name="idx"
+            )
             # preserve freq
             expected = date_range(
                 "1/1/2000 09:00", periods=7, freq="H", tz=tz, name="idx"
@@ -458,8 +487,12 @@ class TestDatetimeIndex:
         idx = date_range(start="2000-01-01", periods=5, freq="M", name="idx")
 
         # prserve freq
-        expected_0 = date_range(start="2000-02-01", periods=4, freq="M", name="idx")
-        expected_4 = date_range(start="2000-01-01", periods=4, freq="M", name="idx")
+        expected_0 = date_range(
+            start="2000-02-01", periods=4, freq="M", name="idx"
+        )
+        expected_4 = date_range(
+            start="2000-01-01", periods=4, freq="M", name="idx"
+        )
 
         # reset freq to None
         expected_1 = DatetimeIndex(
@@ -487,11 +520,19 @@ class TestDatetimeIndex:
 
         for tz in [None, "Asia/Tokyo", "US/Pacific"]:
             idx = date_range(
-                start="2000-01-01 09:00", periods=10, freq="H", name="idx", tz=tz
+                start="2000-01-01 09:00",
+                periods=10,
+                freq="H",
+                name="idx",
+                tz=tz,
             )
 
             expected = date_range(
-                start="2000-01-01 10:00", periods=9, freq="H", name="idx", tz=tz
+                start="2000-01-01 10:00",
+                periods=9,
+                freq="H",
+                name="idx",
+                tz=tz,
             )
             result = idx.delete(0)
             tm.assert_index_equal(result, expected)
@@ -500,7 +541,11 @@ class TestDatetimeIndex:
             assert result.tz == expected.tz
 
             expected = date_range(
-                start="2000-01-01 09:00", periods=9, freq="H", name="idx", tz=tz
+                start="2000-01-01 09:00",
+                periods=9,
+                freq="H",
+                name="idx",
+                tz=tz,
             )
             result = idx.delete(-1)
             tm.assert_index_equal(result, expected)
@@ -512,8 +557,12 @@ class TestDatetimeIndex:
         idx = date_range(start="2000-01-01", periods=10, freq="D", name="idx")
 
         # prserve freq
-        expected_0_2 = date_range(start="2000-01-04", periods=7, freq="D", name="idx")
-        expected_7_9 = date_range(start="2000-01-01", periods=7, freq="D", name="idx")
+        expected_0_2 = date_range(
+            start="2000-01-04", periods=7, freq="D", name="idx"
+        )
+        expected_7_9 = date_range(
+            start="2000-01-01", periods=7, freq="D", name="idx"
+        )
 
         # reset freq to None
         expected_3_5 = DatetimeIndex(
@@ -592,25 +641,38 @@ class TestDatetimeIndex:
 
             if method is not None:
                 assert (
-                    idx.get_loc(idx[1], method, tolerance=pd.Timedelta("0 days")) == 1
+                    idx.get_loc(
+                        idx[1], method, tolerance=pd.Timedelta("0 days")
+                    )
+                    == 1
                 )
 
         assert idx.get_loc("2000-01-01", method="nearest") == 0
         assert idx.get_loc("2000-01-01T12", method="nearest") == 1
 
-        assert idx.get_loc("2000-01-01T12", method="nearest", tolerance="1 day") == 1
         assert (
-            idx.get_loc("2000-01-01T12", method="nearest", tolerance=pd.Timedelta("1D"))
+            idx.get_loc("2000-01-01T12", method="nearest", tolerance="1 day")
             == 1
         )
         assert (
             idx.get_loc(
-                "2000-01-01T12", method="nearest", tolerance=np.timedelta64(1, "D")
+                "2000-01-01T12", method="nearest", tolerance=pd.Timedelta("1D")
             )
             == 1
         )
         assert (
-            idx.get_loc("2000-01-01T12", method="nearest", tolerance=timedelta(1)) == 1
+            idx.get_loc(
+                "2000-01-01T12",
+                method="nearest",
+                tolerance=np.timedelta64(1, "D"),
+            )
+            == 1
+        )
+        assert (
+            idx.get_loc(
+                "2000-01-01T12", method="nearest", tolerance=timedelta(1)
+            )
+            == 1
         )
         with pytest.raises(ValueError, match="unit abbreviation w/o a number"):
             idx.get_loc("2000-01-01T12", method="nearest", tolerance="foo")
@@ -665,18 +727,24 @@ class TestDatetimeIndex:
         exp = np.array([0, 1, 2], dtype=np.intp)
         tm.assert_numpy_array_equal(idx.get_indexer(idx), exp)
 
-        target = idx[0] + pd.to_timedelta(["-1 hour", "12 hours", "1 day 1 hour"])
+        target = idx[0] + pd.to_timedelta(
+            ["-1 hour", "12 hours", "1 day 1 hour"]
+        )
         tm.assert_numpy_array_equal(
             idx.get_indexer(target, "pad"), np.array([-1, 0, 1], dtype=np.intp)
         )
         tm.assert_numpy_array_equal(
-            idx.get_indexer(target, "backfill"), np.array([0, 1, 2], dtype=np.intp)
+            idx.get_indexer(target, "backfill"),
+            np.array([0, 1, 2], dtype=np.intp),
         )
         tm.assert_numpy_array_equal(
-            idx.get_indexer(target, "nearest"), np.array([0, 1, 1], dtype=np.intp)
+            idx.get_indexer(target, "nearest"),
+            np.array([0, 1, 1], dtype=np.intp),
         )
         tm.assert_numpy_array_equal(
-            idx.get_indexer(target, "nearest", tolerance=pd.Timedelta("1 hour")),
+            idx.get_indexer(
+                target, "nearest", tolerance=pd.Timedelta("1 hour")
+            ),
             np.array([0, -1, 1], dtype=np.intp),
         )
         tol_raw = [
@@ -686,7 +754,9 @@ class TestDatetimeIndex:
         ]
         tm.assert_numpy_array_equal(
             idx.get_indexer(
-                target, "nearest", tolerance=[np.timedelta64(x) for x in tol_raw]
+                target,
+                "nearest",
+                tolerance=[np.timedelta64(x) for x in tol_raw],
             ),
             np.array([0, -1, 1], dtype=np.intp),
         )
@@ -706,7 +776,9 @@ class TestDatetimeIndex:
         with pytest.raises(KeyError, match="2000"):
             index.get_loc("1/1/2000")
 
-    @pytest.mark.parametrize("key", [pd.Timedelta(0), pd.Timedelta(1), timedelta(0)])
+    @pytest.mark.parametrize(
+        "key", [pd.Timedelta(0), pd.Timedelta(1), timedelta(0)]
+    )
     def test_timedelta_invalid_key(self, key):
         # GH#20464
         dti = pd.date_range("1970-01-01", periods=10)

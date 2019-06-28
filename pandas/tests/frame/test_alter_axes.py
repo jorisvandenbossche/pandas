@@ -50,16 +50,21 @@ class TestDataFrameAlterAxes:
     def test_set_index_cast(self):
         # issue casting an index then set_index
         df = DataFrame(
-            {"A": [1.1, 2.2, 3.3], "B": [5.0, 6.1, 7.2]}, index=[2010, 2011, 2012]
+            {"A": [1.1, 2.2, 3.3], "B": [5.0, 6.1, 7.2]},
+            index=[2010, 2011, 2012],
         )
         df2 = df.set_index(df.index.astype(np.int32))
         tm.assert_frame_equal(df, df2)
 
     # A has duplicate values, C does not
-    @pytest.mark.parametrize("keys", ["A", "C", ["A", "B"], ("tuple", "as", "label")])
+    @pytest.mark.parametrize(
+        "keys", ["A", "C", ["A", "B"], ("tuple", "as", "label")]
+    )
     @pytest.mark.parametrize("inplace", [True, False])
     @pytest.mark.parametrize("drop", [True, False])
-    def test_set_index_drop_inplace(self, frame_of_index_cols, drop, inplace, keys):
+    def test_set_index_drop_inplace(
+        self, frame_of_index_cols, drop, inplace, keys
+    ):
         df = frame_of_index_cols
 
         if isinstance(keys, list):
@@ -78,7 +83,9 @@ class TestDataFrameAlterAxes:
         tm.assert_frame_equal(result, expected)
 
     # A has duplicate values, C does not
-    @pytest.mark.parametrize("keys", ["A", "C", ["A", "B"], ("tuple", "as", "label")])
+    @pytest.mark.parametrize(
+        "keys", ["A", "C", ["A", "B"], ("tuple", "as", "label")]
+    )
     @pytest.mark.parametrize("drop", [True, False])
     def test_set_index_append(self, frame_of_index_cols, drop, keys):
         df = frame_of_index_cols
@@ -95,14 +102,20 @@ class TestDataFrameAlterAxes:
         tm.assert_frame_equal(result, expected)
 
     # A has duplicate values, C does not
-    @pytest.mark.parametrize("keys", ["A", "C", ["A", "B"], ("tuple", "as", "label")])
+    @pytest.mark.parametrize(
+        "keys", ["A", "C", ["A", "B"], ("tuple", "as", "label")]
+    )
     @pytest.mark.parametrize("drop", [True, False])
-    def test_set_index_append_to_multiindex(self, frame_of_index_cols, drop, keys):
+    def test_set_index_append_to_multiindex(
+        self, frame_of_index_cols, drop, keys
+    ):
         # append to existing multiindex
         df = frame_of_index_cols.set_index(["D"], drop=drop, append=True)
 
         keys = keys if isinstance(keys, list) else [keys]
-        expected = frame_of_index_cols.set_index(["D"] + keys, drop=drop, append=True)
+        expected = frame_of_index_cols.set_index(
+            ["D"] + keys, drop=drop, append=True
+        )
 
         result = df.set_index(keys, drop=drop, append=True)
 
@@ -132,7 +145,8 @@ class TestDataFrameAlterAxes:
         ],
     )
     @pytest.mark.parametrize(
-        "append, index_name", [(True, None), (True, "B"), (True, "test"), (False, None)]
+        "append, index_name",
+        [(True, None), (True, "B"), (True, "test"), (False, None)],
     )
     @pytest.mark.parametrize("drop", [True, False])
     def test_set_index_pass_single_array(
@@ -164,11 +178,18 @@ class TestDataFrameAlterAxes:
     # MultiIndex constructor does not work directly on Series -> lambda
     # also test index name if append=True (name is duplicate here for A & B)
     @pytest.mark.parametrize(
-        "box", [Series, Index, np.array, list, lambda x: MultiIndex.from_arrays([x])]
+        "box",
+        [Series, Index, np.array, list, lambda x: MultiIndex.from_arrays([x])],
     )
     @pytest.mark.parametrize(
         "append, index_name",
-        [(True, None), (True, "A"), (True, "B"), (True, "test"), (False, None)],
+        [
+            (True, None),
+            (True, "A"),
+            (True, "B"),
+            (True, "test"),
+            (False, None),
+        ],
     )
     @pytest.mark.parametrize("drop", [True, False])
     def test_set_index_pass_arrays(
@@ -219,7 +240,8 @@ class TestDataFrameAlterAxes:
         ],
     )
     @pytest.mark.parametrize(
-        "append, index_name", [(True, None), (True, "A"), (True, "test"), (False, None)]
+        "append, index_name",
+        [(True, None), (True, "A"), (True, "test"), (False, None)],
     )
     @pytest.mark.parametrize("drop", [True, False])
     def test_set_index_pass_arrays_duplicate(
@@ -238,7 +260,9 @@ class TestDataFrameAlterAxes:
         # cannot drop the same column twice;
         # use "is" because == would give ambiguous Boolean error for containers
         first_drop = (
-            False if (keys[0] is "A" and keys[1] is "A") else drop  # noqa: F632
+            False
+            if (keys[0] is "A" and keys[1] is "A")
+            else drop  # noqa: F632
         )
         # to test against already-tested behaviour, we add sequentially,
         # hence second append always True; must wrap keys in list, otherwise
@@ -249,7 +273,9 @@ class TestDataFrameAlterAxes:
 
     @pytest.mark.parametrize("append", [True, False])
     @pytest.mark.parametrize("drop", [True, False])
-    def test_set_index_pass_multiindex(self, frame_of_index_cols, drop, append):
+    def test_set_index_pass_multiindex(
+        self, frame_of_index_cols, drop, append
+    ):
         df = frame_of_index_cols
         keys = MultiIndex.from_arrays([df["A"], df["B"]], names=["A", "B"])
 
@@ -289,12 +315,16 @@ class TestDataFrameAlterAxes:
 
         # also within a list
         with pytest.raises(KeyError, match=msg):
-            df.set_index(["A", df["A"], tuple(df["A"])], drop=drop, append=append)
+            df.set_index(
+                ["A", df["A"], tuple(df["A"])], drop=drop, append=append
+            )
 
     @pytest.mark.parametrize("append", [True, False])
     @pytest.mark.parametrize("drop", [True, False])
     @pytest.mark.parametrize("box", [set], ids=["set"])
-    def test_set_index_raise_on_type(self, frame_of_index_cols, box, drop, append):
+    def test_set_index_raise_on_type(
+        self, frame_of_index_cols, box, drop, append
+    ):
         df = frame_of_index_cols
 
         msg = 'The parameter "keys" may be a column key, .*'
@@ -304,7 +334,9 @@ class TestDataFrameAlterAxes:
 
         # forbidden type in list, e.g. set
         with pytest.raises(TypeError, match=msg):
-            df.set_index(["A", df["A"], box(df["A"])], drop=drop, append=append)
+            df.set_index(
+                ["A", df["A"], box(df["A"])], drop=drop, append=append
+            )
 
     # MultiIndex constructor does not work directly on Series -> lambda
     @pytest.mark.parametrize(
@@ -350,7 +382,9 @@ class TestDataFrameAlterAxes:
         thing1 = Thing("One", "red")
         thing2 = Thing("Two", "blue")
         df = DataFrame({thing1: [0, 1], thing2: [2, 3]})
-        expected = DataFrame({thing1: [0, 1]}, index=Index([2, 3], name=thing2))
+        expected = DataFrame(
+            {thing1: [0, 1]}, index=Index([2, 3], name=thing2)
+        )
 
         # use custom label directly
         result = df.set_index(thing2)
@@ -388,7 +422,9 @@ class TestDataFrameAlterAxes:
         thing1 = Thing(["One", "red"])
         thing2 = Thing(["Two", "blue"])
         df = DataFrame({thing1: [0, 1], thing2: [2, 3]})
-        expected = DataFrame({thing1: [0, 1]}, index=Index([2, 3], name=thing2))
+        expected = DataFrame(
+            {thing1: [0, 1]}, index=Index([2, 3], name=thing2)
+        )
 
         # use custom label directly
         result = df.set_index(thing2)
@@ -456,7 +492,9 @@ class TestDataFrameAlterAxes:
     def test_set_index_cast_datetimeindex(self):
         df = DataFrame(
             {
-                "A": [datetime(2000, 1, 1) + timedelta(i) for i in range(1000)],
+                "A": [
+                    datetime(2000, 1, 1) + timedelta(i) for i in range(1000)
+                ],
                 "B": np.random.randn(1000),
             }
         )
@@ -500,7 +538,9 @@ class TestDataFrameAlterAxes:
         with tm.assert_produces_warning(FutureWarning):
             df["B"] = idx.to_series(keep_tz=False, index=[0, 1])
         result = df["B"]
-        comp = Series(DatetimeIndex(expected.values).tz_localize(None), name="B")
+        comp = Series(
+            DatetimeIndex(expected.values).tz_localize(None), name="B"
+        )
         tm.assert_series_equal(result, comp)
 
         with tm.assert_produces_warning(FutureWarning) as m:
@@ -526,7 +566,9 @@ class TestDataFrameAlterAxes:
         # set the index manually
         import pytz
 
-        df = DataFrame([{"ts": datetime(2014, 4, 1, tzinfo=pytz.utc), "foo": 1}])
+        df = DataFrame(
+            [{"ts": datetime(2014, 4, 1, tzinfo=pytz.utc), "foo": 1}]
+        )
         expected = df.set_index("ts")
         df.index = df["ts"]
         df.pop("ts")
@@ -537,7 +579,9 @@ class TestDataFrameAlterAxes:
         # reset_index with single level
         tz = tz_aware_fixture
         idx = date_range("1/1/2011", periods=5, freq="D", tz=tz, name="idx")
-        df = DataFrame({"a": range(5), "b": ["A", "B", "C", "D", "E"]}, index=idx)
+        df = DataFrame(
+            {"a": range(5), "b": ["A", "B", "C", "D", "E"]}, index=idx
+        )
 
         expected = DataFrame(
             {
@@ -559,26 +603,35 @@ class TestDataFrameAlterAxes:
     def test_set_index_timezone(self):
         # GH 12358
         # tz-aware Series should retain the tz
-        idx = to_datetime(["2014-01-01 10:10:10"], utc=True).tz_convert("Europe/Rome")
+        idx = to_datetime(["2014-01-01 10:10:10"], utc=True).tz_convert(
+            "Europe/Rome"
+        )
         df = DataFrame({"A": idx})
         assert df.set_index(idx).index[0].hour == 11
         assert DatetimeIndex(Series(df.A))[0].hour == 11
         assert df.set_index(df.A).index[0].hour == 11
 
     def test_set_index_dst(self):
-        di = date_range("2006-10-29 00:00:00", periods=3, freq="H", tz="US/Pacific")
+        di = date_range(
+            "2006-10-29 00:00:00", periods=3, freq="H", tz="US/Pacific"
+        )
 
-        df = DataFrame(data={"a": [0, 1, 2], "b": [3, 4, 5]}, index=di).reset_index()
+        df = DataFrame(
+            data={"a": [0, 1, 2], "b": [3, 4, 5]}, index=di
+        ).reset_index()
         # single level
         res = df.set_index("index")
         exp = DataFrame(
-            data={"a": [0, 1, 2], "b": [3, 4, 5]}, index=Index(di, name="index")
+            data={"a": [0, 1, 2], "b": [3, 4, 5]},
+            index=Index(di, name="index"),
         )
         tm.assert_frame_equal(res, exp)
 
         # GH 12920
         res = df.set_index(["index", "a"])
-        exp_index = MultiIndex.from_arrays([di, [0, 1, 2]], names=["index", "a"])
+        exp_index = MultiIndex.from_arrays(
+            [di, [0, 1, 2]], names=["index", "a"]
+        )
         exp = DataFrame({"b": [3, 4, 5]}, index=exp_index)
         tm.assert_frame_equal(res, exp)
 
@@ -616,7 +669,9 @@ class TestDataFrameAlterAxes:
 
         result = df.set_index(["a", "x"])
         expected = df[["m", "p"]]
-        expected.index = MultiIndex.from_arrays([df["a"], df["x"]], names=["a", "x"])
+        expected.index = MultiIndex.from_arrays(
+            [df["a"], df["x"]], names=["a", "x"]
+        )
         tm.assert_frame_equal(result, expected)
 
     def test_set_columns(self, float_string_frame):
@@ -639,11 +694,17 @@ class TestDataFrameAlterAxes:
         # GH 11314
         # with tz
         index = date_range(
-            datetime(2015, 10, 1), datetime(2015, 10, 1, 23), freq="H", tz="US/Eastern"
+            datetime(2015, 10, 1),
+            datetime(2015, 10, 1, 23),
+            freq="H",
+            tz="US/Eastern",
         )
         df = DataFrame(np.random.randn(24, 1), columns=["a"], index=index)
         new_index = date_range(
-            datetime(2015, 10, 2), datetime(2015, 10, 2, 23), freq="H", tz="US/Eastern"
+            datetime(2015, 10, 2),
+            datetime(2015, 10, 2, 23),
+            freq="H",
+            tz="US/Eastern",
         )
 
         result = df.set_index(new_index)
@@ -689,7 +750,9 @@ class TestDataFrameAlterAxes:
         index = Index(["foo", "bar"], name="name")
         renamer = DataFrame(data, index=index)
         renamed = renamer.rename(index={"foo": "bar", "bar": "foo"})
-        tm.assert_index_equal(renamed.index, Index(["bar", "foo"], name="name"))
+        tm.assert_index_equal(
+            renamed.index, Index(["bar", "foo"], name="name")
+        )
         assert renamed.index.name == renamer.index.name
 
     def test_rename_axis_inplace(self, float_frame):
@@ -729,9 +792,14 @@ class TestDataFrameAlterAxes:
 
     def test_rename_axis_mapper(self):
         # GH 19978
-        mi = MultiIndex.from_product([["a", "b", "c"], [1, 2]], names=["ll", "nn"])
+        mi = MultiIndex.from_product(
+            [["a", "b", "c"], [1, 2]], names=["ll", "nn"]
+        )
         df = DataFrame(
-            {"x": [i for i in range(len(mi))], "y": [i * 10 for i in range(len(mi))]},
+            {
+                "x": [i for i in range(len(mi))],
+                "y": [i * 10 for i in range(len(mi))],
+            },
             index=mi,
         )
 
@@ -800,7 +868,9 @@ class TestDataFrameAlterAxes:
         tuples_index = [("foo1", "bar1"), ("foo2", "bar2")]
         tuples_columns = [("fizz1", "buzz1"), ("fizz2", "buzz2")]
         index = MultiIndex.from_tuples(tuples_index, names=["foo", "bar"])
-        columns = MultiIndex.from_tuples(tuples_columns, names=["fizz", "buzz"])
+        columns = MultiIndex.from_tuples(
+            tuples_columns, names=["fizz", "buzz"]
+        )
         df = DataFrame([(0, 0), (1, 1)], index=index, columns=columns)
 
         #
@@ -828,17 +898,25 @@ class TestDataFrameAlterAxes:
         new_columns = MultiIndex.from_tuples(
             [("fizz3", "buzz1"), ("fizz2", "buzz2")], names=["fizz", "buzz"]
         )
-        renamed = df.rename(columns={"fizz1": "fizz3", "buzz2": "buzz3"}, level=0)
+        renamed = df.rename(
+            columns={"fizz1": "fizz3", "buzz2": "buzz3"}, level=0
+        )
         tm.assert_index_equal(renamed.columns, new_columns)
-        renamed = df.rename(columns={"fizz1": "fizz3", "buzz2": "buzz3"}, level="fizz")
+        renamed = df.rename(
+            columns={"fizz1": "fizz3", "buzz2": "buzz3"}, level="fizz"
+        )
         tm.assert_index_equal(renamed.columns, new_columns)
 
         new_columns = MultiIndex.from_tuples(
             [("fizz1", "buzz1"), ("fizz2", "buzz3")], names=["fizz", "buzz"]
         )
-        renamed = df.rename(columns={"fizz1": "fizz3", "buzz2": "buzz3"}, level=1)
+        renamed = df.rename(
+            columns={"fizz1": "fizz3", "buzz2": "buzz3"}, level=1
+        )
         tm.assert_index_equal(renamed.columns, new_columns)
-        renamed = df.rename(columns={"fizz1": "fizz3", "buzz2": "buzz3"}, level="buzz")
+        renamed = df.rename(
+            columns={"fizz1": "fizz3", "buzz2": "buzz3"}, level="buzz"
+        )
         tm.assert_index_equal(renamed.columns, new_columns)
 
         # function
@@ -905,7 +983,9 @@ class TestDataFrameAlterAxes:
         # GH 19497
         # rename was changing Index to MultiIndex if Index contained tuples
 
-        df = DataFrame(data=np.arange(3), index=[(0, 0), (1, 1), (2, 2)], columns=["a"])
+        df = DataFrame(
+            data=np.arange(3), index=[(0, 0), (1, 1), (2, 2)], columns=["a"]
+        )
         df = df.rename({(1, 1): (5, 4)}, axis="index")
         expected = DataFrame(
             data=np.arange(3), index=[(0, 0), (5, 4), (2, 2)], columns=["a"]
@@ -956,7 +1036,9 @@ class TestDataFrameAlterAxes:
             codes=[[0, 1, 2, 0, 1, 2], [0, 1, 0, 1, 0, 1], [0, 0, 0, 0, 0, 0]],
             names=["L1", "L2", "L0"],
         )
-        expected = DataFrame({"A": np.arange(6), "B": np.arange(6)}, index=e_idx)
+        expected = DataFrame(
+            {"A": np.arange(6), "B": np.arange(6)}, index=e_idx
+        )
         tm.assert_frame_equal(result, expected)
 
         result = df.reorder_levels([0, 0, 0])
@@ -965,7 +1047,9 @@ class TestDataFrameAlterAxes:
             codes=[[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]],
             names=["L0", "L0", "L0"],
         )
-        expected = DataFrame({"A": np.arange(6), "B": np.arange(6)}, index=e_idx)
+        expected = DataFrame(
+            {"A": np.arange(6), "B": np.arange(6)}, index=e_idx
+        )
         tm.assert_frame_equal(result, expected)
 
         result = df.reorder_levels(["L0", "L0", "L0"])
@@ -1010,7 +1094,9 @@ class TestDataFrameAlterAxes:
         float_frame.index.name = "index"
         deleveled = float_frame.reset_index()
         tm.assert_series_equal(deleveled["index"], Series(float_frame.index))
-        tm.assert_index_equal(deleveled.index, Index(np.arange(len(deleveled))))
+        tm.assert_index_equal(
+            deleveled.index, Index(np.arange(len(deleveled)))
+        )
 
         # preserve column names
         float_frame.columns.name = "columns"
@@ -1059,7 +1145,9 @@ class TestDataFrameAlterAxes:
         assert df.index.name is None
 
     def test_reset_index_level(self):
-        df = DataFrame([[1, 2, 3, 4], [5, 6, 7, 8]], columns=["A", "B", "C", "D"])
+        df = DataFrame(
+            [[1, 2, 3, 4], [5, 6, 7, 8]], columns=["A", "B", "C", "D"]
+        )
 
         for levels in ["A", "B"], [0, 1]:
             # With MultiIndex
@@ -1072,7 +1160,9 @@ class TestDataFrameAlterAxes:
             result = df.set_index(["A", "B"]).reset_index(level=levels)
             tm.assert_frame_equal(result, df)
 
-            result = df.set_index(["A", "B"]).reset_index(level=levels, drop=True)
+            result = df.set_index(["A", "B"]).reset_index(
+                level=levels, drop=True
+            )
             tm.assert_frame_equal(result, df[["C", "D"]])
 
             # With single-level Index (GH 16263)
@@ -1082,7 +1172,9 @@ class TestDataFrameAlterAxes:
             result = df.set_index("A").reset_index(level=levels[:1])
             tm.assert_frame_equal(result, df)
 
-            result = df.set_index(["A"]).reset_index(level=levels[0], drop=True)
+            result = df.set_index(["A"]).reset_index(
+                level=levels[0], drop=True
+            )
             tm.assert_frame_equal(result, df[["B", "C", "D"]])
 
         # Missing levels - for both MultiIndex and single-level Index:
@@ -1095,7 +1187,9 @@ class TestDataFrameAlterAxes:
     def test_reset_index_right_dtype(self):
         time = np.arange(0.0, 10, np.sqrt(2) / 2)
         s1 = Series(
-            (9.81 * time ** 2) / 2, index=Index(time, name="time"), name="speed"
+            (9.81 * time ** 2) / 2,
+            index=Index(time, name="time"),
+            name="speed",
         )
         df = DataFrame(s1)
 
@@ -1116,25 +1210,30 @@ class TestDataFrameAlterAxes:
         )
         rs = df.reset_index()
         xp = DataFrame(
-            full, columns=[["a", "b", "b", "c"], ["", "mean", "median", "mean"]]
+            full,
+            columns=[["a", "b", "b", "c"], ["", "mean", "median", "mean"]],
         )
         tm.assert_frame_equal(rs, xp)
 
         rs = df.reset_index(col_fill=None)
         xp = DataFrame(
-            full, columns=[["a", "b", "b", "c"], ["a", "mean", "median", "mean"]]
+            full,
+            columns=[["a", "b", "b", "c"], ["a", "mean", "median", "mean"]],
         )
         tm.assert_frame_equal(rs, xp)
 
         rs = df.reset_index(col_level=1, col_fill="blah")
         xp = DataFrame(
-            full, columns=[["blah", "b", "b", "c"], ["a", "mean", "median", "mean"]]
+            full,
+            columns=[["blah", "b", "b", "c"], ["a", "mean", "median", "mean"]],
         )
         tm.assert_frame_equal(rs, xp)
 
         df = DataFrame(
             vals,
-            MultiIndex.from_arrays([[0, 1, 2], ["x", "y", "z"]], names=["d", "a"]),
+            MultiIndex.from_arrays(
+                [[0, 1, 2], ["x", "y", "z"]], names=["d", "a"]
+            ),
             columns=[["b", "b", "c"], ["mean", "median", "mean"]],
         )
         rs = df.reset_index("a")
@@ -1176,7 +1275,9 @@ class TestDataFrameAlterAxes:
         rs = df.set_index(["A", "B"]).reset_index()
         tm.assert_frame_equal(rs, df)
 
-        df = DataFrame({"A": ["a", "b", "c"], "B": [0, 1, 2], "C": [np.nan, 1.1, 2.2]})
+        df = DataFrame(
+            {"A": ["a", "b", "c"], "B": [0, 1, 2], "C": [np.nan, 1.1, 2.2]}
+        )
         rs = df.set_index(["A", "B"]).reset_index()
         tm.assert_frame_equal(rs, df)
 
@@ -1208,7 +1309,9 @@ class TestDataFrameAlterAxes:
 
     def test_reset_index_range(self):
         # GH 12071
-        df = DataFrame([[0, 0], [1, 1]], columns=["A", "B"], index=RangeIndex(stop=2))
+        df = DataFrame(
+            [[0, 0], [1, 1]], columns=["A", "B"], index=RangeIndex(stop=2)
+        )
         result = df.reset_index()
         assert isinstance(result.index, RangeIndex)
         expected = DataFrame(
@@ -1289,9 +1392,9 @@ class TestDataFrameAlterAxes:
         tm.assert_frame_equal(result, expected)
 
     def test_rename_mapper_multi(self):
-        df = DataFrame({"A": ["a", "b"], "B": ["c", "d"], "C": [1, 2]}).set_index(
-            ["A", "B"]
-        )
+        df = DataFrame(
+            {"A": ["a", "b"], "B": ["c", "d"], "C": [1, 2]}
+        ).set_index(["A", "B"])
         result = df.rename(str.upper)
         expected = df.rename(index=str.upper)
         tm.assert_frame_equal(result, expected)
@@ -1308,7 +1411,9 @@ class TestDataFrameAlterAxes:
         df = DataFrame({"A": [1, 2], "B": [1, 2]}, index=["0", "1"])
 
         # Named target and axis
-        over_spec_msg = "Cannot specify both 'axis' and " "any of 'index' or 'columns'"
+        over_spec_msg = (
+            "Cannot specify both 'axis' and " "any of 'index' or 'columns'"
+        )
         with pytest.raises(TypeError, match=over_spec_msg):
             df.rename(index=str.lower, axis=1)
 
@@ -1358,7 +1463,9 @@ class TestDataFrameAlterAxes:
 
         res1 = df.reindex(index=["b", "a"], columns=["e", "d"])
         res2 = df.reindex(columns=["e", "d"], index=["b", "a"])
-        res3 = df.reindex(labels=["b", "a"], axis=0).reindex(labels=["e", "d"], axis=1)
+        res3 = df.reindex(labels=["b", "a"], axis=0).reindex(
+            labels=["e", "d"], axis=1
+        )
         for res in [res2, res3]:
             tm.assert_frame_equal(res1, res)
 
@@ -1379,7 +1486,9 @@ class TestDataFrameAlterAxes:
         df = float_frame.copy()
         df.columns = ["foo", "bar", "baz", "quux", "foo2"]
         tm.assert_series_equal(float_frame["C"], df["baz"], check_names=False)
-        tm.assert_series_equal(float_frame["hi"], df["foo2"], check_names=False)
+        tm.assert_series_equal(
+            float_frame["hi"], df["foo2"], check_names=False
+        )
 
     def test_set_index_preserve_categorical_dtype(self):
         # GH13743, GH13854
@@ -1387,8 +1496,12 @@ class TestDataFrameAlterAxes:
             {
                 "A": [1, 2, 1, 1, 2],
                 "B": [10, 16, 22, 28, 34],
-                "C1": Categorical(list("abaab"), categories=list("bac"), ordered=False),
-                "C2": Categorical(list("abaab"), categories=list("bac"), ordered=True),
+                "C1": Categorical(
+                    list("abaab"), categories=list("bac"), ordered=False
+                ),
+                "C2": Categorical(
+                    list("abaab"), categories=list("bac"), ordered=True
+                ),
             }
         )
         for cols in ["C1", "C2", ["A", "C1"], ["A", "C2"], ["C1", "C2"]]:

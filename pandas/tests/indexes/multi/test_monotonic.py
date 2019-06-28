@@ -7,7 +7,9 @@ from pandas.api.types import is_scalar
 
 
 def test_is_monotonic_increasing():
-    i = MultiIndex.from_product([np.arange(10), np.arange(10)], names=["one", "two"])
+    i = MultiIndex.from_product(
+        [np.arange(10), np.arange(10)], names=["one", "two"]
+    )
     assert i.is_monotonic is True
     assert i._is_strictly_monotonic_increasing is True
     assert Index(i.values).is_monotonic is True
@@ -164,7 +166,8 @@ def test_is_monotonic_decreasing():
 
 def test_is_strictly_monotonic_increasing():
     idx = pd.MultiIndex(
-        levels=[["bar", "baz"], ["mom", "next"]], codes=[[0, 0, 1, 1], [0, 0, 0, 1]]
+        levels=[["bar", "baz"], ["mom", "next"]],
+        codes=[[0, 0, 1, 1], [0, 0, 0, 1]],
     )
     assert idx.is_monotonic_increasing is True
     assert idx._is_strictly_monotonic_increasing is False
@@ -172,7 +175,8 @@ def test_is_strictly_monotonic_increasing():
 
 def test_is_strictly_monotonic_decreasing():
     idx = pd.MultiIndex(
-        levels=[["baz", "bar"], ["next", "mom"]], codes=[[0, 0, 1, 1], [0, 0, 0, 1]]
+        levels=[["baz", "bar"], ["next", "mom"]],
+        codes=[[0, 0, 1, 1], [0, 0, 0, 1]],
     )
     assert idx.is_monotonic_decreasing is True
     assert idx._is_strictly_monotonic_decreasing is False

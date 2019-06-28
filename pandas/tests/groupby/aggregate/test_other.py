@@ -63,7 +63,11 @@ def test_agg_datetimes_mixed():
     data = [
         [
             row[0],
-            (dt.datetime.strptime(row[1], "%Y-%m-%d").date() if row[1] else None),
+            (
+                dt.datetime.strptime(row[1], "%Y-%m-%d").date()
+                if row[1]
+                else None
+            ),
             row[2],
         ]
         for row in data
@@ -132,11 +136,15 @@ def test_agg_dict_parameter_cast_result_dtypes():
     tm.assert_series_equal(grouped.time.agg("last"), exp["time"])
 
     # count
-    exp = pd.Series([2, 2, 2, 2], index=Index(list("ABCD"), name="class"), name="time")
+    exp = pd.Series(
+        [2, 2, 2, 2], index=Index(list("ABCD"), name="class"), name="time"
+    )
     tm.assert_series_equal(grouped.time.agg(len), exp)
     tm.assert_series_equal(grouped.time.size(), exp)
 
-    exp = pd.Series([0, 1, 1, 2], index=Index(list("ABCD"), name="class"), name="time")
+    exp = pd.Series(
+        [0, 1, 1, 2], index=Index(list("ABCD"), name="class"), name="time"
+    )
     tm.assert_series_equal(grouped.time.count(), exp)
 
 
@@ -154,7 +162,9 @@ def test_agg_cast_results_dtypes():
 
 def test_aggregate_float64_no_int64():
     # see gh-11199
-    df = DataFrame({"a": [1, 2, 3, 4, 5], "b": [1, 2, 2, 4, 5], "c": [1, 2, 3, 4, 5]})
+    df = DataFrame(
+        {"a": [1, 2, 3, 4, 5], "b": [1, 2, 2, 4, 5], "c": [1, 2, 3, 4, 5]}
+    )
 
     expected = DataFrame({"a": [1, 2.5, 4, 5]}, index=[1, 2, 4, 5])
     expected.index.name = "b"
@@ -162,7 +172,9 @@ def test_aggregate_float64_no_int64():
     result = df.groupby("b")[["a"]].mean()
     tm.assert_frame_equal(result, expected)
 
-    expected = DataFrame({"a": [1, 2.5, 4, 5], "c": [1, 2.5, 4, 5]}, index=[1, 2, 4, 5])
+    expected = DataFrame(
+        {"a": [1, 2.5, 4, 5], "c": [1, 2.5, 4, 5]}, index=[1, 2, 4, 5]
+    )
     expected.index.name = "b"
 
     result = df.groupby("b")[["a", "c"]].mean()
@@ -222,7 +234,9 @@ def test_agg_dict_renaming_deprecation():
     # 15931
     df = pd.DataFrame({"A": [1, 1, 1, 2, 2], "B": range(5), "C": range(5)})
 
-    with tm.assert_produces_warning(FutureWarning, check_stacklevel=False) as w:
+    with tm.assert_produces_warning(
+        FutureWarning, check_stacklevel=False
+    ) as w:
         df.groupby("A").agg(
             {"B": {"foo": ["sum", "max"]}, "C": {"bar": ["count", "min"]}}
         )
@@ -280,10 +294,14 @@ def test_agg_nested_dicts():
 
     msg = r"cannot perform renaming for r[1-2] with a nested dictionary"
     with pytest.raises(SpecificationError, match=msg):
-        g.aggregate({"r1": {"C": ["mean", "sum"]}, "r2": {"D": ["mean", "sum"]}})
+        g.aggregate(
+            {"r1": {"C": ["mean", "sum"]}, "r2": {"D": ["mean", "sum"]}}
+        )
 
     with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
-        result = g.agg({"C": {"ra": ["mean", "std"]}, "D": {"rb": ["mean", "std"]}})
+        result = g.agg(
+            {"C": {"ra": ["mean", "std"]}, "D": {"rb": ["mean", "std"]}}
+        )
     expected = pd.concat(
         [g["C"].mean(), g["C"].std(), g["D"].mean(), g["D"].std()], axis=1
     )
@@ -473,7 +491,8 @@ def test_agg_timezone_round_trip():
     assert result3 == ts
 
     dates = [
-        pd.Timestamp("2016-01-0%d 12:00:00" % i, tz="US/Pacific") for i in range(1, 5)
+        pd.Timestamp("2016-01-0%d 12:00:00" % i, tz="US/Pacific")
+        for i in range(1, 5)
     ]
     df = pd.DataFrame({"A": ["a", "b"] * 2, "B": dates})
     grouped = df.groupby("A")
@@ -496,7 +515,8 @@ def test_sum_uint64_overflow():
     df = df + 9223372036854775807
 
     index = pd.Index(
-        [9223372036854775808, 9223372036854775810, 9223372036854775812], dtype=np.uint64
+        [9223372036854775808, 9223372036854775810, 9223372036854775812],
+        dtype=np.uint64,
     )
     expected = pd.DataFrame(
         {1: [9223372036854775809, 9223372036854775811, 9223372036854775813]},
@@ -525,7 +545,11 @@ def test_sum_uint64_overflow():
 )
 def test_agg_structs_dataframe(structure, expected):
     df = pd.DataFrame(
-        {"A": [1, 1, 1, 3, 3, 3], "B": [1, 1, 1, 4, 4, 4], "C": [1, 1, 1, 3, 4, 4]}
+        {
+            "A": [1, 1, 1, 3, 3, 3],
+            "B": [1, 1, 1, 4, 4, 4],
+            "C": [1, 1, 1, 3, 4, 4],
+        }
     )
 
     result = df.groupby(["A", "B"]).aggregate(structure)
@@ -538,14 +562,24 @@ def test_agg_structs_dataframe(structure, expected):
     [
         (tuple, pd.Series([(1, 1, 1), (3, 4, 4)], index=[1, 3], name="C")),
         (list, pd.Series([[1, 1, 1], [3, 4, 4]], index=[1, 3], name="C")),
-        (lambda x: tuple(x), pd.Series([(1, 1, 1), (3, 4, 4)], index=[1, 3], name="C")),
-        (lambda x: list(x), pd.Series([[1, 1, 1], [3, 4, 4]], index=[1, 3], name="C")),
+        (
+            lambda x: tuple(x),
+            pd.Series([(1, 1, 1), (3, 4, 4)], index=[1, 3], name="C"),
+        ),
+        (
+            lambda x: list(x),
+            pd.Series([[1, 1, 1], [3, 4, 4]], index=[1, 3], name="C"),
+        ),
     ],
 )
 def test_agg_structs_series(structure, expected):
     # Issue #18079
     df = pd.DataFrame(
-        {"A": [1, 1, 1, 3, 3, 3], "B": [1, 1, 1, 4, 4, 4], "C": [1, 1, 1, 3, 4, 4]}
+        {
+            "A": [1, 1, 1, 3, 3, 3],
+            "B": [1, 1, 1, 4, 4, 4],
+            "C": [1, 1, 1, 3, 4, 4],
+        }
     )
 
     result = df.groupby("A")["C"].aggregate(structure)
@@ -556,12 +590,17 @@ def test_agg_structs_series(structure, expected):
 def test_agg_category_nansum(observed):
     categories = ["a", "b", "c"]
     df = pd.DataFrame(
-        {"A": pd.Categorical(["a", "a", "b"], categories=categories), "B": [1, 2, 3]}
+        {
+            "A": pd.Categorical(["a", "a", "b"], categories=categories),
+            "B": [1, 2, 3],
+        }
     )
     result = df.groupby("A", observed=observed).B.agg(np.nansum)
     expected = pd.Series(
         [3, 3, 0],
-        index=pd.CategoricalIndex(["a", "b", "c"], categories=categories, name="A"),
+        index=pd.CategoricalIndex(
+            ["a", "b", "c"], categories=categories, name="A"
+        ),
         name="B",
     )
     if observed:

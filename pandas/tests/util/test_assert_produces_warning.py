@@ -18,5 +18,7 @@ def test_assert_produces_warning_honors_filter():
         with tm.assert_produces_warning(RuntimeWarning):
             f()
 
-    with tm.assert_produces_warning(RuntimeWarning, raise_on_extra_warnings=False):
+    with tm.assert_produces_warning(
+        RuntimeWarning, raise_on_extra_warnings=False
+    ):
         f()

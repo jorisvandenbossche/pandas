@@ -34,7 +34,9 @@ from pandas.tseries.offsets import Day, MonthEnd
 @pytest.fixture(scope="module")
 def current_pickle_data():
     # our current version pickle data
-    from pandas.tests.io.generate_legacy_storage_files import create_pickle_data
+    from pandas.tests.io.generate_legacy_storage_files import (
+        create_pickle_data,
+    )
 
     return create_pickle_data()
 
@@ -57,7 +59,9 @@ def compare_element(result, expected, typ, version=None):
             assert result == expected
             assert result.freq == expected.freq
     else:
-        comparator = getattr(tm, "assert_%s_equal" % typ, tm.assert_almost_equal)
+        comparator = getattr(
+            tm, "assert_%s_equal" % typ, tm.assert_almost_equal
+        )
         comparator(result, expected)
 
 
@@ -136,7 +140,9 @@ def compare_sp_frame_float(result, expected, typ, version):
 
 
 files = glob.glob(
-    os.path.join(os.path.dirname(__file__), "data", "legacy_pickle", "*", "*.pickle")
+    os.path.join(
+        os.path.dirname(__file__), "data", "legacy_pickle", "*", "*.pickle"
+    )
 )
 
 
@@ -265,7 +271,9 @@ class TestCompression:
         elif compression == "bz2":
             f = bz2.BZ2File(dest_path, "w")
         elif compression == "zip":
-            with zipfile.ZipFile(dest_path, "w", compression=zipfile.ZIP_DEFLATED) as f:
+            with zipfile.ZipFile(
+                dest_path, "w", compression=zipfile.ZIP_DEFLATED
+            ) as f:
                 f.write(src_path, os.path.basename(src_path))
         elif compression == "xz":
             f = lzma.LZMAFile(dest_path, "w")
@@ -351,7 +359,9 @@ class TestCompression:
 
             tm.assert_frame_equal(df, df2)
 
-    @pytest.mark.parametrize("ext", ["", ".gz", ".bz2", ".zip", ".no_compress", ".xz"])
+    @pytest.mark.parametrize(
+        "ext", ["", ".gz", ".bz2", ".zip", ".no_compress", ".xz"]
+    )
     def test_read_infer(self, ext, get_random_path):
         base = get_random_path
         path1 = base + ".raw"

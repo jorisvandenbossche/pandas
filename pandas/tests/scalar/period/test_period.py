@@ -64,14 +64,18 @@ class TestPeriodConstruction:
         expected = Period(datetime(2007, 1, 1, 9, 0, 0, 1000), freq="L")
         assert i1 == expected
 
-        expected = Period(np_datetime64_compat("2007-01-01 09:00:00.001Z"), freq="L")
+        expected = Period(
+            np_datetime64_compat("2007-01-01 09:00:00.001Z"), freq="L"
+        )
         assert i1 == expected
 
         i1 = Period("2007-01-01 09:00:00.00101")
         expected = Period(datetime(2007, 1, 1, 9, 0, 0, 1010), freq="U")
         assert i1 == expected
 
-        expected = Period(np_datetime64_compat("2007-01-01 09:00:00.00101Z"), freq="U")
+        expected = Period(
+            np_datetime64_compat("2007-01-01 09:00:00.00101Z"), freq="U"
+        )
         assert i1 == expected
 
         msg = "Must supply freq for ordinal value"
@@ -168,12 +172,18 @@ class TestPeriodConstruction:
         assert Period("1/1/2005", freq=offsets.MonthEnd()) == Period(
             "1/1/2005", freq="M"
         )
-        assert Period("2005", freq=offsets.YearEnd()) == Period("2005", freq="A")
-        assert Period("2005", freq=offsets.MonthEnd()) == Period("2005", freq="M")
+        assert Period("2005", freq=offsets.YearEnd()) == Period(
+            "2005", freq="A"
+        )
+        assert Period("2005", freq=offsets.MonthEnd()) == Period(
+            "2005", freq="M"
+        )
         assert Period("3/10/12", freq=offsets.BusinessDay()) == Period(
             "3/10/12", freq="B"
         )
-        assert Period("3/10/12", freq=offsets.Day()) == Period("3/10/12", freq="D")
+        assert Period("3/10/12", freq=offsets.Day()) == Period(
+            "3/10/12", freq="D"
+        )
 
         assert Period(
             year=2005, quarter=1, freq=offsets.QuarterEnd(startingMonth=12)
@@ -185,19 +195,23 @@ class TestPeriodConstruction:
         assert Period(year=2005, month=3, day=1, freq=offsets.Day()) == Period(
             year=2005, month=3, day=1, freq="D"
         )
-        assert Period(year=2012, month=3, day=10, freq=offsets.BDay()) == Period(
-            year=2012, month=3, day=10, freq="B"
-        )
+        assert Period(
+            year=2012, month=3, day=10, freq=offsets.BDay()
+        ) == Period(year=2012, month=3, day=10, freq="B")
 
         expected = Period("2005-03-01", freq="3D")
-        assert Period(year=2005, month=3, day=1, freq=offsets.Day(3)) == expected
+        assert (
+            Period(year=2005, month=3, day=1, freq=offsets.Day(3)) == expected
+        )
         assert Period(year=2005, month=3, day=1, freq="3D") == expected
 
-        assert Period(year=2012, month=3, day=10, freq=offsets.BDay(3)) == Period(
-            year=2012, month=3, day=10, freq="3B"
-        )
+        assert Period(
+            year=2012, month=3, day=10, freq=offsets.BDay(3)
+        ) == Period(year=2012, month=3, day=10, freq="3B")
 
-        assert Period(200701, freq=offsets.MonthEnd()) == Period(200701, freq="M")
+        assert Period(200701, freq=offsets.MonthEnd()) == Period(
+            200701, freq="M"
+        )
 
         i1 = Period(ordinal=200701, freq=offsets.MonthEnd())
         i2 = Period(ordinal=200701, freq="M")
@@ -223,14 +237,18 @@ class TestPeriodConstruction:
         expected = Period(datetime(2007, 1, 1, 9, 0, 0, 1000), freq="L")
         assert i1 == expected
 
-        expected = Period(np_datetime64_compat("2007-01-01 09:00:00.001Z"), freq="L")
+        expected = Period(
+            np_datetime64_compat("2007-01-01 09:00:00.001Z"), freq="L"
+        )
         assert i1 == expected
 
         i1 = Period("2007-01-01 09:00:00.00101")
         expected = Period(datetime(2007, 1, 1, 9, 0, 0, 1010), freq="U")
         assert i1 == expected
 
-        expected = Period(np_datetime64_compat("2007-01-01 09:00:00.00101Z"), freq="U")
+        expected = Period(
+            np_datetime64_compat("2007-01-01 09:00:00.00101Z"), freq="U"
+        )
         assert i1 == expected
 
     def test_invalid_arguments(self):
@@ -477,18 +495,28 @@ class TestPeriodMethods:
         assert new_p == p
 
     def test_hash(self):
-        assert hash(Period("2011-01", freq="M")) == hash(Period("2011-01", freq="M"))
+        assert hash(Period("2011-01", freq="M")) == hash(
+            Period("2011-01", freq="M")
+        )
 
-        assert hash(Period("2011-01-01", freq="D")) != hash(Period("2011-01", freq="M"))
+        assert hash(Period("2011-01-01", freq="D")) != hash(
+            Period("2011-01", freq="M")
+        )
 
-        assert hash(Period("2011-01", freq="3M")) != hash(Period("2011-01", freq="2M"))
+        assert hash(Period("2011-01", freq="3M")) != hash(
+            Period("2011-01", freq="2M")
+        )
 
-        assert hash(Period("2011-01", freq="M")) != hash(Period("2011-02", freq="M"))
+        assert hash(Period("2011-01", freq="M")) != hash(
+            Period("2011-02", freq="M")
+        )
 
     # --------------------------------------------------------------
     # to_timestamp
 
-    @pytest.mark.parametrize("tzstr", ["Europe/Brussels", "Asia/Tokyo", "US/Pacific"])
+    @pytest.mark.parametrize(
+        "tzstr", ["Europe/Brussels", "Asia/Tokyo", "US/Pacific"]
+    )
     def test_to_timestamp_tz_arg(self, tzstr):
         p = Period("1/1/2005", freq="M").to_timestamp(tz=tzstr)
         exp = Timestamp("1/1/2005", tz="UTC").tz_convert(tzstr)
@@ -524,7 +552,11 @@ class TestPeriodMethods:
 
     @pytest.mark.parametrize(
         "tzstr",
-        ["dateutil/Europe/Brussels", "dateutil/Asia/Tokyo", "dateutil/US/Pacific"],
+        [
+            "dateutil/Europe/Brussels",
+            "dateutil/Asia/Tokyo",
+            "dateutil/US/Pacific",
+        ],
     )
     def test_to_timestamp_tz_arg_dateutil(self, tzstr):
         tz = maybe_get_tz(tzstr)
@@ -541,7 +573,9 @@ class TestPeriodMethods:
         assert p.tz == exp.tz
 
     def test_to_timestamp_tz_arg_dateutil_from_string(self):
-        p = Period("1/1/2005", freq="M").to_timestamp(tz="dateutil/Europe/Brussels")
+        p = Period("1/1/2005", freq="M").to_timestamp(
+            tz="dateutil/Europe/Brussels"
+        )
         assert p.tz == dateutil_gettz("Europe/Brussels")
 
     def test_to_timestamp_mult(self):
@@ -878,12 +912,17 @@ class TestPeriodProperties:
             assert h_date.hour == 0
             assert h_date.days_in_month == 31
             assert (
-                Period(freq="H", year=2012, month=2, day=1, hour=0).days_in_month == 29
+                Period(
+                    freq="H", year=2012, month=2, day=1, hour=0
+                ).days_in_month
+                == 29
             )
 
     def test_properties_minutely(self):
         # Test properties on Periods with minutely frequency.
-        t_date = Period(freq="Min", year=2007, month=1, day=1, hour=0, minute=0)
+        t_date = Period(
+            freq="Min", year=2007, month=1, day=1, hour=0, minute=0
+        )
         #
         assert t_date.quarter == 1
         assert t_date.month == 1
@@ -894,7 +933,9 @@ class TestPeriodProperties:
         assert t_date.minute == 0
         assert t_date.days_in_month == 31
         assert (
-            Period(freq="D", year=2012, month=2, day=1, hour=0, minute=0).days_in_month
+            Period(
+                freq="D", year=2012, month=2, day=1, hour=0, minute=0
+            ).days_in_month
             == 29
         )
 
@@ -916,7 +957,13 @@ class TestPeriodProperties:
         assert s_date.days_in_month == 31
         assert (
             Period(
-                freq="Min", year=2012, month=2, day=1, hour=0, minute=0, second=0
+                freq="Min",
+                year=2012,
+                month=2,
+                day=1,
+                hour=0,
+                minute=0,
+                second=0,
             ).days_in_month
             == 29
         )
@@ -1430,8 +1477,12 @@ class TestArithmetic:
             p = Period("2011-04-01", freq=freq)
             assert p - offsets.Day(5) == Period("2011-03-27", freq=freq)
             assert p - offsets.Hour(24) == Period("2011-03-31", freq=freq)
-            assert p - np.timedelta64(2, "D") == Period("2011-03-30", freq=freq)
-            assert p - np.timedelta64(3600 * 24, "s") == Period("2011-03-31", freq=freq)
+            assert p - np.timedelta64(2, "D") == Period(
+                "2011-03-30", freq=freq
+            )
+            assert p - np.timedelta64(3600 * 24, "s") == Period(
+                "2011-03-31", freq=freq
+            )
             assert p - timedelta(-2) == Period("2011-04-03", freq=freq)
             assert p - timedelta(hours=48) == Period("2011-03-30", freq=freq)
 
@@ -1449,11 +1500,15 @@ class TestArithmetic:
             p = Period("2011-04-01 09:00", freq=freq)
             assert p - offsets.Day(2) == Period("2011-03-30 09:00", freq=freq)
             assert p - offsets.Hour(3) == Period("2011-04-01 06:00", freq=freq)
-            assert p - np.timedelta64(3, "h") == Period("2011-04-01 06:00", freq=freq)
+            assert p - np.timedelta64(3, "h") == Period(
+                "2011-04-01 06:00", freq=freq
+            )
             assert p - np.timedelta64(3600, "s") == Period(
                 "2011-04-01 08:00", freq=freq
             )
-            assert p - timedelta(minutes=120) == Period("2011-04-01 07:00", freq=freq)
+            assert p - timedelta(minutes=120) == Period(
+                "2011-04-01 07:00", freq=freq
+            )
             assert p - timedelta(days=4, minutes=180) == Period(
                 "2011-03-28 06:00", freq=freq
             )
@@ -1580,7 +1635,9 @@ def test_period_immutable():
 
 
 # TODO: This doesn't fail on all systems; track down which
-@pytest.mark.xfail(reason="Parses as Jan 1, 0007 on some systems", strict=False)
+@pytest.mark.xfail(
+    reason="Parses as Jan 1, 0007 on some systems", strict=False
+)
 def test_small_year_parsing():
     per1 = Period("0001-01-07", "D")
     assert per1.year == 1

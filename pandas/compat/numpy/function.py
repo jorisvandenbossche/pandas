@@ -33,13 +33,17 @@ from pandas.util._validators import (
 
 
 class CompatValidator:
-    def __init__(self, defaults, fname=None, method=None, max_fname_arg_count=None):
+    def __init__(
+        self, defaults, fname=None, method=None, max_fname_arg_count=None
+    ):
         self.fname = fname
         self.method = method
         self.defaults = defaults
         self.max_fname_arg_count = max_fname_arg_count
 
-    def __call__(self, args, kwargs, fname=None, max_fname_arg_count=None, method=None):
+    def __call__(
+        self, args, kwargs, fname=None, max_fname_arg_count=None, method=None
+    ):
         if args or kwargs:
             fname = self.fname if fname is None else fname
             max_fname_arg_count = (
@@ -59,7 +63,8 @@ class CompatValidator:
                 )
             else:
                 raise ValueError(
-                    "invalid validation method " "'{method}'".format(method=method)
+                    "invalid validation method "
+                    "'{method}'".format(method=method)
                 )
 
 
@@ -108,7 +113,9 @@ def validate_argmax_with_skipna(skipna, args, kwargs):
     return skipna
 
 
-ARGSORT_DEFAULTS = OrderedDict()  # type: OrderedDict[str, Optional[Union[int, str]]]
+ARGSORT_DEFAULTS = (
+    OrderedDict()
+)  # type: OrderedDict[str, Optional[Union[int, str]]]
 ARGSORT_DEFAULTS["axis"] = -1
 ARGSORT_DEFAULTS["kind"] = "quicksort"
 ARGSORT_DEFAULTS["order"] = None
@@ -128,7 +135,10 @@ ARGSORT_DEFAULTS_KIND = OrderedDict()  # type: OrderedDict[str, Optional[int]]
 ARGSORT_DEFAULTS_KIND["axis"] = -1
 ARGSORT_DEFAULTS_KIND["order"] = None
 validate_argsort_kind = CompatValidator(
-    ARGSORT_DEFAULTS_KIND, fname="argsort", max_fname_arg_count=0, method="both"
+    ARGSORT_DEFAULTS_KIND,
+    fname="argsort",
+    max_fname_arg_count=0,
+    method="both",
 )
 
 
@@ -241,7 +251,9 @@ validate_round = CompatValidator(
     ROUND_DEFAULTS, fname="round", method="both", max_fname_arg_count=1
 )
 
-SORT_DEFAULTS = OrderedDict()  # type: OrderedDict[str, Optional[Union[int, str]]]
+SORT_DEFAULTS = (
+    OrderedDict()
+)  # type: OrderedDict[str, Optional[Union[int, str]]]
 SORT_DEFAULTS["axis"] = -1
 SORT_DEFAULTS["kind"] = "quicksort"
 SORT_DEFAULTS["order"] = None
@@ -275,11 +287,15 @@ validate_median = CompatValidator(
     MEDIAN_DEFAULTS, fname="median", method="both", max_fname_arg_count=1
 )
 
-STAT_DDOF_FUNC_DEFAULTS = OrderedDict()  # type: OrderedDict[str, Optional[bool]]
+STAT_DDOF_FUNC_DEFAULTS = (
+    OrderedDict()
+)  # type: OrderedDict[str, Optional[bool]]
 STAT_DDOF_FUNC_DEFAULTS["dtype"] = None
 STAT_DDOF_FUNC_DEFAULTS["out"] = None
 STAT_DDOF_FUNC_DEFAULTS["keepdims"] = False
-validate_stat_ddof_func = CompatValidator(STAT_DDOF_FUNC_DEFAULTS, method="kwargs")
+validate_stat_ddof_func = CompatValidator(
+    STAT_DDOF_FUNC_DEFAULTS, method="kwargs"
+)
 
 TAKE_DEFAULTS = OrderedDict()  # type: OrderedDict[str, Optional[str]]
 TAKE_DEFAULTS["out"] = None

@@ -96,7 +96,9 @@ class CSSResolver:
             prop = "border-{side}-width".format(side=side)
             if prop in props:
                 props[prop] = self.size_to_pt(
-                    props[prop], em_pt=font_size, conversions=self.BORDER_WIDTH_RATIOS
+                    props[prop],
+                    em_pt=font_size,
+                    conversions=self.BORDER_WIDTH_RATIOS,
                 )
             for prop in [
                 "margin-{side}".format(side=side),
@@ -105,7 +107,9 @@ class CSSResolver:
                 if prop in props:
                     # TODO: support %
                     props[prop] = self.size_to_pt(
-                        props[prop], em_pt=font_size, conversions=self.MARGIN_RATIOS
+                        props[prop],
+                        em_pt=font_size,
+                        conversions=self.MARGIN_RATIOS,
                     )
 
         return props
@@ -156,7 +160,9 @@ class CSSResolver:
 
     def size_to_pt(self, in_val, em_pt=None, conversions=UNIT_RATIOS):
         def _error():
-            warnings.warn("Unhandled size: {val!r}".format(val=in_val), CSSWarning)
+            warnings.warn(
+                "Unhandled size: {val!r}".format(val=in_val), CSSWarning
+            )
             return self.size_to_pt("1!!default", conversions=conversions)
 
         try:
@@ -220,7 +226,9 @@ class CSSResolver:
                 mapping = self.SIDE_SHORTHANDS[len(tokens)]
             except KeyError:
                 warnings.warn(
-                    'Could not expand "{prop}: {val}"'.format(prop=prop, val=value),
+                    'Could not expand "{prop}: {val}"'.format(
+                        prop=prop, val=value
+                    ),
                     CSSWarning,
                 )
                 return

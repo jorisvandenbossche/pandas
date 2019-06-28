@@ -56,17 +56,27 @@ class TestIndexing:
                 maybe_slice = lib.maybe_indices_to_slice(indices, len(target))
 
                 assert isinstance(maybe_slice, slice)
-                tm.assert_numpy_array_equal(target[indices], target[maybe_slice])
+                tm.assert_numpy_array_equal(
+                    target[indices], target[maybe_slice]
+                )
 
                 # reverse
                 indices = indices[::-1]
                 maybe_slice = lib.maybe_indices_to_slice(indices, len(target))
 
                 assert isinstance(maybe_slice, slice)
-                tm.assert_numpy_array_equal(target[indices], target[maybe_slice])
+                tm.assert_numpy_array_equal(
+                    target[indices], target[maybe_slice]
+                )
 
         # not slice
-        for case in [[2, 1, 2, 0], [2, 2, 1, 0], [0, 1, 2, 1], [-2, 0, 2], [2, 0, -2]]:
+        for case in [
+            [2, 1, 2, 0],
+            [2, 2, 1, 0],
+            [0, 1, 2, 1],
+            [-2, 0, 2],
+            [2, 0, -2],
+        ]:
             indices = np.array(case, dtype=np.int64)
             maybe_slice = lib.maybe_indices_to_slice(indices, len(target))
 
@@ -84,14 +94,18 @@ class TestIndexing:
                 maybe_slice = lib.maybe_indices_to_slice(indices, len(target))
 
                 assert isinstance(maybe_slice, slice)
-                tm.assert_numpy_array_equal(target[indices], target[maybe_slice])
+                tm.assert_numpy_array_equal(
+                    target[indices], target[maybe_slice]
+                )
 
                 # reverse
                 indices = indices[::-1]
                 maybe_slice = lib.maybe_indices_to_slice(indices, len(target))
 
                 assert isinstance(maybe_slice, slice)
-                tm.assert_numpy_array_equal(target[indices], target[maybe_slice])
+                tm.assert_numpy_array_equal(
+                    target[indices], target[maybe_slice]
+                )
 
         # not slice
         indices = np.array([97, 98, 99, 100], dtype=np.int64)
@@ -158,14 +172,18 @@ class TestIndexing:
                 maybe_slice = lib.maybe_indices_to_slice(indices, len(target))
 
                 assert isinstance(maybe_slice, slice)
-                tm.assert_numpy_array_equal(target[indices], target[maybe_slice])
+                tm.assert_numpy_array_equal(
+                    target[indices], target[maybe_slice]
+                )
 
                 # reverse
                 indices = indices[::-1]
                 maybe_slice = lib.maybe_indices_to_slice(indices, len(target))
 
                 assert isinstance(maybe_slice, slice)
-                tm.assert_numpy_array_equal(target[indices], target[maybe_slice])
+                tm.assert_numpy_array_equal(
+                    target[indices], target[maybe_slice]
+                )
 
         # not slice
         for case in [[14, 12, 10, 12], [12, 12, 11, 10], [10, 11, 12, 11]]:

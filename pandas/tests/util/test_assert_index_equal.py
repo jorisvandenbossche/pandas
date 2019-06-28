@@ -85,7 +85,9 @@ Index values are different \\(33\\.33333 %\\)
 def test_index_equal_values_less_close(check_exact, check_less_precise):
     idx1 = Index([1, 2, 3.0])
     idx2 = Index([1, 2, 3.0001])
-    kwargs = dict(check_exact=check_exact, check_less_precise=check_less_precise)
+    kwargs = dict(
+        check_exact=check_exact, check_less_precise=check_less_precise
+    )
 
     if check_exact or not check_less_precise:
         msg = """Index are different
@@ -103,7 +105,9 @@ Index values are different \\(33\\.33333 %\\)
 def test_index_equal_values_too_far(check_exact, check_less_precise):
     idx1 = Index([1, 2, 3])
     idx2 = Index([1, 2, 4])
-    kwargs = dict(check_exact=check_exact, check_less_precise=check_less_precise)
+    kwargs = dict(
+        check_exact=check_exact, check_less_precise=check_less_precise
+    )
 
     msg = """Index are different
 
@@ -118,7 +122,9 @@ Index values are different \\(33\\.33333 %\\)
 def test_index_equal_level_values_mismatch(check_exact, check_less_precise):
     idx1 = MultiIndex.from_tuples([("A", 2), ("A", 2), ("B", 3), ("B", 4)])
     idx2 = MultiIndex.from_tuples([("A", 1), ("A", 2), ("B", 3), ("B", 4)])
-    kwargs = dict(check_exact=check_exact, check_less_precise=check_less_precise)
+    kwargs = dict(
+        check_exact=check_exact, check_less_precise=check_less_precise
+    )
 
     msg = """MultiIndex level \\[1\\] are different
 

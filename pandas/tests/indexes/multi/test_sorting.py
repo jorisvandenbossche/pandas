@@ -100,10 +100,19 @@ def test_numpy_argsort(idx):
 def test_unsortedindex():
     # GH 11897
     mi = pd.MultiIndex.from_tuples(
-        [("z", "a"), ("x", "a"), ("y", "b"), ("x", "b"), ("y", "a"), ("z", "b")],
+        [
+            ("z", "a"),
+            ("x", "a"),
+            ("y", "b"),
+            ("x", "b"),
+            ("y", "a"),
+            ("z", "b"),
+        ],
         names=["one", "two"],
     )
-    df = pd.DataFrame([[i, 10 * i] for i in range(6)], index=mi, columns=["one", "two"])
+    df = pd.DataFrame(
+        [[i, 10 * i] for i in range(6)], index=mi, columns=["one", "two"]
+    )
 
     # GH 16734: not sorted, but no real slicing
     result = df.loc(axis=0)["z", "a"]
@@ -122,7 +131,11 @@ def test_unsortedindex():
 def test_unsortedindex_doc_examples():
     # http://pandas.pydata.org/pandas-docs/stable/advanced.html#sorting-a-multiindex  # noqa
     dfm = DataFrame(
-        {"jim": [0, 0, 1, 1], "joe": ["x", "x", "z", "y"], "jolie": np.random.rand(4)}
+        {
+            "jim": [0, 0, 1, 1],
+            "joe": ["x", "x", "z", "y"],
+            "jolie": np.random.rand(4),
+        }
     )
 
     dfm = dfm.set_index(["jim", "joe"])
@@ -161,7 +174,14 @@ def test_reconstruct_sort():
 
     # cannot convert to lexsorted
     mi = pd.MultiIndex.from_tuples(
-        [("z", "a"), ("x", "a"), ("y", "b"), ("x", "b"), ("y", "a"), ("z", "b")],
+        [
+            ("z", "a"),
+            ("x", "a"),
+            ("y", "b"),
+            ("x", "b"),
+            ("y", "a"),
+            ("z", "b"),
+        ],
         names=["one", "two"],
     )
     assert not mi.is_lexsorted()
@@ -254,7 +274,9 @@ def test_remove_unused_levels_large(first_type, second_type):
     tm.assert_index_equal(result, expected)
 
 
-@pytest.mark.parametrize("level0", [["a", "d", "b"], ["a", "d", "b", "unused"]])
+@pytest.mark.parametrize(
+    "level0", [["a", "d", "b"], ["a", "d", "b", "unused"]]
+)
 @pytest.mark.parametrize(
     "level1", [["w", "x", "y", "z"], ["w", "x", "y", "z", "unused"]]
 )

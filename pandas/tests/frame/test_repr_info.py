@@ -47,7 +47,8 @@ class TestDataFrameReprInfoEtc(TestData):
     def test_repr_mixed_big(self):
         # big mixed
         biggie = DataFrame(
-            {"A": np.random.randn(200), "B": tm.makeStringIndex(200)}, index=range(200)
+            {"A": np.random.randn(200), "B": tm.makeStringIndex(200)},
+            index=range(200),
         )
         biggie.loc[:20, "A"] = np.nan
         biggie.loc[:20, "B"] = np.nan
@@ -93,7 +94,9 @@ class TestDataFrameReprInfoEtc(TestData):
     @pytest.mark.slow
     def test_repr_big(self):
         # big one
-        biggie = DataFrame(np.zeros((200, 4)), columns=range(4), index=range(200))
+        biggie = DataFrame(
+            np.zeros((200, 4)), columns=range(4), index=range(200)
+        )
         repr(biggie)
 
     def test_repr_unsortable(self):
@@ -101,7 +104,9 @@ class TestDataFrameReprInfoEtc(TestData):
         import warnings
 
         warn_filters = warnings.filters
-        warnings.filterwarnings("ignore", category=FutureWarning, module=".*format")
+        warnings.filterwarnings(
+            "ignore", category=FutureWarning, module=".*format"
+        )
 
         unsortable = DataFrame(
             {
@@ -189,7 +194,9 @@ class TestDataFrameReprInfoEtc(TestData):
 \bottomrule
 \end{tabular}
 """
-        with option_context("display.latex.escape", False, "display.latex.repr", True):
+        with option_context(
+            "display.latex.escape", False, "display.latex.repr", True
+        ):
             df = DataFrame([[r"$\alpha$", "b", "c"], [1, 2, 3]])
             assert result == df._repr_latex_()
 
@@ -252,7 +259,9 @@ class TestDataFrameReprInfoEtc(TestData):
         io = StringIO()
 
         # it works!
-        frame = DataFrame(np.random.randn(1500, 4), columns=["a", "a", "b", "b"])
+        frame = DataFrame(
+            np.random.randn(1500, 4), columns=["a", "a", "b", "b"]
+        )
         frame.info(buf=io)
 
     def test_info_duplicate_columns_shows_correct_dtypes(self):
@@ -417,9 +426,14 @@ class TestDataFrameReprInfoEtc(TestData):
         )
 
         df_object = pd.DataFrame({"a": ["a"]})
-        assert df_object.memory_usage(deep=True).sum() > df_object.memory_usage().sum()
+        assert (
+            df_object.memory_usage(deep=True).sum()
+            > df_object.memory_usage().sum()
+        )
 
-    @pytest.mark.skipif(not PYPY, reason="on PyPy deep=True does not change result")
+    @pytest.mark.skipif(
+        not PYPY, reason="on PyPy deep=True does not change result"
+    )
     def test_info_memory_usage_deep_pypy(self):
         df_with_object_index = pd.DataFrame({"a": [1]}, index=["foo"])
         assert (
@@ -428,7 +442,10 @@ class TestDataFrameReprInfoEtc(TestData):
         )
 
         df_object = pd.DataFrame({"a": ["a"]})
-        assert df_object.memory_usage(deep=True).sum() == df_object.memory_usage().sum()
+        assert (
+            df_object.memory_usage(deep=True).sum()
+            == df_object.memory_usage().sum()
+        )
 
     @pytest.mark.skipif(PYPY, reason="PyPy getsizeof() fails by design")
     def test_usage_via_getsizeof(self):
@@ -523,7 +540,9 @@ class TestDataFrameReprInfoEtc(TestData):
 
     def test_repr_categorical_dates_periods(self):
         # normal DataFrame
-        dt = date_range("2011-01-01 09:00", freq="H", periods=5, tz="US/Eastern")
+        dt = date_range(
+            "2011-01-01 09:00", freq="H", periods=5, tz="US/Eastern"
+        )
         p = period_range("2011-01", freq="M", periods=5)
         df = DataFrame({"dt": dt, "p": p})
         exp = """                         dt        p

@@ -96,8 +96,14 @@ series_apply_whitelist = (
     )
 ) | frozenset(["dtype", "unique"])
 
-dataframe_apply_whitelist = common_apply_whitelist | frozenset(["dtypes", "corrwith"])
+dataframe_apply_whitelist = common_apply_whitelist | frozenset(
+    ["dtypes", "corrwith"]
+)
 
-cython_transforms = frozenset(["cumprod", "cumsum", "shift", "cummin", "cummax"])
+cython_transforms = frozenset(
+    ["cumprod", "cumsum", "shift", "cummin", "cummax"]
+)
 
-cython_cast_blacklist = frozenset(["rank", "count", "size", "idxmin", "idxmax"])
+cython_cast_blacklist = frozenset(
+    ["rank", "count", "size", "idxmin", "idxmax"]
+)

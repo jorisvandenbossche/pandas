@@ -2,7 +2,14 @@ import pytest
 
 import pandas.core.dtypes.concat as _concat
 
-from pandas import DatetimeIndex, Index, Period, PeriodIndex, Series, TimedeltaIndex
+from pandas import (
+    DatetimeIndex,
+    Index,
+    Period,
+    PeriodIndex,
+    Series,
+    TimedeltaIndex,
+)
 
 
 @pytest.mark.parametrize(
@@ -13,8 +20,14 @@ from pandas import DatetimeIndex, Index, Period, PeriodIndex, Series, TimedeltaI
         ([[3, 4], [1, 2]], ["i"]),
         ([[3, 4], [1, 2.1]], ["i", "f"]),
         # datetimelike
-        ([DatetimeIndex(["2011-01-01"]), DatetimeIndex(["2011-01-02"])], ["datetime"]),
-        ([TimedeltaIndex(["1 days"]), TimedeltaIndex(["2 days"])], ["timedelta"]),
+        (
+            [DatetimeIndex(["2011-01-01"]), DatetimeIndex(["2011-01-02"])],
+            ["datetime"],
+        ),
+        (
+            [TimedeltaIndex(["1 days"]), TimedeltaIndex(["2 days"])],
+            ["timedelta"],
+        ),
         # datetimelike object
         (
             [
@@ -30,7 +43,10 @@ from pandas import DatetimeIndex, Index, Period, PeriodIndex, Series, TimedeltaI
             ],
             ["datetime64[ns, Asia/Tokyo]", "datetime64[ns, US/Eastern]"],
         ),
-        ([TimedeltaIndex(["1 days"]), TimedeltaIndex(["2 hours"])], ["timedelta"]),
+        (
+            [TimedeltaIndex(["1 days"]), TimedeltaIndex(["2 hours"])],
+            ["timedelta"],
+        ),
         (
             [
                 DatetimeIndex(["2011-01-01"], tz="Asia/Tokyo"),
@@ -51,7 +67,10 @@ def test_get_dtype_kinds(klass, to_concat, expected):
     "to_concat, expected",
     [
         (
-            [PeriodIndex(["2011-01"], freq="M"), PeriodIndex(["2011-01"], freq="M")],
+            [
+                PeriodIndex(["2011-01"], freq="M"),
+                PeriodIndex(["2011-01"], freq="M"),
+            ],
             ["period[M]"],
         ),
         (
@@ -62,7 +81,10 @@ def test_get_dtype_kinds(klass, to_concat, expected):
             ["period[M]"],
         ),
         (
-            [PeriodIndex(["2011-01"], freq="M"), PeriodIndex(["2011-01"], freq="D")],
+            [
+                PeriodIndex(["2011-01"], freq="M"),
+                PeriodIndex(["2011-01"], freq="D"),
+            ],
             ["period[M]", "period[D]"],
         ),
         (

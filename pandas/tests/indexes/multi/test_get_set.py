@@ -413,7 +413,9 @@ def test_set_value_keeps_names():
     lev2 = ["1", "2", "3"] * 2
     idx = pd.MultiIndex.from_arrays([lev1, lev2], names=["Name", "Number"])
     df = pd.DataFrame(
-        np.random.randn(6, 4), columns=["one", "two", "three", "four"], index=idx
+        np.random.randn(6, 4),
+        columns=["one", "two", "three", "four"],
+        index=idx,
     )
     df = df.sort_index()
     assert df._is_copy is None

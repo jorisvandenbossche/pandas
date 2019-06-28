@@ -30,10 +30,15 @@ def test_skip_rows_bug(all_parsers, skiprows):
 1/3/2000,7,8,9
 """
     result = parser.read_csv(
-        StringIO(text), skiprows=skiprows, header=None, index_col=0, parse_dates=True
+        StringIO(text),
+        skiprows=skiprows,
+        header=None,
+        index_col=0,
+        parse_dates=True,
     )
     index = Index(
-        [datetime(2000, 1, 1), datetime(2000, 1, 2), datetime(2000, 1, 3)], name=0
+        [datetime(2000, 1, 1), datetime(2000, 1, 2), datetime(2000, 1, 3)],
+        name=0,
     )
 
     expected = DataFrame(
@@ -49,7 +54,10 @@ def test_deep_skip_rows(all_parsers):
         [",".join([str(i), str(i + 1), str(i + 2)]) for i in range(10)]
     )
     condensed_data = "a,b,c\n" + "\n".join(
-        [",".join([str(i), str(i + 1), str(i + 2)]) for i in [0, 1, 2, 3, 4, 6, 8, 9]]
+        [
+            ",".join([str(i), str(i + 1), str(i + 2)])
+            for i in [0, 1, 2, 3, 4, 6, 8, 9]
+        ]
     )
 
     result = parser.read_csv(StringIO(data), skiprows=[6, 8])
@@ -74,7 +82,8 @@ def test_skip_rows_blank(all_parsers):
         StringIO(text), skiprows=6, header=None, index_col=0, parse_dates=True
     )
     index = Index(
-        [datetime(2000, 1, 1), datetime(2000, 1, 2), datetime(2000, 1, 3)], name=0
+        [datetime(2000, 1, 1), datetime(2000, 1, 2), datetime(2000, 1, 3)],
+        name=0,
     )
 
     expected = DataFrame(
@@ -112,7 +121,9 @@ line 22",2
                 "example\n sentence\n three~,url3"
             ),
             dict(quotechar="~", skiprows=[1, 3]),
-            DataFrame([["example\n sentence\n two", "url2"]], columns=["Text", "url"]),
+            DataFrame(
+                [["example\n sentence\n two", "url2"]], columns=["Text", "url"]
+            ),
         ),
     ],
 )
@@ -160,7 +171,10 @@ def test_skip_row_with_quote(all_parsers):
 1,"line '11\n' \r\tline 12",2
 2,"line '21\n' \r\tline 22",2
 3,"line '31\n' \r\tline 32",1""",
-            [[2, "line '21\n' \r\tline 22", 2], [3, "line '31\n' \r\tline 32", 1]],
+            [
+                [2, "line '21\n' \r\tline 22", 2],
+                [3, "line '31\n' \r\tline 32", 1],
+            ],
         ),
     ],
 )
@@ -230,7 +244,9 @@ def test_skip_rows_callable(all_parsers, kwargs, expected):
     parser = all_parsers
     data = "a\n1\n2\n3\n4\n5"
 
-    result = parser.read_csv(StringIO(data), skiprows=lambda x: x % 2 == 0, **kwargs)
+    result = parser.read_csv(
+        StringIO(data), skiprows=lambda x: x % 2 == 0, **kwargs
+    )
     tm.assert_frame_equal(result, expected)
 
 

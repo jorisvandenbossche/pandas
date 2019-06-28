@@ -269,7 +269,9 @@ def simple_frame():
     """
     arr = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]])
 
-    return DataFrame(arr, columns=["one", "two", "three"], index=["a", "b", "c"])
+    return DataFrame(
+        arr, columns=["one", "two", "three"], index=["a", "b", "c"]
+    )
 
 
 @pytest.fixture

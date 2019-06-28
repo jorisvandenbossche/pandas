@@ -38,7 +38,10 @@ class TestSparseArrayArithmetics:
             self._assert((b / a).to_dense(), b_dense * 1.0 / a_dense)
 
             # ToDo: FIXME in GH 13843
-            if not (self._base == pd.Series and a.dtype.subtype == np.dtype("int64")):
+            if not (
+                self._base == pd.Series
+                and a.dtype.subtype == np.dtype("int64")
+            ):
                 self._assert((a // b).to_dense(), a_dense // b_dense)
                 self._assert((b // a).to_dense(), b_dense // a_dense)
 
@@ -63,7 +66,10 @@ class TestSparseArrayArithmetics:
             self._assert((b_dense / a).to_dense(), b_dense * 1.0 / a_dense)
 
             # ToDo: FIXME in GH 13843
-            if not (self._base == pd.Series and a.dtype.subtype == np.dtype("int64")):
+            if not (
+                self._base == pd.Series
+                and a.dtype.subtype == np.dtype("int64")
+            ):
                 self._assert((a // b_dense).to_dense(), a_dense // b_dense)
                 self._assert((b_dense // a).to_dense(), b_dense // a_dense)
 
@@ -184,8 +190,12 @@ class TestSparseArrayArithmetics:
             b = self._klass(rvalues, kind=kind)
             self._check_numeric_ops(a, b, values, rvalues)
 
-            values = self._base([0.0, 1.0, 2.0, 6.0, 0.0, 0.0, 1.0, 2.0, 1.0, 0.0])
-            rvalues = self._base([0.0, 2.0, 3.0, 4.0, 0.0, 0.0, 1.0, 3.0, 2.0, 0.0])
+            values = self._base(
+                [0.0, 1.0, 2.0, 6.0, 0.0, 0.0, 1.0, 2.0, 1.0, 0.0]
+            )
+            rvalues = self._base(
+                [0.0, 2.0, 3.0, 4.0, 0.0, 0.0, 1.0, 3.0, 2.0, 0.0]
+            )
 
             a = self._klass(values, kind=kind, fill_value=0)
             b = self._klass(rvalues, kind=kind, fill_value=0)
@@ -201,8 +211,12 @@ class TestSparseArrayArithmetics:
             b = self._klass(rvalues, kind=kind)
             self._check_comparison_ops(a, b, values, rvalues)
 
-            values = self._base([0.0, 1.0, 2.0, 6.0, 0.0, 0.0, 1.0, 2.0, 1.0, 0.0])
-            rvalues = self._base([0.0, 2.0, 3.0, 4.0, 0.0, 0.0, 1.0, 3.0, 2.0, 0.0])
+            values = self._base(
+                [0.0, 1.0, 2.0, 6.0, 0.0, 0.0, 1.0, 2.0, 1.0, 0.0]
+            )
+            rvalues = self._base(
+                [0.0, 2.0, 3.0, 4.0, 0.0, 0.0, 1.0, 3.0, 2.0, 0.0]
+            )
 
             a = self._klass(values, kind=kind, fill_value=0)
             b = self._klass(rvalues, kind=kind, fill_value=0)
@@ -341,7 +355,9 @@ class TestSparseArrayArithmetics:
             rvalues = self._base([True, False, True, True], dtype=np.bool)
 
             for fill_value in [True, False, np.nan]:
-                a = self._klass(values, kind=kind, dtype=np.bool, fill_value=fill_value)
+                a = self._klass(
+                    values, kind=kind, dtype=np.bool, fill_value=fill_value
+                )
                 b = self._klass(
                     rvalues, kind=kind, dtype=np.bool, fill_value=fill_value
                 )
@@ -351,11 +367,17 @@ class TestSparseArrayArithmetics:
         # GH 14000
         # when sp_index are the same
         for kind in ["integer", "block"]:
-            values = self._base([True, False, True, False, True, True], dtype=np.bool)
-            rvalues = self._base([True, False, False, True, False, True], dtype=np.bool)
+            values = self._base(
+                [True, False, True, False, True, True], dtype=np.bool
+            )
+            rvalues = self._base(
+                [True, False, False, True, False, True], dtype=np.bool
+            )
 
             for fill_value in [True, False, np.nan]:
-                a = self._klass(values, kind=kind, dtype=np.bool, fill_value=fill_value)
+                a = self._klass(
+                    values, kind=kind, dtype=np.bool, fill_value=fill_value
+                )
                 b = self._klass(
                     rvalues, kind=kind, dtype=np.bool, fill_value=fill_value
                 )
@@ -456,7 +478,10 @@ class TestSparseSeriesArithmetic(TestSparseArrayArithmetics):
 
         sa = pd.SparseSeries(np.arange(4), dtype=np.int64, fill_value=np.nan)
         sb = pd.SparseSeries(
-            np.arange(4), index=[10, 11, 12, 13], dtype=np.int64, fill_value=np.nan
+            np.arange(4),
+            index=[10, 11, 12, 13],
+            dtype=np.int64,
+            fill_value=np.nan,
         )
         self._check_numeric_ops(sa, sb, da, db)
 

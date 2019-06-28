@@ -41,7 +41,9 @@ class TestDatetimeIndex:
         # 8260
         # support datetime64 with tz
 
-        idx = Index(date_range("20130101", periods=3, tz="US/Eastern"), name="foo")
+        idx = Index(
+            date_range("20130101", periods=3, tz="US/Eastern"), name="foo"
+        )
         dr = date_range("20130110", periods=3)
         df = DataFrame({"A": idx, "B": dr})
         df["C"] = idx
@@ -51,7 +53,11 @@ class TestDatetimeIndex:
         # indexing
         result = df.iloc[1]
         expected = Series(
-            [Timestamp("2013-01-02 00:00:00-0500", tz="US/Eastern"), np.nan, np.nan],
+            [
+                Timestamp("2013-01-02 00:00:00-0500", tz="US/Eastern"),
+                np.nan,
+                np.nan,
+            ],
             index=list("ABC"),
             dtype="object",
             name=1,
@@ -59,7 +65,11 @@ class TestDatetimeIndex:
         tm.assert_series_equal(result, expected)
         result = df.loc[1]
         expected = Series(
-            [Timestamp("2013-01-02 00:00:00-0500", tz="US/Eastern"), np.nan, np.nan],
+            [
+                Timestamp("2013-01-02 00:00:00-0500", tz="US/Eastern"),
+                np.nan,
+                np.nan,
+            ],
             index=list("ABC"),
             dtype="object",
             name=1,
@@ -82,12 +92,18 @@ class TestDatetimeIndex:
 
         # indexing - setting an element
         df = DataFrame(
-            data=pd.to_datetime(["2015-03-30 20:12:32", "2015-03-12 00:11:11"]),
+            data=pd.to_datetime(
+                ["2015-03-30 20:12:32", "2015-03-12 00:11:11"]
+            ),
             columns=["time"],
         )
         df["new_col"] = ["new", "old"]
         df.time = df.set_index("time").index.tz_localize("UTC")
-        v = df[df.new_col == "new"].set_index("time").index.tz_convert("US/Pacific")
+        v = (
+            df[df.new_col == "new"]
+            .set_index("time")
+            .index.tz_convert("US/Pacific")
+        )
 
         # trying to set a single element on a part of a different timezone
         # this converts to object
@@ -104,7 +120,9 @@ class TestDatetimeIndex:
     def test_consistency_with_tz_aware_scalar(self):
         # xef gh-12938
         # various ways of indexing the same tz-aware scalar
-        df = Series([Timestamp("2016-03-30 14:35:25", tz="Europe/Brussels")]).to_frame()
+        df = Series(
+            [Timestamp("2016-03-30 14:35:25", tz="Europe/Brussels")]
+        ).to_frame()
 
         df = pd.concat([df, df]).reset_index(drop=True)
         expected = Timestamp("2016-03-30 14:35:25+0200", tz="Europe/Brussels")
@@ -241,7 +259,9 @@ class TestDatetimeIndex:
             Timestamp("2011-01-03"),
         ]
         exp = Series(
-            [np.nan, 0.2, np.nan], index=pd.DatetimeIndex(keys, name="idx"), name="s"
+            [np.nan, 0.2, np.nan],
+            index=pd.DatetimeIndex(keys, name="idx"),
+            name="s",
         )
         with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
             tm.assert_series_equal(ser.loc[keys], exp, check_index_type=True)
@@ -253,7 +273,10 @@ class TestDatetimeIndex:
         ser = Series([0.1, 0.2], index=idx, name="s")
 
         result = ser.loc[
-            [pd.Period("2011-01-01", freq="D"), pd.Period("2011-01-02", freq="D")]
+            [
+                pd.Period("2011-01-01", freq="D"),
+                pd.Period("2011-01-02", freq="D"),
+            ]
         ]
         exp = Series([0.1, 0.2], index=idx, name="s")
         tm.assert_series_equal(result, exp, check_index_type=True)
@@ -263,7 +286,9 @@ class TestDatetimeIndex:
             pd.Period("2011-01-02", freq="D"),
             pd.Period("2011-01-01", freq="D"),
         ]
-        exp = Series([0.2, 0.2, 0.1], index=pd.PeriodIndex(keys, name="idx"), name="s")
+        exp = Series(
+            [0.2, 0.2, 0.1], index=pd.PeriodIndex(keys, name="idx"), name="s"
+        )
         tm.assert_series_equal(ser.loc[keys], exp, check_index_type=True)
 
         keys = [
@@ -272,7 +297,9 @@ class TestDatetimeIndex:
             pd.Period("2011-01-03", freq="D"),
         ]
         exp = Series(
-            [np.nan, 0.2, np.nan], index=pd.PeriodIndex(keys, name="idx"), name="s"
+            [np.nan, 0.2, np.nan],
+            index=pd.PeriodIndex(keys, name="idx"),
+            name="s",
         )
         with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
             result = ser.loc[keys]

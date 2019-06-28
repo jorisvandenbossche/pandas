@@ -13,7 +13,9 @@ def _check_is_partition(parts, whole):
     whole = set(whole)
     parts = [set(x) for x in parts]
     if set.intersection(*parts) != set():
-        raise ValueError("Is not a partition because intersection is not null.")
+        raise ValueError(
+            "Is not a partition because intersection is not null."
+        )
     if set.union(*parts) != whole:
         raise ValueError("Is not a partition because union is not the whole.")
 
@@ -35,7 +37,9 @@ def _to_ijv(ss, row_levels=(0,), column_levels=(1,), sort_labels=False):
 
         # TODO: how to do this better? cleanly slice nonnull_labels given the
         # coord
-        values_ilabels = [tuple(x[i] for i in levels) for x in nonnull_labels.index]
+        values_ilabels = [
+            tuple(x[i] for i in levels) for x in nonnull_labels.index
+        ]
         if len(levels) == 1:
             values_ilabels = [x[0] for x in values_ilabels]
 
@@ -57,7 +61,9 @@ def _to_ijv(ss, row_levels=(0,), column_levels=(1,), sort_labels=False):
 
         def _get_index_subset_to_coord_dict(index, subset, sort_labels=False):
             ilabels = list(zip(*[index._get_level_values(i) for i in subset]))
-            labels_to_i = _get_label_to_i_dict(ilabels, sort_labels=sort_labels)
+            labels_to_i = _get_label_to_i_dict(
+                ilabels, sort_labels=sort_labels
+            )
             labels_to_i = Series(labels_to_i)
             if len(subset) > 1:
                 labels_to_i.index = MultiIndex.from_tuples(labels_to_i.index)
@@ -86,7 +92,9 @@ def _to_ijv(ss, row_levels=(0,), column_levels=(1,), sort_labels=False):
     return values, i_coord, j_coord, i_labels, j_labels
 
 
-def _sparse_series_to_coo(ss, row_levels=(0,), column_levels=(1,), sort_labels=False):
+def _sparse_series_to_coo(
+    ss, row_levels=(0,), column_levels=(1,), sort_labels=False
+):
     """
     Convert a SparseSeries to a scipy.sparse.coo_matrix using index
     levels row_levels, column_levels as the row and column
@@ -99,7 +107,8 @@ def _sparse_series_to_coo(ss, row_levels=(0,), column_levels=(1,), sort_labels=F
         raise ValueError("to_coo requires MultiIndex with nlevels > 2")
     if not ss.index.is_unique:
         raise ValueError(
-            "Duplicate index entries are not allowed in to_coo " "transformation."
+            "Duplicate index entries are not allowed in to_coo "
+            "transformation."
         )
 
     # to keep things simple, only rely on integer indexing (not labels)
@@ -107,7 +116,10 @@ def _sparse_series_to_coo(ss, row_levels=(0,), column_levels=(1,), sort_labels=F
     column_levels = [ss.index._get_level_number(x) for x in column_levels]
 
     v, i, j, rows, columns = _to_ijv(
-        ss, row_levels=row_levels, column_levels=column_levels, sort_labels=sort_labels
+        ss,
+        row_levels=row_levels,
+        column_levels=column_levels,
+        sort_labels=sort_labels,
     )
     sparse_matrix = scipy.sparse.coo_matrix(
         (v, (i, j)), shape=(len(rows), len(columns))
@@ -115,7 +127,9 @@ def _sparse_series_to_coo(ss, row_levels=(0,), column_levels=(1,), sort_labels=F
     return sparse_matrix, rows, columns
 
 
-def _coo_to_sparse_series(A, dense_index: bool = False, sparse_series: bool = True):
+def _coo_to_sparse_series(
+    A, dense_index: bool = False, sparse_series: bool = True
+):
     """
     Convert a scipy.sparse.coo_matrix to a SparseSeries.
 
@@ -139,7 +153,9 @@ def _coo_to_sparse_series(A, dense_index: bool = False, sparse_series: bool = Tr
     try:
         s = Series(A.data, MultiIndex.from_arrays((A.row, A.col)))
     except AttributeError:
-        raise TypeError("Expected coo_matrix. Got {} instead.".format(type(A).__name__))
+        raise TypeError(
+            "Expected coo_matrix. Got {} instead.".format(type(A).__name__)
+        )
     s = s.sort_index()
     if sparse_series:
         # TODO(SparseSeries): remove this and the sparse_series keyword.

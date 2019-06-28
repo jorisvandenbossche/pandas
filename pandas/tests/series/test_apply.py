@@ -92,7 +92,9 @@ class TestSeriesApply:
         s = pd.Series(vals)
         assert s.dtype == "datetime64[ns]"
         # boxed value must be Timestamp instance
-        res = s.apply(lambda x: "{0}_{1}_{2}".format(x.__class__.__name__, x.day, x.tz))
+        res = s.apply(
+            lambda x: "{0}_{1}_{2}".format(x.__class__.__name__, x.day, x.tz)
+        )
         exp = pd.Series(["Timestamp_1_None", "Timestamp_2_None"])
         tm.assert_series_equal(res, exp)
 
@@ -102,7 +104,9 @@ class TestSeriesApply:
         ]
         s = pd.Series(vals)
         assert s.dtype == "datetime64[ns, US/Eastern]"
-        res = s.apply(lambda x: "{0}_{1}_{2}".format(x.__class__.__name__, x.day, x.tz))
+        res = s.apply(
+            lambda x: "{0}_{1}_{2}".format(x.__class__.__name__, x.day, x.tz)
+        )
         exp = pd.Series(["Timestamp_1_US/Eastern", "Timestamp_2_US/Eastern"])
         tm.assert_series_equal(res, exp)
 
@@ -115,23 +119,28 @@ class TestSeriesApply:
         tm.assert_series_equal(res, exp)
 
         # period
-        vals = [pd.Period("2011-01-01", freq="M"), pd.Period("2011-01-02", freq="M")]
+        vals = [
+            pd.Period("2011-01-01", freq="M"),
+            pd.Period("2011-01-02", freq="M"),
+        ]
         s = pd.Series(vals)
         assert s.dtype == "Period[M]"
-        res = s.apply(lambda x: "{0}_{1}".format(x.__class__.__name__, x.freqstr))
+        res = s.apply(
+            lambda x: "{0}_{1}".format(x.__class__.__name__, x.freqstr)
+        )
         exp = pd.Series(["Period_M", "Period_M"])
         tm.assert_series_equal(res, exp)
 
     def test_apply_datetimetz(self):
-        values = pd.date_range("2011-01-01", "2011-01-02", freq="H").tz_localize(
-            "Asia/Tokyo"
-        )
+        values = pd.date_range(
+            "2011-01-01", "2011-01-02", freq="H"
+        ).tz_localize("Asia/Tokyo")
         s = pd.Series(values, name="XX")
 
         result = s.apply(lambda x: x + pd.offsets.Day())
-        exp_values = pd.date_range("2011-01-02", "2011-01-03", freq="H").tz_localize(
-            "Asia/Tokyo"
-        )
+        exp_values = pd.date_range(
+            "2011-01-02", "2011-01-03", freq="H"
+        ).tz_localize("Asia/Tokyo")
         exp = pd.Series(exp_values, name="XX")
         tm.assert_series_equal(result, exp)
 
@@ -161,7 +170,9 @@ class TestSeriesApply:
         with tm.assert_produces_warning(FutureWarning):
             tsdf.A.agg({"foo": ["sum", "mean"]})
 
-    @pytest.mark.parametrize("series", [["1-1", "1-1", np.NaN], ["1-1", "1-2", np.NaN]])
+    @pytest.mark.parametrize(
+        "series", [["1-1", "1-1", np.NaN], ["1-1", "1-2", np.NaN]]
+    )
     def test_apply_categorical_with_nan_values(self, series):
         # GH 20714 bug fixed in: GH 24275
         s = pd.Series(series, dtype="category")
@@ -255,7 +266,9 @@ class TestSeriesAggregate:
             result = s.agg({"foo": ["min", "max"]})
 
         expected = (
-            DataFrame({"foo": [0, 5]}, index=["min", "max"]).unstack().rename("series")
+            DataFrame({"foo": [0, 5]}, index=["min", "max"])
+            .unstack()
+            .rename("series")
         )
         tm.assert_series_equal(result, expected)
 
@@ -268,7 +281,10 @@ class TestSeriesAggregate:
 
         expected = (
             DataFrame(
-                {"foo": [5.0, np.nan, 0.0, np.nan], "bar": [np.nan, 2.5, np.nan, 15.0]},
+                {
+                    "foo": [5.0, np.nan, 0.0, np.nan],
+                    "bar": [np.nan, 2.5, np.nan, 15.0],
+                },
                 columns=["foo", "bar"],
                 index=["max", "mean", "min", "sum"],
             )
@@ -294,10 +310,14 @@ class TestSeriesAggregate:
         result = datetime_series.apply(
             lambda x: Series([x, x ** 2], index=["x", "x^2"])
         )
-        expected = DataFrame({"x": datetime_series, "x^2": datetime_series ** 2})
+        expected = DataFrame(
+            {"x": datetime_series, "x^2": datetime_series ** 2}
+        )
         tm.assert_frame_equal(result, expected)
 
-        result = datetime_series.agg(lambda x: Series([x, x ** 2], index=["x", "x^2"]))
+        result = datetime_series.agg(
+            lambda x: Series([x, x ** 2], index=["x", "x^2"])
+        )
         tm.assert_frame_equal(result, expected)
 
     def test_replicate_describe(self, string_series):
@@ -340,7 +360,9 @@ class TestSeriesAggregate:
 
         # test when mixed w/ callable reducers
         result = s.agg(["size", "count", "mean"])
-        expected = Series(OrderedDict([("size", 3.0), ("count", 2.0), ("mean", 1.5)]))
+        expected = Series(
+            OrderedDict([("size", 3.0), ("count", 2.0), ("mean", 1.5)])
+        )
         assert_series_equal(result[expected.index], expected)
 
     @pytest.mark.parametrize(
@@ -403,7 +425,10 @@ class TestSeriesAggregate:
         chain(
             _get_cython_table_params(
                 Series(),
-                [("cumprod", Series([], Index([]))), ("cumsum", Series([], Index([])))],
+                [
+                    ("cumprod", Series([], Index([]))),
+                    ("cumsum", Series([], Index([]))),
+                ],
             ),
             _get_cython_table_params(
                 Series([np.nan, 1, 2, 3]),
@@ -413,7 +438,8 @@ class TestSeriesAggregate:
                 ],
             ),
             _get_cython_table_params(
-                Series("a b c".split()), [("cumsum", Series(["a", "ab", "abc"]))]
+                Series("a b c".split()),
+                [("cumsum", Series(["a", "ab", "abc"]))],
             ),
         ),
     )
@@ -480,7 +506,9 @@ class TestSeriesMap:
         tm.assert_series_equal(a.map(c), exp)
 
         a = Series(["a", "b", "c", "d"])
-        b = Series([1, 2, 3, 4], index=pd.CategoricalIndex(["b", "c", "d", "e"]))
+        b = Series(
+            [1, 2, 3, 4], index=pd.CategoricalIndex(["b", "c", "d", "e"])
+        )
         c = Series([1, 2, 3, 4], index=Index(["b", "c", "d", "e"]))
 
         exp = Series([np.nan, 1, 2, 3])
@@ -497,7 +525,9 @@ class TestSeriesMap:
         c = Series(["B", "C", "D", "E"], index=Index(["b", "c", "d", "e"]))
 
         exp = Series(
-            pd.Categorical([np.nan, "B", "C", "D"], categories=["B", "C", "D", "E"])
+            pd.Categorical(
+                [np.nan, "B", "C", "D"], categories=["B", "C", "D", "E"]
+            )
         )
         tm.assert_series_equal(a.map(b), exp)
         exp = Series([np.nan, "B", "C", "D"])
@@ -563,7 +593,9 @@ class TestSeriesMap:
         df["labels"] = df["a"].map(label_mappings)
         df["expected_labels"] = pd.Series(["A", "B", "A", "B"], index=df.index)
         # All labels should be filled now
-        tm.assert_series_equal(df["labels"], df["expected_labels"], check_names=False)
+        tm.assert_series_equal(
+            df["labels"], df["expected_labels"], check_names=False
+        )
 
     def test_map_counter(self):
         s = Series(["a", "b", "c"], index=[1, 2, 3])
@@ -613,7 +645,9 @@ class TestSeriesMap:
         s = pd.Series(vals)
         assert s.dtype == "datetime64[ns]"
         # boxed value must be Timestamp instance
-        res = s.map(lambda x: "{0}_{1}_{2}".format(x.__class__.__name__, x.day, x.tz))
+        res = s.map(
+            lambda x: "{0}_{1}_{2}".format(x.__class__.__name__, x.day, x.tz)
+        )
         exp = pd.Series(["Timestamp_1_None", "Timestamp_2_None"])
         tm.assert_series_equal(res, exp)
 
@@ -623,7 +657,9 @@ class TestSeriesMap:
         ]
         s = pd.Series(vals)
         assert s.dtype == "datetime64[ns, US/Eastern]"
-        res = s.map(lambda x: "{0}_{1}_{2}".format(x.__class__.__name__, x.day, x.tz))
+        res = s.map(
+            lambda x: "{0}_{1}_{2}".format(x.__class__.__name__, x.day, x.tz)
+        )
         exp = pd.Series(["Timestamp_1_US/Eastern", "Timestamp_2_US/Eastern"])
         tm.assert_series_equal(res, exp)
 
@@ -636,15 +672,22 @@ class TestSeriesMap:
         tm.assert_series_equal(res, exp)
 
         # period
-        vals = [pd.Period("2011-01-01", freq="M"), pd.Period("2011-01-02", freq="M")]
+        vals = [
+            pd.Period("2011-01-01", freq="M"),
+            pd.Period("2011-01-02", freq="M"),
+        ]
         s = pd.Series(vals)
         assert s.dtype == "Period[M]"
-        res = s.map(lambda x: "{0}_{1}".format(x.__class__.__name__, x.freqstr))
+        res = s.map(
+            lambda x: "{0}_{1}".format(x.__class__.__name__, x.freqstr)
+        )
         exp = pd.Series(["Period_M", "Period_M"])
         tm.assert_series_equal(res, exp)
 
     def test_map_categorical(self):
-        values = pd.Categorical(list("ABBABCD"), categories=list("DCBA"), ordered=True)
+        values = pd.Categorical(
+            list("ABBABCD"), categories=list("DCBA"), ordered=True
+        )
         s = pd.Series(values, name="XX", index=list("abcdefg"))
 
         result = s.map(lambda x: x.lower())
@@ -664,16 +707,16 @@ class TestSeriesMap:
             s.map(lambda x: x, na_action="ignore")
 
     def test_map_datetimetz(self):
-        values = pd.date_range("2011-01-01", "2011-01-02", freq="H").tz_localize(
-            "Asia/Tokyo"
-        )
+        values = pd.date_range(
+            "2011-01-01", "2011-01-02", freq="H"
+        ).tz_localize("Asia/Tokyo")
         s = pd.Series(values, name="XX")
 
         # keep tz
         result = s.map(lambda x: x + pd.offsets.Day())
-        exp_values = pd.date_range("2011-01-02", "2011-01-03", freq="H").tz_localize(
-            "Asia/Tokyo"
-        )
+        exp_values = pd.date_range(
+            "2011-01-02", "2011-01-03", freq="H"
+        ).tz_localize("Asia/Tokyo")
         exp = pd.Series(exp_values, name="XX")
         tm.assert_series_equal(result, exp)
 

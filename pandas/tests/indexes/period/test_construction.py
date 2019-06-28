@@ -6,7 +6,15 @@ from pandas._libs.tslibs.period import IncompatibleFrequency
 from pandas.core.dtypes.dtypes import PeriodDtype
 
 import pandas as pd
-from pandas import Index, Period, PeriodIndex, Series, date_range, offsets, period_range
+from pandas import (
+    Index,
+    Period,
+    PeriodIndex,
+    Series,
+    date_range,
+    offsets,
+    period_range,
+)
 import pandas.core.indexes.period as period
 import pandas.util.testing as tm
 
@@ -17,15 +25,27 @@ class TestPeriodIndex:
 
     def test_construction_base_constructor(self):
         # GH 13664
-        arr = [pd.Period("2011-01", freq="M"), pd.NaT, pd.Period("2011-03", freq="M")]
+        arr = [
+            pd.Period("2011-01", freq="M"),
+            pd.NaT,
+            pd.Period("2011-03", freq="M"),
+        ]
         tm.assert_index_equal(pd.Index(arr), pd.PeriodIndex(arr))
-        tm.assert_index_equal(pd.Index(np.array(arr)), pd.PeriodIndex(np.array(arr)))
+        tm.assert_index_equal(
+            pd.Index(np.array(arr)), pd.PeriodIndex(np.array(arr))
+        )
 
         arr = [np.nan, pd.NaT, pd.Period("2011-03", freq="M")]
         tm.assert_index_equal(pd.Index(arr), pd.PeriodIndex(arr))
-        tm.assert_index_equal(pd.Index(np.array(arr)), pd.PeriodIndex(np.array(arr)))
+        tm.assert_index_equal(
+            pd.Index(np.array(arr)), pd.PeriodIndex(np.array(arr))
+        )
 
-        arr = [pd.Period("2011-01", freq="M"), pd.NaT, pd.Period("2011-03", freq="D")]
+        arr = [
+            pd.Period("2011-01", freq="M"),
+            pd.NaT,
+            pd.Period("2011-03", freq="D"),
+        ]
         tm.assert_index_equal(pd.Index(arr), pd.Index(arr, dtype=object))
 
         tm.assert_index_equal(
@@ -71,7 +91,10 @@ class TestPeriodIndex:
         msg = "Can either instantiate from fields or endpoints, but not both"
         with pytest.raises(ValueError, match=msg):
             PeriodIndex(
-                year=years, month=months, freq="M", start=Period("2007-01", freq="M")
+                year=years,
+                month=months,
+                freq="M",
+                start=Period("2007-01", freq="M"),
             )
 
         years = [2007, 2007, 2007]
@@ -87,7 +110,9 @@ class TestPeriodIndex:
 
     def test_constructor_nano(self):
         idx = period_range(
-            start=Period(ordinal=1, freq="N"), end=Period(ordinal=4, freq="N"), freq="N"
+            start=Period(ordinal=1, freq="N"),
+            end=Period(ordinal=4, freq="N"),
+            freq="N",
         )
         exp = PeriodIndex(
             [
@@ -112,7 +137,9 @@ class TestPeriodIndex:
     def test_constructor_invalid_quarters(self):
         msg = "Quarter must be 1 <= q <= 4"
         with pytest.raises(ValueError, match=msg):
-            PeriodIndex(year=range(2000, 2004), quarter=list(range(4)), freq="Q-DEC")
+            PeriodIndex(
+                year=range(2000, 2004), quarter=list(range(4)), freq="Q-DEC"
+            )
 
     def test_constructor_corner(self):
         msg = "Not enough parameters to construct Period range"
@@ -250,12 +277,23 @@ class TestPeriodIndex:
         tm.assert_index_equal(idx, exp)
 
         idx = PeriodIndex(
-            np.array([Period("2011-01", freq="M"), pd.NaT, Period("2011-01", freq="M")])
+            np.array(
+                [
+                    Period("2011-01", freq="M"),
+                    pd.NaT,
+                    Period("2011-01", freq="M"),
+                ]
+            )
         )
         tm.assert_index_equal(idx, exp)
 
         idx = PeriodIndex(
-            [pd.NaT, pd.NaT, Period("2011-01", freq="M"), Period("2011-01", freq="M")]
+            [
+                pd.NaT,
+                pd.NaT,
+                Period("2011-01", freq="M"),
+                Period("2011-01", freq="M"),
+            ]
         )
         exp = PeriodIndex(["NaT", "NaT", "2011-01", "2011-01"], freq="M")
         tm.assert_index_equal(idx, exp)
@@ -292,26 +330,42 @@ class TestPeriodIndex:
 
         with pytest.raises(period.IncompatibleFrequency, match=msg):
             PeriodIndex(
-                [Period("2011-01", freq="M"), pd.NaT, Period("2011-01", freq="D")]
+                [
+                    Period("2011-01", freq="M"),
+                    pd.NaT,
+                    Period("2011-01", freq="D"),
+                ]
             )
 
         with pytest.raises(period.IncompatibleFrequency, match=msg):
             PeriodIndex(
                 np.array(
-                    [Period("2011-01", freq="M"), pd.NaT, Period("2011-01", freq="D")]
+                    [
+                        Period("2011-01", freq="M"),
+                        pd.NaT,
+                        Period("2011-01", freq="D"),
+                    ]
                 )
             )
 
         # first element is pd.NaT
         with pytest.raises(period.IncompatibleFrequency, match=msg):
             PeriodIndex(
-                [pd.NaT, Period("2011-01", freq="M"), Period("2011-01", freq="D")]
+                [
+                    pd.NaT,
+                    Period("2011-01", freq="M"),
+                    Period("2011-01", freq="D"),
+                ]
             )
 
         with pytest.raises(period.IncompatibleFrequency, match=msg):
             PeriodIndex(
                 np.array(
-                    [pd.NaT, Period("2011-01", freq="M"), Period("2011-01", freq="D")]
+                    [
+                        pd.NaT,
+                        Period("2011-01", freq="M"),
+                        Period("2011-01", freq="D"),
+                    ]
                 )
             )
 
@@ -324,7 +378,9 @@ class TestPeriodIndex:
         exp = PeriodIndex(["NaT", "NaT", "2011-01"], freq="M")
         tm.assert_index_equal(idx, exp)
 
-        idx = PeriodIndex([Period("2011-01-01", freq="D"), pd.NaT, "2012-01-01"])
+        idx = PeriodIndex(
+            [Period("2011-01-01", freq="D"), pd.NaT, "2012-01-01"]
+        )
         exp = PeriodIndex(["2011-01-01", "NaT", "2012-01-01"], freq="D")
         tm.assert_index_equal(idx, exp)
 
@@ -376,13 +432,21 @@ class TestPeriodIndex:
         with tm.assert_produces_warning(warning):
             # must be the same, but for sure...
             pidx = func(start="2014-01", freq="2M", periods=4)
-        expected = PeriodIndex(["2014-01", "2014-03", "2014-05", "2014-07"], freq="2M")
+        expected = PeriodIndex(
+            ["2014-01", "2014-03", "2014-05", "2014-07"], freq="2M"
+        )
         tm.assert_index_equal(pidx, expected)
 
         with tm.assert_produces_warning(warning):
             pidx = func(start="2014-01-02", end="2014-01-15", freq="3D")
         expected = PeriodIndex(
-            ["2014-01-02", "2014-01-05", "2014-01-08", "2014-01-11", "2014-01-14"],
+            [
+                "2014-01-02",
+                "2014-01-05",
+                "2014-01-08",
+                "2014-01-11",
+                "2014-01-14",
+            ],
             freq="3D",
         )
         tm.assert_index_equal(pidx, expected)
@@ -390,7 +454,8 @@ class TestPeriodIndex:
         with tm.assert_produces_warning(warning):
             pidx = func(end="2014-01-01 17:00", freq="4H", periods=3)
         expected = PeriodIndex(
-            ["2014-01-01 09:00", "2014-01-01 13:00", "2014-01-01 17:00"], freq="4H"
+            ["2014-01-01 09:00", "2014-01-01 13:00", "2014-01-01 17:00"],
+            freq="4H",
         )
         tm.assert_index_equal(pidx, expected)
 
@@ -411,18 +476,22 @@ class TestPeriodIndex:
     def test_constructor_freq_mult_dti_compat(self, mult, freq):
         freqstr = str(mult) + freq
         pidx = period_range(start="2014-04-01", freq=freqstr, periods=10)
-        expected = date_range(start="2014-04-01", freq=freqstr, periods=10).to_period(
-            freqstr
-        )
+        expected = date_range(
+            start="2014-04-01", freq=freqstr, periods=10
+        ).to_period(freqstr)
         tm.assert_index_equal(pidx, expected)
 
     def test_constructor_freq_combined(self):
         for freq in ["1D1H", "1H1D"]:
             pidx = PeriodIndex(["2016-01-01", "2016-01-02"], freq=freq)
-            expected = PeriodIndex(["2016-01-01 00:00", "2016-01-02 00:00"], freq="25H")
+            expected = PeriodIndex(
+                ["2016-01-01 00:00", "2016-01-02 00:00"], freq="25H"
+            )
         for freq in ["1D1H", "1H1D"]:
             pidx = period_range(start="2016-01-01", periods=2, freq=freq)
-            expected = PeriodIndex(["2016-01-01 00:00", "2016-01-02 01:00"], freq="25H")
+            expected = PeriodIndex(
+                ["2016-01-01 00:00", "2016-01-02 01:00"], freq="25H"
+            )
             tm.assert_index_equal(pidx, expected)
 
     def test_constructor_range_based_deprecated(self):
@@ -554,9 +623,13 @@ class TestSeriesPeriod:
     def test_constructor_cant_cast_period(self):
         msg = "Cannot cast PeriodArray to dtype float64"
         with pytest.raises(TypeError, match=msg):
-            Series(period_range("2000-01-01", periods=10, freq="D"), dtype=float)
+            Series(
+                period_range("2000-01-01", periods=10, freq="D"), dtype=float
+            )
 
     def test_constructor_cast_object(self):
-        s = Series(period_range("1/1/2000", periods=10), dtype=PeriodDtype("D"))
+        s = Series(
+            period_range("1/1/2000", periods=10), dtype=PeriodDtype("D")
+        )
         exp = Series(period_range("1/1/2000", periods=10))
         tm.assert_series_equal(s, exp)

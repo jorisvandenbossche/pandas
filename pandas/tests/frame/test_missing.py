@@ -126,7 +126,10 @@ class TestDataFrameMissingData:
         assert_frame_equal(dropped, expected)
 
         # bad input
-        msg = "No axis named 3 for object type" " <class 'pandas.core.frame.DataFrame'>"
+        msg = (
+            "No axis named 3 for object type"
+            " <class 'pandas.core.frame.DataFrame'>"
+        )
         with pytest.raises(ValueError, match=msg):
             df.dropna(axis=3)
 
@@ -211,7 +214,8 @@ class TestDataFrameMissingData:
         padded = datetime_frame.fillna(method="pad")
         assert np.isnan(padded.loc[padded.index[:5], "A"]).all()
         assert (
-            padded.loc[padded.index[-5:], "A"] == padded.loc[padded.index[-5], "A"]
+            padded.loc[padded.index[-5:], "A"]
+            == padded.loc[padded.index[-5], "A"]
         ).all()
 
         msg = "Must specify a fill 'value' or 'method'"
@@ -251,12 +255,20 @@ class TestDataFrameMissingData:
     def test_fillna_different_dtype(self):
         # with different dtype (GH#3386)
         df = DataFrame(
-            [["a", "a", np.nan, "a"], ["b", "b", np.nan, "b"], ["c", "c", np.nan, "c"]]
+            [
+                ["a", "a", np.nan, "a"],
+                ["b", "b", np.nan, "b"],
+                ["c", "c", np.nan, "c"],
+            ]
         )
 
         result = df.fillna({2: "foo"})
         expected = DataFrame(
-            [["a", "a", "foo", "a"], ["b", "b", "foo", "b"], ["c", "c", "foo", "c"]]
+            [
+                ["a", "a", "foo", "a"],
+                ["b", "b", "foo", "b"],
+                ["c", "c", "foo", "c"],
+            ]
         )
         assert_frame_equal(result, expected)
 
@@ -286,14 +298,18 @@ class TestDataFrameMissingData:
         )
 
         expected = df.copy()
-        expected["Date"] = expected["Date"].fillna(df.loc[df.index[0], "Date2"])
+        expected["Date"] = expected["Date"].fillna(
+            df.loc[df.index[0], "Date2"]
+        )
         result = df.fillna(value={"Date": df["Date2"]})
         assert_frame_equal(result, expected)
 
     def test_fillna_tzaware(self):
         # with timezone
         # GH#15855
-        df = pd.DataFrame({"A": [pd.Timestamp("2012-11-11 00:00:00+01:00"), pd.NaT]})
+        df = pd.DataFrame(
+            {"A": [pd.Timestamp("2012-11-11 00:00:00+01:00"), pd.NaT]}
+        )
         exp = pd.DataFrame(
             {
                 "A": [
@@ -304,7 +320,9 @@ class TestDataFrameMissingData:
         )
         assert_frame_equal(df.fillna(method="pad"), exp)
 
-        df = pd.DataFrame({"A": [pd.NaT, pd.Timestamp("2012-11-11 00:00:00+01:00")]})
+        df = pd.DataFrame(
+            {"A": [pd.NaT, pd.Timestamp("2012-11-11 00:00:00+01:00")]}
+        )
         exp = pd.DataFrame(
             {
                 "A": [
@@ -352,7 +370,9 @@ class TestDataFrameMissingData:
         res = df.fillna(value={"cats": 3, "vals": "b"})
         tm.assert_frame_equal(res, df_exp_fill)
 
-        with pytest.raises(ValueError, match=("fill value must " "be in categories")):
+        with pytest.raises(
+            ValueError, match=("fill value must " "be in categories")
+        ):
             df.fillna(value={"cats": 4, "vals": "c"})
 
         res = df.fillna(method="pad")
@@ -383,7 +403,9 @@ class TestDataFrameMissingData:
         df = DataFrame({"cats": cat, "vals": val})
         res = df.fillna(df.median())
         v_exp = [np.nan, np.nan, np.nan]
-        df_exp = DataFrame({"cats": [2, 2, 2], "vals": v_exp}, dtype="category")
+        df_exp = DataFrame(
+            {"cats": [2, 2, 2], "vals": v_exp}, dtype="category"
+        )
         tm.assert_frame_equal(res, df_exp)
 
         result = df.cats.fillna(np.nan)
@@ -392,7 +414,13 @@ class TestDataFrameMissingData:
         tm.assert_series_equal(result, df.vals)
 
         idx = pd.DatetimeIndex(
-            ["2011-01-01 09:00", "2016-01-01 23:45", "2011-01-01 09:00", pd.NaT, pd.NaT]
+            [
+                "2011-01-01 09:00",
+                "2016-01-01 23:45",
+                "2011-01-01 09:00",
+                pd.NaT,
+                pd.NaT,
+            ]
         )
         df = DataFrame({"a": Categorical(idx)})
         tm.assert_frame_equal(df.fillna(value=pd.NaT), df)
@@ -473,7 +501,11 @@ class TestDataFrameMissingData:
         df = pd.DataFrame(
             {
                 "A": [-1, -2, np.nan],
-                "B": [pd.Timestamp("2013-01-01"), pd.Timestamp("2013-01-02"), pd.NaT],
+                "B": [
+                    pd.Timestamp("2013-01-01"),
+                    pd.Timestamp("2013-01-02"),
+                    pd.NaT,
+                ],
                 "C": ["foo", "bar", None],
                 "D": ["foo2", "bar2", None],
             },
@@ -483,7 +515,11 @@ class TestDataFrameMissingData:
         expected = pd.DataFrame(
             {
                 "A": [-1, -2, "?"],
-                "B": [pd.Timestamp("2013-01-01"), pd.Timestamp("2013-01-02"), "?"],
+                "B": [
+                    pd.Timestamp("2013-01-01"),
+                    pd.Timestamp("2013-01-02"),
+                    "?",
+                ],
                 "C": ["foo", "bar", "?"],
                 "D": ["foo2", "bar2", "?"],
             },
@@ -669,7 +705,10 @@ class TestDataFrameMissingData:
 
     def test_fillna_invalid_value(self, float_frame):
         # list
-        msg = '"value" parameter must be a scalar or dict, but you passed' ' a "{}"'
+        msg = (
+            '"value" parameter must be a scalar or dict, but you passed'
+            ' a "{}"'
+        )
         with pytest.raises(TypeError, match=msg.format("list")):
             float_frame.fillna([1, 2])
         # tuple
@@ -780,7 +819,10 @@ class TestDataFrameInterpolate:
     @td.skip_if_no_scipy
     def test_interp_various(self):
         df = DataFrame(
-            {"A": [1, 2, np.nan, 4, 5, np.nan, 7], "C": [1, 2, 3, 5, 8, 13, 21]}
+            {
+                "A": [1, 2, np.nan, 4, 5, np.nan, 7],
+                "C": [1, 2, 3, 5, 8, 13, 21],
+            }
         )
         df = df.set_index("C")
         expected = df.copy()
@@ -819,7 +861,10 @@ class TestDataFrameInterpolate:
     @td.skip_if_no_scipy
     def test_interp_alt_scipy(self):
         df = DataFrame(
-            {"A": [1, 2, np.nan, 4, 5, np.nan, 7], "C": [1, 2, 3, 5, 8, 13, 21]}
+            {
+                "A": [1, 2, np.nan, 4, 5, np.nan, 7],
+                "C": [1, 2, 3, 5, 8, 13, 21],
+            }
         )
         result = df.interpolate(method="barycentric")
         expected = df.copy()
@@ -882,7 +927,10 @@ class TestDataFrameInterpolate:
     )
     def test_interp_leading_nans(self, check_scipy):
         df = DataFrame(
-            {"A": [np.nan, np.nan, 0.5, 0.25, 0], "B": [np.nan, -3, -3.5, np.nan, -4]}
+            {
+                "A": [np.nan, np.nan, 0.5, 0.25, 0],
+                "B": [np.nan, -3, -3.5, np.nan, -4],
+            }
         )
         result = df.interpolate()
         expected = df.copy()
@@ -931,7 +979,11 @@ class TestDataFrameInterpolate:
     def test_interp_inplace_row(self):
         # GH 10395
         result = DataFrame(
-            {"a": [1.0, 2.0, 3.0, 4.0], "b": [np.nan, 2.0, 3.0, 4.0], "c": [3, 2, 2, 2]}
+            {
+                "a": [1.0, 2.0, 3.0, 4.0],
+                "b": [np.nan, 2.0, 3.0, 4.0],
+                "c": [3, 2, 2, 2],
+            }
         )
         expected = result.interpolate(method="linear", axis=1, inplace=False)
         result.interpolate(method="linear", axis=1, inplace=True)

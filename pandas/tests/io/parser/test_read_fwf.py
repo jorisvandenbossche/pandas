@@ -337,7 +337,9 @@ def test_fwf_comment(comment):
     colspecs = [(0, 3), (4, 9), (9, 25)]
     expected = DataFrame([[1, 2.0, 4], [5, np.nan, 10.0]])
 
-    result = read_fwf(StringIO(data), colspecs=colspecs, header=None, comment=comment)
+    result = read_fwf(
+        StringIO(data), colspecs=colspecs, header=None, comment=comment
+    )
     tm.assert_almost_equal(result, expected)
 
 
@@ -501,7 +503,9 @@ def test_variable_width_unicode():
     tm.assert_frame_equal(result, expected)
 
 
-@pytest.mark.parametrize("dtype", [dict(), {"a": "float64", "b": str, "c": "int32"}])
+@pytest.mark.parametrize(
+    "dtype", [dict(), {"a": "float64", "b": str, "c": "int32"}]
+)
 def test_dtype(dtype):
     data = """ a    b    c
 1    2    3.2
@@ -530,7 +534,9 @@ DataCol1   DataCol2
    101.6      956.1
 """.strip()
     skiprows = 2
-    expected = read_csv(StringIO(data), skiprows=skiprows, delim_whitespace=True)
+    expected = read_csv(
+        StringIO(data), skiprows=skiprows, delim_whitespace=True
+    )
 
     result = read_fwf(StringIO(data), skiprows=skiprows)
     tm.assert_frame_equal(result, expected)
@@ -545,7 +551,9 @@ Once more to be skipped
 456  78   9      456
 """.strip()
     skiprows = [0, 2]
-    expected = read_csv(StringIO(data), skiprows=skiprows, delim_whitespace=True)
+    expected = read_csv(
+        StringIO(data), skiprows=skiprows, delim_whitespace=True
+    )
 
     result = read_fwf(StringIO(data), skiprows=skiprows)
     tm.assert_frame_equal(result, expected)
@@ -574,7 +582,11 @@ def test_whitespace_preservation():
  a bbb
  ccdd """
     result = read_fwf(
-        StringIO(fwf_data), widths=[3, 3], header=header, skiprows=[0], delimiter="\n\t"
+        StringIO(fwf_data),
+        widths=[3, 3],
+        header=header,
+        skiprows=[0],
+        delimiter="\n\t",
     )
     expected = read_csv(StringIO(csv_data), header=header)
     tm.assert_frame_equal(result, expected)
@@ -589,7 +601,9 @@ cc,dd"""
     fwf_data = """
 a \tbbb
 cc\tdd """
-    result = read_fwf(StringIO(fwf_data), widths=[3, 3], header=header, skiprows=[0])
+    result = read_fwf(
+        StringIO(fwf_data), widths=[3, 3], header=header, skiprows=[0]
+    )
     expected = read_csv(StringIO(csv_data), header=header)
     tm.assert_frame_equal(result, expected)
 

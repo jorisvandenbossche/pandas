@@ -51,7 +51,9 @@ class PandasDelegate:
     """
 
     def _delegate_property_get(self, name, *args, **kwargs):
-        raise TypeError("You cannot access the " "property {name}".format(name=name))
+        raise TypeError(
+            "You cannot access the " "property {name}".format(name=name)
+        )
 
     def _delegate_property_set(self, name, value, *args, **kwargs):
         raise TypeError("The property {name} cannot be set".format(name=name))
@@ -60,7 +62,9 @@ class PandasDelegate:
         raise TypeError("You cannot call method {name}".format(name=name))
 
     @classmethod
-    def _add_delegate_accessors(cls, delegate, accessors, typ, overwrite=False):
+    def _add_delegate_accessors(
+        cls, delegate, accessors, typ, overwrite=False
+    ):
         """
         Add accessors to cls from the delegate class.
 
@@ -138,7 +142,9 @@ def delegate_names(delegate, accessors, typ, overwrite=False):
     """
 
     def add_delegate_accessors(cls):
-        cls._add_delegate_accessors(delegate, accessors, typ, overwrite=overwrite)
+        cls._add_delegate_accessors(
+            delegate, accessors, typ, overwrite=overwrite
+        )
         return cls
 
     return add_delegate_accessors

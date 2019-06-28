@@ -24,7 +24,9 @@ def test_invalid_total_length_max_length_one():
     )
 
     with pytest.raises(TypeError, match=msg):
-        validate_args_and_kwargs(_fname, args, kwargs, min_fname_arg_count, compat_args)
+        validate_args_and_kwargs(
+            _fname, args, kwargs, min_fname_arg_count, compat_args
+        )
 
 
 def test_invalid_total_length_max_length_multiple():
@@ -44,10 +46,14 @@ def test_invalid_total_length_max_length_multiple():
     )
 
     with pytest.raises(TypeError, match=msg):
-        validate_args_and_kwargs(_fname, args, kwargs, min_fname_arg_count, compat_args)
+        validate_args_and_kwargs(
+            _fname, args, kwargs, min_fname_arg_count, compat_args
+        )
 
 
-@pytest.mark.parametrize("args,kwargs", [((), {"foo": -5, "bar": 2}), ((-5, 2), {})])
+@pytest.mark.parametrize(
+    "args,kwargs", [((), {"foo": -5, "bar": 2}), ((-5, 2), {})]
+)
 def test_missing_args_or_kwargs(args, kwargs):
     bad_arg = "bar"
     min_fname_arg_count = 2
@@ -58,11 +64,15 @@ def test_missing_args_or_kwargs(args, kwargs):
 
     msg = (
         r"the '{arg}' parameter is not supported "
-        r"in the pandas implementation of {func}\(\)".format(arg=bad_arg, func=_fname)
+        r"in the pandas implementation of {func}\(\)".format(
+            arg=bad_arg, func=_fname
+        )
     )
 
     with pytest.raises(ValueError, match=msg):
-        validate_args_and_kwargs(_fname, args, kwargs, min_fname_arg_count, compat_args)
+        validate_args_and_kwargs(
+            _fname, args, kwargs, min_fname_arg_count, compat_args
+        )
 
 
 def test_duplicate_argument():
@@ -76,12 +86,15 @@ def test_duplicate_argument():
     kwargs = {"foo": None, "bar": None}
     args = (None,)  # duplicate value for "foo"
 
-    msg = r"{fname}\(\) got multiple values for keyword " r"argument '{arg}'".format(
-        fname=_fname, arg="foo"
+    msg = (
+        r"{fname}\(\) got multiple values for keyword "
+        r"argument '{arg}'".format(fname=_fname, arg="foo")
     )
 
     with pytest.raises(TypeError, match=msg):
-        validate_args_and_kwargs(_fname, args, kwargs, min_fname_arg_count, compat_args)
+        validate_args_and_kwargs(
+            _fname, args, kwargs, min_fname_arg_count, compat_args
+        )
 
 
 def test_validation():
@@ -95,4 +108,6 @@ def test_validation():
     args = (1, None)
     min_fname_arg_count = 2
 
-    validate_args_and_kwargs(_fname, args, kwargs, min_fname_arg_count, compat_args)
+    validate_args_and_kwargs(
+        _fname, args, kwargs, min_fname_arg_count, compat_args
+    )

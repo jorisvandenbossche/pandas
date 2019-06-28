@@ -5,7 +5,14 @@ import numpy as np
 import pytest
 
 import pandas as pd
-from pandas import DataFrame, DatetimeIndex, Index, Timestamp, date_range, offsets
+from pandas import (
+    DataFrame,
+    DatetimeIndex,
+    Index,
+    Timestamp,
+    date_range,
+    offsets,
+)
 import pandas.util.testing as tm
 from pandas.util.testing import assert_almost_equal
 
@@ -41,7 +48,9 @@ class TestDatetimeIndex:
             ts = pd.Series(np.random.randn(n), index=idx)
             i = np.arange(start, n, step)
 
-            tm.assert_numpy_array_equal(ts.index.get_loc(key), i, check_dtype=False)
+            tm.assert_numpy_array_equal(
+                ts.index.get_loc(key), i, check_dtype=False
+            )
             tm.assert_series_equal(ts[key], ts.iloc[i])
 
             left, right = ts.copy(), ts.copy()
@@ -138,7 +147,10 @@ class TestDatetimeIndex:
             assert result == expected
 
         index = date_range(
-            "2012-01-01", periods=3, freq="H", tz=dateutil.tz.tzoffset(None, -28800)
+            "2012-01-01",
+            periods=3,
+            freq="H",
+            tz=dateutil.tz.tzoffset(None, -28800),
         )
 
         for i, ts in enumerate(index):
@@ -149,7 +161,10 @@ class TestDatetimeIndex:
 
         # 9100
         index = pd.DatetimeIndex(
-            ["2014-12-01 03:32:39.987000-08:00", "2014-12-01 04:12:34.987000-08:00"]
+            [
+                "2014-12-01 03:32:39.987000-08:00",
+                "2014-12-01 04:12:34.987000-08:00",
+            ]
         )
         for i, ts in enumerate(index):
             result = ts
@@ -181,7 +196,9 @@ class TestDatetimeIndex:
 
     def test_string_index_series_name_converted(self):
         # #1644
-        df = DataFrame(np.random.randn(10, 4), index=date_range("1/1/2000", periods=10))
+        df = DataFrame(
+            np.random.randn(10, 4), index=date_range("1/1/2000", periods=10)
+        )
 
         result = df.loc["1/3/2000"]
         assert result.name == df.index[2]
@@ -239,7 +256,9 @@ class TestDatetimeIndex:
         tm.assert_index_equal(result, expected)
 
     def test_groupby_function_tuple_1677(self):
-        df = DataFrame(np.random.rand(100), index=date_range("1/1/2000", periods=100))
+        df = DataFrame(
+            np.random.rand(100), index=date_range("1/1/2000", periods=100)
+        )
         monthly_group = df.groupby(lambda x: (x.year, x.month))
 
         result = monthly_group.mean()
@@ -299,7 +318,9 @@ class TestDatetimeIndex:
         index = pd.DatetimeIndex(dt, freq=freq, name="time")
         self.assert_index_parameters(index)
 
-        new_index = pd.date_range(start=index[0], end=index[-1], freq=index.freq)
+        new_index = pd.date_range(
+            start=index[0], end=index[-1], freq=index.freq
+        )
         self.assert_index_parameters(new_index)
 
     def test_join_with_period_index(self, join_type):
@@ -378,14 +399,18 @@ class TestDatetimeIndex:
 
     def test_factorize_dst(self):
         # GH 13750
-        idx = pd.date_range("2016-11-06", freq="H", periods=12, tz="US/Eastern")
+        idx = pd.date_range(
+            "2016-11-06", freq="H", periods=12, tz="US/Eastern"
+        )
 
         for obj in [idx, pd.Series(idx)]:
             arr, res = obj.factorize()
             tm.assert_numpy_array_equal(arr, np.arange(12, dtype=np.intp))
             tm.assert_index_equal(res, idx)
 
-        idx = pd.date_range("2016-06-13", freq="H", periods=12, tz="US/Eastern")
+        idx = pd.date_range(
+            "2016-06-13", freq="H", periods=12, tz="US/Eastern"
+        )
 
         for obj in [idx, pd.Series(idx)]:
             arr, res = obj.factorize()
@@ -423,7 +448,9 @@ class TestDatetimeIndex:
         with tm.assert_produces_warning(None):
             result = np.asarray(idx, dtype=object)
 
-        expected = np.array([pd.Timestamp("2000-01-01"), pd.Timestamp("2000-01-02")])
+        expected = np.array(
+            [pd.Timestamp("2000-01-01"), pd.Timestamp("2000-01-02")]
+        )
         tm.assert_numpy_array_equal(result, expected)
 
     def test_asarray_tz_aware(self):
@@ -444,7 +471,10 @@ class TestDatetimeIndex:
 
         # Future behavior with no warning
         expected = np.array(
-            [pd.Timestamp("2000-01-01", tz=tz), pd.Timestamp("2000-01-02", tz=tz)]
+            [
+                pd.Timestamp("2000-01-01", tz=tz),
+                pd.Timestamp("2000-01-02", tz=tz),
+            ]
         )
         with tm.assert_produces_warning(None):
             result = np.asarray(idx, dtype=object)

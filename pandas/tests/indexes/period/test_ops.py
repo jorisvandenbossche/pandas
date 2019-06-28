@@ -11,7 +11,9 @@ import pandas.util.testing as tm
 class TestPeriodIndexOps(Ops):
     def setup_method(self, method):
         super().setup_method(method)
-        mask = lambda x: (isinstance(x, DatetimeIndex) or isinstance(x, PeriodIndex))
+        mask = lambda x: (
+            isinstance(x, DatetimeIndex) or isinstance(x, PeriodIndex)
+        )
         self.is_valid_objs = [o for o in self.objs if mask(o)]
         self.not_valid_objs = [o for o in self.objs if not mask(o)]
 
@@ -44,7 +46,9 @@ class TestPeriodIndexOps(Ops):
         # GH 7735
         idx = pd.period_range("2011-01-01 09:00", freq="H", periods=10)
         # create repeated values, 'n'th element is repeated by n+1 times
-        idx = PeriodIndex(np.repeat(idx._values, range(1, len(idx) + 1)), freq="H")
+        idx = PeriodIndex(
+            np.repeat(idx._values, range(1, len(idx) + 1)), freq="H"
+        )
 
         exp_idx = PeriodIndex(
             [
@@ -81,13 +85,17 @@ class TestPeriodIndexOps(Ops):
             freq="H",
         )
 
-        exp_idx = PeriodIndex(["2013-01-01 09:00", "2013-01-01 08:00"], freq="H")
+        exp_idx = PeriodIndex(
+            ["2013-01-01 09:00", "2013-01-01 08:00"], freq="H"
+        )
         expected = Series([3, 2], index=exp_idx)
 
         for obj in [idx, Series(idx)]:
             tm.assert_series_equal(obj.value_counts(), expected)
 
-        exp_idx = PeriodIndex(["2013-01-01 09:00", "2013-01-01 08:00", NaT], freq="H")
+        exp_idx = PeriodIndex(
+            ["2013-01-01 09:00", "2013-01-01 08:00", NaT], freq="H"
+        )
         expected = Series([3, 2, 1], index=exp_idx)
 
         for obj in [idx, Series(idx)]:
@@ -109,7 +117,9 @@ class TestPeriodIndexOps(Ops):
 
     def test_drop_duplicates(self):
         # to check Index/Series compat
-        base = pd.period_range("2011-01-01", "2011-01-31", freq="D", name="idx")
+        base = pd.period_range(
+            "2011-01-01", "2011-01-31", freq="D", name="idx"
+        )
         idx = base.append(base[:5])
 
         res = idx.drop_duplicates()
@@ -147,12 +157,18 @@ class TestPeriodIndexOps(Ops):
 
             ordered, indexer = idx.sort_values(return_indexer=True)
             tm.assert_index_equal(ordered, idx)
-            tm.assert_numpy_array_equal(indexer, np.array([0, 1, 2]), check_dtype=False)
+            tm.assert_numpy_array_equal(
+                indexer, np.array([0, 1, 2]), check_dtype=False
+            )
             _check_freq(ordered, idx)
 
-            ordered, indexer = idx.sort_values(return_indexer=True, ascending=False)
+            ordered, indexer = idx.sort_values(
+                return_indexer=True, ascending=False
+            )
             tm.assert_index_equal(ordered, idx[::-1])
-            tm.assert_numpy_array_equal(indexer, np.array([2, 1, 0]), check_dtype=False)
+            tm.assert_numpy_array_equal(
+                indexer, np.array([2, 1, 0]), check_dtype=False
+            )
             _check_freq(ordered, idx[::-1])
 
         pidx = PeriodIndex(
@@ -180,29 +196,39 @@ class TestPeriodIndexOps(Ops):
             tm.assert_numpy_array_equal(indexer, exp, check_dtype=False)
             _check_freq(ordered, idx)
 
-            ordered, indexer = idx.sort_values(return_indexer=True, ascending=False)
+            ordered, indexer = idx.sort_values(
+                return_indexer=True, ascending=False
+            )
             tm.assert_index_equal(ordered, expected[::-1])
 
             exp = np.array([2, 1, 3, 4, 0])
             tm.assert_numpy_array_equal(indexer, exp, check_dtype=False)
             _check_freq(ordered, idx)
 
-        pidx = PeriodIndex(["2011", "2013", "NaT", "2011"], name="pidx", freq="D")
+        pidx = PeriodIndex(
+            ["2011", "2013", "NaT", "2011"], name="pidx", freq="D"
+        )
 
         result = pidx.sort_values()
-        expected = PeriodIndex(["NaT", "2011", "2011", "2013"], name="pidx", freq="D")
+        expected = PeriodIndex(
+            ["NaT", "2011", "2011", "2013"], name="pidx", freq="D"
+        )
         tm.assert_index_equal(result, expected)
         assert result.freq == "D"
 
         result = pidx.sort_values(ascending=False)
-        expected = PeriodIndex(["2013", "2011", "2011", "NaT"], name="pidx", freq="D")
+        expected = PeriodIndex(
+            ["2013", "2011", "2011", "NaT"], name="pidx", freq="D"
+        )
         tm.assert_index_equal(result, expected)
         assert result.freq == "D"
 
     def test_order(self):
         for freq in ["D", "2D", "4D"]:
             idx = PeriodIndex(
-                ["2011-01-01", "2011-01-02", "2011-01-03"], freq=freq, name="idx"
+                ["2011-01-01", "2011-01-02", "2011-01-03"],
+                freq=freq,
+                name="idx",
             )
 
             ordered = idx.sort_values()
@@ -217,44 +243,78 @@ class TestPeriodIndexOps(Ops):
 
             ordered, indexer = idx.sort_values(return_indexer=True)
             tm.assert_index_equal(ordered, idx)
-            tm.assert_numpy_array_equal(indexer, np.array([0, 1, 2]), check_dtype=False)
+            tm.assert_numpy_array_equal(
+                indexer, np.array([0, 1, 2]), check_dtype=False
+            )
             assert ordered.freq == idx.freq
             assert ordered.freq == freq
 
-            ordered, indexer = idx.sort_values(return_indexer=True, ascending=False)
+            ordered, indexer = idx.sort_values(
+                return_indexer=True, ascending=False
+            )
             expected = idx[::-1]
             tm.assert_index_equal(ordered, expected)
-            tm.assert_numpy_array_equal(indexer, np.array([2, 1, 0]), check_dtype=False)
+            tm.assert_numpy_array_equal(
+                indexer, np.array([2, 1, 0]), check_dtype=False
+            )
             assert ordered.freq == expected.freq
             assert ordered.freq == freq
 
         idx1 = PeriodIndex(
-            ["2011-01-01", "2011-01-03", "2011-01-05", "2011-01-02", "2011-01-01"],
+            [
+                "2011-01-01",
+                "2011-01-03",
+                "2011-01-05",
+                "2011-01-02",
+                "2011-01-01",
+            ],
             freq="D",
             name="idx1",
         )
         exp1 = PeriodIndex(
-            ["2011-01-01", "2011-01-01", "2011-01-02", "2011-01-03", "2011-01-05"],
+            [
+                "2011-01-01",
+                "2011-01-01",
+                "2011-01-02",
+                "2011-01-03",
+                "2011-01-05",
+            ],
             freq="D",
             name="idx1",
         )
 
         idx2 = PeriodIndex(
-            ["2011-01-01", "2011-01-03", "2011-01-05", "2011-01-02", "2011-01-01"],
+            [
+                "2011-01-01",
+                "2011-01-03",
+                "2011-01-05",
+                "2011-01-02",
+                "2011-01-01",
+            ],
             freq="D",
             name="idx2",
         )
         exp2 = PeriodIndex(
-            ["2011-01-01", "2011-01-01", "2011-01-02", "2011-01-03", "2011-01-05"],
+            [
+                "2011-01-01",
+                "2011-01-01",
+                "2011-01-02",
+                "2011-01-03",
+                "2011-01-05",
+            ],
             freq="D",
             name="idx2",
         )
 
         idx3 = PeriodIndex(
-            [NaT, "2011-01-03", "2011-01-05", "2011-01-02", NaT], freq="D", name="idx3"
+            [NaT, "2011-01-03", "2011-01-05", "2011-01-02", NaT],
+            freq="D",
+            name="idx3",
         )
         exp3 = PeriodIndex(
-            [NaT, NaT, "2011-01-02", "2011-01-03", "2011-01-05"], freq="D", name="idx3"
+            [NaT, NaT, "2011-01-02", "2011-01-03", "2011-01-05"],
+            freq="D",
+            name="idx3",
         )
 
         for idx, expected in [(idx1, exp1), (idx2, exp2), (idx3, exp3)]:
@@ -273,7 +333,9 @@ class TestPeriodIndexOps(Ops):
             tm.assert_numpy_array_equal(indexer, exp, check_dtype=False)
             assert ordered.freq == "D"
 
-            ordered, indexer = idx.sort_values(return_indexer=True, ascending=False)
+            ordered, indexer = idx.sort_values(
+                return_indexer=True, ascending=False
+            )
             tm.assert_index_equal(ordered, expected[::-1])
 
             exp = np.array([2, 1, 3, 4, 0])
@@ -300,7 +362,9 @@ class TestPeriodIndexOps(Ops):
 
         tm.assert_numpy_array_equal(idx._isnan, np.array([False, True]))
         assert idx.hasnans is True
-        tm.assert_numpy_array_equal(idx._nan_idxs, np.array([1], dtype=np.intp))
+        tm.assert_numpy_array_equal(
+            idx._nan_idxs, np.array([1], dtype=np.intp)
+        )
 
     @pytest.mark.parametrize("freq", ["D", "M"])
     def test_equals(self, freq):

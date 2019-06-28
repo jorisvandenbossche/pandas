@@ -101,7 +101,9 @@ class TestTimedeltas:
 
         with tm.assert_produces_warning(FutureWarning):
             # Test with lists as input when box=false
-            expected = np.array(np.arange(3) * 1000000000, dtype="timedelta64[ns]")
+            expected = np.array(
+                np.arange(3) * 1000000000, dtype="timedelta64[ns]"
+            )
             result = to_timedelta(range(3), unit="s", box=False)
             tm.assert_numpy_array_equal(expected, result)
 
@@ -168,7 +170,9 @@ class TestTimedeltas:
         )
 
         invalid_data = pd.Index(["apple", "1 days"])
-        tm.assert_index_equal(invalid_data, to_timedelta(invalid_data, errors="ignore"))
+        tm.assert_index_equal(
+            invalid_data, to_timedelta(invalid_data, errors="ignore")
+        )
 
         invalid_data = Series(["apple", "1 days"])
         tm.assert_series_equal(

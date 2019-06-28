@@ -37,7 +37,9 @@ class TestPeriodIndex:
         s = df.iloc[:2, 0]
 
         res = s.index.join(df.columns, how="outer")
-        expected = Index([s.index[0], s.index[1], df.columns[0], df.columns[1]], object)
+        expected = Index(
+            [s.index[0], s.index[1], df.columns[0], df.columns[1]], object
+        )
         tm.assert_index_equal(res, expected)
 
     @pytest.mark.parametrize("sort", [None, False])
@@ -88,10 +90,12 @@ class TestPeriodIndex:
         )
 
         rng5 = pd.PeriodIndex(
-            ["2000-01-01 09:01", "2000-01-01 09:03", "2000-01-01 09:05"], freq="T"
+            ["2000-01-01 09:01", "2000-01-01 09:03", "2000-01-01 09:05"],
+            freq="T",
         )
         other5 = pd.PeriodIndex(
-            ["2000-01-01 09:01", "2000-01-01 09:05" "2000-01-01 09:08"], freq="T"
+            ["2000-01-01 09:01", "2000-01-01 09:05" "2000-01-01 09:08"],
+            freq="T",
         )
         expected5 = pd.PeriodIndex(
             [
@@ -126,7 +130,8 @@ class TestPeriodIndex:
         )
 
         rng8 = pd.PeriodIndex(
-            ["1/3/2000", "1/2/2000", "1/1/2000", "1/5/2000", "1/4/2000"], freq="D"
+            ["1/3/2000", "1/2/2000", "1/1/2000", "1/5/2000", "1/4/2000"],
+            freq="D",
         )
         other8 = pd.period_range("1/6/2000", freq="D", periods=5)
         expected8 = pd.PeriodIndex(
@@ -257,14 +262,18 @@ class TestPeriodIndex:
             freq="D",
             name="idx",
         )
-        expected2 = PeriodIndex(["2011-01-04", "2011-01-02"], freq="D", name="idx")
+        expected2 = PeriodIndex(
+            ["2011-01-04", "2011-01-02"], freq="D", name="idx"
+        )
 
         rng3 = PeriodIndex(
             ["2011-01-04", "2011-01-02", "2011-02-02", "2011-02-03"],
             freq="D",
             name="other",
         )
-        expected3 = PeriodIndex(["2011-01-04", "2011-01-02"], freq="D", name=None)
+        expected3 = PeriodIndex(
+            ["2011-01-04", "2011-01-02"], freq="D", name=None
+        )
 
         rng4 = period_range("7/1/2000", "7/31/2000", freq="D", name="idx")
         expected4 = PeriodIndex([], freq="D", name="idx")
@@ -292,14 +301,22 @@ class TestPeriodIndex:
     @pytest.mark.parametrize("sort", [None, False])
     def test_difference(self, sort):
         # diff
-        period_rng = ["1/3/2000", "1/2/2000", "1/1/2000", "1/5/2000", "1/4/2000"]
+        period_rng = [
+            "1/3/2000",
+            "1/2/2000",
+            "1/1/2000",
+            "1/5/2000",
+            "1/4/2000",
+        ]
         rng1 = pd.PeriodIndex(period_rng, freq="D")
         other1 = pd.period_range("1/6/2000", freq="D", periods=5)
         expected1 = rng1
 
         rng2 = pd.PeriodIndex(period_rng, freq="D")
         other2 = pd.period_range("1/4/2000", freq="D", periods=5)
-        expected2 = pd.PeriodIndex(["1/3/2000", "1/2/2000", "1/1/2000"], freq="D")
+        expected2 = pd.PeriodIndex(
+            ["1/3/2000", "1/2/2000", "1/1/2000"], freq="D"
+        )
 
         rng3 = pd.PeriodIndex(period_rng, freq="D")
         other3 = pd.PeriodIndex([], freq="D")
@@ -317,9 +334,12 @@ class TestPeriodIndex:
         expected4 = rng4
 
         rng5 = pd.PeriodIndex(
-            ["2000-01-01 09:03", "2000-01-01 09:01", "2000-01-01 09:05"], freq="T"
+            ["2000-01-01 09:03", "2000-01-01 09:01", "2000-01-01 09:05"],
+            freq="T",
         )
-        other5 = pd.PeriodIndex(["2000-01-01 09:01", "2000-01-01 09:05"], freq="T")
+        other5 = pd.PeriodIndex(
+            ["2000-01-01 09:01", "2000-01-01 09:05"], freq="T"
+        )
         expected5 = pd.PeriodIndex(["2000-01-01 09:03"], freq="T")
 
         period_rng = [
@@ -333,7 +353,9 @@ class TestPeriodIndex:
         ]
         rng6 = pd.PeriodIndex(period_rng, freq="M")
         other6 = pd.period_range("2000-04-01", freq="M", periods=7)
-        expected6 = pd.PeriodIndex(["2000-02-01", "2000-01-01", "2000-03-01"], freq="M")
+        expected6 = pd.PeriodIndex(
+            ["2000-02-01", "2000-01-01", "2000-03-01"], freq="M"
+        )
 
         period_rng = ["2003", "2007", "2006", "2005", "2004"]
         rng7 = pd.PeriodIndex(period_rng, freq="A")

@@ -19,7 +19,11 @@ def mix_ab() -> Dict[str, list]:
 
 @pytest.fixture
 def mix_abc() -> Dict[str, list]:
-    return {"a": list(range(4)), "b": list("ab.."), "c": ["a", "b", np.nan, "d"]}
+    return {
+        "a": list(range(4)),
+        "b": list("ab.."),
+        "c": ["a", "b", np.nan, "d"],
+    }
 
 
 class TestDataFrameReplace(TestData):
@@ -156,7 +160,9 @@ class TestDataFrameReplace(TestData):
         # regex -> regex
         # obj frame
         res = dfobj.copy()
-        res.replace(re.compile(r"\s*(\.)\s*"), r"\1\1\1", regex=True, inplace=True)
+        res.replace(
+            re.compile(r"\s*(\.)\s*"), r"\1\1\1", regex=True, inplace=True
+        )
         objc = obj.copy()
         objc["a"] = ["a", "b", "...", "..."]
         expec = DataFrame(objc)
@@ -164,7 +170,9 @@ class TestDataFrameReplace(TestData):
 
         # with mixed
         res = dfmix.copy()
-        res.replace(re.compile(r"\s*(\.)\s*"), r"\1\1\1", regex=True, inplace=True)
+        res.replace(
+            re.compile(r"\s*(\.)\s*"), r"\1\1\1", regex=True, inplace=True
+        )
         mixc = mix_ab.copy()
         mixc["b"] = ["a", "b", "...", "..."]
         expec = DataFrame(mixc)
@@ -209,7 +217,9 @@ class TestDataFrameReplace(TestData):
         # regex -> regex
         # obj frame
         res = dfobj.copy()
-        res.replace(regex=re.compile(r"\s*(\.)\s*"), value=r"\1\1\1", inplace=True)
+        res.replace(
+            regex=re.compile(r"\s*(\.)\s*"), value=r"\1\1\1", inplace=True
+        )
         objc = obj.copy()
         objc["a"] = ["a", "b", "...", "..."]
         expec = DataFrame(objc)
@@ -217,7 +227,9 @@ class TestDataFrameReplace(TestData):
 
         # with mixed
         res = dfmix.copy()
-        res.replace(regex=re.compile(r"\s*(\.)\s*"), value=r"\1\1\1", inplace=True)
+        res.replace(
+            regex=re.compile(r"\s*(\.)\s*"), value=r"\1\1\1", inplace=True
+        )
         mixc = mix_ab.copy()
         mixc["b"] = ["a", "b", "...", "..."]
         expec = DataFrame(mixc)
@@ -367,7 +379,9 @@ class TestDataFrameReplace(TestData):
         to_replace_res = [r"\s*(\.)\s*", r"(a|b)"]
         values = [r"\1\1", r"\1_crap"]
         res = dfmix.replace(to_replace_res, values, regex=True)
-        expec = DataFrame({"a": mix_ab["a"], "b": ["a_crap", "b_crap", "..", ".."]})
+        expec = DataFrame(
+            {"a": mix_ab["a"], "b": ["a_crap", "b_crap", "..", ".."]}
+        )
         assert_frame_equal(res, expec)
 
         # list of [re1, re2, ..., reN] -> [(re1 or v1), (re2 or v2), ..., (reN
@@ -375,13 +389,17 @@ class TestDataFrameReplace(TestData):
         to_replace_res = [r"\s*(\.)\s*", r"a", r"(b)"]
         values = [r"\1\1", r"crap", r"\1_crap"]
         res = dfmix.replace(to_replace_res, values, regex=True)
-        expec = DataFrame({"a": mix_ab["a"], "b": ["crap", "b_crap", "..", ".."]})
+        expec = DataFrame(
+            {"a": mix_ab["a"], "b": ["crap", "b_crap", "..", ".."]}
+        )
         assert_frame_equal(res, expec)
 
         to_replace_res = [r"\s*(\.)\s*", r"a", r"(b)"]
         values = [r"\1\1", r"crap", r"\1_crap"]
         res = dfmix.replace(regex=to_replace_res, value=values)
-        expec = DataFrame({"a": mix_ab["a"], "b": ["crap", "b_crap", "..", ".."]})
+        expec = DataFrame(
+            {"a": mix_ab["a"], "b": ["crap", "b_crap", "..", ".."]}
+        )
         assert_frame_equal(res, expec)
 
     def test_regex_replace_list_mixed_inplace(self, mix_ab):
@@ -393,7 +411,9 @@ class TestDataFrameReplace(TestData):
         values = [np.nan, "crap"]
         res = dfmix.copy()
         res.replace(to_replace_res, values, inplace=True, regex=True)
-        expec = DataFrame({"a": mix_ab["a"], "b": ["crap", "b", np.nan, np.nan]})
+        expec = DataFrame(
+            {"a": mix_ab["a"], "b": ["crap", "b", np.nan, np.nan]}
+        )
         assert_frame_equal(res, expec)
 
         # list of [re1, re2, ..., reN] -> [re1, re2, .., reN]
@@ -401,7 +421,9 @@ class TestDataFrameReplace(TestData):
         values = [r"\1\1", r"\1_crap"]
         res = dfmix.copy()
         res.replace(to_replace_res, values, inplace=True, regex=True)
-        expec = DataFrame({"a": mix_ab["a"], "b": ["a_crap", "b_crap", "..", ".."]})
+        expec = DataFrame(
+            {"a": mix_ab["a"], "b": ["a_crap", "b_crap", "..", ".."]}
+        )
         assert_frame_equal(res, expec)
 
         # list of [re1, re2, ..., reN] -> [(re1 or v1), (re2 or v2), ..., (reN
@@ -410,14 +432,18 @@ class TestDataFrameReplace(TestData):
         values = [r"\1\1", r"crap", r"\1_crap"]
         res = dfmix.copy()
         res.replace(to_replace_res, values, inplace=True, regex=True)
-        expec = DataFrame({"a": mix_ab["a"], "b": ["crap", "b_crap", "..", ".."]})
+        expec = DataFrame(
+            {"a": mix_ab["a"], "b": ["crap", "b_crap", "..", ".."]}
+        )
         assert_frame_equal(res, expec)
 
         to_replace_res = [r"\s*(\.)\s*", r"a", r"(b)"]
         values = [r"\1\1", r"crap", r"\1_crap"]
         res = dfmix.copy()
         res.replace(regex=to_replace_res, value=values, inplace=True)
-        expec = DataFrame({"a": mix_ab["a"], "b": ["crap", "b_crap", "..", ".."]})
+        expec = DataFrame(
+            {"a": mix_ab["a"], "b": ["crap", "b_crap", "..", ".."]}
+        )
         assert_frame_equal(res, expec)
 
     def test_regex_replace_dict_mixed(self, mix_abc):
@@ -431,9 +457,15 @@ class TestDataFrameReplace(TestData):
         # frame
         res = dfmix.replace({"b": r"\s*\.\s*"}, {"b": np.nan}, regex=True)
         res2 = dfmix.copy()
-        res2.replace({"b": r"\s*\.\s*"}, {"b": np.nan}, inplace=True, regex=True)
+        res2.replace(
+            {"b": r"\s*\.\s*"}, {"b": np.nan}, inplace=True, regex=True
+        )
         expec = DataFrame(
-            {"a": mix_abc["a"], "b": ["a", "b", np.nan, np.nan], "c": mix_abc["c"]}
+            {
+                "a": mix_abc["a"],
+                "b": ["a", "b", np.nan, np.nan],
+                "c": mix_abc["c"],
+            }
         )
         assert_frame_equal(res, expec)
         assert_frame_equal(res2, expec)
@@ -442,18 +474,30 @@ class TestDataFrameReplace(TestData):
         # whole frame
         res = dfmix.replace({"b": r"\s*(\.)\s*"}, {"b": r"\1ty"}, regex=True)
         res2 = dfmix.copy()
-        res2.replace({"b": r"\s*(\.)\s*"}, {"b": r"\1ty"}, inplace=True, regex=True)
+        res2.replace(
+            {"b": r"\s*(\.)\s*"}, {"b": r"\1ty"}, inplace=True, regex=True
+        )
         expec = DataFrame(
-            {"a": mix_abc["a"], "b": ["a", "b", ".ty", ".ty"], "c": mix_abc["c"]}
+            {
+                "a": mix_abc["a"],
+                "b": ["a", "b", ".ty", ".ty"],
+                "c": mix_abc["c"],
+            }
         )
         assert_frame_equal(res, expec)
         assert_frame_equal(res2, expec)
 
         res = dfmix.replace(regex={"b": r"\s*(\.)\s*"}, value={"b": r"\1ty"})
         res2 = dfmix.copy()
-        res2.replace(regex={"b": r"\s*(\.)\s*"}, value={"b": r"\1ty"}, inplace=True)
+        res2.replace(
+            regex={"b": r"\s*(\.)\s*"}, value={"b": r"\1ty"}, inplace=True
+        )
         expec = DataFrame(
-            {"a": mix_abc["a"], "b": ["a", "b", ".ty", ".ty"], "c": mix_abc["c"]}
+            {
+                "a": mix_abc["a"],
+                "b": ["a", "b", ".ty", ".ty"],
+                "c": mix_abc["c"],
+            }
         )
         assert_frame_equal(res, expec)
         assert_frame_equal(res2, expec)
@@ -461,7 +505,11 @@ class TestDataFrameReplace(TestData):
         # scalar -> dict
         # to_replace regex, {value: value}
         expec = DataFrame(
-            {"a": mix_abc["a"], "b": [np.nan, "b", ".", "."], "c": mix_abc["c"]}
+            {
+                "a": mix_abc["a"],
+                "b": [np.nan, "b", ".", "."],
+                "c": mix_abc["c"],
+            }
         )
         res = dfmix.replace("a", {"b": np.nan}, regex=True)
         res2 = dfmix.copy()
@@ -473,7 +521,11 @@ class TestDataFrameReplace(TestData):
         res2 = dfmix.copy()
         res2.replace(regex="a", value={"b": np.nan}, inplace=True)
         expec = DataFrame(
-            {"a": mix_abc["a"], "b": [np.nan, "b", ".", "."], "c": mix_abc["c"]}
+            {
+                "a": mix_abc["a"],
+                "b": [np.nan, "b", ".", "."],
+                "c": mix_abc["c"],
+            }
         )
         assert_frame_equal(res, expec)
         assert_frame_equal(res2, expec)
@@ -488,7 +540,11 @@ class TestDataFrameReplace(TestData):
         res3 = dfmix.replace(regex={"b": {r"\s*\.\s*": np.nan}})
         res4.replace(regex={"b": {r"\s*\.\s*": np.nan}}, inplace=True)
         expec = DataFrame(
-            {"a": mix_abc["a"], "b": ["a", "b", np.nan, np.nan], "c": mix_abc["c"]}
+            {
+                "a": mix_abc["a"],
+                "b": ["a", "b", np.nan, np.nan],
+                "c": mix_abc["c"],
+            }
         )
         assert_frame_equal(res, expec)
         assert_frame_equal(res2, expec)
@@ -534,7 +590,9 @@ class TestDataFrameReplace(TestData):
         res2.replace(r"\s*\.\s*", 0, inplace=True, regex=True)
         res3 = df.copy()
         res3.replace(regex=r"\s*\.\s*", value=0, inplace=True)
-        expec = DataFrame({"a": mix_abc["a"], "b": ["a", "b", 0, 0], "c": mix_abc["c"]})
+        expec = DataFrame(
+            {"a": mix_abc["a"], "b": ["a", "b", 0, 0], "c": mix_abc["c"]}
+        )
         assert_frame_equal(res, expec)
         assert_frame_equal(res2, expec)
         assert_frame_equal(res3, expec)
@@ -547,7 +605,11 @@ class TestDataFrameReplace(TestData):
         res3 = df.copy()
         res3.replace(regex=[r"\s*\.\s*", "b"], value=0, inplace=True)
         expec = DataFrame(
-            {"a": mix_abc["a"], "b": ["a", 0, 0, 0], "c": ["a", 0, np.nan, "d"]}
+            {
+                "a": mix_abc["a"],
+                "b": ["a", 0, 0, 0],
+                "c": ["a", 0, np.nan, "d"],
+            }
         )
         assert_frame_equal(res, expec)
         assert_frame_equal(res2, expec)
@@ -563,7 +625,11 @@ class TestDataFrameReplace(TestData):
         res3 = df.copy()
         res3.replace(regex=s1, value=s2, inplace=True)
         expec = DataFrame(
-            {"a": mix_abc["a"], "b": ["a", "b", np.nan, np.nan], "c": mix_abc["c"]}
+            {
+                "a": mix_abc["a"],
+                "b": ["a", "b", np.nan, np.nan],
+                "c": mix_abc["c"],
+            }
         )
         assert_frame_equal(res, expec)
         assert_frame_equal(res2, expec)
@@ -571,7 +637,9 @@ class TestDataFrameReplace(TestData):
 
     def test_regex_replace_numeric_to_object_conversion(self, mix_abc):
         df = DataFrame(mix_abc)
-        expec = DataFrame({"a": ["a", 1, 2, 3], "b": mix_abc["b"], "c": mix_abc["c"]})
+        expec = DataFrame(
+            {"a": ["a", 1, 2, 3], "b": mix_abc["b"], "c": mix_abc["c"]}
+        )
         res = df.replace(0, "a")
         assert_frame_equal(res, expec)
         assert res.a.dtype == np.object_
@@ -602,11 +670,17 @@ class TestDataFrameReplace(TestData):
         # GH 11698
         # test for mixed data types.
         df = pd.DataFrame(
-            [("-", pd.to_datetime("20150101")), ("a", pd.to_datetime("20150102"))]
+            [
+                ("-", pd.to_datetime("20150101")),
+                ("a", pd.to_datetime("20150102")),
+            ]
         )
         df1 = df.replace("-", np.nan)
         expected_df = pd.DataFrame(
-            [(np.nan, pd.to_datetime("20150101")), ("a", pd.to_datetime("20150102"))]
+            [
+                (np.nan, pd.to_datetime("20150101")),
+                ("a", pd.to_datetime("20150102")),
+            ]
         )
         assert_frame_equal(df1, expected_df)
 
@@ -659,7 +733,9 @@ class TestDataFrameReplace(TestData):
         # from GH 3064
         df = DataFrame({"zero": {"a": 0.0, "b": 1}, "one": {"a": 2.0, "b": 0}})
         result = df.replace(0, {"zero": 0.5, "one": 1.0})
-        expected = DataFrame({"zero": {"a": 0.5, "b": 1}, "one": {"a": 2.0, "b": 1.0}})
+        expected = DataFrame(
+            {"zero": {"a": 0.5, "b": 1}, "one": {"a": 2.0, "b": 1.0}}
+        )
         assert_frame_equal(result, expected)
 
         result = df.replace(0, df.mean())
@@ -669,7 +745,9 @@ class TestDataFrameReplace(TestData):
         df = DataFrame({"zero": {"a": 0.0, "b": 1}, "one": {"a": 2.0, "b": 0}})
         s = Series({"zero": 0.0, "one": 2.0})
         result = df.replace(s, {"zero": 0.5, "one": 1.0})
-        expected = DataFrame({"zero": {"a": 0.5, "b": 1}, "one": {"a": 1.0, "b": 0.0}})
+        expected = DataFrame(
+            {"zero": {"a": 0.5, "b": 1}, "one": {"a": 1.0, "b": 0.0}}
+        )
         assert_frame_equal(result, expected)
 
         result = df.replace(s, df.mean())
@@ -763,7 +841,10 @@ class TestDataFrameReplace(TestData):
 
         # test case from
         df = DataFrame(
-            {"A": Series([3, 0], dtype="int64"), "B": Series([0, 3], dtype="int64")}
+            {
+                "A": Series([3, 0], dtype="int64"),
+                "B": Series([0, 3], dtype="int64"),
+            }
         )
         result = df.replace(3, df.mean().to_dict())
         expected = df.copy().astype("float64")
@@ -837,7 +918,12 @@ class TestDataFrameReplace(TestData):
     @pytest.mark.parametrize(
         "frame, to_replace, value, expected",
         [
-            (DataFrame({"ints": [1, 2, 3]}), 1, 0, DataFrame({"ints": [0, 2, 3]})),
+            (
+                DataFrame({"ints": [1, 2, 3]}),
+                1,
+                0,
+                DataFrame({"ints": [0, 2, 3]}),
+            ),
             (
                 DataFrame({"ints": [1, 2, 3]}, dtype=np.int32),
                 1,
@@ -888,7 +974,9 @@ class TestDataFrameReplace(TestData):
             (
                 DataFrame(
                     {
-                        "A": date_range("20130101", periods=3, tz="US/Eastern"),
+                        "A": date_range(
+                            "20130101", periods=3, tz="US/Eastern"
+                        ),
                         "B": [0, np.nan, 2],
                     }
                 ),
@@ -1096,15 +1184,27 @@ class TestDataFrameReplace(TestData):
     def test_replace_period(self):
         d = {
             "fname": {
-                "out_augmented_AUG_2011.json": pd.Period(year=2011, month=8, freq="M"),
-                "out_augmented_JAN_2011.json": pd.Period(year=2011, month=1, freq="M"),
-                "out_augmented_MAY_2012.json": pd.Period(year=2012, month=5, freq="M"),
+                "out_augmented_AUG_2011.json": pd.Period(
+                    year=2011, month=8, freq="M"
+                ),
+                "out_augmented_JAN_2011.json": pd.Period(
+                    year=2011, month=1, freq="M"
+                ),
+                "out_augmented_MAY_2012.json": pd.Period(
+                    year=2012, month=5, freq="M"
+                ),
                 "out_augmented_SUBSIDY_WEEK.json": pd.Period(
                     year=2011, month=4, freq="M"
                 ),
-                "out_augmented_AUG_2012.json": pd.Period(year=2012, month=8, freq="M"),
-                "out_augmented_MAY_2011.json": pd.Period(year=2011, month=5, freq="M"),
-                "out_augmented_SEP_2013.json": pd.Period(year=2013, month=9, freq="M"),
+                "out_augmented_AUG_2012.json": pd.Period(
+                    year=2012, month=8, freq="M"
+                ),
+                "out_augmented_MAY_2011.json": pd.Period(
+                    year=2011, month=5, freq="M"
+                ),
+                "out_augmented_SEP_2013.json": pd.Period(
+                    year=2013, month=9, freq="M"
+                ),
             }
         }
 
@@ -1155,7 +1255,9 @@ class TestDataFrameReplace(TestData):
             columns=["fname"],
         )
         assert set(df.fname.values) == set(d["fname"].keys())
-        expected = DataFrame({"fname": [d["fname"][k] for k in df.fname.values]})
+        expected = DataFrame(
+            {"fname": [d["fname"][k] for k in df.fname.values]}
+        )
         result = df.replace(d)
         assert_frame_equal(result, expected)
 
@@ -1208,13 +1310,17 @@ class TestDataFrameReplace(TestData):
 
         result = df.copy()
         result.iloc[1, 0] = np.nan
-        result = result.replace({"A": pd.NaT}, Timestamp("20130104", tz="US/Eastern"))
+        result = result.replace(
+            {"A": pd.NaT}, Timestamp("20130104", tz="US/Eastern")
+        )
         assert_frame_equal(result, expected)
 
         # coerce to object
         result = df.copy()
         result.iloc[1, 0] = np.nan
-        result = result.replace({"A": pd.NaT}, Timestamp("20130104", tz="US/Pacific"))
+        result = result.replace(
+            {"A": pd.NaT}, Timestamp("20130104", tz="US/Pacific")
+        )
         expected = DataFrame(
             {
                 "A": [
@@ -1254,13 +1360,21 @@ class TestDataFrameReplace(TestData):
     @pytest.mark.parametrize(
         "to_replace, method, expected",
         [
-            (0, "bfill", {"A": [1, 1, 2], "B": [5, np.nan, 7], "C": ["a", "b", "c"]}),
+            (
+                0,
+                "bfill",
+                {"A": [1, 1, 2], "B": [5, np.nan, 7], "C": ["a", "b", "c"]},
+            ),
             (
                 np.nan,
                 "bfill",
                 {"A": [0, 1, 2], "B": [5.0, 7.0, 7.0], "C": ["a", "b", "c"]},
             ),
-            ("d", "ffill", {"A": [0, 1, 2], "B": [5, np.nan, 7], "C": ["a", "b", "c"]}),
+            (
+                "d",
+                "ffill",
+                {"A": [0, 1, 2], "B": [5, np.nan, 7], "C": ["a", "b", "c"]},
+            ),
             (
                 [0, 2],
                 "bfill",
@@ -1285,7 +1399,9 @@ class TestDataFrameReplace(TestData):
     )
     def test_replace_method(self, to_replace, method, expected):
         # GH 19632
-        df = DataFrame({"A": [0, 1, 2], "B": [5, np.nan, 7], "C": ["a", "b", "c"]})
+        df = DataFrame(
+            {"A": [0, 1, 2], "B": [5, np.nan, 7], "C": ["a", "b", "c"]}
+        )
 
         result = df.replace(to_replace=to_replace, value=None, method=method)
         expected = DataFrame(expected)

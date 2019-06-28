@@ -29,7 +29,11 @@ from pandas.core.dtypes.missing import isna
 from pandas.core import algorithms
 import pandas.core.common as com
 import pandas.core.indexes.base as ibase
-from pandas.core.indexes.base import Index, InvalidIndexError, _index_shared_docs
+from pandas.core.indexes.base import (
+    Index,
+    InvalidIndexError,
+    _index_shared_docs,
+)
 from pandas.core.ops import get_op_result_name
 
 _num_index_shared_docs = dict()
@@ -45,7 +49,9 @@ class NumericIndex(Index):
 
     _is_numeric_dtype = True
 
-    def __new__(cls, data=None, dtype=None, copy=False, name=None, fastpath=None):
+    def __new__(
+        cls, data=None, dtype=None, copy=False, name=None, fastpath=None
+    ):
 
         if fastpath is not None:
             warnings.warn(
@@ -100,7 +106,9 @@ class NumericIndex(Index):
     def _convert_tolerance(self, tolerance, target):
         tolerance = np.asarray(tolerance)
         if target.size != tolerance.size and tolerance.size > 1:
-            raise ValueError("list-like tolerance size must match " "target index size")
+            raise ValueError(
+                "list-like tolerance size must match " "target index size"
+            )
         if not np.issubdtype(tolerance.dtype, np.number):
             if tolerance.ndim > 0:
                 raise ValueError(
@@ -153,9 +161,9 @@ class NumericIndex(Index):
         # float | [u]int -> float  (the special case)
         # <T>   | <T>    -> T
         # <T>   | <U>    -> object
-        needs_cast = (is_integer_dtype(self.dtype) and is_float_dtype(other.dtype)) or (
-            is_integer_dtype(other.dtype) and is_float_dtype(self.dtype)
-        )
+        needs_cast = (
+            is_integer_dtype(self.dtype) and is_float_dtype(other.dtype)
+        ) or (is_integer_dtype(other.dtype) and is_float_dtype(self.dtype))
         if needs_cast:
             first = self.astype("float")
             second = other.astype("float")
@@ -197,7 +205,9 @@ _num_index_shared_docs[
     An Index instance can **only** contain hashable objects.
 """
 
-_int64_descr_args = dict(klass="Int64Index", ltype="integer", dtype="int64", extra="")
+_int64_descr_args = dict(
+    klass="Int64Index", ltype="integer", dtype="int64", extra=""
+)
 
 
 class IntegerIndex(NumericIndex):
@@ -256,11 +266,15 @@ class Int64Index(IntegerIndex):
         """
         if not issubclass(data.dtype.type, np.signedinteger):
             if not np.array_equal(data, subarr):
-                raise TypeError("Unsafe NumPy casting, you must " "explicitly cast")
+                raise TypeError(
+                    "Unsafe NumPy casting, you must " "explicitly cast"
+                )
 
     def _is_compatible_with_other(self, other):
         return super()._is_compatible_with_other(other) or all(
-            isinstance(type(obj), (ABCInt64Index, ABCFloat64Index, ABCRangeIndex))
+            isinstance(
+                type(obj), (ABCInt64Index, ABCFloat64Index, ABCRangeIndex)
+            )
             for obj in [self, other]
         )
 
@@ -330,7 +344,9 @@ class UInt64Index(IntegerIndex):
         """
         if not issubclass(data.dtype.type, np.unsignedinteger):
             if not np.array_equal(data, subarr):
-                raise TypeError("Unsafe NumPy casting, you must " "explicitly cast")
+                raise TypeError(
+                    "Unsafe NumPy casting, you must " "explicitly cast"
+                )
 
     def _is_compatible_with_other(self, other):
         return super()._is_compatible_with_other(other) or all(
@@ -438,7 +454,10 @@ class Float64Index(NumericIndex):
         try:
             if not isinstance(other, Float64Index):
                 other = self._constructor(other)
-            if not is_dtype_equal(self.dtype, other.dtype) or self.shape != other.shape:
+            if (
+                not is_dtype_equal(self.dtype, other.dtype)
+                or self.shape != other.shape
+            ):
                 return False
             left, right = self._ndarray_values, other._ndarray_values
             return ((left == right) | (self._isnan & other._isnan)).all()
@@ -493,7 +512,12 @@ class Float64Index(NumericIndex):
         return super()._is_compatible_with_other(other) or all(
             isinstance(
                 type(obj),
-                (ABCInt64Index, ABCFloat64Index, ABCUInt64Index, ABCRangeIndex),
+                (
+                    ABCInt64Index,
+                    ABCFloat64Index,
+                    ABCUInt64Index,
+                    ABCRangeIndex,
+                ),
             )
             for obj in [self, other]
         )

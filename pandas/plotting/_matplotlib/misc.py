@@ -74,7 +74,11 @@ def scatter_matrix(
                 common = (mask[a] & mask[b]).values
 
                 ax.scatter(
-                    df[b][common], df[a][common], marker=marker, alpha=alpha, **kwds
+                    df[b][common],
+                    df[a][common],
+                    marker=marker,
+                    alpha=alpha,
+                    **kwds
                 )
 
                 ax.set_xlim(boundaries_list[j])
@@ -132,7 +136,10 @@ def radviz(frame, class_column, ax=None, color=None, colormap=None, **kwds):
 
     to_plot = {}
     colors = _get_standard_colors(
-        num_colors=len(classes), colormap=colormap, color_type="random", color=color
+        num_colors=len(classes),
+        colormap=colormap,
+        color_type="random",
+        color=color,
     )
 
     for kls in classes:
@@ -172,7 +179,12 @@ def radviz(frame, class_column, ax=None, color=None, colormap=None, **kwds):
 
         if xy[0] < 0.0 and xy[1] < 0.0:
             ax.text(
-                xy[0] - 0.025, xy[1] - 0.025, name, ha="right", va="top", size="small"
+                xy[0] - 0.025,
+                xy[1] - 0.025,
+                name,
+                ha="right",
+                va="top",
+                size="small",
             )
         elif xy[0] < 0.0 and xy[1] >= 0.0:
             ax.text(
@@ -185,11 +197,21 @@ def radviz(frame, class_column, ax=None, color=None, colormap=None, **kwds):
             )
         elif xy[0] >= 0.0 and xy[1] < 0.0:
             ax.text(
-                xy[0] + 0.025, xy[1] - 0.025, name, ha="left", va="top", size="small"
+                xy[0] + 0.025,
+                xy[1] - 0.025,
+                name,
+                ha="left",
+                va="top",
+                size="small",
             )
         elif xy[0] >= 0.0 and xy[1] >= 0.0:
             ax.text(
-                xy[0] + 0.025, xy[1] + 0.025, name, ha="left", va="bottom", size="small"
+                xy[0] + 0.025,
+                xy[1] + 0.025,
+                name,
+                ha="left",
+                va="bottom",
+                size="small",
             )
 
     ax.axis("equal")
@@ -197,7 +219,13 @@ def radviz(frame, class_column, ax=None, color=None, colormap=None, **kwds):
 
 
 def andrews_curves(
-    frame, class_column, ax=None, samples=200, color=None, colormap=None, **kwds
+    frame,
+    class_column,
+    ax=None,
+    samples=200,
+    color=None,
+    colormap=None,
+    **kwds
 ):
     import matplotlib.pyplot as plt
 
@@ -234,7 +262,10 @@ def andrews_curves(
     used_legends = set()
 
     color_values = _get_standard_colors(
-        num_colors=len(classes), colormap=colormap, color_type="random", color=color
+        num_colors=len(classes),
+        colormap=colormap,
+        color_type="random",
+        color=color,
     )
     colors = dict(zip(classes, color_values))
     if ax is None:
@@ -353,7 +384,10 @@ def parallel_coordinates(
         ax = plt.gca()
 
     color_values = _get_standard_colors(
-        num_colors=len(classes), colormap=colormap, color_type="random", color=color
+        num_colors=len(classes),
+        colormap=colormap,
+        color_type="random",
+        color=color,
     )
 
     if sort_labels:
@@ -411,7 +445,9 @@ def autocorrelation_plot(series, ax=None, **kwds):
     c0 = np.sum((data - mean) ** 2) / float(n)
 
     def r(h):
-        return ((data[: n - h] - mean) * (data[h:] - mean)).sum() / float(n) / c0
+        return (
+            ((data[: n - h] - mean) * (data[h:] - mean)).sum() / float(n) / c0
+        )
 
     x = np.arange(n) + 1
     y = [r(loc) for loc in x]

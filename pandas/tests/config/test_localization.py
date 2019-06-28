@@ -13,7 +13,8 @@ _current_locale = locale.getlocale()
 
 # Don't run any of these tests if we are on Windows or have no locales.
 pytestmark = pytest.mark.skipif(
-    is_platform_windows() or not _all_locales, reason="Need non-Windows and locales"
+    is_platform_windows() or not _all_locales,
+    reason="Need non-Windows and locales",
 )
 
 _skip_if_only_one_locale = pytest.mark.skipif(

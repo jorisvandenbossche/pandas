@@ -108,7 +108,9 @@ class BaseMissingTests(BaseExtensionTests):
     def test_fillna_frame(self, data_missing):
         fill_value = data_missing[1]
 
-        result = pd.DataFrame({"A": data_missing, "B": [1, 2]}).fillna(fill_value)
+        result = pd.DataFrame({"A": data_missing, "B": [1, 2]}).fillna(
+            fill_value
+        )
 
         expected = pd.DataFrame(
             {
@@ -122,7 +124,9 @@ class BaseMissingTests(BaseExtensionTests):
         self.assert_frame_equal(result, expected)
 
     def test_fillna_fill_other(self, data):
-        result = pd.DataFrame({"A": data, "B": [np.nan] * len(data)}).fillna({"B": 0.0})
+        result = pd.DataFrame({"A": data, "B": [np.nan] * len(data)}).fillna(
+            {"B": 0.0}
+        )
 
         expected = pd.DataFrame({"A": data, "B": [0.0] * len(result)})
 

@@ -69,7 +69,9 @@ def _maybe_cache(arg, format, cache, convert_listlike):
 
         unique_dates = Index(arg).unique()
         if len(unique_dates) < len(arg):
-            cache_dates = convert_listlike(unique_dates.to_numpy(), True, format)
+            cache_dates = convert_listlike(
+                unique_dates.to_numpy(), True, format
+            )
             cache_array = Series(cache_dates, index=unique_dates)
     return cache_array
 
@@ -142,7 +144,10 @@ def _return_parsed_timezone_results(result, timezones, box, tz, name):
             "information."
         )
     tz_results = np.array(
-        [Timestamp(res).tz_localize(zone) for res, zone in zip(result, timezones)]
+        [
+            Timestamp(res).tz_localize(zone)
+            for res, zone in zip(result, timezones)
+        ]
     )
     if box:
         from pandas import Index
@@ -230,7 +235,9 @@ def _convert_listlike_datetimes(
         if format is not None:
             raise ValueError("cannot specify both format and unit")
         arg = getattr(arg, "values", arg)
-        result, tz_parsed = tslib.array_with_unit_to_datetime(arg, unit, errors=errors)
+        result, tz_parsed = tslib.array_with_unit_to_datetime(
+            arg, unit, errors=errors
+        )
         if box:
             if errors == "ignore":
                 from pandas import Index
@@ -254,7 +261,8 @@ def _convert_listlike_datetimes(
         return result
     elif getattr(arg, "ndim", 1) > 1:
         raise TypeError(
-            "arg must be a string, datetime, list, tuple, " "1-d array, or Series"
+            "arg must be a string, datetime, list, tuple, "
+            "1-d array, or Series"
         )
 
     # warn if passing timedelta64, raise for PeriodDtype
@@ -357,7 +365,9 @@ def _convert_listlike_datetimes(
         else:
             # Convert the datetime64 numpy array to an numpy array
             # of datetime objects
-            result = [Timestamp(ts, tz=tz_parsed).to_pydatetime() for ts in result]
+            result = [
+                Timestamp(ts, tz=tz_parsed).to_pydatetime() for ts in result
+            ]
             return np.array(result, dtype=object)
 
     if box:
@@ -398,7 +408,9 @@ def _adjust_to_origin(arg, origin, unit):
         try:
             arg = arg - j0
         except TypeError:
-            raise ValueError("incompatible 'arg' type for given " "'origin'='julian'")
+            raise ValueError(
+                "incompatible 'arg' type for given " "'origin'='julian'"
+            )
 
         # preemptively check this for a nice range
         j_max = Timestamp.max.to_julian_date() - j0
@@ -435,7 +447,9 @@ def _adjust_to_origin(arg, origin, unit):
             )
 
         if offset.tz is not None:
-            raise ValueError("origin offset {} must be tz-naive".format(offset))
+            raise ValueError(
+                "origin offset {} must be tz-naive".format(offset)
+            )
         offset -= Timestamp(0)
 
         # convert the offset to the unit of the arg
@@ -794,13 +808,17 @@ def _assemble_from_unit_mappings(arg, errors, box, tz):
     try:
         values = to_datetime(values, format="%Y%m%d", errors=errors, utc=tz)
     except (TypeError, ValueError) as e:
-        raise ValueError("cannot assemble the " "datetimes: {error}".format(error=e))
+        raise ValueError(
+            "cannot assemble the " "datetimes: {error}".format(error=e)
+        )
 
     for u in ["h", "m", "s", "ms", "us", "ns"]:
         value = unit_rev.get(u)
         if value is not None and value in arg:
             try:
-                values += to_timedelta(coerce(arg[value]), unit=u, errors=errors)
+                values += to_timedelta(
+                    coerce(arg[value]), unit=u, errors=errors
+                )
             except (TypeError, ValueError) as e:
                 raise ValueError(
                     "cannot assemble the datetimes [{value}]: "
@@ -926,7 +944,8 @@ def to_time(arg, format=None, infer_time_format=False, errors="raise"):
 
         elif getattr(arg, "ndim", 1) > 1:
             raise TypeError(
-                "arg must be a string, datetime, list, tuple, " "1-d array, or Series"
+                "arg must be a string, datetime, list, tuple, "
+                "1-d array, or Series"
             )
 
         arg = ensure_object(arg)
@@ -957,7 +976,9 @@ def to_time(arg, format=None, infer_time_format=False, errors="raise"):
                 time_object = None
                 for time_format in formats:
                     try:
-                        time_object = datetime.strptime(element, time_format).time()
+                        time_object = datetime.strptime(
+                            element, time_format
+                        ).time()
                         if not format_found:
                             # Put the found format in front
                             fmt = formats.pop(formats.index(time_format))

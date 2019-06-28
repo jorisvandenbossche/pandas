@@ -60,7 +60,11 @@ with cf.config_prefix("compute"):
         cb=use_bottleneck_cb,
     )
     cf.register_option(
-        "use_numexpr", True, use_numexpr_doc, validator=is_bool, cb=use_numexpr_cb
+        "use_numexpr",
+        True,
+        use_numexpr_doc,
+        validator=is_bool,
+        cb=use_numexpr_cb,
     )
 #
 # options from the "display" namespace
@@ -332,7 +336,9 @@ with cf.config_prefix("display"):
         pc_max_rows_doc,
         validator=is_instance_factory([type(None), int]),
     )
-    cf.register_option("max_categories", 8, pc_max_categories_doc, validator=is_int)
+    cf.register_option(
+        "max_categories", 8, pc_max_categories_doc, validator=is_int
+    )
     cf.register_option("max_colwidth", 50, max_colwidth_doc, validator=is_int)
     if is_terminal():
         max_cols = 0  # automatically determine optimal number of columns
@@ -350,13 +356,21 @@ with cf.config_prefix("display"):
         pc_large_repr_doc,
         validator=is_one_of_factory(["truncate", "info"]),
     )
-    cf.register_option("max_info_columns", 100, pc_max_info_cols_doc, validator=is_int)
+    cf.register_option(
+        "max_info_columns", 100, pc_max_info_cols_doc, validator=is_int
+    )
     cf.register_option(
         "colheader_justify", "right", colheader_justify_doc, validator=is_text
     )
-    cf.register_option("notebook_repr_html", True, pc_nb_repr_h_doc, validator=is_bool)
-    cf.register_option("pprint_nest_depth", 3, pc_pprint_nest_depth, validator=is_int)
-    cf.register_option("multi_sparse", True, pc_multi_sparse_doc, validator=is_bool)
+    cf.register_option(
+        "notebook_repr_html", True, pc_nb_repr_h_doc, validator=is_bool
+    )
+    cf.register_option(
+        "pprint_nest_depth", 3, pc_pprint_nest_depth, validator=is_int
+    )
+    cf.register_option(
+        "multi_sparse", True, pc_multi_sparse_doc, validator=is_bool
+    )
     cf.register_option("expand_frame_repr", True, pc_expand_repr_doc)
     cf.register_option(
         "show_dimensions",
@@ -367,7 +381,10 @@ with cf.config_prefix("display"):
     cf.register_option("chop_threshold", None, pc_chop_threshold_doc)
     cf.register_option("max_seq_items", 100, pc_max_seq_items)
     cf.register_option(
-        "width", 80, pc_width_doc, validator=is_instance_factory([type(None), int])
+        "width",
+        80,
+        pc_width_doc,
+        validator=is_instance_factory([type(None), int]),
     )
     cf.register_option(
         "memory_usage",
@@ -376,21 +393,38 @@ with cf.config_prefix("display"):
         validator=is_one_of_factory([None, True, False, "deep"]),
     )
     cf.register_option(
-        "unicode.east_asian_width", False, pc_east_asian_width_doc, validator=is_bool
+        "unicode.east_asian_width",
+        False,
+        pc_east_asian_width_doc,
+        validator=is_bool,
     )
     cf.register_option(
-        "unicode.ambiguous_as_wide", False, pc_east_asian_width_doc, validator=is_bool
+        "unicode.ambiguous_as_wide",
+        False,
+        pc_east_asian_width_doc,
+        validator=is_bool,
     )
-    cf.register_option("latex.repr", False, pc_latex_repr_doc, validator=is_bool)
-    cf.register_option("latex.escape", True, pc_latex_escape, validator=is_bool)
-    cf.register_option("latex.longtable", False, pc_latex_longtable, validator=is_bool)
+    cf.register_option(
+        "latex.repr", False, pc_latex_repr_doc, validator=is_bool
+    )
+    cf.register_option(
+        "latex.escape", True, pc_latex_escape, validator=is_bool
+    )
+    cf.register_option(
+        "latex.longtable", False, pc_latex_longtable, validator=is_bool
+    )
     cf.register_option(
         "latex.multicolumn", True, pc_latex_multicolumn, validator=is_bool
     )
     cf.register_option(
-        "latex.multicolumn_format", "l", pc_latex_multicolumn, validator=is_text
+        "latex.multicolumn_format",
+        "l",
+        pc_latex_multicolumn,
+        validator=is_text,
     )
-    cf.register_option("latex.multirow", False, pc_latex_multirow, validator=is_bool)
+    cf.register_option(
+        "latex.multirow", False, pc_latex_multirow, validator=is_bool
+    )
     cf.register_option(
         "html.table_schema",
         False,
@@ -435,7 +469,9 @@ def use_inf_as_na_cb(key):
 
 
 with cf.config_prefix("mode"):
-    cf.register_option("use_inf_as_na", False, use_inf_as_na_doc, cb=use_inf_as_na_cb)
+    cf.register_option(
+        "use_inf_as_na", False, use_inf_as_na_doc, cb=use_inf_as_na_cb
+    )
     cf.register_option(
         "use_inf_as_null", False, use_inf_as_null_doc, cb=use_inf_as_na_cb
     )

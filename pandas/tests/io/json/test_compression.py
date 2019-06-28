@@ -45,7 +45,9 @@ def test_with_s3_url(compression, s3_resource):
         with open(path, "rb") as f:
             s3_resource.Bucket("pandas-test").put_object(Key="test-1", Body=f)
 
-    roundtripped_df = pd.read_json("s3://pandas-test/test-1", compression=compression)
+    roundtripped_df = pd.read_json(
+        "s3://pandas-test/test-1", compression=compression
+    )
     assert_frame_equal(df, roundtripped_df)
 
 
@@ -54,7 +56,9 @@ def test_lines_with_compression(compression):
     with tm.ensure_clean() as path:
         df = pd.read_json('{"a": [1, 2, 3], "b": [4, 5, 6]}')
         df.to_json(path, orient="records", lines=True, compression=compression)
-        roundtripped_df = pd.read_json(path, lines=True, compression=compression)
+        roundtripped_df = pd.read_json(
+            path, lines=True, compression=compression
+        )
         assert_frame_equal(df, roundtripped_df)
 
 
@@ -64,7 +68,9 @@ def test_chunksize_with_compression(compression):
         df = pd.read_json('{"a": ["foo", "bar", "baz"], "b": [4, 5, 6]}')
         df.to_json(path, orient="records", lines=True, compression=compression)
 
-        res = pd.read_json(path, lines=True, chunksize=1, compression=compression)
+        res = pd.read_json(
+            path, lines=True, chunksize=1, compression=compression
+        )
         roundtripped_df = pd.concat(res)
         assert_frame_equal(df, roundtripped_df)
 

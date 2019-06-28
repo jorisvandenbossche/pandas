@@ -7,7 +7,14 @@ from pandas._libs.tslibs.ccalendar import DAYS, MONTHS
 from pandas._libs.tslibs.frequencies import INVALID_FREQ_ERR_MSG
 from pandas.compat import is_platform_windows
 
-from pandas import DatetimeIndex, Index, Series, Timestamp, date_range, period_range
+from pandas import (
+    DatetimeIndex,
+    Index,
+    Series,
+    Timestamp,
+    date_range,
+    period_range,
+)
 from pandas.core.tools.datetimes import to_datetime
 import pandas.util.testing as tm
 
@@ -144,7 +151,9 @@ def test_fifth_week_of_month_infer():
 def test_week_of_month_fake():
     # All of these dates are on same day
     # of week and are 4 or 5 weeks apart.
-    index = DatetimeIndex(["2013-08-27", "2013-10-01", "2013-10-29", "2013-11-26"])
+    index = DatetimeIndex(
+        ["2013-08-27", "2013-10-01", "2013-10-29", "2013-11-26"]
+    )
     assert frequencies.infer_freq(index) != "WOM-4TUE"
 
 
@@ -217,13 +226,17 @@ def test_monthly_infer(periods, freq):
 
 
 def test_quarterly_infer(month, periods):
-    _check_generated_range("1/1/2000", periods, "Q-{month}".format(month=month))
+    _check_generated_range(
+        "1/1/2000", periods, "Q-{month}".format(month=month)
+    )
 
 
 @pytest.mark.parametrize("annual", ["A", "BA"])
 def test_annually_infer(month, periods, annual):
     _check_generated_range(
-        "1/1/2000", periods, "{annual}-{month}".format(annual=annual, month=month)
+        "1/1/2000",
+        periods,
+        "{annual}-{month}".format(annual=annual, month=month),
     )
 
 
@@ -399,8 +412,12 @@ def test_invalid_index_types(idx):
         frequencies.infer_freq(idx)
 
 
-@pytest.mark.skipif(is_platform_windows(), reason="see gh-10822: Windows issue")
-@pytest.mark.parametrize("idx", [tm.makeStringIndex(10), tm.makeUnicodeIndex(10)])
+@pytest.mark.skipif(
+    is_platform_windows(), reason="see gh-10822: Windows issue"
+)
+@pytest.mark.parametrize(
+    "idx", [tm.makeStringIndex(10), tm.makeUnicodeIndex(10)]
+)
 def test_invalid_index_types_unicode(idx):
     # see gh-10822
     #

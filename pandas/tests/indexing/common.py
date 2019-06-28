@@ -7,7 +7,14 @@ import numpy as np
 
 from pandas.core.dtypes.common import is_scalar
 
-from pandas import DataFrame, Float64Index, MultiIndex, Series, UInt64Index, date_range
+from pandas import (
+    DataFrame,
+    Float64Index,
+    MultiIndex,
+    Series,
+    UInt64Index,
+    date_range,
+)
 from pandas.util import testing as tm
 
 from pandas.io.formats.printing import pprint_thing
@@ -46,7 +53,9 @@ class Base:
 
         self.series_ints = Series(np.random.rand(4), index=np.arange(0, 8, 2))
         self.frame_ints = DataFrame(
-            np.random.randn(4, 4), index=np.arange(0, 8, 2), columns=np.arange(0, 12, 3)
+            np.random.randn(4, 4),
+            index=np.arange(0, 8, 2),
+            columns=np.arange(0, 12, 3),
         )
 
         self.series_uints = Series(
@@ -84,7 +93,9 @@ class Base:
         )
 
         self.series_mixed = Series(np.random.randn(4), index=[2, 4, "null", 8])
-        self.frame_mixed = DataFrame(np.random.randn(4, 4), index=[2, 4, "null", 8])
+        self.frame_mixed = DataFrame(
+            np.random.randn(4, 4), index=[2, 4, "null", 8]
+        )
 
         self.series_ts = Series(
             np.random.randn(4), index=date_range("20130101", periods=4)
@@ -93,7 +104,9 @@ class Base:
             np.random.randn(4, 4), index=date_range("20130101", periods=4)
         )
 
-        dates_rev = date_range("20130101", periods=4).sort_values(ascending=False)
+        dates_rev = date_range("20130101", periods=4).sort_values(
+            ascending=False
+        )
         self.series_ts_rev = Series(np.random.randn(4), index=dates_rev)
         self.frame_ts_rev = DataFrame(np.random.randn(4, 4), index=dates_rev)
 

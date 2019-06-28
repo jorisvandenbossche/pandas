@@ -92,7 +92,13 @@ class Grouper:
     >>> df.groupby(Grouper(level='date', freq='60s', axis=1))
     """
 
-    _attributes = ("key", "level", "freq", "axis", "sort")  # type: Tuple[str, ...]
+    _attributes = (
+        "key",
+        "level",
+        "freq",
+        "axis",
+        "sort",
+    )  # type: Tuple[str, ...]
 
     def __new__(cls, *args, **kwargs):
         if kwargs.get("freq") is not None:
@@ -155,7 +161,9 @@ class Grouper:
         """
 
         if self.key is not None and self.level is not None:
-            raise ValueError("The Grouper cannot specify both a key and a level!")
+            raise ValueError(
+                "The Grouper cannot specify both a key and a level!"
+            )
 
         # Keep self.grouper value before overriding
         if self._grouper is None:
@@ -171,7 +179,9 @@ class Grouper:
                 ax = self._grouper.take(obj.index)
             else:
                 if key not in obj._info_axis:
-                    raise KeyError("The grouper name {0} is not found".format(key))
+                    raise KeyError(
+                        "The grouper name {0} is not found".format(key)
+                    )
                 ax = Index(obj[key], name=key)
 
         else:
@@ -183,11 +193,15 @@ class Grouper:
                 # equivalent to the axis name
                 if isinstance(ax, MultiIndex):
                     level = ax._get_level_number(level)
-                    ax = Index(ax._get_level_values(level), name=ax.names[level])
+                    ax = Index(
+                        ax._get_level_values(level), name=ax.names[level]
+                    )
 
                 else:
                     if level not in (0, ax.name):
-                        raise ValueError("The level {0} is not valid".format(level))
+                        raise ValueError(
+                            "The level {0} is not valid".format(level)
+                        )
 
         # possibly sort
         if (self.sort or sort) and not ax.is_monotonic:
@@ -331,7 +345,9 @@ class Grouping:
 
                 self._group_index = CategoricalIndex(
                     Categorical.from_codes(
-                        codes=codes, categories=categories, ordered=self.grouper.ordered
+                        codes=codes,
+                        categories=categories,
+                        ordered=self.grouper.ordered,
                     )
                 )
 
@@ -345,7 +361,9 @@ class Grouping:
             ):
                 if getattr(self.grouper, "ndim", 1) != 1:
                     t = self.name or str(type(self.grouper))
-                    raise ValueError("Grouper for '{}' not 1-dimensional".format(t))
+                    raise ValueError(
+                        "Grouper for '{}' not 1-dimensional".format(t)
+                    )
                 self.grouper = self.index.map(self.grouper)
                 if not (
                     hasattr(self.grouper, "__len__")
@@ -403,7 +421,9 @@ class Grouping:
         if self.all_grouper is not None:
             from pandas.core.groupby.categorical import recode_from_groupby
 
-            return recode_from_groupby(self.all_grouper, self.sort, self.group_index)
+            return recode_from_groupby(
+                self.all_grouper, self.sort, self.group_index
+            )
         return self.group_index
 
     @property
@@ -419,14 +439,18 @@ class Grouping:
                 labels = self.grouper.label_info
                 uniques = self.grouper.result_index
             else:
-                labels, uniques = algorithms.factorize(self.grouper, sort=self.sort)
+                labels, uniques = algorithms.factorize(
+                    self.grouper, sort=self.sort
+                )
                 uniques = Index(uniques, name=self.name)
             self._labels = labels
             self._group_index = uniques
 
     @cache_readonly
     def groups(self):
-        return self.index.groupby(Categorical.from_codes(self.labels, self.group_index))
+        return self.index.groupby(
+            Categorical.from_codes(self.labels, self.group_index)
+        )
 
 
 def _get_grouper(
@@ -494,15 +518,20 @@ def _get_grouper(
                 elif nlevels == 0:
                     raise ValueError("No group keys passed!")
                 else:
-                    raise ValueError("multiple levels only valid with " "MultiIndex")
+                    raise ValueError(
+                        "multiple levels only valid with " "MultiIndex"
+                    )
 
             if isinstance(level, str):
                 if obj.index.name != level:
                     raise ValueError(
-                        "level name {} is not the name of the " "index".format(level)
+                        "level name {} is not the name of the "
+                        "index".format(level)
                     )
             elif level > 0 or level < -1:
-                raise ValueError("level > 0 or level < -1 only valid with MultiIndex")
+                raise ValueError(
+                    "level > 0 or level < -1 only valid with MultiIndex"
+                )
 
             # NOTE: `group_axis` and `group_axis.get_level_values(level)`
             # are same in this section.
@@ -665,7 +694,9 @@ def _get_grouper(
 
 
 def _is_label_like(val):
-    return isinstance(val, (str, tuple)) or (val is not None and is_scalar(val))
+    return isinstance(val, (str, tuple)) or (
+        val is not None and is_scalar(val)
+    )
 
 
 def _convert_grouper(axis, grouper):

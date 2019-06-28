@@ -55,7 +55,10 @@ def test_override_set_noconvert_columns():
     parse_dates = [[1, 2]]
     cols = {
         "a": [0, 0],
-        "c_d": [Timestamp("2014-01-01 09:00:00"), Timestamp("2014-01-02 10:00:00")],
+        "c_d": [
+            Timestamp("2014-01-01 09:00:00"),
+            Timestamp("2014-01-02 10:00:00"),
+        ],
     }
     expected = DataFrame(cols, columns=["c_d", "a"])
 
@@ -109,7 +112,11 @@ def test_bad_stream_exception(all_parsers, csv_dir_path):
 
     # Stream must be binary UTF8.
     with open(path, "rb") as handle, codecs.StreamRecoder(
-        handle, utf8.encode, utf8.decode, codec.streamreader, codec.streamwriter
+        handle,
+        utf8.encode,
+        utf8.decode,
+        codec.streamreader,
+        codec.streamwriter,
     ) as stream:
 
         with pytest.raises(UnicodeDecodeError, match=msg):
@@ -172,7 +179,9 @@ c,3
     index = Index(["a", "b", "c"], name=0)
     expected = Series([1, 2, 3], name=1, index=index)
 
-    result = parser.read_csv(StringIO(data), index_col=0, header=None, squeeze=True)
+    result = parser.read_csv(
+        StringIO(data), index_col=0, header=None, squeeze=True
+    )
     tm.assert_series_equal(result, expected)
 
     # see gh-8217
@@ -208,7 +217,12 @@ skip
     parser = all_parsers
     msg = "Expected 3 fields in line 6, saw 5"
     reader = parser.read_csv(
-        StringIO(data), header=1, comment="#", iterator=True, chunksize=1, skiprows=[2]
+        StringIO(data),
+        header=1,
+        comment="#",
+        iterator=True,
+        chunksize=1,
+        skiprows=[2],
     )
 
     with pytest.raises(ParserError, match=msg):
@@ -238,7 +252,9 @@ b,3,4
 c,4,5
 """
     parser = all_parsers
-    expected = DataFrame({"A": ["a", "b", "c"], "B": [1, 3, 4], "C": [2, 4, 5]})
+    expected = DataFrame(
+        {"A": ["a", "b", "c"], "B": [1, 3, 4], "C": [2, 4, 5]}
+    )
     result = parser.read_csv(StringIO(data))
     tm.assert_frame_equal(result, expected)
 
@@ -255,7 +271,9 @@ def test_read_csv_low_memory_no_rows_with_index(all_parsers):
 2,2,3,4
 3,3,4,5
 """
-    result = parser.read_csv(StringIO(data), low_memory=True, index_col=0, nrows=0)
+    result = parser.read_csv(
+        StringIO(data), low_memory=True, index_col=0, nrows=0
+    )
     expected = DataFrame(columns=["A", "B", "C"])
     tm.assert_frame_equal(result, expected)
 
@@ -405,7 +423,10 @@ bar,12,13,14,15
         ),
         (
             "A,B\nYES,1\nno,2\nyes,3\nNo,3\nYes,3",
-            dict(true_values=["yes", "Yes", "YES"], false_values=["no", "NO", "No"]),
+            dict(
+                true_values=["yes", "Yes", "YES"],
+                false_values=["no", "NO", "No"],
+            ),
             DataFrame(
                 [[True, 1], [False, 2], [True, 3], [False, 3], [True, 3]],
                 columns=["A", "B"],
@@ -620,7 +641,11 @@ def test_read_data_list(all_parsers):
     kwargs = dict(index_col=0)
     data = "A,B,C\nfoo,1,2,3\nbar,4,5,6"
 
-    data_list = [["A", "B", "C"], ["foo", "1", "2", "3"], ["bar", "4", "5", "6"]]
+    data_list = [
+        ["A", "B", "C"],
+        ["foo", "1", "2", "3"],
+        ["bar", "4", "5", "6"],
+    ]
     expected = parser.read_csv(StringIO(data), **kwargs)
 
     parser = TextParser(data_list, chunksize=2, **kwargs)
@@ -737,7 +762,8 @@ baz,7,8,9
 
 
 @pytest.mark.parametrize(
-    "kwargs", [dict(iterator=True, chunksize=1), dict(iterator=True), dict(chunksize=1)]
+    "kwargs",
+    [dict(iterator=True, chunksize=1), dict(iterator=True), dict(chunksize=1)],
 )
 def test_iterator_skipfooter_errors(all_parsers, kwargs):
     msg = "'skipfooter' not supported for 'iteration'"
@@ -778,7 +804,9 @@ bar2,12,13,14,15
                     [12, 13, 14, 15],
                     [12, 13, 14, 15],
                 ],
-                index=Index(["foo", "bar", "baz", "qux", "foo2", "bar2"], name="index"),
+                index=Index(
+                    ["foo", "bar", "baz", "qux", "foo2", "bar2"], name="index"
+                ),
                 columns=["A", "B", "C", "D"],
             ),
         ),
@@ -789,7 +817,10 @@ foo,three,12,13,14,15
 bar,one,12,13,14,15
 bar,two,12,13,14,15
 """,
-            dict(index_col=[0, 1], names=["index1", "index2", "A", "B", "C", "D"]),
+            dict(
+                index_col=[0, 1],
+                names=["index1", "index2", "A", "B", "C", "D"],
+            ),
             DataFrame(
                 [
                     [2, 3, 4, 5],
@@ -882,7 +913,9 @@ bar,two,12,13,14,15
         ("a,b", DataFrame(columns=["a", "b"]), [0]),
         (
             "a,b\nc,d",
-            DataFrame(columns=MultiIndex.from_tuples([("a", "c"), ("b", "d")])),
+            DataFrame(
+                columns=MultiIndex.from_tuples([("a", "c"), ("b", "d")])
+            ),
             [0, 1],
         ),
     ],
@@ -962,7 +995,9 @@ def test_local_file(all_parsers, csv_dir_path):
 def test_path_path_lib(all_parsers):
     parser = all_parsers
     df = tm.makeDataFrame()
-    result = tm.round_trip_pathlib(df.to_csv, lambda p: parser.read_csv(p, index_col=0))
+    result = tm.round_trip_pathlib(
+        df.to_csv, lambda p: parser.read_csv(p, index_col=0)
+    )
     tm.assert_frame_equal(df, result)
 
 
@@ -986,7 +1021,9 @@ def test_nonexistent_path(all_parsers):
         parser.read_csv(path)
 
         filename = e.value.filename
-        filename = filename.decode() if isinstance(filename, bytes) else filename
+        filename = (
+            filename.decode() if isinstance(filename, bytes) else filename
+        )
 
         assert path == filename
 
@@ -1319,13 +1356,17 @@ def test_float_parser(all_parsers):
 def test_scientific_no_exponent(all_parsers):
     # see gh-12215
     df = DataFrame.from_dict(
-        OrderedDict([("w", ["2e"]), ("x", ["3E"]), ("y", ["42e"]), ("z", ["632E"])])
+        OrderedDict(
+            [("w", ["2e"]), ("x", ["3E"]), ("y", ["42e"]), ("z", ["632E"])]
+        )
     )
     data = df.to_csv(index=False)
     parser = all_parsers
 
     for precision in parser.float_precision_choices:
-        df_roundtrip = parser.read_csv(StringIO(data), float_precision=precision)
+        df_roundtrip = parser.read_csv(
+            StringIO(data), float_precision=precision
+        )
         tm.assert_frame_equal(df_roundtrip, df)
 
 
@@ -1373,7 +1414,8 @@ def test_int64_overflow(all_parsers, conv):
 
 
 @pytest.mark.parametrize(
-    "val", [np.iinfo(np.uint64).max, np.iinfo(np.int64).max, np.iinfo(np.int64).min]
+    "val",
+    [np.iinfo(np.uint64).max, np.iinfo(np.int64).max, np.iinfo(np.int64).min],
 )
 def test_int64_uint64_range(all_parsers, val):
     # These numbers fall right inside the int64-uint64
@@ -1398,7 +1440,9 @@ def test_outside_int64_uint64_range(all_parsers, val):
     tm.assert_frame_equal(result, expected)
 
 
-@pytest.mark.parametrize("exp_data", [[str(-1), str(2 ** 63)], [str(2 ** 63), str(-1)]])
+@pytest.mark.parametrize(
+    "exp_data", [[str(-1), str(2 ** 63)], [str(2 ** 63), str(-1)]]
+)
 def test_numeric_range_too_wide(all_parsers, exp_data):
     # No numerical dtype can hold both negative and uint64
     # values, so they should be cast as string.
@@ -1476,14 +1520,18 @@ def test_empty_with_nrows_chunksize(all_parsers, iterator):
         (
             "a,b,c\n4,5,6\n ",
             dict(skip_blank_lines=False),
-            DataFrame([["4", 5, 6], [" ", None, None]], columns=["a", "b", "c"]),
+            DataFrame(
+                [["4", 5, 6], [" ", None, None]], columns=["a", "b", "c"]
+            ),
             None,
         ),
         # EAT_CRNL
         (
             "a,b,c\n4,5,6\n\r",
             dict(skip_blank_lines=False),
-            DataFrame([[4, 5, 6], [None, None, None]], columns=["a", "b", "c"]),
+            DataFrame(
+                [[4, 5, 6], [None, None, None]], columns=["a", "b", "c"]
+            ),
             None,
         ),
         # ESCAPED_CHAR
@@ -1605,7 +1653,9 @@ def test_read_empty_with_usecols(all_parsers, data, kwargs, expected):
         # gh-8983: test skipping set of rows after a row with trailing spaces.
         (
             dict(
-                delim_whitespace=True, skiprows=[1, 2, 3, 5, 6], skip_blank_lines=True
+                delim_whitespace=True,
+                skiprows=[1, 2, 3, 5, 6],
+                skip_blank_lines=True,
             ),
             DataFrame({"A": [1.0, 5.1], "B": [2.0, np.nan], "C": [4.0, 10]}),
         ),
@@ -1641,7 +1691,9 @@ b\n"""
 
     expected = DataFrame({"MyColumn": list("abab")})
     result = parser.read_csv(
-        StringIO(data), skipinitialspace=True, delim_whitespace=delim_whitespace
+        StringIO(data),
+        skipinitialspace=True,
+        delim_whitespace=delim_whitespace,
     )
     tm.assert_frame_equal(result, expected)
 
@@ -1650,7 +1702,11 @@ b\n"""
     "sep,skip_blank_lines,exp_data",
     [
         (",", True, [[1.0, 2.0, 4.0], [5.0, np.nan, 10.0], [-70.0, 0.4, 1.0]]),
-        (r"\s+", True, [[1.0, 2.0, 4.0], [5.0, np.nan, 10.0], [-70.0, 0.4, 1.0]]),
+        (
+            r"\s+",
+            True,
+            [[1.0, 2.0, 4.0], [5.0, np.nan, 10.0], [-70.0, 0.4, 1.0]],
+        ),
         (
             ",",
             False,
@@ -1680,7 +1736,9 @@ A,B,C
     if sep == r"\s+":
         data = data.replace(",", "  ")
 
-    result = parser.read_csv(StringIO(data), sep=sep, skip_blank_lines=skip_blank_lines)
+    result = parser.read_csv(
+        StringIO(data), sep=sep, skip_blank_lines=skip_blank_lines
+    )
     expected = DataFrame(exp_data, columns=["A", "B", "C"])
     tm.assert_frame_equal(result, expected)
 
@@ -1695,7 +1753,9 @@ A,B,C
 \t    1,2.,4.
 5.,NaN,10.0
 """
-    expected = DataFrame([[1, 2.0, 4.0], [5.0, np.nan, 10.0]], columns=["A", "B", "C"])
+    expected = DataFrame(
+        [[1, 2.0, 4.0], [5.0, np.nan, 10.0]], columns=["A", "B", "C"]
+    )
     result = parser.read_csv(StringIO(data))
     tm.assert_frame_equal(result, expected)
 
@@ -1717,7 +1777,9 @@ c   1   2   3   4
         ),
         (
             "    a b c\n1 2 3 \n4 5  6\n 7 8 9",
-            DataFrame([[1, 2, 3], [4, 5, 6], [7, 8, 9]], columns=["a", "b", "c"]),
+            DataFrame(
+                [[1, 2, 3], [4, 5, 6], [7, 8, 9]], columns=["a", "b", "c"]
+            ),
         ),
     ],
 )
@@ -1913,7 +1975,11 @@ def test_null_byte_char(all_parsers):
         # Test in a data row instead of header
         ("b\n1", dict(names=["a"]), DataFrame({"a": ["b", "1"]})),
         # Test in empty data row with skipping
-        ("\n1", dict(names=["a"], skip_blank_lines=True), DataFrame({"a": [1]})),
+        (
+            "\n1",
+            dict(names=["a"], skip_blank_lines=True),
+            DataFrame({"a": [1]}),
+        ),
         # Test in empty data row without skipping
         (
             "\n1",
@@ -1932,7 +1998,9 @@ def test_utf8_bom(all_parsers, data, kwargs, expected):
         bom_data = (bom + _data).encode(utf8)
         return BytesIO(bom_data)
 
-    result = parser.read_csv(_encode_data_with_bom(data), encoding=utf8, **kwargs)
+    result = parser.read_csv(
+        _encode_data_with_bom(data), encoding=utf8, **kwargs
+    )
     tm.assert_frame_equal(result, expected)
 
 
@@ -1981,7 +2049,9 @@ def test_internal_eof_byte_to_file(all_parsers):
     # see gh-16559
     parser = all_parsers
     data = b'c1,c2\r\n"test \x1a    test", test\r\n'
-    expected = DataFrame([["test \x1a    test", " test"]], columns=["c1", "c2"])
+    expected = DataFrame(
+        [["test \x1a    test", " test"]], columns=["c1", "c2"]
+    )
     path = "__%s__.csv" % tm.rands(10)
 
     with tm.ensure_clean(path) as path:
@@ -2073,10 +2143,14 @@ def test_valid_file_buffer_seems_invalid(all_parsers):
 
 @pytest.mark.parametrize(
     "kwargs",
-    [dict(), dict(error_bad_lines=True)],  # Default is True.  # Explicitly pass in.
+    [
+        dict(),
+        dict(error_bad_lines=True),
+    ],  # Default is True.  # Explicitly pass in.
 )
 @pytest.mark.parametrize(
-    "warn_kwargs", [dict(), dict(warn_bad_lines=True), dict(warn_bad_lines=False)]
+    "warn_kwargs",
+    [dict(), dict(warn_bad_lines=True), dict(warn_bad_lines=False)],
 )
 def test_error_bad_lines(all_parsers, kwargs, warn_kwargs):
     # see gh-15925
@@ -2095,7 +2169,9 @@ def test_warn_bad_lines(all_parsers, capsys):
     data = "a\n1\n1,2,3\n4\n5,6,7"
     expected = DataFrame({"a": [1, 4]})
 
-    result = parser.read_csv(StringIO(data), error_bad_lines=False, warn_bad_lines=True)
+    result = parser.read_csv(
+        StringIO(data), error_bad_lines=False, warn_bad_lines=True
+    )
     tm.assert_frame_equal(result, expected)
 
     captured = capsys.readouterr()

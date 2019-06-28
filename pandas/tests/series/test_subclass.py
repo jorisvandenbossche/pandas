@@ -29,10 +29,14 @@ class TestSeriesSubclassing:
 
     def test_subclass_unstack(self):
         # GH 15564
-        s = tm.SubclassedSeries([1, 2, 3, 4], index=[list("aabb"), list("xyxy")])
+        s = tm.SubclassedSeries(
+            [1, 2, 3, 4], index=[list("aabb"), list("xyxy")]
+        )
 
         res = s.unstack()
-        exp = tm.SubclassedDataFrame({"x": [1, 3], "y": [2, 4]}, index=["a", "b"])
+        exp = tm.SubclassedDataFrame(
+            {"x": [1, 3], "y": [2, 4]}, index=["a", "b"]
+        )
 
         tm.assert_frame_equal(res, exp)
 
@@ -86,7 +90,9 @@ class TestSparseSeriesSubclassing:
         s = tm.SubclassedSparseSeries([1, 2], index=list("ab"), name="xxx")
         res = s.to_frame()
 
-        exp_arr = pd.SparseArray([1, 2], dtype=np.int64, kind="block", fill_value=0)
+        exp_arr = pd.SparseArray(
+            [1, 2], dtype=np.int64, kind="block", fill_value=0
+        )
         exp = tm.SubclassedSparseDataFrame(
             {"xxx": exp_arr}, index=list("ab"), default_fill_value=0
         )
@@ -100,5 +106,7 @@ class TestSparseSeriesSubclassing:
 
         s = tm.SubclassedSparseSeries([1.1, 2.1], index=list("ab"), name="xxx")
         res = s.to_frame()
-        exp = tm.SubclassedSparseDataFrame({"xxx": [1.1, 2.1]}, index=list("ab"))
+        exp = tm.SubclassedSparseDataFrame(
+            {"xxx": [1.1, 2.1]}, index=list("ab")
+        )
         tm.assert_sp_frame_equal(res, exp)

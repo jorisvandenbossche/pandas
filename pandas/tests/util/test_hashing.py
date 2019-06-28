@@ -113,7 +113,12 @@ def test_hash_tuples():
 
 @pytest.mark.parametrize(
     "tup",
-    [(1, "one"), (1, np.nan), (1.0, pd.NaT, "A"), ("A", pd.Timestamp("2012-01-01"))],
+    [
+        (1, "one"),
+        (1, np.nan),
+        (1.0, pd.NaT, "A"),
+        ("A", pd.Timestamp("2012-01-01")),
+    ],
 )
 def test_hash_tuple(tup):
     # Test equivalence between
@@ -221,7 +226,11 @@ def test_multiindex_objects():
         Series(tm.makePeriodIndex()),
         Series(pd.date_range("20130101", periods=3, tz="US/Eastern")),
         MultiIndex.from_product(
-            [range(5), ["foo", "bar", "baz"], pd.date_range("20130101", periods=2)]
+            [
+                range(5),
+                ["foo", "bar", "baz"],
+                pd.date_range("20130101", periods=2),
+            ]
         ),
         MultiIndex.from_product([pd.CategoricalIndex(list("aabc")), range(3)]),
     ],
@@ -273,11 +282,14 @@ def test_categorical_consistency(s1, categorize):
 
 def test_categorical_with_nan_consistency():
     c = pd.Categorical.from_codes(
-        [-1, 0, 1, 2, 3, 4], categories=pd.date_range("2012-01-01", periods=5, name="B")
+        [-1, 0, 1, 2, 3, 4],
+        categories=pd.date_range("2012-01-01", periods=5, name="B"),
     )
     expected = hash_array(c, categorize=False)
 
-    c = pd.Categorical.from_codes([-1, 0], categories=[pd.Timestamp("2012-01-01")])
+    c = pd.Categorical.from_codes(
+        [-1, 0], categories=[pd.Timestamp("2012-01-01")]
+    )
     result = hash_array(c, categorize=False)
 
     assert result[0] in expected
@@ -352,4 +364,6 @@ def test_hash_collisions():
     tm.assert_numpy_array_equal(result2, expected2)
 
     result = hash_array(np.asarray(hashes, dtype=object), "utf8")
-    tm.assert_numpy_array_equal(result, np.concatenate([expected1, expected2], axis=0))
+    tm.assert_numpy_array_equal(
+        result, np.concatenate([expected1, expected2], axis=0)
+    )

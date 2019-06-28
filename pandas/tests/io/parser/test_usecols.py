@@ -65,7 +65,9 @@ a,b,c
     parser = all_parsers
     result = parser.read_csv(StringIO(data), usecols=usecols)
 
-    expected = DataFrame([[2, 3], [5, 6], [8, 9], [11, 12]], columns=["b", "c"])
+    expected = DataFrame(
+        [[2, 3], [5, 6], [8, 9], [11, 12]], columns=["b", "c"]
+    )
     tm.assert_frame_equal(result, expected)
 
 
@@ -78,7 +80,9 @@ a,b,c
 10,11,12"""
     parser = all_parsers
     names = ["foo", "bar"]
-    result = parser.read_csv(StringIO(data), names=names, usecols=[1, 2], header=0)
+    result = parser.read_csv(
+        StringIO(data), names=names, usecols=[1, 2], header=0
+    )
 
     expected = DataFrame([[2, 3], [5, 6], [8, 9], [11, 12]], columns=names)
     tm.assert_frame_equal(result, expected)
@@ -94,9 +98,13 @@ def test_usecols_relative_to_names(all_parsers, names, usecols):
 7,8,9
 10,11,12"""
     parser = all_parsers
-    result = parser.read_csv(StringIO(data), names=names, header=None, usecols=usecols)
+    result = parser.read_csv(
+        StringIO(data), names=names, header=None, usecols=usecols
+    )
 
-    expected = DataFrame([[2, 3], [5, 6], [8, 9], [11, 12]], columns=["b", "c"])
+    expected = DataFrame(
+        [[2, 3], [5, 6], [8, 9], [11, 12]], columns=["b", "c"]
+    )
     tm.assert_frame_equal(result, expected)
 
 
@@ -112,7 +120,9 @@ def test_usecols_relative_to_names2(all_parsers):
         StringIO(data), names=["a", "b"], header=None, usecols=[0, 1]
     )
 
-    expected = DataFrame([[1, 2], [4, 5], [7, 8], [10, 11]], columns=["a", "b"])
+    expected = DataFrame(
+        [[1, 2], [4, 5], [7, 8], [10, 11]], columns=["a", "b"]
+    )
     tm.assert_frame_equal(result, expected)
 
 
@@ -124,13 +134,16 @@ def test_usecols_name_length_conflict(all_parsers):
 10,11,12"""
     parser = all_parsers
     msg = (
-        "Number of passed names did not " "match number of header fields in the file"
+        "Number of passed names did not "
+        "match number of header fields in the file"
         if parser.engine == "python"
         else "Passed header names mismatches usecols"
     )
 
     with pytest.raises(ValueError, match=msg):
-        parser.read_csv(StringIO(data), names=["a", "b"], header=None, usecols=[1])
+        parser.read_csv(
+            StringIO(data), names=["a", "b"], header=None, usecols=[1]
+        )
 
 
 def test_usecols_single_string(all_parsers):
@@ -165,7 +178,9 @@ def test_usecols_index_col_conflict(all_parsers, usecols, index_col):
     data = "a,b,c,d\nA,a,1,one\nB,b,2,two"
     expected = DataFrame({"c": [1, 2]}, index=Index(["a", "b"], name="b"))
 
-    result = parser.read_csv(StringIO(data), usecols=usecols, index_col=index_col)
+    result = parser.read_csv(
+        StringIO(data), usecols=usecols, index_col=index_col
+    )
     tm.assert_frame_equal(result, expected)
 
 
@@ -189,7 +204,9 @@ def test_usecols_implicit_index_col(all_parsers):
     data = "a,b,c\n4,apple,bat,5.7\n8,orange,cow,10"
 
     result = parser.read_csv(StringIO(data), usecols=["a", "b"])
-    expected = DataFrame({"a": ["apple", "orange"], "b": ["bat", "cow"]}, index=[4, 8])
+    expected = DataFrame(
+        {"a": ["apple", "orange"], "b": ["bat", "cow"]}, index=[4, 8]
+    )
     tm.assert_frame_equal(result, expected)
 
 
@@ -199,7 +216,9 @@ def test_usecols_regex_sep(all_parsers):
     data = "a  b  c\n4  apple  bat  5.7\n8  orange  cow  10"
     result = parser.read_csv(StringIO(data), sep=r"\s+", usecols=("a", "b"))
 
-    expected = DataFrame({"a": ["apple", "orange"], "b": ["bat", "cow"]}, index=[4, 8])
+    expected = DataFrame(
+        {"a": ["apple", "orange"], "b": ["bat", "cow"]}, index=[4, 8]
+    )
     tm.assert_frame_equal(result, expected)
 
 
@@ -207,8 +226,12 @@ def test_usecols_with_whitespace(all_parsers):
     parser = all_parsers
     data = "a  b  c\n4  apple  bat  5.7\n8  orange  cow  10"
 
-    result = parser.read_csv(StringIO(data), delim_whitespace=True, usecols=("a", "b"))
-    expected = DataFrame({"a": ["apple", "orange"], "b": ["bat", "cow"]}, index=[4, 8])
+    result = parser.read_csv(
+        StringIO(data), delim_whitespace=True, usecols=("a", "b")
+    )
+    expected = DataFrame(
+        {"a": ["apple", "orange"], "b": ["bat", "cow"]}, index=[4, 8]
+    )
     tm.assert_frame_equal(result, expected)
 
 
@@ -216,9 +239,15 @@ def test_usecols_with_whitespace(all_parsers):
     "usecols,expected",
     [
         # Column selection by index.
-        ([0, 1], DataFrame(data=[[1000, 2000], [4000, 5000]], columns=["2", "0"])),
+        (
+            [0, 1],
+            DataFrame(data=[[1000, 2000], [4000, 5000]], columns=["2", "0"]),
+        ),
         # Column selection by name.
-        (["0", "1"], DataFrame(data=[[2000, 3000], [5000, 6000]], columns=["0", "1"])),
+        (
+            ["0", "1"],
+            DataFrame(data=[[2000, 3000], [5000, 6000]], columns=["0", "1"]),
+        ),
     ],
 )
 def test_usecols_with_integer_like_header(all_parsers, usecols, expected):
@@ -242,10 +271,15 @@ def test_usecols_with_parse_dates(all_parsers, usecols):
 
     cols = {
         "a": [0, 0],
-        "c_d": [Timestamp("2014-01-01 09:00:00"), Timestamp("2014-01-02 10:00:00")],
+        "c_d": [
+            Timestamp("2014-01-01 09:00:00"),
+            Timestamp("2014-01-02 10:00:00"),
+        ],
     }
     expected = DataFrame(cols, columns=["c_d", "a"])
-    result = parser.read_csv(StringIO(data), usecols=usecols, parse_dates=parse_dates)
+    result = parser.read_csv(
+        StringIO(data), usecols=usecols, parse_dates=parse_dates
+    )
     tm.assert_frame_equal(result, expected)
 
 
@@ -305,7 +339,9 @@ def test_usecols_with_parse_dates3(all_parsers):
     }
     expected = DataFrame(cols, columns=usecols)
 
-    result = parser.read_csv(StringIO(data), usecols=usecols, parse_dates=parse_dates)
+    result = parser.read_csv(
+        StringIO(data), usecols=usecols, parse_dates=parse_dates
+    )
     tm.assert_frame_equal(result, expected)
 
 
@@ -328,7 +364,9 @@ def test_usecols_with_parse_dates4(all_parsers):
     }
     expected = DataFrame(cols, columns=["a_b"] + list("cdefghij"))
 
-    result = parser.read_csv(StringIO(data), usecols=usecols, parse_dates=parse_dates)
+    result = parser.read_csv(
+        StringIO(data), usecols=usecols, parse_dates=parse_dates
+    )
     tm.assert_frame_equal(result, expected)
 
 
@@ -349,7 +387,10 @@ def test_usecols_with_parse_dates_and_names(all_parsers, usecols, names):
 
     cols = {
         "a": [0, 0],
-        "c_d": [Timestamp("2014-01-01 09:00:00"), Timestamp("2014-01-02 10:00:00")],
+        "c_d": [
+            Timestamp("2014-01-01 09:00:00"),
+            Timestamp("2014-01-02 10:00:00"),
+        ],
     }
     expected = DataFrame(cols, columns=["c_d", "a"])
 
@@ -368,7 +409,11 @@ def test_usecols_with_unicode_strings(all_parsers):
     parser = all_parsers
 
     exp_data = {
-        "AAA": {0: 0.056674972999999997, 1: 2.6132309819999997, 2: 3.5689350380000002},
+        "AAA": {
+            0: 0.056674972999999997,
+            1: 2.6132309819999997,
+            2: 3.5689350380000002,
+        },
         "BBB": {0: 8, 1: 2, 2: 7},
     }
     expected = DataFrame(exp_data)
@@ -386,7 +431,11 @@ def test_usecols_with_single_byte_unicode_strings(all_parsers):
     parser = all_parsers
 
     exp_data = {
-        "A": {0: 0.056674972999999997, 1: 2.6132309819999997, 2: 3.5689350380000002},
+        "A": {
+            0: 0.056674972999999997,
+            1: 2.6132309819999997,
+            2: 3.5689350380000002,
+        },
         "B": {0: 8, 1: 2, 2: 7},
     }
     expected = DataFrame(exp_data)
@@ -416,7 +465,11 @@ def test_usecols_with_multi_byte_characters(all_parsers, usecols):
     parser = all_parsers
 
     exp_data = {
-        "あああ": {0: 0.056674972999999997, 1: 2.6132309819999997, 2: 3.5689350380000002},
+        "あああ": {
+            0: 0.056674972999999997,
+            1: 2.6132309819999997,
+            2: 3.5689350380000002,
+        },
         "いい": {0: 8, 1: 2, 2: 7},
     }
     expected = DataFrame(exp_data)
@@ -536,7 +589,12 @@ def test_uneven_length_cols(all_parsers, data, usecols, kwargs, expected):
             None,
             _msg_validate_usecols_names.format(r"\['f'\]"),
         ),
-        (["a", "b", "f"], dict(), None, _msg_validate_usecols_names.format(r"\['f'\]")),
+        (
+            ["a", "b", "f"],
+            dict(),
+            None,
+            _msg_validate_usecols_names.format(r"\['f'\]"),
+        ),
         (
             ["a", "b", "f", "g"],
             dict(),
@@ -564,7 +622,9 @@ def test_uneven_length_cols(all_parsers, data, usecols, kwargs, expected):
         ),
     ],
 )
-def test_raises_on_usecols_names_mismatch(all_parsers, usecols, kwargs, expected, msg):
+def test_raises_on_usecols_names_mismatch(
+    all_parsers, usecols, kwargs, expected, msg
+):
     data = "a,b,c,d\n1,2,3,4\n5,6,7,8"
     kwargs.update(usecols=usecols)
     parser = all_parsers
@@ -578,7 +638,8 @@ def test_raises_on_usecols_names_mismatch(all_parsers, usecols, kwargs, expected
 
 
 @pytest.mark.xfail(
-    reason="see gh-16469: works on the C engine but not the Python engine", strict=False
+    reason="see gh-16469: works on the C engine but not the Python engine",
+    strict=False,
 )
 @pytest.mark.parametrize("usecols", [["A", "C"], [0, 2]])
 def test_usecols_subset_names_mismatch_orig_columns(all_parsers, usecols):
@@ -586,6 +647,8 @@ def test_usecols_subset_names_mismatch_orig_columns(all_parsers, usecols):
     names = ["A", "B", "C", "D"]
     parser = all_parsers
 
-    result = parser.read_csv(StringIO(data), header=0, names=names, usecols=usecols)
+    result = parser.read_csv(
+        StringIO(data), header=0, names=names, usecols=usecols
+    )
     expected = DataFrame({"A": [1, 5], "C": [3, 7]})
     tm.assert_frame_equal(result, expected)

@@ -91,7 +91,9 @@ def test_custom_grouper(index):
             "right",
             lambda s: Series(
                 [s[0], s[1:6].mean(), s[6:11].mean(), s[11:].mean()],
-                index=date_range("1/1/2000", periods=4, freq="5min", name="index"),
+                index=date_range(
+                    "1/1/2000", periods=4, freq="5min", name="index"
+                ),
             ),
         ),
         (
@@ -115,7 +117,9 @@ def test_resample_basic(series, closed, expected):
 def test_resample_integerarray():
     # GH 25580, resample on IntegerArray
     ts = pd.Series(
-        range(9), index=pd.date_range("1/1/2000", periods=9, freq="T"), dtype="Int64"
+        range(9),
+        index=pd.date_range("1/1/2000", periods=9, freq="T"),
+        dtype="Int64",
     )
     result = ts.resample("3T").sum()
     expected = Series(
@@ -167,7 +171,9 @@ def test_resample_how(series, downsample_method):
     grouplist[6:11] = 2
     grouplist[11:] = 3
     expected = s.groupby(grouplist).agg(downsample_method)
-    expected.index = date_range("1/1/2000", periods=4, freq="5min", name="index")
+    expected.index = date_range(
+        "1/1/2000", periods=4, freq="5min", name="index"
+    )
 
     result = getattr(
         s.resample("5min", closed="right", label="right"), downsample_method
@@ -202,10 +208,14 @@ def test_resample_how_ohlc(series):
     assert_frame_equal(result, expected)
 
 
-@pytest.mark.parametrize("func", ["min", "max", "sum", "prod", "mean", "var", "std"])
+@pytest.mark.parametrize(
+    "func", ["min", "max", "sum", "prod", "mean", "var", "std"]
+)
 def test_numpy_compat(func):
     # see gh-12811
-    s = Series([1, 2, 3, 4, 5], index=date_range("20130101", periods=5, freq="s"))
+    s = Series(
+        [1, 2, 3, 4, 5], index=date_range("20130101", periods=5, freq="s")
+    )
     r = s.resample("2s")
 
     msg = "numpy operations are not valid with resample"
@@ -274,31 +284,36 @@ def test_resample_rounding():
     df.index.name = None
     result = df.resample("6s").sum()
     expected = DataFrame(
-        {"value": [4, 9, 4, 2]}, index=date_range("2014-11-08", freq="6s", periods=4)
+        {"value": [4, 9, 4, 2]},
+        index=date_range("2014-11-08", freq="6s", periods=4),
     )
     assert_frame_equal(result, expected)
 
     result = df.resample("7s").sum()
     expected = DataFrame(
-        {"value": [4, 10, 4, 1]}, index=date_range("2014-11-08", freq="7s", periods=4)
+        {"value": [4, 10, 4, 1]},
+        index=date_range("2014-11-08", freq="7s", periods=4),
     )
     assert_frame_equal(result, expected)
 
     result = df.resample("11s").sum()
     expected = DataFrame(
-        {"value": [11, 8]}, index=date_range("2014-11-08", freq="11s", periods=2)
+        {"value": [11, 8]},
+        index=date_range("2014-11-08", freq="11s", periods=2),
     )
     assert_frame_equal(result, expected)
 
     result = df.resample("13s").sum()
     expected = DataFrame(
-        {"value": [13, 6]}, index=date_range("2014-11-08", freq="13s", periods=2)
+        {"value": [13, 6]},
+        index=date_range("2014-11-08", freq="13s", periods=2),
     )
     assert_frame_equal(result, expected)
 
     result = df.resample("17s").sum()
     expected = DataFrame(
-        {"value": [16, 3]}, index=date_range("2014-11-08", freq="17s", periods=2)
+        {"value": [16, 3]},
+        index=date_range("2014-11-08", freq="17s", periods=2),
     )
     assert_frame_equal(result, expected)
 
@@ -306,7 +321,10 @@ def test_resample_rounding():
 def test_resample_basic_from_daily():
     # from daily
     dti = date_range(
-        start=datetime(2005, 1, 1), end=datetime(2005, 1, 10), freq="D", name="index"
+        start=datetime(2005, 1, 1),
+        end=datetime(2005, 1, 10),
+        freq="D",
+        name="index",
     )
 
     s = Series(np.random.rand(len(dti)), dti)
@@ -375,7 +393,8 @@ def test_resample_upsampling_picked_but_not_correct():
     # resample frequency
 
     s = Series(
-        np.arange(1.0, 6), index=[datetime(1975, 1, i, 12, 0) for i in range(1, 6)]
+        np.arange(1.0, 6),
+        index=[datetime(1975, 1, i, 12, 0) for i in range(1, 6)],
     )
     expected = Series(
         np.arange(1.0, 6), index=date_range("19750101", periods=5, freq="D")
@@ -412,14 +431,17 @@ def test_resample_frame_basic():
 
 
 @pytest.mark.parametrize(
-    "loffset", [timedelta(minutes=1), "1min", Minute(1), np.timedelta64(1, "m")]
+    "loffset",
+    [timedelta(minutes=1), "1min", Minute(1), np.timedelta64(1, "m")],
 )
 def test_resample_loffset(loffset):
     # GH 7687
     rng = date_range("1/1/2000 00:00:00", "1/1/2000 00:13:00", freq="min")
     s = Series(np.random.randn(14), index=rng)
 
-    result = s.resample("5min", closed="right", label="right", loffset=loffset).mean()
+    result = s.resample(
+        "5min", closed="right", label="right", loffset=loffset
+    ).mean()
     idx = date_range("1/1/2000", periods=4, freq="5min")
     expected = Series(
         [s[0], s[1:6].mean(), s[6:11].mean(), s[11:].mean()],
@@ -429,7 +451,9 @@ def test_resample_loffset(loffset):
     assert result.index.freq == Minute(5)
 
     # from daily
-    dti = date_range(start=datetime(2005, 1, 1), end=datetime(2005, 1, 10), freq="D")
+    dti = date_range(
+        start=datetime(2005, 1, 1), end=datetime(2005, 1, 10), freq="D"
+    )
     ser = Series(np.random.rand(len(dti)), dti)
 
     # to weekly
@@ -448,7 +472,9 @@ def test_resample_loffset_upsample():
         "5min", closed="right", label="right", loffset=timedelta(minutes=1)
     ).ffill()
     idx = date_range("1/1/2000", periods=4, freq="5min")
-    expected = Series([s[0], s[5], s[10], s[-1]], index=idx + timedelta(minutes=1))
+    expected = Series(
+        [s[0], s[5], s[10], s[-1]], index=idx + timedelta(minutes=1)
+    )
 
     assert_series_equal(result, expected)
 
@@ -461,9 +487,9 @@ def test_resample_loffset_count():
 
     result = ts.resample("10S", loffset="1s").count()
 
-    expected_index = date_range(start_time, periods=10, freq="10S") + timedelta(
-        seconds=1
-    )
+    expected_index = date_range(
+        start_time, periods=10, freq="10S"
+    ) + timedelta(seconds=1)
     expected = Series(10, index=expected_index)
 
     assert_series_equal(result, expected)
@@ -478,7 +504,10 @@ def test_resample_loffset_count():
 def test_resample_upsample():
     # from daily
     dti = date_range(
-        start=datetime(2005, 1, 1), end=datetime(2005, 1, 10), freq="D", name="index"
+        start=datetime(2005, 1, 1),
+        end=datetime(2005, 1, 10),
+        freq="D",
+        name="index",
     )
 
     s = Series(np.random.rand(len(dti)), dti)
@@ -522,7 +551,9 @@ def test_resample_extra_index_point():
     expected = DataFrame({"A": Series([21, 41, 63], index=index)})
 
     index = date_range(start="20150101", end="20150331", freq="B")
-    df = DataFrame({"A": Series(range(len(index)), index=index)}, dtype="int64")
+    df = DataFrame(
+        {"A": Series(range(len(index)), index=index)}, dtype="int64"
+    )
     result = df.resample("BM").last()
     assert_frame_equal(result, expected)
 
@@ -655,12 +686,16 @@ def test_resample_dup_index():
     df.iloc[3, :] = np.nan
     result = df.resample("Q", axis=1).mean()
     expected = df.groupby(lambda x: int((x.month - 1) / 3), axis=1).mean()
-    expected.columns = [Period(year=2000, quarter=i + 1, freq="Q") for i in range(4)]
+    expected.columns = [
+        Period(year=2000, quarter=i + 1, freq="Q") for i in range(4)
+    ]
     assert_frame_equal(result, expected)
 
 
 def test_resample_reresample():
-    dti = date_range(start=datetime(2005, 1, 1), end=datetime(2005, 1, 10), freq="D")
+    dti = date_range(
+        start=datetime(2005, 1, 1), end=datetime(2005, 1, 10), freq="D"
+    )
     s = Series(np.random.rand(len(dti)), dti)
     bs = s.resample("B", closed="right", label="right").mean()
     result = bs.resample("8H").mean()
@@ -739,7 +774,9 @@ def test_asfreq_non_unique():
 
 def test_resample_axis1():
     rng = date_range("1/1/2000", "2/29/2000")
-    df = DataFrame(np.random.randn(3, len(rng)), columns=rng, index=["a", "b", "c"])
+    df = DataFrame(
+        np.random.randn(3, len(rng)), columns=rng, index=["a", "b", "c"]
+    )
 
     result = df.resample("M", axis=1).mean()
     expected = df.T.resample("M").mean().T
@@ -796,7 +833,11 @@ def test_resample_base():
 def test_resample_float_base():
     # GH25161
     dt = pd.to_datetime(
-        ["2018-11-26 16:17:43.51", "2018-11-26 16:17:44.51", "2018-11-26 16:17:45.51"]
+        [
+            "2018-11-26 16:17:43.51",
+            "2018-11-26 16:17:44.51",
+            "2018-11-26 16:17:45.51",
+        ]
     )
     s = Series(np.arange(3), index=dt)
 
@@ -887,7 +928,9 @@ def test_resample_dtype_coerceion():
     df = {"a": [1, 3, 1, 4]}
     df = DataFrame(df, index=pd.date_range("2017-01-01", "2017-01-04"))
 
-    expected = df.astype("float64").resample("H").mean()["a"].interpolate("cubic")
+    expected = (
+        df.astype("float64").resample("H").mean()["a"].interpolate("cubic")
+    )
 
     result = df.resample("H")["a"].mean().interpolate("cubic")
     tm.assert_series_equal(result, expected)
@@ -924,7 +967,9 @@ def test_nanosecond_resample_error():
     r = ts.resample(pd.tseries.offsets.Nano(100))
     result = r.agg("mean")
 
-    exp_indx = pd.date_range(start=pd.to_datetime(exp_start), periods=10, freq="100n")
+    exp_indx = pd.date_range(
+        start=pd.to_datetime(exp_start), periods=10, freq="100n"
+    )
     exp = Series(range(len(exp_indx)), index=exp_indx)
 
     assert_series_equal(result, exp)
@@ -957,12 +1002,18 @@ def test_resample_anchored_intraday(simple_date_range_series):
     tm.assert_frame_equal(result, expected)
 
     result = df.resample("Q", closed="left").mean()
-    expected = df.tshift(1, freq="D").resample("Q", kind="period", closed="left").mean()
+    expected = (
+        df.tshift(1, freq="D")
+        .resample("Q", kind="period", closed="left")
+        .mean()
+    )
     expected = expected.to_timestamp(how="end")
     expected.index += Timedelta(1, "ns") - Timedelta(1, "D")
     tm.assert_frame_equal(result, expected)
 
-    ts = simple_date_range_series("2012-04-29 23:00", "2012-04-30 5:00", freq="h")
+    ts = simple_date_range_series(
+        "2012-04-29 23:00", "2012-04-30 5:00", freq="h"
+    )
     resampled = ts.resample("M").mean()
     assert len(resampled) == 1
 
@@ -1053,7 +1104,10 @@ def test_resample_median_bug_1688():
     for dtype in ["int64", "int32", "float64", "float32"]:
         df = DataFrame(
             [1, 2],
-            index=[datetime(2012, 1, 1, 0, 0, 0), datetime(2012, 1, 1, 0, 5, 0)],
+            index=[
+                datetime(2012, 1, 1, 0, 0, 0),
+                datetime(2012, 1, 1, 0, 5, 0),
+            ],
             dtype=dtype,
         )
 
@@ -1079,7 +1133,9 @@ def test_how_lambda_functions(simple_date_range_series):
     bar_exp = ts.resample("M").std()
     bar_exp.name = "bar"
 
-    result = ts.resample("M").apply([lambda x: x.mean(), lambda x: x.std(ddof=1)])
+    result = ts.resample("M").apply(
+        [lambda x: x.mean(), lambda x: x.std(ddof=1)]
+    )
     result.columns = ["foo", "bar"]
     tm.assert_series_equal(result["foo"], foo_exp)
     tm.assert_series_equal(result["bar"], bar_exp)
@@ -1147,7 +1203,13 @@ def test_resample_timegrouper():
         df = DataFrame(dict(A=dates, B=np.arange(len(dates))))
         result = df.set_index("A").resample("M").count()
         exp_idx = pd.DatetimeIndex(
-            ["2014-07-31", "2014-08-31", "2014-09-30", "2014-10-31", "2014-11-30"],
+            [
+                "2014-07-31",
+                "2014-08-31",
+                "2014-09-30",
+                "2014-10-31",
+                "2014-11-30",
+            ],
             freq="M",
             name="A",
         )
@@ -1157,7 +1219,9 @@ def test_resample_timegrouper():
         result = df.groupby(pd.Grouper(freq="M", key="A")).count()
         assert_frame_equal(result, expected)
 
-        df = DataFrame(dict(A=dates, B=np.arange(len(dates)), C=np.arange(len(dates))))
+        df = DataFrame(
+            dict(A=dates, B=np.arange(len(dates)), C=np.arange(len(dates)))
+        )
         result = df.set_index("A").resample("M").count()
         expected = DataFrame(
             {"B": [1, 0, 2, 2, 1], "C": [1, 0, 2, 2, 1]},
@@ -1236,7 +1300,9 @@ def test_resample_group_info(n, k):
     prng = np.random.RandomState(1234)
 
     dr = date_range(start="2015-08-27", periods=n // 10, freq="T")
-    ts = Series(prng.randint(0, n // k, n).astype("int64"), index=prng.choice(dr, n))
+    ts = Series(
+        prng.randint(0, n // k, n).astype("int64"), index=prng.choice(dr, n)
+    )
 
     left = ts.resample("30T").nunique()
     ix = date_range(start=ts.index.min(), end=ts.index.max(), freq="30T")
@@ -1250,7 +1316,9 @@ def test_resample_group_info(n, k):
     mask = np.r_[True, vals[1:] != vals[:-1]]
     mask |= np.r_[True, bins[1:] != bins[:-1]]
 
-    arr = np.bincount(bins[mask] - 1, minlength=len(ix)).astype("int64", copy=False)
+    arr = np.bincount(bins[mask] - 1, minlength=len(ix)).astype(
+        "int64", copy=False
+    )
     right = Series(arr, index=ix)
 
     assert_series_equal(left, right)
@@ -1265,7 +1333,9 @@ def test_resample_size():
     ix = date_range(start=left.index.min(), end=ts.index.max(), freq="7T")
 
     bins = np.searchsorted(ix.values, ts.index.values, side="right")
-    val = np.bincount(bins, minlength=len(ix) + 1)[1:].astype("int64", copy=False)
+    val = np.bincount(bins, minlength=len(ix) + 1)[1:].astype(
+        "int64", copy=False
+    )
 
     right = Series(val, index=ix)
     assert_series_equal(left, right)
@@ -1329,12 +1399,18 @@ def test_resample_dst_anchor():
     df.resample(rule="MS").sum()
     assert_frame_equal(
         df.resample(rule="MS").sum(),
-        DataFrame([5], index=DatetimeIndex([datetime(2012, 11, 1)], tz="US/Eastern")),
+        DataFrame(
+            [5], index=DatetimeIndex([datetime(2012, 11, 1)], tz="US/Eastern")
+        ),
     )
 
-    dti = date_range("2013-09-30", "2013-11-02", freq="30Min", tz="Europe/Paris")
+    dti = date_range(
+        "2013-09-30", "2013-11-02", freq="30Min", tz="Europe/Paris"
+    )
     values = range(dti.size)
-    df = DataFrame({"a": values, "b": values, "c": values}, index=dti, dtype="int64")
+    df = DataFrame(
+        {"a": values, "b": values, "c": values}, index=dti, dtype="int64"
+    )
     how = {"a": "min", "b": "max", "c": "count"}
 
     assert_frame_equal(
@@ -1345,7 +1421,9 @@ def test_resample_dst_anchor():
                 "b": [47, 383, 719, 1055, 1393, 1586],
                 "c": [48, 336, 336, 336, 338, 193],
             },
-            index=date_range("9/30/2013", "11/4/2013", freq="W-MON", tz="Europe/Paris"),
+            index=date_range(
+                "9/30/2013", "11/4/2013", freq="W-MON", tz="Europe/Paris"
+            ),
         ),
         "W-MON Frequency",
     )
@@ -1369,7 +1447,9 @@ def test_resample_dst_anchor():
         df.resample("MS").agg(how)[["a", "b", "c"]],
         DataFrame(
             {"a": [0, 48, 1538], "b": [47, 1537, 1586], "c": [48, 1490, 49]},
-            index=date_range("9/1/2013", "11/1/2013", freq="MS", tz="Europe/Paris"),
+            index=date_range(
+                "9/1/2013", "11/1/2013", freq="MS", tz="Europe/Paris"
+            ),
         ),
         "MS Frequency",
     )
@@ -1378,7 +1458,9 @@ def test_resample_dst_anchor():
         df.resample("2MS").agg(how)[["a", "b", "c"]],
         DataFrame(
             {"a": [0, 1538], "b": [1537, 1586], "c": [1538, 49]},
-            index=date_range("9/1/2013", "11/1/2013", freq="2MS", tz="Europe/Paris"),
+            index=date_range(
+                "9/1/2013", "11/1/2013", freq="2MS", tz="Europe/Paris"
+            ),
         ),
         "2MS Frequency",
     )
@@ -1394,7 +1476,9 @@ def test_resample_dst_anchor():
                 "b": [1295, 1345, 1393, 1441],
                 "c": [48, 50, 48, 48],
             },
-            index=date_range("10/26/2013", "10/29/2013", freq="D", tz="Europe/Paris"),
+            index=date_range(
+                "10/26/2013", "10/29/2013", freq="D", tz="Europe/Paris"
+            ),
         ),
         "D Frequency",
     )
@@ -1417,7 +1501,13 @@ def test_downsample_across_dst_weekly():
     # GH 9119, GH 21459
     df = DataFrame(
         index=DatetimeIndex(
-            ["2017-03-25", "2017-03-26", "2017-03-27", "2017-03-28", "2017-03-29"],
+            [
+                "2017-03-25",
+                "2017-03-26",
+                "2017-03-27",
+                "2017-03-28",
+                "2017-03-29",
+            ],
             tz="Europe/Amsterdam",
         ),
         data=[11, 12, 13, 14, 15],
@@ -1425,15 +1515,21 @@ def test_downsample_across_dst_weekly():
     result = df.resample("1W").sum()
     expected = DataFrame(
         [23, 42],
-        index=pd.DatetimeIndex(["2017-03-26", "2017-04-02"], tz="Europe/Amsterdam"),
+        index=pd.DatetimeIndex(
+            ["2017-03-26", "2017-04-02"], tz="Europe/Amsterdam"
+        ),
     )
     tm.assert_frame_equal(result, expected)
 
-    idx = pd.date_range("2013-04-01", "2013-05-01", tz="Europe/London", freq="H")
+    idx = pd.date_range(
+        "2013-04-01", "2013-05-01", tz="Europe/London", freq="H"
+    )
     s = Series(index=idx)
     result = s.resample("W").mean()
     expected = Series(
-        index=pd.date_range("2013-04-07", freq="W", periods=5, tz="Europe/London")
+        index=pd.date_range(
+            "2013-04-07", freq="W", periods=5, tz="Europe/London"
+        )
     )
     tm.assert_series_equal(result, expected)
 
@@ -1504,7 +1600,9 @@ def test_resample_apply_with_additional_args(series):
     tm.assert_series_equal(result, expected)
 
     # Testing dataframe
-    df = pd.DataFrame({"A": 1, "B": 2}, index=pd.date_range("2017", periods=10))
+    df = pd.DataFrame(
+        {"A": 1, "B": 2}, index=pd.date_range("2017", periods=10)
+    )
     result = df.groupby("A").resample("D").agg(f, multiplier)
     expected = df.groupby("A").resample("D").mean().multiply(multiplier)
     assert_frame_equal(result, expected)
@@ -1545,7 +1643,13 @@ def test_resample_equivalent_offsets(n1, freq1, n2, freq2, k):
     [
         ("19910905", "19920406", "D", "19910905", "19920407"),
         ("19910905 00:00", "19920406 06:00", "D", "19910905", "19920407"),
-        ("19910905 06:00", "19920406 06:00", "H", "19910905 06:00", "19920406 07:00"),
+        (
+            "19910905 06:00",
+            "19920406 06:00",
+            "H",
+            "19910905 06:00",
+            "19920406 07:00",
+        ),
         ("19910906", "19920406", "M", "19910831", "19920430"),
         ("19910831", "19920430", "M", "19910831", "19920531"),
         ("1991-08", "1992-04", "M", "19910831", "19920531"),

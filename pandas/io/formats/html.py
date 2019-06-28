@@ -44,7 +44,9 @@ class HTMLFormatter(TableFormatter):
         self.table_id = self.fmt.table_id
         self.render_links = self.fmt.render_links
         if isinstance(self.fmt.col_space, int):
-            self.fmt.col_space = "{colspace}px".format(colspace=self.fmt.col_space)
+            self.fmt.col_space = "{colspace}px".format(
+                colspace=self.fmt.col_space
+            )
 
     @property
     def show_row_idx_names(self):
@@ -109,7 +111,9 @@ class HTMLFormatter(TableFormatter):
         """
         if header and self.fmt.col_space is not None:
             tags = tags or ""
-            tags += 'style="min-width: {colspace};"'.format(colspace=self.fmt.col_space)
+            tags += 'style="min-width: {colspace};"'.format(
+                colspace=self.fmt.col_space
+            )
 
         return self._write_cell(s, kind="th", indent=indent, tags=tags)
 
@@ -124,7 +128,9 @@ class HTMLFormatter(TableFormatter):
 
         if self.escape:
             # escape & first to prevent double escaping of &
-            esc = OrderedDict([("&", r"&amp;"), ("<", r"&lt;"), (">", r"&gt;")])
+            esc = OrderedDict(
+                [("&", r"&amp;"), ("<", r"&lt;"), (">", r"&gt;")]
+            )
         else:
             esc = {}
 
@@ -132,7 +138,9 @@ class HTMLFormatter(TableFormatter):
 
         if self.render_links and _is_url(rs):
             rs_unescaped = pprint_thing(s, escape_chars={}).strip()
-            start_tag += '<a href="{url}" target="_blank">'.format(url=rs_unescaped)
+            start_tag += '<a href="{url}" target="_blank">'.format(
+                url=rs_unescaped
+            )
             end_a = "</a>"
         else:
             end_a = ""
@@ -160,7 +168,9 @@ class HTMLFormatter(TableFormatter):
         if align is None:
             self.write("<tr>", indent)
         else:
-            self.write('<tr style="text-align: {align};">'.format(align=align), indent)
+            self.write(
+                '<tr style="text-align: {align};">'.format(align=align), indent
+            )
         indent += indent_delta
 
         for i, s in enumerate(line):
@@ -208,7 +218,9 @@ class HTMLFormatter(TableFormatter):
 
         self.write(
             '<table border="{border}" class="{cls}"{id_section}>'.format(
-                border=self.border, cls=" ".join(_classes), id_section=id_section
+                border=self.border,
+                cls=" ".join(_classes),
+                id_section=id_section,
             ),
             indent,
         )
@@ -230,10 +242,14 @@ class HTMLFormatter(TableFormatter):
                 sentinel = object()
             else:
                 sentinel = False
-            levels = self.columns.format(sparsify=sentinel, adjoin=False, names=False)
+            levels = self.columns.format(
+                sparsify=sentinel, adjoin=False, names=False
+            )
             level_lengths = get_level_lengths(levels, sentinel)
             inner_lvl = len(level_lengths) - 1
-            for lnum, (records, values) in enumerate(zip(level_lengths, levels)):
+            for lnum, (records, values) in enumerate(
+                zip(level_lengths, levels)
+            ):
                 if truncate_h:
                     # modify the header lines
                     ins_col = self.fmt.tr_col_num
@@ -247,7 +263,9 @@ class HTMLFormatter(TableFormatter):
                                 recs_new[tag] = span + 1
                                 if lnum == inner_lvl:
                                     values = (
-                                        values[:ins_col] + ("...",) + values[ins_col:]
+                                        values[:ins_col]
+                                        + ("...",)
+                                        + values[ins_col:]
                                     )
                                 else:
                                     # sparse col headers do not receive a ...
@@ -262,7 +280,11 @@ class HTMLFormatter(TableFormatter):
                             # get ...
                             if tag + span == ins_col:
                                 recs_new[ins_col] = 1
-                                values = values[:ins_col] + ("...",) + values[ins_col:]
+                                values = (
+                                    values[:ins_col]
+                                    + ("...",)
+                                    + values[ins_col:]
+                                )
                         records = recs_new
                         inner_lvl = len(level_lengths) - 1
                         if lnum == inner_lvl:
@@ -309,7 +331,9 @@ class HTMLFormatter(TableFormatter):
                         continue
                     j += 1
                     row.append(v)
-                self.write_tr(row, indent, self.indent_delta, tags=tags, header=True)
+                self.write_tr(
+                    row, indent, self.indent_delta, tags=tags, header=True
+                )
         else:
             # see gh-22579
             # Column misalignment also occurs for
@@ -335,13 +359,15 @@ class HTMLFormatter(TableFormatter):
                 ins_col = self.row_levels + self.fmt.tr_col_num
                 row.insert(ins_col, "...")
 
-            self.write_tr(row, indent, self.indent_delta, header=True, align=align)
+            self.write_tr(
+                row, indent, self.indent_delta, header=True, align=align
+            )
 
     def _write_row_header(self, indent):
         truncate_h = self.fmt.truncate_h
-        row = [x if x is not None else "" for x in self.frame.index.names] + [""] * (
-            self.ncols + (1 if truncate_h else 0)
-        )
+        row = [x if x is not None else "" for x in self.frame.index.names] + [
+            ""
+        ] * (self.ncols + (1 if truncate_h else 0))
         self.write_tr(row, indent, self.indent_delta, header=True)
 
     def _write_header(self, indent):
@@ -357,7 +383,9 @@ class HTMLFormatter(TableFormatter):
 
     def _get_formatted_values(self):
         with option_context("display.max_colwidth", 999999):
-            fmt_values = {i: self.fmt._format_col(i) for i in range(self.ncols)}
+            fmt_values = {
+                i: self.fmt._format_col(i) for i in range(self.ncols)
+            }
         return fmt_values
 
     def _write_body(self, indent):
@@ -366,7 +394,9 @@ class HTMLFormatter(TableFormatter):
 
         # write values
         if self.fmt.index and isinstance(self.frame.index, ABCMultiIndex):
-            self._write_hierarchical_rows(fmt_values, indent + self.indent_delta)
+            self._write_hierarchical_rows(
+                fmt_values, indent + self.indent_delta
+            )
         else:
             self._write_regular_rows(fmt_values, indent + self.indent_delta)
 
@@ -413,7 +443,11 @@ class HTMLFormatter(TableFormatter):
                 dot_col_ix = self.fmt.tr_col_num + self.row_levels
                 row.insert(dot_col_ix, "...")
             self.write_tr(
-                row, indent, self.indent_delta, tags=None, nindex_levels=self.row_levels
+                row,
+                indent,
+                self.indent_delta,
+                tags=None,
+                nindex_levels=self.row_levels,
             )
 
     def _write_hierarchical_rows(self, fmt_values, indent):
@@ -424,13 +458,17 @@ class HTMLFormatter(TableFormatter):
         frame = self.fmt.tr_frame
         nrows = len(frame)
 
-        idx_values = frame.index.format(sparsify=False, adjoin=False, names=False)
+        idx_values = frame.index.format(
+            sparsify=False, adjoin=False, names=False
+        )
         idx_values = list(zip(*idx_values))
 
         if self.fmt.sparsify:
             # GH3547
             sentinel = object()
-            levels = frame.index.format(sparsify=sentinel, adjoin=False, names=False)
+            levels = frame.index.format(
+                sparsify=sentinel, adjoin=False, names=False
+            )
 
             level_lengths = get_level_lengths(levels, sentinel)
             inner_lvl = len(level_lengths) - 1
@@ -465,7 +503,8 @@ class HTMLFormatter(TableFormatter):
                             rec_new[ins_row] = 1
                             if lnum == 0:
                                 idx_values.insert(
-                                    ins_row, tuple(["..."] * len(level_lengths))
+                                    ins_row,
+                                    tuple(["..."] * len(level_lengths)),
                                 )
 
                             # GH 14882 - Place ... in correct level
@@ -500,7 +539,8 @@ class HTMLFormatter(TableFormatter):
                 row.extend(fmt_values[j][i] for j in range(self.ncols))
                 if truncate_h:
                     row.insert(
-                        self.row_levels - sparse_offset + self.fmt.tr_col_num, "..."
+                        self.row_levels - sparse_offset + self.fmt.tr_col_num,
+                        "...",
                     )
                 self.write_tr(
                     row,
@@ -523,7 +563,11 @@ class HTMLFormatter(TableFormatter):
                     )
 
                 idx_values = list(
-                    zip(*frame.index.format(sparsify=False, adjoin=False, names=False))
+                    zip(
+                        *frame.index.format(
+                            sparsify=False, adjoin=False, names=False
+                        )
+                    )
                 )
                 row = []
                 row.extend(idx_values[i])
@@ -576,8 +620,12 @@ class NotebookFormatter(HTMLFormatter):
                 )
         else:
             element_props.append(("thead th", "text-align", "right"))
-        template_mid = "\n\n".join(map(lambda t: template_select % t, element_props))
-        template = dedent("\n".join((template_first, template_mid, template_last)))
+        template_mid = "\n\n".join(
+            map(lambda t: template_select % t, element_props)
+        )
+        template = dedent(
+            "\n".join((template_first, template_mid, template_last))
+        )
         self.write(template)
 
     def render(self):

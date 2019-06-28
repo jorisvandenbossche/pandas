@@ -88,7 +88,9 @@ def _get_objs_combined_axis(objs, intersect=False, axis=0, sort=True):
     -------
     Index
     """
-    obs_idxes = [obj._get_axis(axis) for obj in objs if hasattr(obj, "_get_axis")]
+    obs_idxes = [
+        obj._get_axis(axis) for obj in objs if hasattr(obj, "_get_axis")
+    ]
     if obs_idxes:
         return _get_combined_index(obs_idxes, intersect=intersect, sort=sort)
 
@@ -194,7 +196,9 @@ def _union_indexes(indexes, sort=True):
                 i = i.tolist()
             return i
 
-        return Index(lib.fast_unique_multiple_list([conv(i) for i in inds], sort=sort))
+        return Index(
+            lib.fast_unique_multiple_list([conv(i) for i in inds], sort=sort)
+        )
 
     if kind == "special":
         result = indexes[0]
@@ -283,7 +287,9 @@ def _get_consensus_names(indexes):
 
     # find the non-none names, need to tupleify to make
     # the set hashable, then reverse on return
-    consensus_names = {tuple(i.names) for i in indexes if com._any_not_none(*i.names)}
+    consensus_names = {
+        tuple(i.names) for i in indexes if com._any_not_none(*i.names)
+    }
     if len(consensus_names) == 1:
         return list(list(consensus_names)[0])
     return [None] * indexes[0].nlevels

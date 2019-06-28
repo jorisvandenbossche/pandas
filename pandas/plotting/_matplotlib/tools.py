@@ -39,7 +39,11 @@ def table(ax, data, rowLabels=None, colLabels=None, **kwargs):
     cellText = data.values
 
     table = matplotlib.table.table(
-        ax, cellText=cellText, rowLabels=rowLabels, colLabels=colLabels, **kwargs
+        ax,
+        cellText=cellText,
+        rowLabels=rowLabels,
+        colLabels=colLabels,
+        **kwargs
     )
     return table
 
@@ -312,7 +316,10 @@ def _handle_shared_axes(axarr, nplots, naxes, nrows, ncols, sharex, sharey):
                     # the last in the column, because below is no subplot/gap.
                     if not layout[ax.rowNum + 1, ax.colNum]:
                         continue
-                    if sharex or len(ax.get_shared_x_axes().get_siblings(ax)) > 1:
+                    if (
+                        sharex
+                        or len(ax.get_shared_x_axes().get_siblings(ax)) > 1
+                    ):
                         _remove_labels_from_axis(ax.xaxis)
 
             except IndexError:
@@ -321,7 +328,10 @@ def _handle_shared_axes(axarr, nplots, naxes, nrows, ncols, sharex, sharey):
                 for ax in axarr:
                     if ax.is_last_row():
                         continue
-                    if sharex or len(ax.get_shared_x_axes().get_siblings(ax)) > 1:
+                    if (
+                        sharex
+                        or len(ax.get_shared_x_axes().get_siblings(ax)) > 1
+                    ):
                         _remove_labels_from_axis(ax.xaxis)
 
         if ncols > 1:
@@ -364,7 +374,9 @@ def _get_xlim(lines):
     return left, right
 
 
-def _set_ticks_props(axes, xlabelsize=None, xrot=None, ylabelsize=None, yrot=None):
+def _set_ticks_props(
+    axes, xlabelsize=None, xrot=None, ylabelsize=None, yrot=None
+):
     import matplotlib.pyplot as plt
 
     for ax in _flatten(axes):

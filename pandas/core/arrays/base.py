@@ -17,7 +17,11 @@ from pandas.util._decorators import Appender, Substitution
 
 from pandas.core.dtypes.common import is_list_like
 from pandas.core.dtypes.dtypes import ExtensionDtype
-from pandas.core.dtypes.generic import ABCExtensionArray, ABCIndexClass, ABCSeries
+from pandas.core.dtypes.generic import (
+    ABCExtensionArray,
+    ABCIndexClass,
+    ABCSeries,
+)
 from pandas.core.dtypes.missing import isna
 
 from pandas._typing import ArrayLike
@@ -480,7 +484,9 @@ class ExtensionArray:
         """
         return self[~self.isna()]
 
-    def shift(self, periods: int = 1, fill_value: object = None) -> ABCExtensionArray:
+    def shift(
+        self, periods: int = 1, fill_value: object = None
+    ) -> ABCExtensionArray:
         """
         Shift values by desired number.
 
@@ -618,7 +624,9 @@ class ExtensionArray:
         """
         return self.astype(object), np.nan
 
-    def factorize(self, na_sentinel: int = -1) -> Tuple[np.ndarray, ABCExtensionArray]:
+    def factorize(
+        self, na_sentinel: int = -1
+    ) -> Tuple[np.ndarray, ABCExtensionArray]:
         """
         Encode the extension array as an enumerated type.
 
@@ -724,7 +732,10 @@ class ExtensionArray:
     # ------------------------------------------------------------------------
 
     def take(
-        self, indices: Sequence[int], allow_fill: bool = False, fill_value: Any = None
+        self,
+        indices: Sequence[int],
+        allow_fill: bool = False,
+        fill_value: Any = None,
     ) -> ABCExtensionArray:
         """
         Take elements from an array.
@@ -840,10 +851,15 @@ class ExtensionArray:
         ).rstrip(", \n")
         class_name = "<{}>\n".format(self.__class__.__name__)
         return template.format(
-            class_name=class_name, data=data, length=len(self), dtype=self.dtype
+            class_name=class_name,
+            data=data,
+            length=len(self),
+            dtype=self.dtype,
         )
 
-    def _formatter(self, boxed: bool = False) -> Callable[[Any], Optional[str]]:
+    def _formatter(
+        self, boxed: bool = False
+    ) -> Callable[[Any], Optional[str]]:
         """Formatting function for scalar values.
 
         This is used in the default '__repr__'. The returned formatting

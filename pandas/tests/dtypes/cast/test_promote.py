@@ -168,9 +168,9 @@ def _check_promote(
 
     # for missing values, None == None and iNaT == iNaT (which is checked
     # through match_value above), but np.nan != np.nan and pd.NaT != pd.NaT
-    match_missing = (result_fill_value is np.nan and expected_fill_value is np.nan) or (
-        result_fill_value is NaT and expected_fill_value is NaT
-    )
+    match_missing = (
+        result_fill_value is np.nan and expected_fill_value is np.nan
+    ) or (result_fill_value is NaT and expected_fill_value is NaT)
 
     assert match_value or match_missing
 
@@ -251,7 +251,11 @@ def test_maybe_promote_bool_with_any(any_numpy_dtype_reduced, box):
 
     if boxed and fill_dtype == bool:
         pytest.xfail("falsely upcasts to object")
-    if boxed and box_dtype is None and is_datetime_or_timedelta_dtype(fill_dtype):
+    if (
+        boxed
+        and box_dtype is None
+        and is_datetime_or_timedelta_dtype(fill_dtype)
+    ):
         pytest.xfail("wrongly casts fill_value")
 
     # create array of given dtype; casts "1" to correct dtype
@@ -336,7 +340,12 @@ def test_maybe_promote_datetime64_with_any():
         datetime.datetime.now(),
         datetime.date.today(),
     ],
-    ids=["pd.Timestamp", "np.datetime64", "datetime.datetime", "datetime.date"],
+    ids=[
+        "pd.Timestamp",
+        "np.datetime64",
+        "datetime.datetime",
+        "datetime.date",
+    ],
 )
 def test_maybe_promote_any_with_datetime64(
     any_numpy_dtype_reduced, datetime64_dtype, fill_value, box
@@ -347,7 +356,9 @@ def test_maybe_promote_any_with_datetime64(
     if is_datetime64_dtype(dtype):
         if boxed and (
             box_dtype == object
-            or (box_dtype is None and not is_datetime64_dtype(type(fill_value)))
+            or (
+                box_dtype is None and not is_datetime64_dtype(type(fill_value))
+            )
         ):
             pytest.xfail("falsely upcasts to object")
     else:
@@ -360,7 +371,9 @@ def test_maybe_promote_any_with_datetime64(
             pytest.xfail("raises error")
 
     # special case for box_dtype
-    box_dtype = np.dtype(datetime64_dtype) if box_dtype == "dt_dtype" else box_dtype
+    box_dtype = (
+        np.dtype(datetime64_dtype) if box_dtype == "dt_dtype" else box_dtype
+    )
 
     # filling datetime with anything but datetime casts to object
     if is_datetime64_dtype(dtype):
@@ -457,7 +470,9 @@ def test_maybe_promote_datetimetz_with_datetimetz(
 
 
 @pytest.mark.parametrize(
-    "fill_value", [None, np.nan, NaT, iNaT], ids=["None", "np.nan", "pd.NaT", "iNaT"]
+    "fill_value",
+    [None, np.nan, NaT, iNaT],
+    ids=["None", "np.nan", "pd.NaT", "iNaT"],
 )
 # override parametrization due to to many xfails; see GH 23982 / 25425
 @pytest.mark.parametrize("box", [(False, None)])
@@ -500,7 +515,12 @@ def test_maybe_promote_datetimetz_with_na(tz_aware_fixture, fill_value, box):
         datetime.datetime.now(),
         datetime.date.today(),
     ],
-    ids=["pd.Timestamp", "np.datetime64", "datetime.datetime", "datetime.date"],
+    ids=[
+        "pd.Timestamp",
+        "np.datetime64",
+        "datetime.datetime",
+        "datetime.date",
+    ],
 )
 def test_maybe_promote_any_numpy_dtype_with_datetimetz(
     any_numpy_dtype_reduced, tz_aware_fixture, fill_value, box
@@ -560,11 +580,18 @@ def test_maybe_promote_any_with_timedelta64(
     if is_timedelta64_dtype(dtype):
         if boxed and (
             box_dtype == object
-            or (box_dtype is None and not is_timedelta64_dtype(type(fill_value)))
+            or (
+                box_dtype is None
+                and not is_timedelta64_dtype(type(fill_value))
+            )
         ):
             pytest.xfail("falsely upcasts to object")
     else:
-        if boxed and box_dtype is None and is_timedelta64_dtype(type(fill_value)):
+        if (
+            boxed
+            and box_dtype is None
+            and is_timedelta64_dtype(type(fill_value))
+        ):
             pytest.xfail("does not upcast correctly")
         if (
             not boxed
@@ -583,7 +610,9 @@ def test_maybe_promote_any_with_timedelta64(
             pytest.xfail("raises error")
 
     # special case for box_dtype
-    box_dtype = np.dtype(timedelta64_dtype) if box_dtype == "td_dtype" else box_dtype
+    box_dtype = (
+        np.dtype(timedelta64_dtype) if box_dtype == "td_dtype" else box_dtype
+    )
 
     # filling anything but timedelta with timedelta casts to object
     if is_timedelta64_dtype(dtype):
@@ -607,12 +636,18 @@ def test_maybe_promote_any_with_timedelta64(
     )
 
 
-def test_maybe_promote_string_with_any(string_dtype, any_numpy_dtype_reduced, box):
+def test_maybe_promote_string_with_any(
+    string_dtype, any_numpy_dtype_reduced, box
+):
     dtype = np.dtype(string_dtype)
     fill_dtype = np.dtype(any_numpy_dtype_reduced)
     boxed, box_dtype = box  # read from parametrized fixture
 
-    if boxed and box_dtype is None and is_datetime_or_timedelta_dtype(fill_dtype):
+    if (
+        boxed
+        and box_dtype is None
+        and is_datetime_or_timedelta_dtype(fill_dtype)
+    ):
         pytest.xfail("wrong missing value marker")
 
     # create array of given dtype; casts "1" to correct dtype
@@ -645,7 +680,9 @@ def test_maybe_promote_string_with_any(string_dtype, any_numpy_dtype_reduced, bo
         (False, None),  # fill_value passed on as scalar
     ],
 )
-def test_maybe_promote_any_with_string(any_numpy_dtype_reduced, string_dtype, box):
+def test_maybe_promote_any_with_string(
+    any_numpy_dtype_reduced, string_dtype, box
+):
     dtype = np.dtype(any_numpy_dtype_reduced)
     fill_dtype = np.dtype(string_dtype)
     boxed, box_dtype = box  # read from parametrized fixture
@@ -686,12 +723,18 @@ def test_maybe_promote_any_with_string(any_numpy_dtype_reduced, string_dtype, bo
     )
 
 
-def test_maybe_promote_object_with_any(object_dtype, any_numpy_dtype_reduced, box):
+def test_maybe_promote_object_with_any(
+    object_dtype, any_numpy_dtype_reduced, box
+):
     dtype = np.dtype(object_dtype)
     fill_dtype = np.dtype(any_numpy_dtype_reduced)
     boxed, box_dtype = box  # read from parametrized fixture
 
-    if boxed and box_dtype is None and is_datetime_or_timedelta_dtype(fill_dtype):
+    if (
+        boxed
+        and box_dtype is None
+        and is_datetime_or_timedelta_dtype(fill_dtype)
+    ):
         pytest.xfail("wrong missing value marker")
 
     # create array of given dtype; casts "1" to correct dtype
@@ -713,7 +756,9 @@ def test_maybe_promote_object_with_any(object_dtype, any_numpy_dtype_reduced, bo
     )
 
 
-def test_maybe_promote_any_with_object(any_numpy_dtype_reduced, object_dtype, box):
+def test_maybe_promote_any_with_object(
+    any_numpy_dtype_reduced, object_dtype, box
+):
     dtype = np.dtype(any_numpy_dtype_reduced)
     boxed, box_dtype = box  # read from parametrized fixture
 
@@ -741,7 +786,9 @@ def test_maybe_promote_any_with_object(any_numpy_dtype_reduced, object_dtype, bo
 
 
 @pytest.mark.parametrize(
-    "fill_value", [None, np.nan, NaT, iNaT], ids=["None", "np.nan", "pd.NaT", "iNaT"]
+    "fill_value",
+    [None, np.nan, NaT, iNaT],
+    ids=["None", "np.nan", "pd.NaT", "iNaT"],
 )
 # override parametrization due to to many xfails; see GH 23982 / 25425
 @pytest.mark.parametrize("box", [(False, None)])
@@ -765,13 +812,19 @@ def test_maybe_promote_any_numpy_dtype_with_na(
     elif (
         boxed
         and (
-            is_integer_dtype(dtype) or is_float_dtype(dtype) or is_complex_dtype(dtype)
+            is_integer_dtype(dtype)
+            or is_float_dtype(dtype)
+            or is_complex_dtype(dtype)
         )
         and fill_value is not NaT
         and dtype != "uint64"
     ):
         pytest.xfail("falsely upcasts to object")
-    elif boxed and dtype == "uint64" and (fill_value is np.nan or fill_value is None):
+    elif (
+        boxed
+        and dtype == "uint64"
+        and (fill_value is np.nan or fill_value is None)
+    ):
         pytest.xfail("falsely upcasts to object")
     # below: opinionated that iNaT should be interpreted as missing value
     elif (
@@ -780,7 +833,11 @@ def test_maybe_promote_any_numpy_dtype_with_na(
         and fill_value == iNaT
     ):
         pytest.xfail("does not cast to missing value marker correctly")
-    elif (is_string_dtype(dtype) or dtype == bool) and not boxed and fill_value == iNaT:
+    elif (
+        (is_string_dtype(dtype) or dtype == bool)
+        and not boxed
+        and fill_value == iNaT
+    ):
         pytest.xfail("does not cast to missing value marker correctly")
 
     if is_integer_dtype(dtype) and dtype == "uint64" and fill_value == iNaT:

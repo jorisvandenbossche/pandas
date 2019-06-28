@@ -94,7 +94,9 @@ def _can_use_numexpr(op, op_str, a, b, dtype_check):
     return False
 
 
-def _evaluate_numexpr(op, op_str, a, b, truediv=True, reversed=False, **eval_kwargs):
+def _evaluate_numexpr(
+    op, op_str, a, b, truediv=True, reversed=False, **eval_kwargs
+):
     result = None
 
     if _can_use_numexpr(op, op_str, a, b, "evaluate"):
@@ -198,7 +200,8 @@ def _bool_arith_check(
 
         if op_str in not_allowed:
             raise NotImplementedError(
-                "operator {op!r} not implemented for " "bool dtypes".format(op=op_str)
+                "operator {op!r} not implemented for "
+                "bool dtypes".format(op=op_str)
             )
     return True
 

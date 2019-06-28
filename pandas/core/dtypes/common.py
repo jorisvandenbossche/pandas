@@ -463,7 +463,11 @@ def is_offsetlike(arr_or_obj):
     """
     if isinstance(arr_or_obj, ABCDateOffset):
         return True
-    elif is_list_like(arr_or_obj) and len(arr_or_obj) and is_object_dtype(arr_or_obj):
+    elif (
+        is_list_like(arr_or_obj)
+        and len(arr_or_obj)
+        and is_object_dtype(arr_or_obj)
+    ):
         return all(isinstance(x, ABCDateOffset) for x in arr_or_obj)
     return False
 
@@ -1035,7 +1039,9 @@ def is_integer_dtype(arr_or_dtype):
     False
     """
 
-    return _is_dtype_type(arr_or_dtype, classes_and_not_datetimelike(np.integer))
+    return _is_dtype_type(
+        arr_or_dtype, classes_and_not_datetimelike(np.integer)
+    )
 
 
 def is_signed_integer_dtype(arr_or_dtype):
@@ -1092,7 +1098,9 @@ def is_signed_integer_dtype(arr_or_dtype):
     False
     """
 
-    return _is_dtype_type(arr_or_dtype, classes_and_not_datetimelike(np.signedinteger))
+    return _is_dtype_type(
+        arr_or_dtype, classes_and_not_datetimelike(np.signedinteger)
+    )
 
 
 def is_unsigned_integer_dtype(arr_or_dtype):
@@ -1232,7 +1240,9 @@ def is_datetime64_any_dtype(arr_or_dtype):
 
     if arr_or_dtype is None:
         return False
-    return is_datetime64_dtype(arr_or_dtype) or is_datetime64tz_dtype(arr_or_dtype)
+    return is_datetime64_dtype(arr_or_dtype) or is_datetime64tz_dtype(
+        arr_or_dtype
+    )
 
 
 def is_datetime64_ns_dtype(arr_or_dtype):
@@ -1762,7 +1772,9 @@ def is_bool_dtype(arr_or_dtype):
         # we don't have a boolean Index class
         # so its object, we need to infer to
         # guess this
-        return arr_or_dtype.is_object and arr_or_dtype.inferred_type == "boolean"
+        return (
+            arr_or_dtype.is_object and arr_or_dtype.inferred_type == "boolean"
+        )
     elif is_extension_array_dtype(arr_or_dtype):
         dtype = getattr(arr_or_dtype, "dtype", arr_or_dtype)
         return dtype._is_boolean
@@ -1875,7 +1887,9 @@ def is_extension_array_dtype(arr_or_dtype):
     False
     """
     dtype = getattr(arr_or_dtype, "dtype", arr_or_dtype)
-    return isinstance(dtype, ExtensionDtype) or registry.find(dtype) is not None
+    return (
+        isinstance(dtype, ExtensionDtype) or registry.find(dtype) is not None
+    )
 
 
 def is_complex_dtype(arr_or_dtype):

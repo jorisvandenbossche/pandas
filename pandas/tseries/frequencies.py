@@ -296,7 +296,8 @@ class _FrequencyInferer:
             raise ValueError("Need at least 3 dates to infer frequency")
 
         self.is_monotonic = (
-            self.index._is_monotonic_increasing or self.index._is_monotonic_decreasing
+            self.index._is_monotonic_increasing
+            or self.index._is_monotonic_decreasing
         )
 
     @cache_readonly
@@ -377,7 +378,9 @@ class _FrequencyInferer:
         return Timestamp(self.values[0])
 
     def month_position_check(self):
-        return libresolution.month_position_check(self.fields, self.index.dayofweek)
+        return libresolution.month_position_check(
+            self.fields, self.index.dayofweek
+        )
 
     @cache_readonly
     def mdiffs(self):
@@ -401,7 +404,9 @@ class _FrequencyInferer:
             nquarters = self.mdiffs[0] / 3
             mod_dict = {0: 12, 2: 11, 1: 10}
             month = MONTH_ALIASES[mod_dict[self.rep_stamp.month % 3]]
-            alias = "{prefix}-{month}".format(prefix=quarterly_rule, month=month)
+            alias = "{prefix}-{month}".format(
+                prefix=quarterly_rule, month=month
+            )
             return _maybe_add_count(alias, nquarters)
 
         monthly_rule = self._get_monthly_rule()

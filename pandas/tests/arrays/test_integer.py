@@ -21,7 +21,9 @@ import pandas.util.testing as tm
 
 
 def make_data():
-    return list(range(8)) + [np.nan] + list(range(10, 98)) + [np.nan] + [99, 100]
+    return (
+        list(range(8)) + [np.nan] + list(range(10, 98)) + [np.nan] + [99, 100]
+    )
 
 
 @pytest.fixture(
@@ -163,7 +165,8 @@ class TestArithmeticOps(BaseOpsUtil):
         if (
             is_float_dtype(other)
             or is_float(other)
-            or op_name in ["__rtruediv__", "__truediv__", "__rdiv__", "__div__"]
+            or op_name
+            in ["__rtruediv__", "__truediv__", "__rdiv__", "__div__"]
         ):
             rs = s.astype("float")
             expected = op(rs, other)
@@ -202,7 +205,9 @@ class TestArithmeticOps(BaseOpsUtil):
                 else:
                     expected = expected.fillna(0)
             else:
-                expected[(s.values == 0) & ((expected == 0) | expected.isna())] = 0
+                expected[
+                    (s.values == 0) & ((expected == 0) | expected.isna())
+                ] = 0
         try:
             expected[(expected == np.inf) | (expected == -np.inf)] = fill_value
             original = expected
@@ -276,7 +281,9 @@ class TestArithmeticOps(BaseOpsUtil):
         other = 0.01
         self._check_op(s, op, other)
 
-    @pytest.mark.parametrize("other", [1.0, 1.0, np.array(1.0), np.array([1.0])])
+    @pytest.mark.parametrize(
+        "other", [1.0, 1.0, np.array(1.0), np.array([1.0])]
+    )
     def test_arithmetic_conversion(self, all_arithmetic_operators, other):
         # if we have a float operand we should have a float result
         # if that is equal to an integer
@@ -459,7 +466,9 @@ class TestCasting:
         expected = pd.Series(np.asarray(mixed))
         tm.assert_series_equal(result, expected)
 
-    @pytest.mark.parametrize("dtype", [Int8Dtype(), "Int8", UInt32Dtype(), "UInt32"])
+    @pytest.mark.parametrize(
+        "dtype", [Int8Dtype(), "Int8", UInt32Dtype(), "UInt32"]
+    )
     def test_astype_specific_casting(self, dtype):
         s = pd.Series([1, 2, 3], dtype="Int64")
         result = s.astype(dtype)
@@ -634,7 +643,9 @@ def test_to_integer_array_float():
         ([False, True, np.nan], [0, 1, np.nan], Int64Dtype(), Int64Dtype()),
     ],
 )
-def test_to_integer_array_bool(bool_values, int_values, target_dtype, expected_dtype):
+def test_to_integer_array_bool(
+    bool_values, int_values, target_dtype, expected_dtype
+):
     result = integer_array(bool_values, dtype=target_dtype)
     assert result.dtype == expected_dtype
     expected = integer_array(int_values, dtype=target_dtype)

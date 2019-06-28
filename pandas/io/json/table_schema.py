@@ -62,7 +62,11 @@ def as_json_table_type(x):
         return "boolean"
     elif is_numeric_dtype(x):
         return "number"
-    elif is_datetime64_dtype(x) or is_datetime64tz_dtype(x) or is_period_dtype(x):
+    elif (
+        is_datetime64_dtype(x)
+        or is_datetime64tz_dtype(x)
+        or is_period_dtype(x)
+    ):
         return "datetime"
     elif is_timedelta64_dtype(x):
         return "duration"
@@ -82,7 +86,8 @@ def set_default_names(data):
             warnings.warn("Index name of 'index' is not round-trippable")
         elif len(nms) > 1 and any(x.startswith("level_") for x in nms):
             warnings.warn(
-                "Index names beginning with 'level_' are not " "round-trippable"
+                "Index names beginning with 'level_' are not "
+                "round-trippable"
             )
         return data
 
@@ -181,7 +186,8 @@ def convert_json_field_to_pandas_type(field):
     elif typ == "any":
         if "constraints" in field and "ordered" in field:
             return CategoricalDtype(
-                categories=field["constraints"]["enum"], ordered=field["ordered"]
+                categories=field["constraints"]["enum"],
+                ordered=field["ordered"],
             )
         else:
             return "object"
@@ -315,7 +321,9 @@ def parse_table_schema(json, precise_float):
 
     # Cannot directly use as_type with timezone data on object; raise for now
     if any(str(x).startswith("datetime64[ns, ") for x in dtypes.values()):
-        raise NotImplementedError('table="orient" can not yet read timezone ' "data")
+        raise NotImplementedError(
+            'table="orient" can not yet read timezone ' "data"
+        )
 
     # No ISO constructor for Timedelta as of yet, so need to raise
     if "timedelta64" in dtypes.values():

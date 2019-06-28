@@ -61,7 +61,9 @@ def _join_unicode(lines, sep=""):
         return sep.join(lines)
     except UnicodeDecodeError:
         sep = str(sep)
-        return sep.join([x.decode("utf-8") if isinstance(x, str) else x for x in lines])
+        return sep.join(
+            [x.decode("utf-8") if isinstance(x, str) else x for x in lines]
+        )
 
 
 # Unicode consolidation
@@ -108,7 +110,9 @@ def _pprint_seq(seq, _nest_lvl=0, max_seq_items=None, **kwds):
     s = iter(seq)
     # handle sets, no slicing
     r = [
-        pprint_thing(next(s), _nest_lvl + 1, max_seq_items=max_seq_items, **kwds)
+        pprint_thing(
+            next(s), _nest_lvl + 1, max_seq_items=max_seq_items, **kwds
+        )
         for i in range(min(nitems, len(seq)))
     ]
     body = ", ".join(r)
@@ -139,8 +143,12 @@ def _pprint_dict(seq, _nest_lvl=0, max_seq_items=None, **kwds):
     for k, v in list(seq.items())[:nitems]:
         pairs.append(
             pfmt.format(
-                key=pprint_thing(k, _nest_lvl + 1, max_seq_items=max_seq_items, **kwds),
-                val=pprint_thing(v, _nest_lvl + 1, max_seq_items=max_seq_items, **kwds),
+                key=pprint_thing(
+                    k, _nest_lvl + 1, max_seq_items=max_seq_items, **kwds
+                ),
+                val=pprint_thing(
+                    v, _nest_lvl + 1, max_seq_items=max_seq_items, **kwds
+                ),
             )
         )
 
@@ -218,7 +226,9 @@ def pprint_thing(
         result = _pprint_dict(
             thing, _nest_lvl, quote_strings=True, max_seq_items=max_seq_items
         )
-    elif is_sequence(thing) and _nest_lvl < get_option("display.pprint_nest_depth"):
+    elif is_sequence(thing) and _nest_lvl < get_option(
+        "display.pprint_nest_depth"
+    ):
         result = _pprint_seq(
             thing,
             _nest_lvl,
@@ -273,7 +283,10 @@ def _enable_data_resource_formatter(enable):
 
 
 default_pprint = lambda x, max_seq_items=None: pprint_thing(
-    x, escape_chars=("\t", "\r", "\n"), quote_strings=True, max_seq_items=max_seq_items
+    x,
+    escape_chars=("\t", "\r", "\n"),
+    quote_strings=True,
+    max_seq_items=max_seq_items,
 )
 
 
@@ -417,7 +430,9 @@ def format_object_summary(
 
         for max_items in range(len(head)):
             word = head[max_items] + sep + " "
-            summary, line = _extend_line(summary, line, word, display_width, space2)
+            summary, line = _extend_line(
+                summary, line, word, display_width, space2
+            )
 
         if is_truncated:
             # remove trailing space of last line
@@ -426,10 +441,14 @@ def format_object_summary(
 
         for max_items in range(len(tail) - 1):
             word = tail[max_items] + sep + " "
-            summary, line = _extend_line(summary, line, word, display_width, space2)
+            summary, line = _extend_line(
+                summary, line, word, display_width, space2
+            )
 
         # last value: no sep added + 1 space of width used for trailing ','
-        summary, line = _extend_line(summary, line, tail[-1], display_width - 2, space2)
+        summary, line = _extend_line(
+            summary, line, tail[-1], display_width - 2, space2
+        )
         summary += line
 
         # right now close is either '' or ', '
@@ -479,10 +498,12 @@ def _justify(head, tail):
 
     # justify each item in each list-like in head and tail using max_length
     head = [
-        tuple(x.rjust(max_len) for x, max_len in zip(seq, max_length)) for seq in head
+        tuple(x.rjust(max_len) for x, max_len in zip(seq, max_length))
+        for seq in head
     ]
     tail = [
-        tuple(x.rjust(max_len) for x, max_len in zip(seq, max_length)) for seq in tail
+        tuple(x.rjust(max_len) for x, max_len in zip(seq, max_length))
+        for seq in tail
     ]
     return head, tail
 

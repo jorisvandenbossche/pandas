@@ -54,7 +54,10 @@ class TestDataFrameTimezones:
         tm.assert_numpy_array_equal(result, expected)
 
     def test_frame_from_records_utc(self):
-        rec = {"datum": 1.5, "begin_time": datetime(2006, 4, 27, tzinfo=pytz.utc)}
+        rec = {
+            "datum": 1.5,
+            "begin_time": datetime(2006, 4, 27, tzinfo=pytz.utc),
+        }
 
         # it works
         DataFrame.from_records([rec], index="begin_time")
@@ -167,7 +170,9 @@ class TestDataFrameTimezones:
             }
         )
         result = df.get_dtype_counts().sort_index()
-        expected = Series({"datetime64[ns]": 2, str(tz_expected): 2}).sort_index()
+        expected = Series(
+            {"datetime64[ns]": 2, str(tz_expected): 2}
+        ).sort_index()
         tm.assert_series_equal(result, expected)
 
     @pytest.mark.parametrize("tz", ["US/Eastern", "dateutil/US/Eastern"])
@@ -195,17 +200,21 @@ class TestDataFrameTimezones:
     def test_tz_localize_convert_copy_inplace_mutate(self, copy, method, tz):
         # GH 6326
         result = DataFrame(
-            np.arange(0, 5), index=date_range("20131027", periods=5, freq="1H", tz=tz)
+            np.arange(0, 5),
+            index=date_range("20131027", periods=5, freq="1H", tz=tz),
         )
         getattr(result, method)("UTC", copy=copy)
         expected = DataFrame(
-            np.arange(0, 5), index=date_range("20131027", periods=5, freq="1H", tz=tz)
+            np.arange(0, 5),
+            index=date_range("20131027", periods=5, freq="1H", tz=tz),
         )
         tm.assert_frame_equal(result, expected)
 
     def test_constructor_data_aware_dtype_naive(self, tz_aware_fixture):
         # GH 25843
         tz = tz_aware_fixture
-        result = DataFrame({"d": [pd.Timestamp("2019", tz=tz)]}, dtype="datetime64[ns]")
+        result = DataFrame(
+            {"d": [pd.Timestamp("2019", tz=tz)]}, dtype="datetime64[ns]"
+        )
         expected = DataFrame({"d": [pd.Timestamp("2019")]})
         tm.assert_frame_equal(result, expected)

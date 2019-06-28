@@ -82,7 +82,9 @@ def test_xs_missing_values_in_index():
     tm.assert_frame_equal(result, expected)
 
 
-@pytest.mark.parametrize("key, level", [("one", "second"), (["one"], ["second"])])
+@pytest.mark.parametrize(
+    "key, level", [("one", "second"), (["one"], ["second"])]
+)
 def test_xs_with_duplicates(key, level, multiindex_dataframe_random_data):
     # see gh-13719
     frame = multiindex_dataframe_random_data
@@ -127,7 +129,9 @@ def test_xs_level_multiple(indexer, four_level_index_dataframe):
     expected_index = MultiIndex(
         levels=[["q"], [20.0]], codes=[[0], [0]], names=["two", "three"]
     )
-    expected = DataFrame(expected_values, index=expected_index, columns=list("ABCDE"))
+    expected = DataFrame(
+        expected_values, index=expected_index, columns=list("ABCDE")
+    )
     result = indexer(df)
     tm.assert_frame_equal(result, expected)
 
@@ -184,7 +188,9 @@ def test_xs_level0(indexer, four_level_index_dataframe):
         codes=[[0, 1], [0, 1], [1, 0]],
         names=["two", "three", "four"],
     )
-    expected = DataFrame(expected_values, index=expected_index, columns=list("ABCDE"))
+    expected = DataFrame(
+        expected_values, index=expected_index, columns=list("ABCDE")
+    )
 
     result = indexer(df)
     tm.assert_frame_equal(result, expected)

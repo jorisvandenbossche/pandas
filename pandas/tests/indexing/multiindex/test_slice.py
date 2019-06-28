@@ -28,7 +28,8 @@ class TestMultiIndexSlicers:
             [
                 tuple([a, b, c, d])
                 for a, b, c, d in df.index.values
-                if (a == "A1" or a == "A2" or a == "A3") and (c == "C1" or c == "C3")
+                if (a == "A1" or a == "A2" or a == "A3")
+                and (c == "C1" or c == "C3")
             ]
         ]
         tm.assert_frame_equal(result, expected)
@@ -54,7 +55,9 @@ class TestMultiIndexSlicers:
         )
 
         df = DataFrame(
-            np.arange(16, dtype="int64").reshape(4, 4), index=index, columns=columns
+            np.arange(16, dtype="int64").reshape(4, 4),
+            index=index,
+            columns=columns,
         )
         df = df.sort_index(axis=0).sort_index(axis=1)
 
@@ -104,7 +107,8 @@ class TestMultiIndexSlicers:
             [
                 tuple([a, b, c, d])
                 for a, b, c, d in s.index.values
-                if (a == "A1" or a == "A2" or a == "A3") and (c == "C1" or c == "C3")
+                if (a == "A1" or a == "A2" or a == "A3")
+                and (c == "C1" or c == "C3")
             ]
         ]
         tm.assert_series_equal(result, expected)
@@ -235,11 +239,14 @@ class TestMultiIndexSlicers:
         import datetime
 
         dates = [
-            datetime.datetime(2012, 1, 1, 12, 12, 12) + datetime.timedelta(days=i)
+            datetime.datetime(2012, 1, 1, 12, 12, 12)
+            + datetime.timedelta(days=i)
             for i in range(6)
         ]
         freq = [1, 2]
-        index = MultiIndex.from_product([dates, freq], names=["date", "frequency"])
+        index = MultiIndex.from_product(
+            [dates, freq], names=["date", "frequency"]
+        )
 
         df = DataFrame(
             np.arange(6 * 2 * 4, dtype="int64").reshape(-1, 4),
@@ -253,7 +260,8 @@ class TestMultiIndexSlicers:
         result = df.loc[
             (
                 slice(
-                    Timestamp("2012-01-01 12:12:12"), Timestamp("2012-01-03 12:12:12")
+                    Timestamp("2012-01-01 12:12:12"),
+                    Timestamp("2012-01-03 12:12:12"),
                 ),
                 slice(1, 1),
             ),
@@ -264,7 +272,9 @@ class TestMultiIndexSlicers:
         result = df.loc[
             (
                 idx[
-                    Timestamp("2012-01-01 12:12:12") : Timestamp("2012-01-03 12:12:12")
+                    Timestamp("2012-01-01 12:12:12") : Timestamp(
+                        "2012-01-03 12:12:12"
+                    )
                 ],
                 idx[1:1],
             ),
@@ -275,7 +285,8 @@ class TestMultiIndexSlicers:
         result = df.loc[
             (
                 slice(
-                    Timestamp("2012-01-01 12:12:12"), Timestamp("2012-01-03 12:12:12")
+                    Timestamp("2012-01-01 12:12:12"),
+                    Timestamp("2012-01-03 12:12:12"),
                 ),
                 1,
             ),
@@ -291,7 +302,8 @@ class TestMultiIndexSlicers:
         tm.assert_frame_equal(result, expected)
 
         result = df.loc[
-            (idx["2012-01-01 12:12:12":"2012-01-03 12:12:12"], 1), idx["A", "B"]
+            (idx["2012-01-01 12:12:12":"2012-01-03 12:12:12"], 1),
+            idx["A", "B"],
         ]
         tm.assert_frame_equal(result, expected)
 
@@ -343,7 +355,9 @@ class TestMultiIndexSlicers:
         tm.assert_frame_equal(result, expected)
 
         # A4 - Get all values between 2013-07-02 and 2013-07-09
-        result = df1.loc[(slice(None), slice(None), slice("20130702", "20130709")), :]
+        result = df1.loc[
+            (slice(None), slice(None), slice("20130702", "20130709")), :
+        ]
         expected = df1.iloc[[1, 2, 6, 7, 12]]
         tm.assert_frame_equal(result, expected)
 
@@ -359,13 +373,17 @@ class TestMultiIndexSlicers:
         tm.assert_frame_equal(result, expected)
 
         # B3 - Get all values from B1 to B2 and up to 2013-08-06
-        result = df1.loc[(slice(None), slice("B1", "B2"), slice("2013-08-06")), :]
+        result = df1.loc[
+            (slice(None), slice("B1", "B2"), slice("2013-08-06")), :
+        ]
         expected = df1.iloc[[2, 3, 4, 7, 8, 9, 12, 13]]
         tm.assert_frame_equal(result, expected)
 
         # B4 - Same as A4 but the start of the date slice is not a key.
         #      shows indexing on a partial selection slice
-        result = df1.loc[(slice(None), slice(None), slice("20130701", "20130709")), :]
+        result = df1.loc[
+            (slice(None), slice(None), slice("20130701", "20130709")), :
+        ]
         expected = df1.iloc[[1, 2, 6, 7, 12]]
         tm.assert_frame_equal(result, expected)
 
@@ -394,7 +412,8 @@ class TestMultiIndexSlicers:
             [
                 tuple([a, b, c, d])
                 for a, b, c, d in df.index.values
-                if (a == "A1" or a == "A2" or a == "A3") and (c == "C1" or c == "C3")
+                if (a == "A1" or a == "A2" or a == "A3")
+                and (c == "C1" or c == "C3")
             ]
         ]
         tm.assert_frame_equal(result, expected)
@@ -458,7 +477,8 @@ class TestMultiIndexSlicers:
             [
                 tuple([a, b, c, d])
                 for a, b, c, d in df.index.values
-                if (a == "A1" or a == "A2" or a == "A3") and (c == "C1" or c == "C3")
+                if (a == "A1" or a == "A2" or a == "A3")
+                and (c == "C1" or c == "C3")
             ]
         ]
         tm.assert_frame_equal(result, expected)
@@ -507,7 +527,9 @@ class TestMultiIndexSlicers:
         )
 
         df_orig = DataFrame(
-            np.arange(16, dtype="int64").reshape(4, 4), index=index, columns=columns
+            np.arange(16, dtype="int64").reshape(4, 4),
+            index=index,
+            columns=columns,
         )
         df_orig = df_orig.sort_index(axis=0).sort_index(axis=1)
 
@@ -630,7 +652,8 @@ class TestMultiIndexSlicers:
 
     def test_multiindex_label_slicing_with_negative_step(self):
         s = Series(
-            np.arange(20), MultiIndex.from_product([list("abcde"), np.arange(4)])
+            np.arange(20),
+            MultiIndex.from_product([list("abcde"), np.arange(4)]),
         )
         SLC = pd.IndexSlice
 
@@ -665,7 +688,9 @@ class TestMultiIndexSlicers:
         df = DataFrame(list(range(2000)), index=idx, columns=["Test"])
         df_slice = df.loc[pd.IndexSlice[:, 30:70], :]
         result = df_slice.loc["a"]
-        expected = DataFrame(list(range(30, 71)), columns=["Test"], index=range(30, 71))
+        expected = DataFrame(
+            list(range(30, 71)), columns=["Test"], index=range(30, 71)
+        )
         tm.assert_frame_equal(result, expected)
         result = df_slice.loc["d"]
         expected = DataFrame(
@@ -673,7 +698,9 @@ class TestMultiIndexSlicers:
         )
         tm.assert_frame_equal(result, expected)
 
-    def test_int_series_slicing(self, multiindex_year_month_day_dataframe_random_data):
+    def test_int_series_slicing(
+        self, multiindex_year_month_day_dataframe_random_data
+    ):
         ymd = multiindex_year_month_day_dataframe_random_data
         s = ymd["A"]
         result = s[5:]

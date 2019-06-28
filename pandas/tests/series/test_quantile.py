@@ -48,7 +48,10 @@ class TestSeriesQuantile(TestData):
         qs = [0.1, 0.9]
         result = self.ts.quantile(qs)
         expected = pd.Series(
-            [np.percentile(self.ts.dropna(), 10), np.percentile(self.ts.dropna(), 90)],
+            [
+                np.percentile(self.ts.dropna(), 10),
+                np.percentile(self.ts.dropna(), 90),
+            ],
             index=qs,
             name=self.ts.name,
         )
@@ -58,14 +61,19 @@ class TestSeriesQuantile(TestData):
         dts.name = "xxx"
         result = dts.quantile((0.2, 0.2))
         expected = Series(
-            [Timestamp("2000-01-10 19:12:00"), Timestamp("2000-01-10 19:12:00")],
+            [
+                Timestamp("2000-01-10 19:12:00"),
+                Timestamp("2000-01-10 19:12:00"),
+            ],
             index=[0.2, 0.2],
             name="xxx",
         )
         tm.assert_series_equal(result, expected)
 
         result = self.ts.quantile([])
-        expected = pd.Series([], name=self.ts.name, index=Index([], dtype=float))
+        expected = pd.Series(
+            [], name=self.ts.name, index=Index([], dtype=float)
+        )
         tm.assert_series_equal(result, expected)
 
     def test_quantile_interpolation(self):
@@ -111,7 +119,9 @@ class TestSeriesQuantile(TestData):
             tm.assert_series_equal(res, pd.Series([np.nan], index=[0.5]))
 
             res = s.quantile([0.2, 0.3])
-            tm.assert_series_equal(res, pd.Series([np.nan, np.nan], index=[0.2, 0.3]))
+            tm.assert_series_equal(
+                res, pd.Series([np.nan, np.nan], index=[0.2, 0.3])
+            )
 
     @pytest.mark.parametrize(
         "case",
@@ -126,7 +136,11 @@ class TestSeriesQuantile(TestData):
                 pd.Timestamp("2011-01-02", tz="US/Eastern"),
                 pd.Timestamp("2011-01-03", tz="US/Eastern"),
             ],
-            [pd.Timedelta("1 days"), pd.Timedelta("2 days"), pd.Timedelta("3 days")],
+            [
+                pd.Timedelta("1 days"),
+                pd.Timedelta("2 days"),
+                pd.Timedelta("3 days"),
+            ],
             # NaT
             [
                 pd.Timestamp("2011-01-01"),
@@ -171,7 +185,10 @@ class TestSeriesQuantile(TestData):
 
     @pytest.mark.parametrize(
         "values, dtype",
-        [([0, 0, 0, 1, 2, 3], "Sparse[int]"), ([0.0, None, 1.0, 2.0], "Sparse[float]")],
+        [
+            ([0, 0, 0, 1, 2, 3], "Sparse[int]"),
+            ([0.0, None, 1.0, 2.0], "Sparse[float]"),
+        ],
     )
     def test_quantile_sparse(self, values, dtype):
         ser = pd.Series(values, dtype=dtype)

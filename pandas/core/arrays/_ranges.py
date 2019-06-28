@@ -40,7 +40,12 @@ def generate_regular_range(
             b = Timestamp(start).value
             # cannot just use e = Timestamp(end) + 1 because arange breaks when
             # stride is too large, see GH10887
-            e = b + (Timestamp(end).value - b) // stride * stride + stride // 2 + 1
+            e = (
+                b
+                + (Timestamp(end).value - b) // stride * stride
+                + stride // 2
+                + 1
+            )
             # end.tz == start.tz by this point due to _generate implementation
             tz = start.tz
         elif start is not None:
@@ -76,7 +81,9 @@ def generate_regular_range(
         elif end is not None:
             tz = end.tz
 
-        xdr = generate_range(start=start, end=end, periods=periods, offset=freq)
+        xdr = generate_range(
+            start=start, end=end, periods=periods, offset=freq
+        )
 
         values = np.array([x.value for x in xdr], dtype=np.int64)
 
@@ -116,7 +123,9 @@ def _generate_range_overflow_safe(
     i64max = np.uint64(np.iinfo(np.int64).max)
     msg = (
         "Cannot generate range with {side}={endpoint} and "
-        "periods={periods}".format(side=side, endpoint=endpoint, periods=periods)
+        "periods={periods}".format(
+            side=side, endpoint=endpoint, periods=periods
+        )
     )
 
     with np.errstate(over="raise"):
@@ -129,7 +138,9 @@ def _generate_range_overflow_safe(
 
     if np.abs(addend) <= i64max:
         # relatively easy case without casting concerns
-        return _generate_range_overflow_safe_signed(endpoint, periods, stride, side)
+        return _generate_range_overflow_safe_signed(
+            endpoint, periods, stride, side
+        )
 
     elif (endpoint > 0 and side == "start" and stride > 0) or (
         endpoint < 0 and side == "end" and stride > 0
@@ -149,7 +160,9 @@ def _generate_range_overflow_safe(
     remaining = periods - mid_periods
     assert 0 < remaining < periods, (remaining, periods, endpoint, stride)
 
-    midpoint = _generate_range_overflow_safe(endpoint, mid_periods, stride, side)
+    midpoint = _generate_range_overflow_safe(
+        endpoint, mid_periods, stride, side
+    )
     return _generate_range_overflow_safe(midpoint, remaining, stride, side)
 
 
@@ -192,5 +205,7 @@ def _generate_range_overflow_safe_signed(
     raise OutOfBoundsDatetime(
         "Cannot generate range with "
         "{side}={endpoint} and "
-        "periods={periods}".format(side=side, endpoint=endpoint, periods=periods)
+        "periods={periods}".format(
+            side=side, endpoint=endpoint, periods=periods
+        )
     )

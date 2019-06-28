@@ -63,7 +63,9 @@ class TestRegistration:
 
         # Set to the "warning" state, in case this isn't the first test run
         converter._WARN = True
-        with tm.assert_produces_warning(FutureWarning, check_stacklevel=False) as w:
+        with tm.assert_produces_warning(
+            FutureWarning, check_stacklevel=False
+        ) as w:
             ax.plot(s.index, s.values)
             plt.close()
 
@@ -97,7 +99,9 @@ class TestRegistration:
         units = pytest.importorskip("matplotlib.units")
         assert Timestamp in units.registry
 
-        ctx = cf.option_context("plotting.matplotlib.register_converters", False)
+        ctx = cf.option_context(
+            "plotting.matplotlib.register_converters", False
+        )
         with ctx:
             assert Timestamp not in units.registry
 
@@ -105,7 +109,9 @@ class TestRegistration:
 
     def test_option_no_warning(self):
         pytest.importorskip("matplotlib.pyplot")
-        ctx = cf.option_context("plotting.matplotlib.register_converters", False)
+        ctx = cf.option_context(
+            "plotting.matplotlib.register_converters", False
+        )
         plt = pytest.importorskip("matplotlib.pyplot")
         s = Series(range(12), index=date_range("2017", periods=12))
         _, ax = plt.subplots()
@@ -159,7 +165,9 @@ class TestRegistration:
             converter.register()
 
         assert len(w)
-        assert "pandas.plotting.register_matplotlib_converters" in str(w[0].message)
+        assert "pandas.plotting.register_matplotlib_converters" in str(
+            w[0].message
+        )
 
 
 class TestDateTimeConverter:
@@ -215,7 +223,9 @@ class TestDateTimeConverter:
 
         # we have a tz-aware date (constructed to that when we turn to utc it
         # is the same as our sample)
-        ts = Timestamp("2012-01-01").tz_localize("UTC").tz_convert("US/Eastern")
+        ts = (
+            Timestamp("2012-01-01").tz_localize("UTC").tz_convert("US/Eastern")
+        )
         rs = self.dtc.convert(ts, None, None)
         assert rs == xp
 
@@ -225,13 +235,17 @@ class TestDateTimeConverter:
         rs = self.dtc.convert(Index([ts - Day(1), ts]), None, None)
         assert rs[1] == xp
 
-        rs = self.dtc.convert(Index([ts - Day(1), ts]).to_pydatetime(), None, None)
+        rs = self.dtc.convert(
+            Index([ts - Day(1), ts]).to_pydatetime(), None, None
+        )
         assert rs[1] == xp
 
     def test_conversion_float(self):
         decimals = 9
 
-        rs = self.dtc.convert(Timestamp("2012-1-1 01:02:03", tz="UTC"), None, None)
+        rs = self.dtc.convert(
+            Timestamp("2012-1-1 01:02:03", tz="UTC"), None, None
+        )
         xp = converter.dates.date2num(Timestamp("2012-1-1 01:02:03", tz="UTC"))
         tm.assert_almost_equal(rs, xp, decimals)
 
@@ -290,7 +304,9 @@ class TestDateTimeConverter:
             val1 = self.dtc.convert(ts1, None, None)
             val2 = self.dtc.convert(ts2, None, None)
             if not val1 < val2:
-                raise AssertionError("{0} is not less than {1}.".format(val1, val2))
+                raise AssertionError(
+                    "{0} is not less than {1}.".format(val1, val2)
+                )
 
         # Matplotlib's time representation using floats cannot distinguish
         # intervals smaller than ~10 microsecond in the common range of years.
@@ -342,7 +358,9 @@ class TestPeriodConverter:
         rs = self.pc.convert(Timestamp("2012-1-1"), None, self.axis)
         assert rs == xp
 
-        rs = self.pc.convert(np_datetime64_compat("2012-01-01"), None, self.axis)
+        rs = self.pc.convert(
+            np_datetime64_compat("2012-01-01"), None, self.axis
+        )
         assert rs == xp
 
         rs = self.pc.convert(

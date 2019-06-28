@@ -32,7 +32,9 @@ class TestDataFrameConvertTo(TestData):
         expected_records_mixed = [{"A": tsmp, "B": 1}, {"A": tsmp, "B": 2}]
 
         assert test_data.to_dict(orient="records") == expected_records
-        assert test_data_mixed.to_dict(orient="records") == expected_records_mixed
+        assert (
+            test_data_mixed.to_dict(orient="records") == expected_records_mixed
+        )
 
         expected_series = {
             "A": Series([tsmp, tsmp], name="A"),
@@ -43,7 +45,9 @@ class TestDataFrameConvertTo(TestData):
             "B": Series([1, 2], name="B"),
         }
 
-        tm.assert_dict_equal(test_data.to_dict(orient="series"), expected_series)
+        tm.assert_dict_equal(
+            test_data.to_dict(orient="series"), expected_series
+        )
         tm.assert_dict_equal(
             test_data_mixed.to_dict(orient="series"), expected_series_mixed
         )
@@ -166,7 +170,10 @@ class TestDataFrameConvertTo(TestData):
         # to be specified using dictionary instead of list of tuples.
         expected = np.rec.array(
             [(0, 1.0)],
-            dtype={"names": ["index", "accented_name_é"], "formats": ["=i8", "=f8"]},
+            dtype={
+                "names": ["index", "accented_name_é"],
+                "formats": ["=i8", "=f8"],
+            },
         )
         tm.assert_almost_equal(result, expected)
 
@@ -188,7 +195,8 @@ class TestDataFrameConvertTo(TestData):
         # this coerces
         result = df.to_records()
         expected = np.rec.array(
-            [(0, "a"), (1, "b"), (2, "c")], dtype=[("index", "=i8"), ("0", "O")]
+            [(0, "a"), (1, "b"), (2, "c")],
+            dtype=[("index", "=i8"), ("0", "O")],
         )
         tm.assert_almost_equal(result, expected)
 
@@ -200,7 +208,12 @@ class TestDataFrameConvertTo(TestData):
                 dict(),
                 np.rec.array(
                     [(0, 1, 0.2, "a"), (1, 2, 1.5, "bc")],
-                    dtype=[("index", "<i8"), ("A", "<i8"), ("B", "<f8"), ("C", "O")],
+                    dtype=[
+                        ("index", "<i8"),
+                        ("A", "<i8"),
+                        ("B", "<f8"),
+                        ("C", "O"),
+                    ],
                 ),
             ),
             # Should have no effect in this case.
@@ -208,7 +221,12 @@ class TestDataFrameConvertTo(TestData):
                 dict(index=True),
                 np.rec.array(
                     [(0, 1, 0.2, "a"), (1, 2, 1.5, "bc")],
-                    dtype=[("index", "<i8"), ("A", "<i8"), ("B", "<f8"), ("C", "O")],
+                    dtype=[
+                        ("index", "<i8"),
+                        ("A", "<i8"),
+                        ("B", "<f8"),
+                        ("C", "O"),
+                    ],
                 ),
             ),
             # Column dtype applied across the board. Index unaffected.
@@ -216,7 +234,12 @@ class TestDataFrameConvertTo(TestData):
                 dict(column_dtypes="<U4"),
                 np.rec.array(
                     [("0", "1", "0.2", "a"), ("1", "2", "1.5", "bc")],
-                    dtype=[("index", "<i8"), ("A", "<U4"), ("B", "<U4"), ("C", "<U4")],
+                    dtype=[
+                        ("index", "<i8"),
+                        ("A", "<U4"),
+                        ("B", "<U4"),
+                        ("C", "<U4"),
+                    ],
                 ),
             ),
             # Index dtype applied across the board. Columns unaffected.
@@ -224,7 +247,12 @@ class TestDataFrameConvertTo(TestData):
                 dict(index_dtypes="<U1"),
                 np.rec.array(
                     [("0", 1, 0.2, "a"), ("1", 2, 1.5, "bc")],
-                    dtype=[("index", "<U1"), ("A", "<i8"), ("B", "<f8"), ("C", "O")],
+                    dtype=[
+                        ("index", "<U1"),
+                        ("A", "<i8"),
+                        ("B", "<f8"),
+                        ("C", "O"),
+                    ],
                 ),
             ),
             # Pass in a type instance.
@@ -232,7 +260,12 @@ class TestDataFrameConvertTo(TestData):
                 dict(column_dtypes=np.unicode),
                 np.rec.array(
                     [("0", "1", "0.2", "a"), ("1", "2", "1.5", "bc")],
-                    dtype=[("index", "<i8"), ("A", "<U"), ("B", "<U"), ("C", "<U")],
+                    dtype=[
+                        ("index", "<i8"),
+                        ("A", "<U"),
+                        ("B", "<U"),
+                        ("C", "<U"),
+                    ],
                 ),
             ),
             # Pass in a dtype instance.
@@ -240,15 +273,27 @@ class TestDataFrameConvertTo(TestData):
                 dict(column_dtypes=np.dtype("unicode")),
                 np.rec.array(
                     [("0", "1", "0.2", "a"), ("1", "2", "1.5", "bc")],
-                    dtype=[("index", "<i8"), ("A", "<U"), ("B", "<U"), ("C", "<U")],
+                    dtype=[
+                        ("index", "<i8"),
+                        ("A", "<U"),
+                        ("B", "<U"),
+                        ("C", "<U"),
+                    ],
                 ),
             ),
             # Pass in a dictionary (name-only).
             (
-                dict(column_dtypes={"A": np.int8, "B": np.float32, "C": "<U2"}),
+                dict(
+                    column_dtypes={"A": np.int8, "B": np.float32, "C": "<U2"}
+                ),
                 np.rec.array(
                     [("0", "1", "0.2", "a"), ("1", "2", "1.5", "bc")],
-                    dtype=[("index", "<i8"), ("A", "i1"), ("B", "<f4"), ("C", "<U2")],
+                    dtype=[
+                        ("index", "<i8"),
+                        ("A", "i1"),
+                        ("B", "<f4"),
+                        ("C", "<U2"),
+                    ],
                 ),
             ),
             # Pass in a dictionary (indices-only).
@@ -256,7 +301,12 @@ class TestDataFrameConvertTo(TestData):
                 dict(index_dtypes={0: "int16"}),
                 np.rec.array(
                     [(0, 1, 0.2, "a"), (1, 2, 1.5, "bc")],
-                    dtype=[("index", "i2"), ("A", "<i8"), ("B", "<f8"), ("C", "O")],
+                    dtype=[
+                        ("index", "i2"),
+                        ("A", "<i8"),
+                        ("B", "<f8"),
+                        ("C", "O"),
+                    ],
                 ),
             ),
             # Ignore index mappings if index is not True.
@@ -272,7 +322,12 @@ class TestDataFrameConvertTo(TestData):
                 dict(index_dtypes={0: "int16", "not-there": "float32"}),
                 np.rec.array(
                     [(0, 1, 0.2, "a"), (1, 2, 1.5, "bc")],
-                    dtype=[("index", "i2"), ("A", "<i8"), ("B", "<f8"), ("C", "O")],
+                    dtype=[
+                        ("index", "i2"),
+                        ("A", "<i8"),
+                        ("B", "<f8"),
+                        ("C", "O"),
+                    ],
                 ),
             ),
             # Names / indices not in mapping default to array dtype.
@@ -280,23 +335,46 @@ class TestDataFrameConvertTo(TestData):
                 dict(column_dtypes={"A": np.int8, "B": np.float32}),
                 np.rec.array(
                     [("0", "1", "0.2", "a"), ("1", "2", "1.5", "bc")],
-                    dtype=[("index", "<i8"), ("A", "i1"), ("B", "<f4"), ("C", "O")],
+                    dtype=[
+                        ("index", "<i8"),
+                        ("A", "i1"),
+                        ("B", "<f4"),
+                        ("C", "O"),
+                    ],
                 ),
             ),
             # Names / indices not in dtype mapping default to array dtype.
             (
-                dict(column_dtypes={"A": np.dtype("int8"), "B": np.dtype("float32")}),
+                dict(
+                    column_dtypes={
+                        "A": np.dtype("int8"),
+                        "B": np.dtype("float32"),
+                    }
+                ),
                 np.rec.array(
                     [("0", "1", "0.2", "a"), ("1", "2", "1.5", "bc")],
-                    dtype=[("index", "<i8"), ("A", "i1"), ("B", "<f4"), ("C", "O")],
+                    dtype=[
+                        ("index", "<i8"),
+                        ("A", "i1"),
+                        ("B", "<f4"),
+                        ("C", "O"),
+                    ],
                 ),
             ),
             # Mixture of everything.
             (
-                dict(column_dtypes={"A": np.int8, "B": np.float32}, index_dtypes="<U2"),
+                dict(
+                    column_dtypes={"A": np.int8, "B": np.float32},
+                    index_dtypes="<U2",
+                ),
                 np.rec.array(
                     [("0", "1", "0.2", "a"), ("1", "2", "1.5", "bc")],
-                    dtype=[("index", "<U2"), ("A", "i1"), ("B", "<f4"), ("C", "O")],
+                    dtype=[
+                        ("index", "<U2"),
+                        ("A", "i1"),
+                        ("B", "<f4"),
+                        ("C", "O"),
+                    ],
                 ),
             ),
             # Invalid dype values.
@@ -312,7 +390,10 @@ class TestDataFrameConvertTo(TestData):
             (
                 dict(
                     index=False,
-                    column_dtypes={"A": "int32", "B": CategoricalDtype(["a", "b"])},
+                    column_dtypes={
+                        "A": "int32",
+                        "B": CategoricalDtype(["a", "b"]),
+                    },
                 ),
                 (ValueError, "Invalid dtype category specified for column B"),
             ),
@@ -342,7 +423,10 @@ class TestDataFrameConvertTo(TestData):
                 DataFrame(
                     [[1, 2, 3], [4, 5, 6], [7, 8, 9]], columns=list("abc")
                 ).set_index(["a", "b"]),
-                dict(column_dtypes="float64", index_dtypes={0: "int32", 1: "int8"}),
+                dict(
+                    column_dtypes="float64",
+                    index_dtypes={0: "int32", 1: "int8"},
+                ),
                 np.rec.array(
                     [(1, 2, 3.0), (4, 5, 6.0), (7, 8, 9.0)],
                     dtype=[("a", "<i4"), ("b", "i1"), ("c", "<f8")],
@@ -356,9 +440,16 @@ class TestDataFrameConvertTo(TestData):
                         [("a", "d"), ("b", "e"), ("c", "f")]
                     ),
                 ),
-                dict(column_dtypes={0: "<U1", 2: "float32"}, index_dtypes="float32"),
+                dict(
+                    column_dtypes={0: "<U1", 2: "float32"},
+                    index_dtypes="float32",
+                ),
                 np.rec.array(
-                    [(0.0, "1", 2, 3.0), (1.0, "4", 5, 6.0), (2.0, "7", 8, 9.0)],
+                    [
+                        (0.0, "1", 2, 3.0),
+                        (1.0, "4", 5, 6.0),
+                        (2.0, "7", 8, 9.0),
+                    ],
                     dtype=[
                         ("index", "<f4"),
                         ("('a', 'd')", "<U1"),
@@ -378,7 +469,9 @@ class TestDataFrameConvertTo(TestData):
                         [("d", -4), ("d", -5), ("f", -6)], names=list("cd")
                     ),
                 ),
-                dict(column_dtypes="float64", index_dtypes={0: "<U2", 1: "int8"}),
+                dict(
+                    column_dtypes="float64", index_dtypes={0: "<U2", 1: "int8"}
+                ),
                 np.rec.array(
                     [
                         ("d", -4, 1.0, 2.0, 3.0),
@@ -432,7 +525,10 @@ class TestDataFrameConvertTo(TestData):
 
     @pytest.mark.parametrize("mapping", [dict, defaultdict(list), OrderedDict])
     def test_to_dict(self, mapping):
-        test_data = {"A": {"1": 1, "2": 2}, "B": {"1": "1", "2": "2", "3": "3"}}
+        test_data = {
+            "A": {"1": 1, "2": 2},
+            "B": {"1": "1", "2": "2", "3": "3"},
+        }
 
         # GH16122
         recons_data = DataFrame(test_data).to_dict(into=mapping)
@@ -524,7 +620,10 @@ class TestDataFrameConvertTo(TestData):
             ("dict", lambda d, col, idx: d[col][idx]),
             ("records", lambda d, col, idx: d[idx][col]),
             ("list", lambda d, col, idx: d[col][idx]),
-            ("split", lambda d, col, idx: d["data"][idx][d["columns"].index(col)]),
+            (
+                "split",
+                lambda d, col, idx: d["data"][idx][d["columns"].index(col)],
+            ),
             ("index", lambda d, col, idx: d[idx][col]),
         ],
     )

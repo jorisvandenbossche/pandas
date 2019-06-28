@@ -241,7 +241,9 @@ def json_normalize(
                     if level + 1 == len(val):
                         seen_meta[key] = _pull_field(obj, val[-1])
 
-                _recursive_extract(obj[path[0]], path[1:], seen_meta, level=level + 1)
+                _recursive_extract(
+                    obj[path[0]], path[1:], seen_meta, level=level + 1
+                )
         else:
             for obj in data:
                 recs = _pull_field(obj, path[0])
@@ -273,7 +275,9 @@ def json_normalize(
     result = DataFrame(records)
 
     if record_prefix is not None:
-        result = result.rename(columns=lambda x: "{p}{c}".format(p=record_prefix, c=x))
+        result = result.rename(
+            columns=lambda x: "{p}{c}".format(p=record_prefix, c=x)
+        )
 
     # Data types, a problem
     for k, v in meta_vals.items():

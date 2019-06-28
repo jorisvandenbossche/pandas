@@ -15,7 +15,8 @@ def skipif_32bit(param):
     here to skip leaf_size parameters related to GH 23440.
     """
     marks = pytest.mark.skipif(
-        compat.is_platform_32bit(), reason="GH 23440: int type mismatch on 32bit"
+        compat.is_platform_32bit(),
+        reason="GH 23440: int type mismatch on 32bit",
     )
     return pytest.param(param, marks=marks)
 
@@ -74,7 +75,9 @@ class TestIntervalTree:
             tree.get_indexer(np.array([3.0]))
 
     def test_get_indexer_non_unique(self, tree):
-        indexer, missing = tree.get_indexer_non_unique(np.array([1.0, 2.0, 6.5]))
+        indexer, missing = tree.get_indexer_non_unique(
+            np.array([1.0, 2.0, 6.5])
+        )
 
         result = indexer[:1]
         expected = np.array([0], dtype="intp")
@@ -124,7 +127,8 @@ class TestIntervalTree:
                 tm.assert_numpy_array_equal(result, expected)
 
     @pytest.mark.parametrize(
-        "leaf_size", [skipif_32bit(1), skipif_32bit(10), skipif_32bit(100), 10000]
+        "leaf_size",
+        [skipif_32bit(1), skipif_32bit(10), skipif_32bit(100), 10000],
     )
     def test_get_indexer_closed(self, closed, leaf_size):
         x = np.arange(1000, dtype="float64")

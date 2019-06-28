@@ -33,7 +33,10 @@ import pytest
 from pandas.compat import is_platform_32bit, is_platform_windows
 from pandas.compat.numpy import _np_version
 
-from pandas.core.computation.expressions import _NUMEXPR_INSTALLED, _USE_NUMEXPR
+from pandas.core.computation.expressions import (
+    _NUMEXPR_INSTALLED,
+    _USE_NUMEXPR,
+)
 
 
 def safe_import(mod_name, min_version=None):
@@ -113,11 +116,14 @@ def skip_if_installed(package: str,) -> MarkDecorator:
         The name of the package.
     """
     return pytest.mark.skipif(
-        safe_import(package), reason="Skipping because {} is installed.".format(package)
+        safe_import(package),
+        reason="Skipping because {} is installed.".format(package),
     )
 
 
-def skip_if_no(package: str, min_version: Optional[str] = None) -> MarkDecorator:
+def skip_if_no(
+    package: str, min_version: Optional[str] = None
+) -> MarkDecorator:
     """
     Generic function to help skip tests when required packages are not
     present on the testing system.
@@ -158,9 +164,15 @@ def skip_if_no(package: str, min_version: Optional[str] = None) -> MarkDecorator
 skip_if_no_mpl = pytest.mark.skipif(
     _skip_if_no_mpl(), reason="Missing matplotlib dependency"
 )
-skip_if_mpl = pytest.mark.skipif(not _skip_if_no_mpl(), reason="matplotlib is present")
-skip_if_32bit = pytest.mark.skipif(is_platform_32bit(), reason="skipping for 32 bit")
-skip_if_windows = pytest.mark.skipif(is_platform_windows(), reason="Running on Windows")
+skip_if_mpl = pytest.mark.skipif(
+    not _skip_if_no_mpl(), reason="matplotlib is present"
+)
+skip_if_32bit = pytest.mark.skipif(
+    is_platform_32bit(), reason="skipping for 32 bit"
+)
+skip_if_windows = pytest.mark.skipif(
+    is_platform_windows(), reason="Running on Windows"
+)
 skip_if_windows_python_3 = pytest.mark.skipif(
     is_platform_windows(), reason="not used on win32"
 )
@@ -170,7 +182,8 @@ skip_if_has_locale = pytest.mark.skipif(
 )
 skip_if_not_us_locale = pytest.mark.skipif(
     _skip_if_not_us_locale(),
-    reason="Specific locale is set " "{lang}".format(lang=locale.getlocale()[0]),
+    reason="Specific locale is set "
+    "{lang}".format(lang=locale.getlocale()[0]),
 )
 skip_if_no_scipy = pytest.mark.skipif(
     _skip_if_no_scipy(), reason="Missing SciPy requirement"
@@ -178,7 +191,9 @@ skip_if_no_scipy = pytest.mark.skipif(
 skip_if_no_ne = pytest.mark.skipif(
     not _USE_NUMEXPR,
     reason="numexpr enabled->{enabled}, "
-    "installed->{installed}".format(enabled=_USE_NUMEXPR, installed=_NUMEXPR_INSTALLED),
+    "installed->{installed}".format(
+        enabled=_USE_NUMEXPR, installed=_NUMEXPR_INSTALLED
+    ),
 )
 
 

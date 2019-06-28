@@ -131,10 +131,12 @@ def test_less_precise(data1, data2, dtype, check_less_precise):
         # MultiIndex
         (
             DataFrame.from_records(
-                {"a": [1, 2], "b": [2.1, 1.5], "c": ["l1", "l2"]}, index=["a", "b"]
+                {"a": [1, 2], "b": [2.1, 1.5], "c": ["l1", "l2"]},
+                index=["a", "b"],
             ).c,
             DataFrame.from_records(
-                {"a": [1.0, 2.0], "b": [2.1, 1.5], "c": ["l1", "l2"]}, index=["a", "b"]
+                {"a": [1.0, 2.0], "b": [2.1, 1.5], "c": ["l1", "l2"]},
+                index=["a", "b"],
             ).c,
             "MultiIndex level \\[0\\] are different",
         ),

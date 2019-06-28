@@ -7,7 +7,9 @@ import pandas.util.testing as tm
 class TestIndexingCallable:
     def test_frame_loc_callable(self):
         # GH 11485
-        df = pd.DataFrame({"A": [1, 2, 3, 4], "B": list("aabb"), "C": [1, 2, 3, 4]})
+        df = pd.DataFrame(
+            {"A": [1, 2, 3, 4], "B": list("aabb"), "C": [1, 2, 3, 4]}
+        )
         # iloc cannot use boolean Series (see GH3635)
 
         # return bool indexer
@@ -62,7 +64,9 @@ class TestIndexingCallable:
 
     def test_frame_loc_callable_mixture(self):
         # GH 11485
-        df = pd.DataFrame({"A": [1, 2, 3, 4], "B": list("aabb"), "C": [1, 2, 3, 4]})
+        df = pd.DataFrame(
+            {"A": [1, 2, 3, 4], "B": list("aabb"), "C": [1, 2, 3, 4]}
+        )
 
         res = df.loc[lambda x: x.A > 2, ["A", "B"]]
         tm.assert_frame_equal(res, df.loc[df.A > 2, ["A", "B"]])
@@ -84,7 +88,9 @@ class TestIndexingCallable:
 
     def test_frame_loc_callable_labels(self):
         # GH 11485
-        df = pd.DataFrame({"X": [1, 2, 3, 4], "Y": list("aabb")}, index=list("ABCD"))
+        df = pd.DataFrame(
+            {"X": [1, 2, 3, 4], "Y": list("aabb")}, index=list("ABCD")
+        )
 
         # return label
         res = df.loc[lambda x: ["A", "C"]]
@@ -117,7 +123,9 @@ class TestIndexingCallable:
 
     def test_frame_loc_callable_setitem(self):
         # GH 11485
-        df = pd.DataFrame({"X": [1, 2, 3, 4], "Y": list("aabb")}, index=list("ABCD"))
+        df = pd.DataFrame(
+            {"X": [1, 2, 3, 4], "Y": list("aabb")}, index=list("ABCD")
+        )
 
         # return label
         res = df.copy()
@@ -171,7 +179,9 @@ class TestIndexingCallable:
 
     def test_frame_iloc_callable(self):
         # GH 11485
-        df = pd.DataFrame({"X": [1, 2, 3, 4], "Y": list("aabb")}, index=list("ABCD"))
+        df = pd.DataFrame(
+            {"X": [1, 2, 3, 4], "Y": list("aabb")}, index=list("ABCD")
+        )
 
         # return location
         res = df.iloc[lambda x: [1, 3]]
@@ -201,7 +211,9 @@ class TestIndexingCallable:
 
     def test_frame_iloc_callable_setitem(self):
         # GH 11485
-        df = pd.DataFrame({"X": [1, 2, 3, 4], "Y": list("aabb")}, index=list("ABCD"))
+        df = pd.DataFrame(
+            {"X": [1, 2, 3, 4], "Y": list("aabb")}, index=list("ABCD")
+        )
 
         # return location
         res = df.copy()

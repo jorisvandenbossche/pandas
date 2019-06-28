@@ -43,7 +43,9 @@ class Base:
         categories = index.dropna().unique().values[:-1]
         dtype = CategoricalDtype(categories=categories, ordered=True)
         result = index.astype(dtype)
-        expected = CategoricalIndex(index.values, categories=categories, ordered=True)
+        expected = CategoricalIndex(
+            index.values, categories=categories, ordered=True
+        )
         tm.assert_index_equal(result, expected)
 
     @pytest.mark.parametrize(
@@ -77,7 +79,9 @@ class TestIntSubtype(Base):
 
     indexes = [
         IntervalIndex.from_breaks(np.arange(-10, 11, dtype="int64")),
-        IntervalIndex.from_breaks(np.arange(100, dtype="uint64"), closed="left"),
+        IntervalIndex.from_breaks(
+            np.arange(100, dtype="uint64"), closed="left"
+        ),
     ]
 
     @pytest.fixture(params=indexes)
@@ -91,12 +95,15 @@ class TestIntSubtype(Base):
         dtype = IntervalDtype(subtype)
         result = index.astype(dtype)
         expected = IntervalIndex.from_arrays(
-            index.left.astype(subtype), index.right.astype(subtype), closed=index.closed
+            index.left.astype(subtype),
+            index.right.astype(subtype),
+            closed=index.closed,
         )
         tm.assert_index_equal(result, expected)
 
     @pytest.mark.parametrize(
-        "subtype_start, subtype_end", [("int64", "uint64"), ("uint64", "int64")]
+        "subtype_start, subtype_end",
+        [("int64", "uint64"), ("uint64", "int64")],
     )
     def test_subtype_integer(self, subtype_start, subtype_end):
         index = IntervalIndex.from_breaks(np.arange(100, dtype=subtype_start))
@@ -124,7 +131,9 @@ class TestFloatSubtype(Base):
     indexes = [
         interval_range(-10.0, 10.0, closed="neither"),
         IntervalIndex.from_arrays(
-            [-1.5, np.nan, 0.0, 0.0, 1.5], [-0.5, np.nan, 1.0, 1.0, 3.0], closed="both"
+            [-1.5, np.nan, 0.0, 0.0, 1.5],
+            [-0.5, np.nan, 1.0, 1.0, 3.0],
+            closed="both",
         ),
     ]
 
@@ -138,7 +147,9 @@ class TestFloatSubtype(Base):
         dtype = IntervalDtype(subtype)
         result = index.astype(dtype)
         expected = IntervalIndex.from_arrays(
-            index.left.astype(subtype), index.right.astype(subtype), closed=index.closed
+            index.left.astype(subtype),
+            index.right.astype(subtype),
+            closed=index.closed,
         )
         tm.assert_index_equal(result, expected)
 
@@ -193,7 +204,9 @@ class TestDatetimelikeSubtype(Base):
         dtype = IntervalDtype(subtype)
         result = index.astype(dtype)
         expected = IntervalIndex.from_arrays(
-            index.left.astype(subtype), index.right.astype(subtype), closed=index.closed
+            index.left.astype(subtype),
+            index.right.astype(subtype),
+            closed=index.closed,
         )
         tm.assert_index_equal(result, expected)
 

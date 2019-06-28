@@ -53,7 +53,9 @@ def test_index_col_named2(all_parsers):
     )
     names = ["a", "b", "c", "d", "message"]
 
-    result = parser.read_csv(StringIO(data), names=names, index_col=["message"])
+    result = parser.read_csv(
+        StringIO(data), names=names, index_col=["message"]
+    )
     tm.assert_frame_equal(result, expected)
 
 
@@ -97,25 +99,29 @@ baz,7,8,9
         (
             [0, 1],
             dict(
-                columns=["z"], index=MultiIndex.from_arrays([[]] * 2, names=["x", "y"])
+                columns=["z"],
+                index=MultiIndex.from_arrays([[]] * 2, names=["x", "y"]),
             ),
         ),
         (
             ["x", "y"],
             dict(
-                columns=["z"], index=MultiIndex.from_arrays([[]] * 2, names=["x", "y"])
+                columns=["z"],
+                index=MultiIndex.from_arrays([[]] * 2, names=["x", "y"]),
             ),
         ),
         (
             [1, 0],
             dict(
-                columns=["z"], index=MultiIndex.from_arrays([[]] * 2, names=["y", "x"])
+                columns=["z"],
+                index=MultiIndex.from_arrays([[]] * 2, names=["y", "x"]),
             ),
         ),
         (
             ["y", "x"],
             dict(
-                columns=["z"], index=MultiIndex.from_arrays([[]] * 2, names=["y", "x"])
+                columns=["z"],
+                index=MultiIndex.from_arrays([[]] * 2, names=["y", "x"]),
             ),
         ),
     ],
@@ -157,7 +163,8 @@ def test_multi_index_naming(all_parsers, index_names):
     result = parser.read_csv(StringIO(data), index_col=[0, 1])
 
     expected = DataFrame(
-        {"col": [1, 2, 3, 4]}, index=MultiIndex.from_product([["a", "b"], ["c", "d"]])
+        {"col": [1, 2, 3, 4]},
+        index=MultiIndex.from_product([["a", "b"], ["c", "d"]]),
     )
     expected.index.names = [name if name else None for name in index_names]
     tm.assert_frame_equal(result, expected)
@@ -171,7 +178,8 @@ def test_multi_index_naming_not_all_at_beginning(all_parsers):
     expected = DataFrame(
         {"Unnamed: 2": ["c", "d", "c", "d"]},
         index=MultiIndex(
-            levels=[["a", "b"], [1, 2, 3, 4]], codes=[[0, 0, 1, 1], [0, 1, 2, 3]]
+            levels=[["a", "b"], [1, 2, 3, 4]],
+            codes=[[0, 0, 1, 1], [0, 1, 2, 3]],
         ),
     )
     tm.assert_frame_equal(result, expected)

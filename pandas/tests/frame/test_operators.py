@@ -23,7 +23,10 @@ class TestDataFrameUnaryOperators:
         "df,expected",
         [
             (pd.DataFrame({"a": [-1, 1]}), pd.DataFrame({"a": [1, -1]})),
-            (pd.DataFrame({"a": [False, True]}), pd.DataFrame({"a": [True, False]})),
+            (
+                pd.DataFrame({"a": [False, True]}),
+                pd.DataFrame({"a": [True, False]}),
+            ),
             (
                 pd.DataFrame({"a": pd.Series(pd.to_timedelta([-1, 1]))}),
                 pd.DataFrame({"a": pd.Series(pd.to_timedelta([1, -1]))}),
@@ -38,7 +41,10 @@ class TestDataFrameUnaryOperators:
         "df, expected",
         [
             (np.array([1, 2], dtype=object), np.array([-1, -2], dtype=object)),
-            ([Decimal("1.0"), Decimal("2.0")], [Decimal("-1.0"), Decimal("-2.0")]),
+            (
+                [Decimal("1.0"), Decimal("2.0")],
+                [Decimal("-1.0"), Decimal("-2.0")],
+            ),
         ],
     )
     def test_neg_object(self, df, expected):
@@ -97,7 +103,8 @@ class TestDataFrameUnaryOperators:
         assert_series_equal(+df["a"], df["a"])
 
     @pytest.mark.parametrize(
-        "df", [pd.DataFrame({"a": pd.to_datetime(["2017-01-22", "1970-01-01"])})]
+        "df",
+        [pd.DataFrame({"a": pd.to_datetime(["2017-01-22", "1970-01-01"])})],
     )
     def test_pos_raises(self, df):
         with pytest.raises(TypeError):
@@ -164,14 +171,18 @@ class TestDataFrameLogicalOperators:
         def _check_bin_op(op):
             result = op(df1, df2)
             expected = DataFrame(
-                op(df1.values, df2.values), index=df1.index, columns=df1.columns
+                op(df1.values, df2.values),
+                index=df1.index,
+                columns=df1.columns,
             )
             assert result.values.dtype == np.bool_
             assert_frame_equal(result, expected)
 
         def _check_unary_op(op):
             result = op(df1)
-            expected = DataFrame(op(df1.values), index=df1.index, columns=df1.columns)
+            expected = DataFrame(
+                op(df1.values), index=df1.index, columns=df1.columns
+            )
             assert result.values.dtype == np.bool_
             assert_frame_equal(result, expected)
 
@@ -289,7 +300,9 @@ class TestDataFrameOperators:
             result = getattr(df, op)(x, level="second", axis=0)
 
             expected = (
-                pd.concat([opa(df.loc[idx[:, i], :], v) for i, v in x.iteritems()])
+                pd.concat(
+                    [opa(df.loc[idx[:, i], :], v) for i, v in x.iteritems()]
+                )
                 .reindex_like(df)
                 .sort_index()
             )
@@ -326,7 +339,9 @@ class TestDataFrameOperators:
             assert_frame_equal(res, exp)
 
     def test_dti_tz_convert_to_utc(self):
-        base = pd.DatetimeIndex(["2011-01-01", "2011-01-02", "2011-01-03"], tz="UTC")
+        base = pd.DatetimeIndex(
+            ["2011-01-01", "2011-01-02", "2011-01-03"], tz="UTC"
+        )
         idx1 = base.tz_convert("Asia/Tokyo")[:2]
         idx2 = base.tz_convert("US/Eastern")[1:]
 
@@ -335,7 +350,9 @@ class TestDataFrameOperators:
         exp = DataFrame({"A": [np.nan, 3, np.nan]}, index=base)
         assert_frame_equal(df1 + df2, exp)
 
-    def test_combineFrame(self, float_frame, mixed_float_frame, mixed_int_frame):
+    def test_combineFrame(
+        self, float_frame, mixed_float_frame, mixed_int_frame
+    ):
         frame_copy = float_frame.reindex(float_frame.index[::2])
 
         del frame_copy["D"]
@@ -489,7 +506,9 @@ class TestDataFrameOperators:
         # vs mix
         result = mixed_float_frame * 2
         for c, s in result.items():
-            tm.assert_numpy_array_equal(s.values, mixed_float_frame[c].values * 2)
+            tm.assert_numpy_array_equal(
+                s.values, mixed_float_frame[c].values * 2
+            )
         _check_mixed_float(result, dtype=dict(C=None))
 
         result = DataFrame() * 2
@@ -505,7 +524,9 @@ class TestDataFrameOperators:
 
         def test_comp(func):
             result = func(df1, df2)
-            tm.assert_numpy_array_equal(result.values, func(df1.values, df2.values))
+            tm.assert_numpy_array_equal(
+                result.values, func(df1.values, df2.values)
+            )
 
             with pytest.raises(ValueError, match="dim must be <= 2"):
                 func(df1, ndim_5)
@@ -516,7 +537,9 @@ class TestDataFrameOperators:
             )
 
             result3 = func(float_frame, 0)
-            tm.assert_numpy_array_equal(result3.values, func(float_frame.values, 0))
+            tm.assert_numpy_array_equal(
+                result3.values, func(float_frame.values, 0)
+            )
 
             msg = "Can only compare identically-labeled DataFrame"
             with pytest.raises(ValueError, match=msg):
@@ -630,7 +653,9 @@ class TestDataFrameOperators:
         chunk2 = combined2.loc[combined2.index[:-5], ["A", "B", "C"]]
 
         exp = (
-            float_frame.loc[float_frame.index[:-5], ["A", "B", "C"]].reindex_like(chunk)
+            float_frame.loc[
+                float_frame.index[:-5], ["A", "B", "C"]
+            ].reindex_like(chunk)
             * 2
         )
         assert_frame_equal(chunk, exp)
@@ -814,7 +839,8 @@ class TestDataFrameOperators:
 
         val = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
         tm.assert_frame_equal(
-            align(df, val, "index"), DataFrame(val, index=df.index, columns=df.columns)
+            align(df, val, "index"),
+            DataFrame(val, index=df.index, columns=df.columns),
         )
         tm.assert_frame_equal(
             align(df, val, "columns"),

@@ -16,7 +16,9 @@ from pandas.io.formats.excel import ExcelFormatter
         pytest.param(
             "xlwt",
             marks=pytest.mark.xfail(
-                reason="xlwt does not support " "openpyxl-compatible " "style dicts"
+                reason="xlwt does not support "
+                "openpyxl-compatible "
+                "style dicts"
             ),
         ),
         "xlsxwriter",
@@ -123,7 +125,8 @@ def test_styler_to_excel(engine):
                     # This fails with engine=xlsxwriter due to
                     # https://bitbucket.org/openpyxl/openpyxl/issues/800
                     if engine == "xlsxwriter" and (
-                        LooseVersion(openpyxl.__version__) < LooseVersion("2.4.6")
+                        LooseVersion(openpyxl.__version__)
+                        < LooseVersion("2.4.6")
                     ):
                         pass
                     else:
@@ -142,7 +145,10 @@ def test_styler_to_excel(engine):
                     assert not cell1.font.italic
                     assert cell2.font.italic
                 elif ref == "D7":
-                    assert cell1.alignment.horizontal != cell2.alignment.horizontal
+                    assert (
+                        cell1.alignment.horizontal
+                        != cell2.alignment.horizontal
+                    )
                     assert cell2.alignment.horizontal == "right"
                 elif ref == "B8":
                     assert cell1.fill.fgColor.rgb != cell2.fill.fgColor.rgb

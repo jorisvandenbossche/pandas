@@ -26,7 +26,8 @@ _correct_line1 = (
     "000000000000000000000000000000  "
 )
 _correct_header1 = (
-    "HEADER RECORD*******MEMBER  HEADER RECORD!!!!!!!" "000000000000000001600000000"
+    "HEADER RECORD*******MEMBER  HEADER RECORD!!!!!!!"
+    "000000000000000001600000000"
 )
 _correct_header2 = (
     "HEADER RECORD*******DSCRPTR HEADER RECORD!!!!!!!"
@@ -255,7 +256,11 @@ class XportReader(BaseIterator):
     __doc__ = _xport_reader_doc
 
     def __init__(
-        self, filepath_or_buffer, index=None, encoding="ISO-8859-1", chunksize=None
+        self,
+        filepath_or_buffer,
+        index=None,
+        encoding="ISO-8859-1",
+        chunksize=None,
     ):
 
         self._encoding = encoding
@@ -300,7 +305,13 @@ class XportReader(BaseIterator):
             raise ValueError("Header record is not an XPORT file.")
 
         line2 = self._get_row()
-        fif = [["prefix", 24], ["version", 8], ["OS", 8], ["_", 24], ["created", 16]]
+        fif = [
+            ["prefix", 24],
+            ["version", 8],
+            ["OS", 8],
+            ["_", 24],
+            ["created", 16],
+        ]
         file_info = _split_line(line2, fif)
         if file_info["prefix"] != "SAS     SAS     SASLIB":
             self.close()
@@ -413,7 +424,9 @@ class XportReader(BaseIterator):
         """
 
         self.filepath_or_buffer.seek(0, 2)
-        total_records_length = self.filepath_or_buffer.tell() - self.record_start
+        total_records_length = (
+            self.filepath_or_buffer.tell() - self.record_start
+        )
 
         if total_records_length % 80 != 0:
             warnings.warn("xport file may be corrupted")
@@ -485,7 +498,9 @@ class XportReader(BaseIterator):
             vec = data["s%d" % j]
             ntype = self.fields[j]["ntype"]
             if ntype == "numeric":
-                vec = _handle_truncated_float_vec(vec, self.fields[j]["field_length"])
+                vec = _handle_truncated_float_vec(
+                    vec, self.fields[j]["field_length"]
+                )
                 miss = self._missing_double(vec)
                 v = _parse_float_vec(vec)
                 v[miss] = np.nan

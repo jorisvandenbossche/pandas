@@ -11,7 +11,14 @@ from pandas.errors import PerformanceWarning
 import pandas.util._test_decorators as td
 
 import pandas as pd
-from pandas import DataFrame, Series, SparseDtype, SparseSeries, bdate_range, isna
+from pandas import (
+    DataFrame,
+    Series,
+    SparseDtype,
+    SparseSeries,
+    bdate_range,
+    isna,
+)
 from pandas.core.reshape.util import cartesian_product
 import pandas.core.sparse.frame as spf
 from pandas.tests.series.test_api import SharedWithSparse
@@ -72,12 +79,16 @@ class TestSparseSeries(SharedWithSparse):
 
         date_index = bdate_range("1/1/2011", periods=len(index))
 
-        self.bseries = SparseSeries(arr, index=index, kind="block", name="bseries")
+        self.bseries = SparseSeries(
+            arr, index=index, kind="block", name="bseries"
+        )
         self.ts = self.bseries
 
         self.btseries = SparseSeries(arr, index=date_index, kind="block")
 
-        self.iseries = SparseSeries(arr, index=index, kind="integer", name="iseries")
+        self.iseries = SparseSeries(
+            arr, index=index, kind="integer", name="iseries"
+        )
 
         arr, index = _test_data2()
         self.bseries2 = SparseSeries(arr, index=index, kind="block")
@@ -87,11 +98,17 @@ class TestSparseSeries(SharedWithSparse):
         self.zbseries = SparseSeries(
             arr, index=index, kind="block", fill_value=0, name="zbseries"
         )
-        self.ziseries = SparseSeries(arr, index=index, kind="integer", fill_value=0)
+        self.ziseries = SparseSeries(
+            arr, index=index, kind="integer", fill_value=0
+        )
 
         arr, index = _test_data2_zero()
-        self.zbseries2 = SparseSeries(arr, index=index, kind="block", fill_value=0)
-        self.ziseries2 = SparseSeries(arr, index=index, kind="integer", fill_value=0)
+        self.zbseries2 = SparseSeries(
+            arr, index=index, kind="block", fill_value=0
+        )
+        self.ziseries2 = SparseSeries(
+            arr, index=index, kind="integer", fill_value=0
+        )
 
     def test_constructor_dict_input(self):
         # gh-16905
@@ -261,7 +278,8 @@ class TestSparseSeries(SharedWithSparse):
 
         assert self.zbseries.fill_value == 0
         tm.assert_numpy_array_equal(
-            self.zbseries.values.to_dense(), self.bseries.to_dense().fillna(0).values
+            self.zbseries.values.to_dense(),
+            self.bseries.to_dense().fillna(0).values,
         )
 
         # pass SparseSeries
@@ -302,7 +320,9 @@ class TestSparseSeries(SharedWithSparse):
         assert sp.shape == (20,)
 
         # but can make it copy!
-        sp = SparseSeries(values, sparse_index=self.bseries.sp_index, copy=True)
+        sp = SparseSeries(
+            values, sparse_index=self.bseries.sp_index, copy=True
+        )
         sp.sp_values[:5] = 100
         assert values[0] == 97
 
@@ -380,7 +400,10 @@ class TestSparseSeries(SharedWithSparse):
     def test_astype(self):
         result = self.bseries.astype(SparseDtype(np.int64, 0))
         expected = (
-            self.bseries.to_dense().fillna(0).astype(np.int64).to_sparse(fill_value=0)
+            self.bseries.to_dense()
+            .fillna(0)
+            .astype(np.int64)
+            .to_sparse(fill_value=0)
         )
         tm.assert_sp_series_equal(result, expected)
 
@@ -409,7 +432,9 @@ class TestSparseSeries(SharedWithSparse):
         tm.assert_sp_frame_equal(s.to_frame(name="y"), exp)
 
         s = pd.SparseSeries([1, 2, 0, nan, 4, nan, 0], name="x", fill_value=0)
-        exp = pd.SparseDataFrame({"x": [1, 2, 0, nan, 4, nan, 0]}, default_fill_value=0)
+        exp = pd.SparseDataFrame(
+            {"x": [1, 2, 0, nan, 4, nan, 0]}, default_fill_value=0
+        )
 
         tm.assert_sp_frame_equal(s.to_frame(), exp)
         exp = pd.DataFrame({"y": [1, 2, 0, nan, 4, nan, 0]})
@@ -470,7 +495,9 @@ class TestSparseSeries(SharedWithSparse):
         tm.assert_almost_equal(result, expected)
 
         with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
-            tm.assert_almost_equal(self.bseries.get_value(10), self.bseries[10])
+            tm.assert_almost_equal(
+                self.bseries.get_value(10), self.bseries[10]
+            )
 
     def test_set_value(self):
 
@@ -511,7 +538,9 @@ class TestSparseSeries(SharedWithSparse):
                 dense_result = dense.take(idx).values
                 sparse_result = sp.take(idx)
                 assert isinstance(sparse_result, SparseSeries)
-                tm.assert_almost_equal(dense_result, sparse_result.values.to_dense())
+                tm.assert_almost_equal(
+                    dense_result, sparse_result.values.to_dense()
+                )
 
             _compare([1.0, 2.0, 3.0, 4.0, 5.0, 0.0])
             _compare([7, 2, 9, 0, 4])
@@ -625,7 +654,9 @@ class TestSparseSeries(SharedWithSparse):
 
         inplace_ops = ["add", "sub", "mul", "truediv", "floordiv", "pow"]
         for op in inplace_ops:
-            _check_inplace_op(getattr(operator, "i%s" % op), getattr(operator, op))
+            _check_inplace_op(
+                getattr(operator, "i%s" % op), getattr(operator, op)
+            )
 
     @pytest.mark.parametrize(
         "values, op, fill_value",
@@ -646,7 +677,10 @@ class TestSparseSeries(SharedWithSparse):
         else:
             new_fill_value = op(fill_value)
         s = SparseSeries(
-            values, fill_value=fill_value, index=["a", "b", "c", "d"], name="name"
+            values,
+            fill_value=fill_value,
+            index=["a", "b", "c", "d"],
+            name="name",
         )
         result = op(s)
         expected = SparseSeries(
@@ -747,7 +781,9 @@ class TestSparseSeries(SharedWithSparse):
 
             # make sure level argument asserts
             # TODO: expected is not used anywhere...remove?
-            expected = expected.reindex(int_indices2).fillna(fill_value)  # noqa
+            expected = expected.reindex(int_indices2).fillna(
+                fill_value
+            )  # noqa
 
         def _check_with_fill_value(values, first, second, fill_value=nan):
             i_index1 = IntIndex(length, first)
@@ -848,7 +884,9 @@ class TestSparseSeries(SharedWithSparse):
         def _check_matches(indices, expected):
             data = {
                 i: SparseSeries(
-                    idx.to_int_index().indices, sparse_index=idx, fill_value=np.nan
+                    idx.to_int_index().indices,
+                    sparse_index=idx,
+                    fill_value=np.nan,
                 )
                 for i, idx in enumerate(indices)
             }
@@ -872,7 +910,11 @@ class TestSparseSeries(SharedWithSparse):
         _check_matches(indices2, expected2)
 
         # must have NaN fill value
-        data = {"a": SparseSeries(np.arange(7), sparse_index=expected2, fill_value=0)}
+        data = {
+            "a": SparseSeries(
+                np.arange(7), sparse_index=expected2, fill_value=0
+            )
+        }
         with pytest.raises(TypeError, match="NaN fill value"):
             spf.homogenize(data)
 
@@ -898,7 +940,9 @@ class TestSparseSeries(SharedWithSparse):
         tm.assert_series_equal(res, exp)
 
     def test_shift(self):
-        series = SparseSeries([nan, 1.0, 2.0, 3.0, nan, nan], index=np.arange(6))
+        series = SparseSeries(
+            [nan, 1.0, 2.0, 3.0, nan, nan], index=np.arange(6)
+        )
 
         shifted = series.shift(0)
         # assert shifted is not series
@@ -911,7 +955,8 @@ class TestSparseSeries(SharedWithSparse):
         _dense_series_compare(series, f)
 
         series = SparseSeries(
-            [nan, 1.0, 2.0, 3.0, nan, nan], index=bdate_range("1/1/2000", periods=6)
+            [nan, 1.0, 2.0, 3.0, nan, nan],
+            index=bdate_range("1/1/2000", periods=6),
         )
         f = lambda s: s.shift(2, freq="B")
         _dense_series_compare(series, f)
@@ -944,29 +989,44 @@ class TestSparseSeries(SharedWithSparse):
 
         sparse = orig.to_sparse(fill_value=0)
         tm.assert_sp_series_equal(
-            sparse.shift(0), orig.shift(0).to_sparse(fill_value=sparse.fill_value)
+            sparse.shift(0),
+            orig.shift(0).to_sparse(fill_value=sparse.fill_value),
         )
         tm.assert_sp_series_equal(
-            sparse.shift(1), orig.shift(1).to_sparse(fill_value=0), check_kind=False
+            sparse.shift(1),
+            orig.shift(1).to_sparse(fill_value=0),
+            check_kind=False,
         )
         tm.assert_sp_series_equal(
-            sparse.shift(2), orig.shift(2).to_sparse(fill_value=0), check_kind=False
+            sparse.shift(2),
+            orig.shift(2).to_sparse(fill_value=0),
+            check_kind=False,
         )
         tm.assert_sp_series_equal(
-            sparse.shift(3), orig.shift(3).to_sparse(fill_value=0), check_kind=False
+            sparse.shift(3),
+            orig.shift(3).to_sparse(fill_value=0),
+            check_kind=False,
         )
 
         tm.assert_sp_series_equal(
-            sparse.shift(-1), orig.shift(-1).to_sparse(fill_value=0), check_kind=False
+            sparse.shift(-1),
+            orig.shift(-1).to_sparse(fill_value=0),
+            check_kind=False,
         )
         tm.assert_sp_series_equal(
-            sparse.shift(-2), orig.shift(-2).to_sparse(fill_value=0), check_kind=False
+            sparse.shift(-2),
+            orig.shift(-2).to_sparse(fill_value=0),
+            check_kind=False,
         )
         tm.assert_sp_series_equal(
-            sparse.shift(-3), orig.shift(-3).to_sparse(fill_value=0), check_kind=False
+            sparse.shift(-3),
+            orig.shift(-3).to_sparse(fill_value=0),
+            check_kind=False,
         )
         tm.assert_sp_series_equal(
-            sparse.shift(-4), orig.shift(-4).to_sparse(fill_value=0), check_kind=False
+            sparse.shift(-4),
+            orig.shift(-4).to_sparse(fill_value=0),
+            check_kind=False,
         )
 
     def test_shift_dtype(self):
@@ -985,26 +1045,37 @@ class TestSparseSeries(SharedWithSparse):
         # Do we want to astype in shift, for backwards compat?
         # If not, document it.
         tm.assert_sp_series_equal(
-            sparse.shift(1).astype("f8"), orig.shift(1).to_sparse(kind="integer")
+            sparse.shift(1).astype("f8"),
+            orig.shift(1).to_sparse(kind="integer"),
         )
         tm.assert_sp_series_equal(
-            sparse.shift(2).astype("f8"), orig.shift(2).to_sparse(kind="integer")
+            sparse.shift(2).astype("f8"),
+            orig.shift(2).to_sparse(kind="integer"),
         )
         tm.assert_sp_series_equal(
-            sparse.shift(3).astype("f8"), orig.shift(3).to_sparse(kind="integer")
+            sparse.shift(3).astype("f8"),
+            orig.shift(3).to_sparse(kind="integer"),
         )
 
         tm.assert_sp_series_equal(
-            sparse.shift(-1).astype("f8"), orig.shift(-1).to_sparse(), check_kind=False
+            sparse.shift(-1).astype("f8"),
+            orig.shift(-1).to_sparse(),
+            check_kind=False,
         )
         tm.assert_sp_series_equal(
-            sparse.shift(-2).astype("f8"), orig.shift(-2).to_sparse(), check_kind=False
+            sparse.shift(-2).astype("f8"),
+            orig.shift(-2).to_sparse(),
+            check_kind=False,
         )
         tm.assert_sp_series_equal(
-            sparse.shift(-3).astype("f8"), orig.shift(-3).to_sparse(), check_kind=False
+            sparse.shift(-3).astype("f8"),
+            orig.shift(-3).to_sparse(),
+            check_kind=False,
         )
         tm.assert_sp_series_equal(
-            sparse.shift(-4).astype("f8"), orig.shift(-4).to_sparse(), check_kind=False
+            sparse.shift(-4).astype("f8"),
+            orig.shift(-4).to_sparse(),
+            check_kind=False,
         )
 
     @pytest.mark.parametrize("fill_value", [0, 1, np.nan])
@@ -1057,7 +1128,9 @@ class TestSparseHandlingMultiIndexes:
             [["a", "b", "c"], ["1", "2"]], names=["col-foo", "col-bar"]
         )
         dense_multiindex_frame = (
-            pd.DataFrame(index=miindex, columns=micol).sort_index().sort_index(axis=1)
+            pd.DataFrame(index=miindex, columns=micol)
+            .sort_index()
+            .sort_index(axis=1)
         )
         self.dense_multiindex_frame = dense_multiindex_frame.fillna(value=3.14)
 
@@ -1065,7 +1138,8 @@ class TestSparseHandlingMultiIndexes:
         sparse_multiindex_frame = self.dense_multiindex_frame.to_sparse()
         sparse_multiindex_frame = sparse_multiindex_frame.copy()
         tm.assert_index_equal(
-            sparse_multiindex_frame.columns, self.dense_multiindex_frame.columns
+            sparse_multiindex_frame.columns,
+            self.dense_multiindex_frame.columns,
         )
 
     def test_round_trip_preserve_multiindex_names(self):
@@ -1080,7 +1154,9 @@ class TestSparseHandlingMultiIndexes:
 
 
 @td.skip_if_no_scipy
-@pytest.mark.filterwarnings("ignore:the matrix subclass:PendingDeprecationWarning")
+@pytest.mark.filterwarnings(
+    "ignore:the matrix subclass:PendingDeprecationWarning"
+)
 @pytest.mark.filterwarnings("ignore:Sparse:FutureWarning")
 @pytest.mark.filterwarnings("ignore:Series.to_sparse:FutureWarning")
 class TestSparseSeriesScipyInteraction:
@@ -1148,7 +1224,11 @@ class TestSparseSeriesScipyInteraction:
 
     def test_to_coo_text_names_integer_row_levels_sort(self):
         ss = self.sparse_series[0]
-        kwargs = {"row_levels": [0, 1], "column_levels": [2, 3], "sort_labels": True}
+        kwargs = {
+            "row_levels": [0, 1],
+            "column_levels": [2, 3],
+            "sort_labels": True,
+        }
         result = (self.coo_matrices[1], self.ils[1], self.jls[0])
         self._run_test(ss, kwargs, result)
 
@@ -1199,8 +1279,13 @@ class TestSparseSeriesScipyInteraction:
             ss.to_coo(["A", "B"], ["C", "D", "E"])
 
     def test_to_coo_duplicate_index_entries(self):
-        ss = pd.concat([self.sparse_series[0], self.sparse_series[0]]).to_sparse()
-        msg = "Duplicate index entries are not allowed in to_coo" " transformation"
+        ss = pd.concat(
+            [self.sparse_series[0], self.sparse_series[0]]
+        ).to_sparse()
+        msg = (
+            "Duplicate index entries are not allowed in to_coo"
+            " transformation"
+        )
         with pytest.raises(ValueError, match=msg):
             ss.to_coo(["A", "B"], ["C", "D"])
 
@@ -1275,7 +1360,9 @@ class TestSparseSeriesScipyInteraction:
         sparse2 = pd.SparseSeries(val2, name="y")
 
         res = pd.concat([sparse1, sparse2], axis=1)
-        exp = pd.concat([pd.Series(val1, name="x"), pd.Series(val2, name="y")], axis=1)
+        exp = pd.concat(
+            [pd.Series(val1, name="x"), pd.Series(val2, name="y")], axis=1
+        )
         exp = pd.SparseDataFrame(exp)
         tm.assert_sp_frame_equal(res, exp)
 
@@ -1311,7 +1398,9 @@ class TestSparseSeriesScipyInteraction:
         sparse2 = pd.SparseSeries(val2, name="y", fill_value=0)
 
         res = pd.concat([sparse1, sparse2], axis=1)
-        exp = pd.concat([pd.Series(val1, name="x"), pd.Series(val2, name="y")], axis=1)
+        exp = pd.concat(
+            [pd.Series(val1, name="x"), pd.Series(val2, name="y")], axis=1
+        )
         assert isinstance(res, pd.SparseDataFrame)
         tm.assert_frame_equal(res.to_dense(), exp)
 
@@ -1435,7 +1524,9 @@ class TestSparseSeriesScipyInteraction:
         tm.assert_sp_series_equal(res, exp)
 
         # if fill_value is not nan, True can be included in sp_values
-        s = pd.SparseSeries([np.nan, 0.0, 1.0, 2.0, 0.0], name="xxx", fill_value=0.0)
+        s = pd.SparseSeries(
+            [np.nan, 0.0, 1.0, 2.0, 0.0], name="xxx", fill_value=0.0
+        )
         res = s.isna()
         assert isinstance(res, pd.SparseSeries)
         exp = pd.Series([True, False, False, False, False], name="xxx")
@@ -1452,7 +1543,9 @@ class TestSparseSeriesScipyInteraction:
         tm.assert_sp_series_equal(res, exp)
 
         # if fill_value is not nan, True can be included in sp_values
-        s = pd.SparseSeries([np.nan, 0.0, 1.0, 2.0, 0.0], name="xxx", fill_value=0.0)
+        s = pd.SparseSeries(
+            [np.nan, 0.0, 1.0, 2.0, 0.0], name="xxx", fill_value=0.0
+        )
         res = s.notna()
         assert isinstance(res, pd.SparseSeries)
         exp = pd.Series([False, True, True, True, True], name="xxx")
@@ -1471,7 +1564,9 @@ def _dense_series_compare(s, f):
 class TestSparseSeriesAnalytics:
     def setup_method(self, method):
         arr, index = _test_data1()
-        self.bseries = SparseSeries(arr, index=index, kind="block", name="bseries")
+        self.bseries = SparseSeries(
+            arr, index=index, kind="block", name="bseries"
+        )
 
         arr, index = _test_data1_zero()
         self.zbseries = SparseSeries(
@@ -1535,19 +1630,25 @@ class TestSparseSeriesAnalytics:
         for func in funcs:
             for series in ("bseries", "zbseries"):
                 with tm.assert_produces_warning(
-                    FutureWarning, check_stacklevel=False, raise_on_extra_warnings=False
+                    FutureWarning,
+                    check_stacklevel=False,
+                    raise_on_extra_warnings=False,
                 ):
                     getattr(np, func)(getattr(self, series))
 
                 with tm.assert_produces_warning(
-                    FutureWarning, check_stacklevel=False, raise_on_extra_warnings=False
+                    FutureWarning,
+                    check_stacklevel=False,
+                    raise_on_extra_warnings=False,
                 ):
                     getattr(getattr(self, series), func)()
 
     def test_deprecated_reindex_axis(self):
         # https://github.com/pandas-dev/pandas/issues/17833
         # Multiple FutureWarnings, can't check stacklevel
-        with tm.assert_produces_warning(FutureWarning, check_stacklevel=False) as m:
+        with tm.assert_produces_warning(
+            FutureWarning, check_stacklevel=False
+        ) as m:
             self.bseries.reindex_axis([0, 1, 2])
         assert "reindex" in str(m[0].message)
 

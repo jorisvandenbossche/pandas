@@ -34,7 +34,11 @@ def test_registered():
         (["2017"], "D", [17167]),
         ([pd.Period("2017", "D")], pd.tseries.offsets.Day(), [17167]),
         ([pd.Period("2017", "D"), None], None, [17167, iNaT]),
-        (pd.Series(pd.date_range("2017", periods=3)), None, [17167, 17168, 17169]),
+        (
+            pd.Series(pd.date_range("2017", periods=3)),
+            None,
+            [17167, 17168, 17169],
+        ),
         (pd.date_range("2017", periods=3), None, [17167, 17168, 17169]),
     ],
 )
@@ -64,7 +68,9 @@ def test_from_datetime64_freq_changes():
     # https://github.com/pandas-dev/pandas/issues/23438
     arr = pd.date_range("2017", periods=3, freq="D")
     result = PeriodArray._from_datetime64(arr, freq="M")
-    expected = period_array(["2017-01-01", "2017-01-01", "2017-01-01"], freq="M")
+    expected = period_array(
+        ["2017-01-01", "2017-01-01", "2017-01-01"], freq="M"
+    )
     tm.assert_period_array_equal(result, expected)
 
 
@@ -108,13 +114,17 @@ def test_asi8():
 def test_take_raises():
     arr = period_array(["2000", "2001"], freq="D")
     with pytest.raises(IncompatibleFrequency, match="freq"):
-        arr.take([0, -1], allow_fill=True, fill_value=pd.Period("2000", freq="W"))
+        arr.take(
+            [0, -1], allow_fill=True, fill_value=pd.Period("2000", freq="W")
+        )
 
     with pytest.raises(ValueError, match="foo"):
         arr.take([0, -1], allow_fill=True, fill_value="foo")
 
 
-@pytest.mark.parametrize("dtype", [int, np.int32, np.int64, "uint32", "uint64"])
+@pytest.mark.parametrize(
+    "dtype", [int, np.int32, np.int64, "uint32", "uint64"]
+)
 def test_astype(dtype):
     # We choose to ignore the sign and size of integers for
     # Period/Datetime/Timedelta astype
@@ -191,7 +201,11 @@ def test_fillna_copies():
         ([0, 1, 2], pd.Period("2000", "D"), [10957] * 3),
         (
             [0, 1, 2],
-            [pd.Period("2000", "D"), pd.Period("2001", "D"), pd.Period("2002", "D")],
+            [
+                pd.Period("2000", "D"),
+                pd.Period("2001", "D"),
+                pd.Period("2002", "D"),
+            ],
             [10957, 11323, 11688],
         ),
     ],
@@ -242,7 +256,10 @@ def test_sub_period():
 
 @pytest.mark.parametrize(
     "other",
-    [pd.Period("2000", freq="H"), period_array(["2000", "2001", "2000"], freq="H")],
+    [
+        pd.Period("2000", freq="H"),
+        period_array(["2000", "2001", "2000"], freq="H"),
+    ],
 )
 def test_where_different_freq_raises(other):
     ser = pd.Series(period_array(["2000", "2001", "2002"], freq="D"))
@@ -259,7 +276,9 @@ def test_repr_small():
     arr = period_array(["2000", "2001"], freq="D")
     result = str(arr)
     expected = (
-        "<PeriodArray>\n" "['2000-01-01', '2001-01-01']\n" "Length: 2, dtype: period[D]"
+        "<PeriodArray>\n"
+        "['2000-01-01', '2001-01-01']\n"
+        "Length: 2, dtype: period[D]"
     )
     assert result == expected
 

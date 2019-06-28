@@ -6,7 +6,14 @@ import numpy as np
 import pytest
 
 import pandas as pd
-from pandas import DatetimeIndex, Index, Timestamp, date_range, datetime, offsets
+from pandas import (
+    DatetimeIndex,
+    Index,
+    Timestamp,
+    date_range,
+    datetime,
+    offsets,
+)
 import pandas.util.testing as tm
 
 
@@ -129,15 +136,21 @@ class TestTimeSeries:
         tm.assert_index_equal(idx, exp)
 
         idx = pd.date_range(
-            start=Timestamp("1970-01-01"), end=Timestamp("1970-01-04"), freq="D"
+            start=Timestamp("1970-01-01"),
+            end=Timestamp("1970-01-04"),
+            freq="D",
         )
-        exp = DatetimeIndex(["1970-01-01", "1970-01-02", "1970-01-03", "1970-01-04"])
+        exp = DatetimeIndex(
+            ["1970-01-01", "1970-01-02", "1970-01-03", "1970-01-04"]
+        )
         tm.assert_index_equal(idx, exp)
 
 
 class TestDatetime64:
     def test_datetimeindex_accessors(self):
-        dti_naive = pd.date_range(freq="D", start=datetime(1998, 1, 1), periods=365)
+        dti_naive = pd.date_range(
+            freq="D", start=datetime(1998, 1, 1), periods=365
+        )
         # GH#13303
         dti_tz = pd.date_range(
             freq="D", start=datetime(1998, 1, 1), periods=365, tz="US/Eastern"
@@ -225,7 +238,9 @@ class TestDatetime64:
             exp = DatetimeIndex([], freq="D", tz=dti.tz, name="name")
             tm.assert_index_equal(res, exp)
 
-        dti = pd.date_range(freq="BQ-FEB", start=datetime(1998, 1, 1), periods=4)
+        dti = pd.date_range(
+            freq="BQ-FEB", start=datetime(1998, 1, 1), periods=4
+        )
 
         assert sum(dti.is_quarter_start) == 0
         assert sum(dti.is_quarter_end) == 4
@@ -291,7 +306,8 @@ class TestDatetime64:
 
     # GH 12806
     @pytest.mark.parametrize(
-        "time_locale", [None] if tm.get_locales() is None else [None] + tm.get_locales()
+        "time_locale",
+        [None] if tm.get_locales() is None else [None] + tm.get_locales(),
     )
     def test_datetime_name_accessors(self, time_locale):
         # Test Monday -> Sunday and January -> December, in that sequence
@@ -337,12 +353,16 @@ class TestDatetime64:
             "Saturday",
             "Sunday",
         ]
-        for day, name, eng_name in zip(range(4, 11), expected_days, english_days):
+        for day, name, eng_name in zip(
+            range(4, 11), expected_days, english_days
+        ):
             name = name.capitalize()
             assert dti.weekday_name[day] == eng_name
             assert dti.day_name(locale=time_locale)[day] == name
             ts = Timestamp(datetime(2016, 4, day))
-            with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
+            with tm.assert_produces_warning(
+                FutureWarning, check_stacklevel=False
+            ):
                 assert ts.weekday_name == eng_name
             assert ts.day_name(locale=time_locale) == name
         dti = dti.append(DatetimeIndex([pd.NaT]))
@@ -376,4 +396,6 @@ class TestDatetime64:
     def test_nanosecond_field(self):
         dti = DatetimeIndex(np.arange(10))
 
-        tm.assert_index_equal(dti.nanosecond, pd.Index(np.arange(10, dtype=np.int64)))
+        tm.assert_index_equal(
+            dti.nanosecond, pd.Index(np.arange(10, dtype=np.int64))
+        )

@@ -16,7 +16,12 @@ from pandas.plotting._matplotlib.core import (
     PiePlot,
     ScatterPlot,
 )
-from pandas.plotting._matplotlib.hist import HistPlot, KdePlot, hist_frame, hist_series
+from pandas.plotting._matplotlib.hist import (
+    HistPlot,
+    KdePlot,
+    hist_frame,
+    hist_series,
+)
 from pandas.plotting._matplotlib.misc import (
     andrews_curves,
     autocorrelation_plot,

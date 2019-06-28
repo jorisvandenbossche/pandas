@@ -52,7 +52,9 @@ def _check_for_default_values(fname, arg_val_dict, compat_args):
 
             # check for None-ness otherwise we could end up
             # comparing a numpy array vs None
-            if (v1 is not None and v2 is None) or (v1 is None and v2 is not None):
+            if (v1 is not None and v2 is None) or (
+                v1 is None and v2 is not None
+            ):
                 match = False
             else:
                 match = v1 == v2
@@ -166,7 +168,9 @@ def validate_kwargs(fname, kwargs, compat_args):
     _check_for_default_values(fname, kwds, compat_args)
 
 
-def validate_args_and_kwargs(fname, args, kwargs, max_fname_arg_count, compat_args):
+def validate_args_and_kwargs(
+    fname, args, kwargs, max_fname_arg_count, compat_args
+):
     """
     Checks whether parameters passed to the *args and **kwargs argument in a
     function `fname` are valid parameters as specified in `*compat_args`
@@ -315,7 +319,9 @@ def validate_axis_style_args(data, args, kwargs, arg_name, method_name):
     elif len(args) == 2:
         if "axis" in kwargs:
             # Unambiguously wrong
-            msg = "Cannot specify both 'axis' and any of 'index' " "or 'columns'"
+            msg = (
+                "Cannot specify both 'axis' and any of 'index' " "or 'columns'"
+            )
             raise TypeError(msg)
 
         msg = (
@@ -325,7 +331,9 @@ def validate_axis_style_args(data, args, kwargs, arg_name, method_name):
             "positional arguments for 'index' or 'columns' will raise "
             " a 'TypeError'."
         )
-        warnings.warn(msg.format(method_name=method_name), FutureWarning, stacklevel=4)
+        warnings.warn(
+            msg.format(method_name=method_name), FutureWarning, stacklevel=4
+        )
         out[data._AXIS_NAMES[0]] = args[0]
         out[data._AXIS_NAMES[1]] = args[1]
     else:

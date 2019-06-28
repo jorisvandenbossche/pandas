@@ -40,7 +40,9 @@ class TestUnsupportedFeatures:
 
         # specify C engine with unsupported options (raise)
         with pytest.raises(ValueError, match=msg):
-            read_csv(StringIO(data), engine="c", sep=None, delim_whitespace=False)
+            read_csv(
+                StringIO(data), engine="c", sep=None, delim_whitespace=False
+            )
         with pytest.raises(ValueError, match=msg):
             read_csv(StringIO(data), engine="c", sep=r"\s")
         with pytest.raises(ValueError, match=msg):

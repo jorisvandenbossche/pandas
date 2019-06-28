@@ -71,35 +71,51 @@ class TestSeriesPlots(TestPlotBase):
         # so we get a warning about an axis being cleared, even
         # though we don't explicing pass one, see GH #13188
         with tm.assert_produces_warning(UserWarning):
-            axes = _check_plot_works(df.height.hist, by=df.gender, layout=(2, 1))
+            axes = _check_plot_works(
+                df.height.hist, by=df.gender, layout=(2, 1)
+            )
         self._check_axes_shape(axes, axes_num=2, layout=(2, 1))
 
         with tm.assert_produces_warning(UserWarning):
-            axes = _check_plot_works(df.height.hist, by=df.gender, layout=(3, -1))
+            axes = _check_plot_works(
+                df.height.hist, by=df.gender, layout=(3, -1)
+            )
         self._check_axes_shape(axes, axes_num=2, layout=(3, 1))
 
         with tm.assert_produces_warning(UserWarning):
-            axes = _check_plot_works(df.height.hist, by=df.category, layout=(4, 1))
+            axes = _check_plot_works(
+                df.height.hist, by=df.category, layout=(4, 1)
+            )
         self._check_axes_shape(axes, axes_num=4, layout=(4, 1))
 
         with tm.assert_produces_warning(UserWarning):
-            axes = _check_plot_works(df.height.hist, by=df.category, layout=(2, -1))
+            axes = _check_plot_works(
+                df.height.hist, by=df.category, layout=(2, -1)
+            )
         self._check_axes_shape(axes, axes_num=4, layout=(2, 2))
 
         with tm.assert_produces_warning(UserWarning):
-            axes = _check_plot_works(df.height.hist, by=df.category, layout=(3, -1))
+            axes = _check_plot_works(
+                df.height.hist, by=df.category, layout=(3, -1)
+            )
         self._check_axes_shape(axes, axes_num=4, layout=(3, 2))
 
         with tm.assert_produces_warning(UserWarning):
-            axes = _check_plot_works(df.height.hist, by=df.category, layout=(-1, 4))
+            axes = _check_plot_works(
+                df.height.hist, by=df.category, layout=(-1, 4)
+            )
         self._check_axes_shape(axes, axes_num=4, layout=(1, 4))
 
         with tm.assert_produces_warning(UserWarning):
-            axes = _check_plot_works(df.height.hist, by=df.classroom, layout=(2, 2))
+            axes = _check_plot_works(
+                df.height.hist, by=df.classroom, layout=(2, 2)
+            )
         self._check_axes_shape(axes, axes_num=3, layout=(2, 2))
 
         axes = df.height.hist(by=df.category, layout=(4, 2), figsize=(12, 7))
-        self._check_axes_shape(axes, axes_num=4, layout=(4, 2), figsize=(12, 7))
+        self._check_axes_shape(
+            axes, axes_num=4, layout=(4, 2), figsize=(12, 7)
+        )
 
     @pytest.mark.slow
     def test_hist_no_overlap(self):
@@ -323,7 +339,9 @@ class TestDataFrameGroupByPlots(TestPlotBase):
         height = Series(np.random.normal(60, 10, size=n))
         with tm.RNGContext(42):
             gender_int = np.random.choice([0, 1], size=n)
-        df_int = DataFrame({"height": height, "weight": weight, "gender": gender_int})
+        df_int = DataFrame(
+            {"height": height, "weight": weight, "gender": gender_int}
+        )
         gb = df_int.groupby("gender")
         axes = gb.hist()
         assert len(axes) == 2
@@ -363,8 +381,12 @@ class TestDataFrameGroupByPlots(TestPlotBase):
         axes = df.hist(column="height", by=df.category, layout=(-1, 1))
         self._check_axes_shape(axes, axes_num=4, layout=(4, 1))
 
-        axes = df.hist(column="height", by=df.category, layout=(4, 2), figsize=(12, 8))
-        self._check_axes_shape(axes, axes_num=4, layout=(4, 2), figsize=(12, 8))
+        axes = df.hist(
+            column="height", by=df.category, layout=(4, 2), figsize=(12, 8)
+        )
+        self._check_axes_shape(
+            axes, axes_num=4, layout=(4, 2), figsize=(12, 8)
+        )
         tm.close()
 
         # GH 6769
@@ -435,7 +457,9 @@ class TestDataFrameGroupByPlots(TestPlotBase):
     @pytest.mark.slow
     def test_axis_share_xy(self):
         df = self.hist_df
-        ax1, ax2 = df.hist(column="height", by=df.gender, sharex=True, sharey=True)
+        ax1, ax2 = df.hist(
+            column="height", by=df.gender, sharex=True, sharey=True
+        )
 
         # share both x and y
         assert ax1._shared_x_axes.joined(ax1, ax2)

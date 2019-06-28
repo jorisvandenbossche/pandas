@@ -716,7 +716,16 @@ def boxplot_frame_groupby(
 
 
 # kinds supported by both dataframe and series
-_common_kinds = ["line", "bar", "barh", "kde", "density", "area", "hist", "box"]
+_common_kinds = [
+    "line",
+    "bar",
+    "barh",
+    "kde",
+    "density",
+    "area",
+    "hist",
+    "box",
+]
 # kinds supported by dataframe
 _dataframe_kinds = ["scatter", "hexbin"]
 # kinds supported only by series or dataframe single column
@@ -779,7 +788,9 @@ def _plot(data, x=None, y=None, subplots=False, ax=None, kind="line", **kwds):
                 data, x=x, y=y, subplots=subplots, ax=ax, kind=kind, **kwds
             )
         else:
-            raise ValueError("plot kind %r can only be used for data frames" % kind)
+            raise ValueError(
+                "plot kind %r can only be used for data frames" % kind
+            )
 
     elif kind in _series_kinds:
         if isinstance(data, ABCDataFrame):
@@ -1886,7 +1897,9 @@ class FramePlotMethods(BasePlotMethods):
         """
         return self(kind="scatter", x=x, y=y, c=c, s=s, **kwds)
 
-    def hexbin(self, x, y, C=None, reduce_C_function=None, gridsize=None, **kwds):
+    def hexbin(
+        self, x, y, C=None, reduce_C_function=None, gridsize=None, **kwds
+    ):
         """
         Generate a hexagonal binning plot.
 

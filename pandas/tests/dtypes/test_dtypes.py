@@ -28,7 +28,13 @@ from pandas.core.dtypes.dtypes import (
 )
 
 import pandas as pd
-from pandas import Categorical, CategoricalIndex, IntervalIndex, Series, date_range
+from pandas import (
+    Categorical,
+    CategoricalIndex,
+    IntervalIndex,
+    Series,
+    date_range,
+)
 from pandas.core.sparse.api import SparseDtype
 import pandas.util.testing as tm
 
@@ -116,7 +122,9 @@ class TestCategoricalDtype(Base):
             [c, ["x", "y"], False, None, dtype2],
         ],
     )
-    def test_from_values_or_dtype(self, values, categories, ordered, dtype, expected):
+    def test_from_values_or_dtype(
+        self, values, categories, ordered, dtype, expected
+    ):
         result = CategoricalDtype._from_values_or_dtype(
             values, categories, ordered, dtype
         )
@@ -130,10 +138,14 @@ class TestCategoricalDtype(Base):
             [None, None, True, dtype2],
         ],
     )
-    def test_from_values_or_dtype_raises(self, values, categories, ordered, dtype):
+    def test_from_values_or_dtype_raises(
+        self, values, categories, ordered, dtype
+    ):
         msg = "Cannot specify `categories` or `ordered` together with `dtype`."
         with pytest.raises(ValueError, match=msg):
-            CategoricalDtype._from_values_or_dtype(values, categories, ordered, dtype)
+            CategoricalDtype._from_values_or_dtype(
+                values, categories, ordered, dtype
+            )
 
     def test_is_dtype(self):
         assert CategoricalDtype.is_dtype(self.dtype)
@@ -236,7 +248,9 @@ class TestDatetimeTZDtype(Base):
         assert not is_datetime64_dtype("datetime64[ns, US/Eastern]")
 
     def test_construction_from_string(self):
-        result = DatetimeTZDtype.construct_from_string("datetime64[ns, US/Eastern]")
+        result = DatetimeTZDtype.construct_from_string(
+            "datetime64[ns, US/Eastern]"
+        )
         assert is_dtype_equal(self.dtype, result)
         msg = "Could not construct DatetimeTZDtype from 'foo'"
         with pytest.raises(TypeError, match=msg):
@@ -246,7 +260,9 @@ class TestDatetimeTZDtype(Base):
         with pytest.raises(TypeError, match="notatz"):
             DatetimeTZDtype.construct_from_string("datetime64[ns, notatz]")
 
-        with pytest.raises(TypeError, match="^Could not construct DatetimeTZDtype$"):
+        with pytest.raises(
+            TypeError, match="^Could not construct DatetimeTZDtype$"
+        ):
             DatetimeTZDtype.construct_from_string(["datetime64[ns, notatz]"])
 
     def test_is_dtype(self):
@@ -263,7 +279,8 @@ class TestDatetimeTZDtype(Base):
         assert not is_dtype_equal(self.dtype, "foo")
         assert not is_dtype_equal(self.dtype, DatetimeTZDtype("ns", "CET"))
         assert not is_dtype_equal(
-            DatetimeTZDtype("ns", "US/Eastern"), DatetimeTZDtype("ns", "US/Pacific")
+            DatetimeTZDtype("ns", "US/Eastern"),
+            DatetimeTZDtype("ns", "US/Pacific"),
         )
 
         # numpy compat
@@ -504,7 +521,8 @@ class TestIntervalDtype(Base):
         assert hash(dtype2) == hash(dtype3)
 
     @pytest.mark.parametrize(
-        "subtype", ["interval[int64]", "Interval[int64]", "int64", np.dtype("int64")]
+        "subtype",
+        ["interval[int64]", "Interval[int64]", "int64", np.dtype("int64")],
     )
     def test_construction(self, subtype):
         i = IntervalDtype(subtype)
@@ -601,7 +619,9 @@ class TestIntervalDtype(Base):
         assert is_dtype_equal(IntervalDtype("int64"), IntervalDtype("int64"))
 
         assert not is_dtype_equal(self.dtype, "int64")
-        assert not is_dtype_equal(IntervalDtype("int64"), IntervalDtype("float64"))
+        assert not is_dtype_equal(
+            IntervalDtype("int64"), IntervalDtype("float64")
+        )
 
         # invalid subtype comparisons do not raise when directly compared
         dtype1 = IntervalDtype("float64")
@@ -737,7 +757,9 @@ class TestCategoricalDtypeParametrized:
         assert c1 is not c2
         assert c1 != c2
 
-    @pytest.mark.parametrize("v1, v2", [([1, 2, 3], [1, 2, 3]), ([1, 2, 3], [3, 2, 1])])
+    @pytest.mark.parametrize(
+        "v1, v2", [([1, 2, 3], [1, 2, 3]), ([1, 2, 3], [3, 2, 1])]
+    )
     def test_order_hashes_different(self, v1, v2):
         c1 = CategoricalDtype(v1, ordered=False)
         c2 = CategoricalDtype(v2, ordered=True)
@@ -793,7 +815,9 @@ class TestCategoricalDtypeParametrized:
 
     @pytest.mark.parametrize("categories", [list("abc"), None])
     @pytest.mark.parametrize("other", ["category", "not a category"])
-    def test_categorical_equality_strings(self, categories, ordered_fixture, other):
+    def test_categorical_equality_strings(
+        self, categories, ordered_fixture, other
+    ):
         c1 = CategoricalDtype(categories, ordered_fixture)
         result = c1 == other
         expected = other == "category"
@@ -820,7 +844,9 @@ class TestCategoricalDtypeParametrized:
     def test_from_categorical_dtype_categories(self):
         c1 = Categorical([1, 2], categories=[1, 2, 3], ordered=True)
         # override categories
-        result = CategoricalDtype._from_categorical_dtype(c1, categories=[2, 3])
+        result = CategoricalDtype._from_categorical_dtype(
+            c1, categories=[2, 3]
+        )
         assert result == CategoricalDtype([2, 3], ordered=True)
 
     def test_from_categorical_dtype_ordered(self):
@@ -879,7 +905,9 @@ class TestCategoricalDtypeParametrized:
         tm.assert_index_equal(result.categories, expected_categories)
         assert result.ordered is expected_ordered
 
-    @pytest.mark.parametrize("bad_dtype", ["foo", object, np.int64, PeriodDtype("Q")])
+    @pytest.mark.parametrize(
+        "bad_dtype", ["foo", object, np.int64, PeriodDtype("Q")]
+    )
     def test_update_dtype_errors(self, bad_dtype):
         dtype = CategoricalDtype(list("abc"), False)
         msg = "a CategoricalDtype must be passed to perform an update, "

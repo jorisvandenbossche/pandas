@@ -119,7 +119,9 @@ class _Window(PandasObject, SelectionMixin):
             "left",
             "neither",
         ]:
-            raise ValueError("closed must be 'right', 'left', 'both' or " "'neither'")
+            raise ValueError(
+                "closed must be 'right', 'left', 'both' or " "'neither'"
+            )
 
     def _convert_freq(self):
         """
@@ -141,7 +143,9 @@ class _Window(PandasObject, SelectionMixin):
         # filter out the on from the object
         if self.on is not None:
             if obj.ndim == 2:
-                obj = obj.reindex(columns=obj.columns.difference([self.on]), copy=False)
+                obj = obj.reindex(
+                    columns=obj.columns.difference([self.on]), copy=False
+                )
         blocks = obj._to_dict_of_blocks(copy=False).values()
 
         return blocks, obj, index
@@ -237,7 +241,9 @@ class _Window(PandasObject, SelectionMixin):
             raise NotImplementedError(
                 "ops for {action} for this "
                 "dtype {dtype} are not "
-                "implemented".format(action=self._window_type, dtype=values.dtype)
+                "implemented".format(
+                    action=self._window_type, dtype=values.dtype
+                )
             )
         else:
             try:
@@ -269,9 +275,9 @@ class _Window(PandasObject, SelectionMixin):
                 if is_timedelta64_dtype(block.values.dtype):
                     from pandas import to_timedelta
 
-                    result = to_timedelta(result.ravel(), unit="ns").values.reshape(
-                        result.shape
-                    )
+                    result = to_timedelta(
+                        result.ravel(), unit="ns"
+                    ).values.reshape(result.shape)
 
             if result.ndim == 1:
                 from pandas import Series
@@ -842,7 +848,13 @@ class _GroupByMixin(GroupByMixin):
     cov = GroupByMixin._dispatch("cov", other=None, pairwise=None)
 
     def _apply(
-        self, func, name=None, window=None, center=None, check_minp=None, **kwargs
+        self,
+        func,
+        name=None,
+        window=None,
+        center=None,
+        check_minp=None,
+        **kwargs
     ):
         """
         Dispatch to apply; we are stripping all of the _apply kwargs and
@@ -866,7 +878,13 @@ class _Rolling(_Window):
         return Rolling
 
     def _apply(
-        self, func, name=None, window=None, center=None, check_minp=None, **kwargs
+        self,
+        func,
+        name=None,
+        window=None,
+        center=None,
+        check_minp=None,
+        **kwargs
     ):
         """
         Rolling statistical measure using supplied function.
@@ -936,7 +954,10 @@ class _Rolling(_Window):
 
                 def calc(x):
                     return func(
-                        x, window, min_periods=self.min_periods, closed=self.closed
+                        x,
+                        window,
+                        min_periods=self.min_periods,
+                        closed=self.closed,
                     )
 
             with np.errstate(all="ignore"):
@@ -1083,10 +1104,21 @@ class _Rolling_and_Expanding(_Rolling):
             if not raw:
                 arg = Series(arg, index=self.obj.index)
             return libwindow.roll_generic(
-                arg, window, minp, indexi, closed, offset, func, raw, args, kwargs
+                arg,
+                window,
+                minp,
+                indexi,
+                closed,
+                offset,
+                func,
+                raw,
+                args,
+                kwargs,
             )
 
-        return self._apply(f, func, args=args, kwargs=kwargs, center=False, raw=raw)
+        return self._apply(
+            f, func, args=args, kwargs=kwargs, center=False, raw=raw
+        )
 
     def sum(self, *args, **kwargs):
         nv.validate_window_func("sum", args, kwargs)
@@ -1260,7 +1292,9 @@ class _Rolling_and_Expanding(_Rolling):
         def f(arg, *args, **kwargs):
             minp = _require_min_periods(1)(self.min_periods, window)
             return _zsqrt(
-                libwindow.roll_var(arg, window, minp, indexi, self.closed, ddof)
+                libwindow.roll_var(
+                    arg, window, minp, indexi, self.closed, ddof
+                )
             )
 
         return self._apply(
@@ -1330,7 +1364,11 @@ class _Rolling_and_Expanding(_Rolling):
     def var(self, ddof=1, *args, **kwargs):
         nv.validate_window_func("var", args, kwargs)
         return self._apply(
-            "roll_var", "var", check_minp=_require_min_periods(1), ddof=ddof, **kwargs
+            "roll_var",
+            "var",
+            check_minp=_require_min_periods(1),
+            ddof=ddof,
+            **kwargs
         )
 
     _shared_docs[
@@ -1449,12 +1487,22 @@ class _Rolling_and_Expanding(_Rolling):
         def f(arg, *args, **kwargs):
             minp = _use_window(self.min_periods, window)
             if quantile == 1.0:
-                return libwindow.roll_max(arg, window, minp, indexi, self.closed)
+                return libwindow.roll_max(
+                    arg, window, minp, indexi, self.closed
+                )
             elif quantile == 0.0:
-                return libwindow.roll_min(arg, window, minp, indexi, self.closed)
+                return libwindow.roll_min(
+                    arg, window, minp, indexi, self.closed
+                )
             else:
                 return libwindow.roll_quantile(
-                    arg, window, minp, indexi, self.closed, quantile, interpolation
+                    arg,
+                    window,
+                    minp,
+                    indexi,
+                    self.closed,
+                    quantile,
+                    interpolation,
                 )
 
         return self._apply(f, "quantile", quantile=quantile, **kwargs)
@@ -1504,12 +1552,19 @@ class _Rolling_and_Expanding(_Rolling):
             mean = lambda x: x.rolling(
                 window, self.min_periods, center=self.center
             ).mean(**kwargs)
-            count = (X + Y).rolling(window=window, center=self.center).count(**kwargs)
+            count = (
+                (X + Y)
+                .rolling(window=window, center=self.center)
+                .count(**kwargs)
+            )
             bias_adj = count / (count - ddof)
             return (mean(X * Y) - mean(X) * mean(Y)) * bias_adj
 
         return _flex_binary_moment(
-            self._selected_obj, other._selected_obj, _get_cov, pairwise=bool(pairwise)
+            self._selected_obj,
+            other._selected_obj,
+            _get_cov,
+            pairwise=bool(pairwise),
         )
 
     _shared_docs["corr"] = dedent(
@@ -1642,7 +1697,10 @@ class _Rolling_and_Expanding(_Rolling):
             return a.cov(b, **kwargs) / (a.std(**kwargs) * b.std(**kwargs))
 
         return _flex_binary_moment(
-            self._selected_obj, other._selected_obj, _get_corr, pairwise=bool(pairwise)
+            self._selected_obj,
+            other._selected_obj,
+            _get_corr,
+            pairwise=bool(pairwise),
         )
 
 
@@ -1658,7 +1716,9 @@ class Rolling(_Rolling_and_Expanding):
 
         if self.on is None:
             return self.obj.index
-        elif isinstance(self.obj, ABCDataFrame) and self.on in self.obj.columns:
+        elif (
+            isinstance(self.obj, ABCDataFrame) and self.on in self.obj.columns
+        ):
             from pandas import Index
 
             return Index(self.obj[self.on])
@@ -1704,7 +1764,8 @@ class Rolling(_Rolling_and_Expanding):
 
         if not self.is_datetimelike and self.closed is not None:
             raise ValueError(
-                "closed only implemented for datetimelike " "and offset based windows"
+                "closed only implemented for datetimelike "
+                "and offset based windows"
             )
 
     def _validate_monotonic(self):
@@ -1997,7 +2058,9 @@ class Expanding(_Rolling_and_Expanding):
     _attributes = ["min_periods", "center", "axis"]
 
     def __init__(self, obj, min_periods=1, center=False, axis=0, **kwargs):
-        super().__init__(obj=obj, min_periods=min_periods, center=center, axis=axis)
+        super().__init__(
+            obj=obj, min_periods=min_periods, center=center, axis=axis
+        )
 
     @property
     def _constructor(self):
@@ -2531,7 +2594,10 @@ class EWM(_Rolling):
             return X._wrap_result(cov)
 
         return _flex_binary_moment(
-            self._selected_obj, other._selected_obj, _get_cov, pairwise=bool(pairwise)
+            self._selected_obj,
+            other._selected_obj,
+            _get_cov,
+            pairwise=bool(pairwise),
         )
 
     @Substitution(name="ewm")
@@ -2572,7 +2638,10 @@ class EWM(_Rolling):
             return X._wrap_result(corr)
 
         return _flex_binary_moment(
-            self._selected_obj, other._selected_obj, _get_corr, pairwise=bool(pairwise)
+            self._selected_obj,
+            other._selected_obj,
+            _get_corr,
+            pairwise=bool(pairwise),
         )
 
 
@@ -2630,7 +2699,9 @@ def _flex_binary_moment(arg1, arg2, f, pairwise=False):
                     for col in res_columns:
                         if col in X and col in Y:
                             results[col] = f(X[col], Y[col])
-                    return DataFrame(results, index=X.index, columns=res_columns)
+                    return DataFrame(
+                        results, index=X.index, columns=res_columns
+                    )
             elif pairwise is True:
                 results = defaultdict(dict)
                 for i, k1 in enumerate(arg1.columns):
@@ -2652,7 +2723,10 @@ def _flex_binary_moment(arg1, arg2, f, pairwise=False):
                     result = concat(
                         [
                             concat(
-                                [results[i][j] for j, c in enumerate(arg2.columns)],
+                                [
+                                    results[i][j]
+                                    for j, c in enumerate(arg2.columns)
+                                ],
                                 ignore_index=True,
                             )
                             for i, c in enumerate(arg1.columns)
@@ -2670,7 +2744,10 @@ def _flex_binary_moment(arg1, arg2, f, pairwise=False):
                         result = result.reorder_levels([2, 0, 1]).sort_index()
                     else:
                         result.index = MultiIndex.from_product(
-                            [range(len(arg2.columns)), range(len(result_index))]
+                            [
+                                range(len(arg2.columns)),
+                                range(len(result_index)),
+                            ]
                         )
                         result = result.swaplevel(1, 0).sort_index()
                         result.index = MultiIndex.from_product(
@@ -2713,7 +2790,9 @@ def _flex_binary_moment(arg1, arg2, f, pairwise=False):
 def _get_center_of_mass(comass, span, halflife, alpha):
     valid_count = com.count_not_none(comass, span, halflife, alpha)
     if valid_count > 1:
-        raise ValueError("comass, span, halflife, and alpha " "are mutually exclusive")
+        raise ValueError(
+            "comass, span, halflife, and alpha " "are mutually exclusive"
+        )
 
     # Convert to center of mass; domain checks ensure 0 < alpha <= 1
     if comass is not None:

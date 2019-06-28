@@ -64,7 +64,9 @@ def test_to_frame():
         index.to_frame(name=["first"])
 
     # Tests for datetime index
-    index = MultiIndex.from_product([range(5), pd.date_range("20130101", periods=3)])
+    index = MultiIndex.from_product(
+        [range(5), pd.date_range("20130101", periods=3)]
+    )
     result = index.to_frame(index=False)
     expected = DataFrame(
         {
@@ -104,14 +106,24 @@ def test_to_frame_dtype_fidelity():
         ],
         names=["dates", "a", "b", "c"],
     )
-    original_dtypes = {name: mi.levels[i].dtype for i, name in enumerate(mi.names)}
+    original_dtypes = {
+        name: mi.levels[i].dtype for i, name in enumerate(mi.names)
+    }
 
     expected_df = pd.DataFrame(
         OrderedDict(
             [
-                ("dates", pd.date_range("19910905", periods=6, tz="US/Eastern")),
+                (
+                    "dates",
+                    pd.date_range("19910905", periods=6, tz="US/Eastern"),
+                ),
                 ("a", [1, 1, 1, 2, 2, 2]),
-                ("b", pd.Categorical(["a", "a", "b", "b", "c", "c"], ordered=True)),
+                (
+                    "b",
+                    pd.Categorical(
+                        ["a", "a", "b", "b", "c", "c"], ordered=True
+                    ),
+                ),
                 ("c", ["x", "x", "y", "z", "x", "y"]),
             ]
         )
@@ -134,7 +146,9 @@ def test_to_frame_resulting_column_order():
 
 
 def test_to_hierarchical():
-    index = MultiIndex.from_tuples([(1, "one"), (1, "two"), (2, "one"), (2, "two")])
+    index = MultiIndex.from_tuples(
+        [(1, "one"), (1, "two"), (2, "one"), (2, "two")]
+    )
     with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
         result = index.to_hierarchical(3)
     expected = MultiIndex(
@@ -190,7 +204,11 @@ def test_roundtrip_pickle_with_tz():
     # GH 8367
     # round-trip of timezone
     index = MultiIndex.from_product(
-        [[1, 2], ["a", "b"], date_range("20130101", periods=3, tz="US/Eastern")],
+        [
+            [1, 2],
+            ["a", "b"],
+            date_range("20130101", periods=3, tz="US/Eastern"),
+        ],
         names=["one", "two", "three"],
     )
     unpickled = tm.round_trip_pickle(index)

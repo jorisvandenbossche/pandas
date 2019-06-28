@@ -7,11 +7,19 @@ import numpy as np
 
 from pandas._libs import NaT, NaTType, Timestamp, algos, iNaT, lib
 from pandas._libs.tslibs.c_timestamp import maybe_integer_op_deprecated
-from pandas._libs.tslibs.period import DIFFERENT_FREQ, IncompatibleFrequency, Period
+from pandas._libs.tslibs.period import (
+    DIFFERENT_FREQ,
+    IncompatibleFrequency,
+    Period,
+)
 from pandas._libs.tslibs.timedeltas import Timedelta, delta_to_nanoseconds
 from pandas._libs.tslibs.timestamps import RoundTo, round_nsint64
 from pandas.compat.numpy import function as nv
-from pandas.errors import AbstractMethodError, NullFrequencyError, PerformanceWarning
+from pandas.errors import (
+    AbstractMethodError,
+    NullFrequencyError,
+    PerformanceWarning,
+)
 from pandas.util._decorators import Appender, Substitution
 from pandas.util._validators import validate_fillna_kwargs
 
@@ -40,7 +48,12 @@ from pandas.core.dtypes.missing import isna
 
 from pandas._typing import DatetimeLikeScalar
 from pandas.core import missing, nanops
-from pandas.core.algorithms import checked_add_with_arr, take, unique1d, value_counts
+from pandas.core.algorithms import (
+    checked_add_with_arr,
+    take,
+    unique1d,
+    value_counts,
+)
 import pandas.core.common as com
 
 from pandas.tseries import frequencies
@@ -99,7 +112,9 @@ class AttributesMixin:
         """
         raise AbstractMethodError(self)
 
-    def _unbox_scalar(self, value: Union[Period, Timestamp, Timedelta, NaTType]) -> int:
+    def _unbox_scalar(
+        self, value: Union[Period, Timestamp, Timedelta, NaTType]
+    ) -> int:
         """
         Unbox the integer value of a scalar `value`.
 
@@ -313,7 +328,9 @@ default 'raise'
 
     @Appender((_round_doc + _round_example).format(op="round"))
     def round(self, freq, ambiguous="raise", nonexistent="raise"):
-        return self._round(freq, RoundTo.NEAREST_HALF_EVEN, ambiguous, nonexistent)
+        return self._round(
+            freq, RoundTo.NEAREST_HALF_EVEN, ambiguous, nonexistent
+        )
 
     @Appender((_round_doc + _floor_example).format(op="floor"))
     def floor(self, freq, ambiguous="raise", nonexistent="raise"):
@@ -324,7 +341,9 @@ default 'raise'
         return self._round(freq, RoundTo.PLUS_INFTY, ambiguous, nonexistent)
 
 
-class DatetimeLikeArrayMixin(ExtensionOpsMixin, AttributesMixin, ExtensionArray):
+class DatetimeLikeArrayMixin(
+    ExtensionOpsMixin, AttributesMixin, ExtensionArray
+):
     """
     Shared Base/Mixin class for DatetimeArray, TimedeltaArray, PeriodArray
 
@@ -500,7 +519,9 @@ class DatetimeLikeArrayMixin(ExtensionOpsMixin, AttributesMixin, ExtensionArray)
                 "Got '{typ}' instead."
             )
             raise TypeError(
-                msg.format(scalar=self._scalar_type.__name__, typ=type(value).__name__)
+                msg.format(
+                    scalar=self._scalar_type.__name__, typ=type(value).__name__
+                )
             )
         self._data[key] = value
         self._maybe_clear_freq()
@@ -655,9 +676,13 @@ class DatetimeLikeArrayMixin(ExtensionOpsMixin, AttributesMixin, ExtensionArray)
         if isinstance(value, str):
             value = self._scalar_from_string(value)
 
-        if not (isinstance(value, (self._scalar_type, type(self))) or isna(value)):
+        if not (
+            isinstance(value, (self._scalar_type, type(self))) or isna(value)
+        ):
             raise ValueError(
-                "Unexpected type for 'value': {valtype}".format(valtype=type(value))
+                "Unexpected type for 'value': {valtype}".format(
+                    valtype=type(value)
+                )
             )
 
         self._check_compatible_with(value)
@@ -704,7 +729,8 @@ class DatetimeLikeArrayMixin(ExtensionOpsMixin, AttributesMixin, ExtensionArray)
 
         result = value_counts(values, sort=False, dropna=dropna)
         index = Index(
-            cls(result.index.view("i8"), dtype=self.dtype), name=result.index.name
+            cls(result.index.view("i8"), dtype=self.dtype),
+            name=result.index.name,
         )
         return Series(result.values, index=index, name=result.name)
 
@@ -884,7 +910,11 @@ class DatetimeLikeArrayMixin(ExtensionOpsMixin, AttributesMixin, ExtensionArray)
 
         try:
             on_freq = cls._generate_range(
-                start=index[0], end=None, periods=len(index), freq=freq, **kwargs
+                start=index[0],
+                end=None,
+                periods=len(index),
+                freq=freq,
+                **kwargs
             )
             if not np.array_equal(index.asi8, on_freq.asi8):
                 raise ValueError
@@ -937,7 +967,9 @@ class DatetimeLikeArrayMixin(ExtensionOpsMixin, AttributesMixin, ExtensionArray)
         # Overridden by DatetimeArray
         assert other is not NaT
         raise TypeError(
-            "cannot subtract a datelike from a {cls}".format(cls=type(self).__name__)
+            "cannot subtract a datelike from a {cls}".format(
+                cls=type(self).__name__
+            )
         )
 
     _sub_datetime_arraylike = _sub_datetimelike_scalar
@@ -945,7 +977,9 @@ class DatetimeLikeArrayMixin(ExtensionOpsMixin, AttributesMixin, ExtensionArray)
     def _sub_period(self, other):
         # Overriden by PeriodArray
         raise TypeError(
-            "cannot subtract Period from a {cls}".format(cls=type(self).__name__)
+            "cannot subtract Period from a {cls}".format(
+                cls=type(self).__name__
+            )
         )
 
     def _add_offset(self, offset):
@@ -990,9 +1024,9 @@ class DatetimeLikeArrayMixin(ExtensionOpsMixin, AttributesMixin, ExtensionArray)
             return new_values
 
         inc = delta_to_nanoseconds(other)
-        new_values = checked_add_with_arr(self.asi8, inc, arr_mask=self._isnan).view(
-            "i8"
-        )
+        new_values = checked_add_with_arr(
+            self.asi8, inc, arr_mask=self._isnan
+        ).view("i8")
         new_values = self._maybe_mask_results(new_values)
         return new_values.view("i8")
 
@@ -1074,10 +1108,14 @@ class DatetimeLikeArrayMixin(ExtensionOpsMixin, AttributesMixin, ExtensionArray)
             )
 
         if len(self) != len(other):
-            raise ValueError("cannot subtract arrays/indices of " "unequal length")
+            raise ValueError(
+                "cannot subtract arrays/indices of " "unequal length"
+            )
         if self.freq != other.freq:
             msg = DIFFERENT_FREQ.format(
-                cls=type(self).__name__, own_freq=self.freqstr, other_freq=other.freqstr
+                cls=type(self).__name__,
+                own_freq=self.freqstr,
+                other_freq=other.freqstr,
             )
             raise IncompatibleFrequency(msg)
 
@@ -1192,7 +1230,9 @@ class DatetimeLikeArrayMixin(ExtensionOpsMixin, AttributesMixin, ExtensionArray)
         # Note: in the DatetimeTZ case, _generate_range will infer the
         #  appropriate timezone from `start` and `end`, so tz does not need
         #  to be passed explicitly.
-        return self._generate_range(start=start, end=end, periods=None, freq=self.freq)
+        return self._generate_range(
+            start=start, end=end, periods=None, freq=self.freq
+        )
 
     def __add__(self, other):
         other = lib.item_from_zerodim(other)
@@ -1498,7 +1538,9 @@ class DatetimeLikeArrayMixin(ExtensionOpsMixin, AttributesMixin, ExtensionArray)
             raise TypeError(
                 "mean is not implemented for {cls} since the meaning is "
                 "ambiguous.  An alternative is "
-                "obj.to_timestamp(how='start').mean()".format(cls=type(self).__name__)
+                "obj.to_timestamp(how='start').mean()".format(
+                    cls=type(self).__name__
+                )
             )
 
         mask = self.isna()
@@ -1545,7 +1587,9 @@ def validate_periods(periods):
             periods = int(periods)
         elif not lib.is_integer(periods):
             raise TypeError(
-                "periods must be a number, got {periods}".format(periods=periods)
+                "periods must be a number, got {periods}".format(
+                    periods=periods
+                )
             )
     return periods
 
@@ -1665,7 +1709,9 @@ def _ensure_datetimelike_to_i8(other, to_utc=False):
 
     if lib.is_scalar(other) and isna(other):
         return iNaT
-    elif isinstance(other, (PeriodArray, ABCIndexClass, DatetimeLikeArrayMixin)):
+    elif isinstance(
+        other, (PeriodArray, ABCIndexClass, DatetimeLikeArrayMixin)
+    ):
         # convert tz if needed
         if getattr(other, "tz", None) is not None:
             if to_utc:

@@ -25,7 +25,9 @@ AnyArrayLike = TypeVar(
     np.ndarray,
 )
 ArrayLike = TypeVar("ArrayLike", ABCExtensionArray, np.ndarray)
-DatetimeLikeScalar = TypeVar("DatetimeLikeScalar", Period, Timestamp, Timedelta)
+DatetimeLikeScalar = TypeVar(
+    "DatetimeLikeScalar", Period, Timestamp, Timedelta
+)
 Dtype = Union[str, np.dtype, ExtensionDtype]
 FilePathOrBuffer = Union[str, Path, IO[AnyStr]]
 

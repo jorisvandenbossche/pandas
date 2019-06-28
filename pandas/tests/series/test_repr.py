@@ -25,7 +25,10 @@ class TestSeriesRepr(TestData):
     def test_multilevel_name_print(self):
         index = MultiIndex(
             levels=[["foo", "bar", "baz", "qux"], ["one", "two", "three"]],
-            codes=[[0, 0, 0, 1, 1, 2, 2, 3, 3, 3], [0, 1, 2, 0, 1, 1, 2, 0, 1, 2]],
+            codes=[
+                [0, 0, 0, 1, 1, 2, 2, 3, 3, 3],
+                [0, 1, 2, 0, 1, 1, 2, 0, 1, 2],
+            ],
             names=["first", "second"],
         )
         s = Series(range(len(index)), index=index, name="sth")
@@ -185,7 +188,8 @@ class TestSeriesRepr(TestData):
 
     def test_timeseries_repr_object_dtype(self):
         index = Index(
-            [datetime(2000, 1, 1) + timedelta(i) for i in range(1000)], dtype=object
+            [datetime(2000, 1, 1) + timedelta(i) for i in range(1000)],
+            dtype=object,
         )
         ts = Series(np.random.randn(len(index)), index)
         repr(ts)
@@ -207,7 +211,9 @@ class TestSeriesRepr(TestData):
 \bottomrule
 \end{tabular}
 """
-        with option_context("display.latex.escape", False, "display.latex.repr", True):
+        with option_context(
+            "display.latex.escape", False, "display.latex.repr", True
+        ):
             s = Series([r"$\alpha$", "b", "c"])
             assert result == s._repr_latex_()
 
@@ -333,7 +339,9 @@ Categories (5, datetime64[ns]): [2011-01-01 09:00:00, 2011-01-01 10:00:00, 2011-
 
         assert repr(s) == exp
 
-        idx = date_range("2011-01-01 09:00", freq="H", periods=5, tz="US/Eastern")
+        idx = date_range(
+            "2011-01-01 09:00", freq="H", periods=5, tz="US/Eastern"
+        )
         s = Series(Categorical(idx))
         exp = """0   2011-01-01 09:00:00-05:00
 1   2011-01-01 10:00:00-05:00
@@ -361,7 +369,9 @@ Categories (5, datetime64[ns]): [2011-01-01 09:00:00 < 2011-01-01 10:00:00 < 201
 
         assert repr(s) == exp
 
-        idx = date_range("2011-01-01 09:00", freq="H", periods=5, tz="US/Eastern")
+        idx = date_range(
+            "2011-01-01 09:00", freq="H", periods=5, tz="US/Eastern"
+        )
         s = Series(Categorical(idx, ordered=True))
         exp = """0   2011-01-01 09:00:00-05:00
 1   2011-01-01 10:00:00-05:00

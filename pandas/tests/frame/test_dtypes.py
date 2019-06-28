@@ -61,7 +61,9 @@ class TestDataFrameDataTypes(TestData):
             assert_series_equal(nocols_df.ftypes, pd.Series(dtype=np.object))
 
         norows_df = pd.DataFrame(columns=list("abc"))
-        assert_series_equal(norows_df.dtypes, pd.Series(np.object, index=list("abc")))
+        assert_series_equal(
+            norows_df.dtypes, pd.Series(np.object, index=list("abc"))
+        )
 
         # GH 26705 - Assert .ftypes is deprecated
         with tm.assert_produces_warning(FutureWarning):
@@ -71,21 +73,31 @@ class TestDataFrameDataTypes(TestData):
 
         norows_int_df = pd.DataFrame(columns=list("abc")).astype(np.int32)
         assert_series_equal(
-            norows_int_df.dtypes, pd.Series(np.dtype("int32"), index=list("abc"))
+            norows_int_df.dtypes,
+            pd.Series(np.dtype("int32"), index=list("abc")),
         )
         # GH 26705 - Assert .ftypes is deprecated
         with tm.assert_produces_warning(FutureWarning):
             assert_series_equal(
-                norows_int_df.ftypes, pd.Series("int32:dense", index=list("abc"))
+                norows_int_df.ftypes,
+                pd.Series("int32:dense", index=list("abc")),
             )
 
         odict = OrderedDict
-        df = pd.DataFrame(odict([("a", 1), ("b", True), ("c", 1.0)]), index=[1, 2, 3])
+        df = pd.DataFrame(
+            odict([("a", 1), ("b", True), ("c", 1.0)]), index=[1, 2, 3]
+        )
         ex_dtypes = pd.Series(
             odict([("a", np.int64), ("b", np.bool), ("c", np.float64)])
         )
         ex_ftypes = pd.Series(
-            odict([("a", "int64:dense"), ("b", "bool:dense"), ("c", "float64:dense")])
+            odict(
+                [
+                    ("a", "int64:dense"),
+                    ("b", "bool:dense"),
+                    ("c", "float64:dense"),
+                ]
+            )
         )
         assert_series_equal(df.dtypes, ex_dtypes)
 
@@ -128,12 +140,18 @@ class TestDataFrameDataTypes(TestData):
         odict = OrderedDict
         assert_series_equal(
             df.dtypes,
-            pd.Series(odict([("a", np.float_), ("b", np.float_), ("c", np.float_)])),
+            pd.Series(
+                odict([("a", np.float_), ("b", np.float_), ("c", np.float_)])
+            ),
         )
-        assert_series_equal(df.iloc[:, 2:].dtypes, pd.Series(odict([("c", np.float_)])))
+        assert_series_equal(
+            df.iloc[:, 2:].dtypes, pd.Series(odict([("c", np.float_)]))
+        )
         assert_series_equal(
             df.dtypes,
-            pd.Series(odict([("a", np.float_), ("b", np.float_), ("c", np.float_)])),
+            pd.Series(
+                odict([("a", np.float_), ("b", np.float_), ("c", np.float_)])
+            ),
         )
 
     def test_select_dtypes_include_using_list_like(self):
@@ -161,7 +179,9 @@ class TestDataFrameDataTypes(TestData):
         ei = df[["b", "c", "d"]]
         assert_frame_equal(ri, ei)
 
-        ri = df.select_dtypes(include=[np.number, "category"], exclude=["timedelta"])
+        ri = df.select_dtypes(
+            include=[np.number, "category"], exclude=["timedelta"]
+        )
         ei = df[["b", "c", "d", "f"]]
         assert_frame_equal(ri, ei)
 
@@ -319,11 +339,15 @@ class TestDataFrameDataTypes(TestData):
             }
         )
 
-        ri = df.select_dtypes(include=np.number, exclude=["floating", "timedelta"])
+        ri = df.select_dtypes(
+            include=np.number, exclude=["floating", "timedelta"]
+        )
         ei = df[["b", "c"]]
         assert_frame_equal(ri, ei)
 
-        ri = df.select_dtypes(include=[np.number, "category"], exclude="floating")
+        ri = df.select_dtypes(
+            include=[np.number, "category"], exclude="floating"
+        )
         ei = df[["b", "c", "f", "k"]]
         assert_frame_equal(ri, ei)
 
@@ -459,7 +483,8 @@ class TestDataFrameDataTypes(TestData):
         self.mixed_frame["bool"] = self.mixed_frame["A"] > 0
         result = self.mixed_frame.dtypes
         expected = Series(
-            {k: v.dtype for k, v in self.mixed_frame.items()}, index=result.index
+            {k: v.dtype for k, v in self.mixed_frame.items()},
+            index=result.index,
         )
         assert_series_equal(result, expected)
 
@@ -604,12 +629,17 @@ class TestDataFrameDataTypes(TestData):
 
         expected = DataFrame(
             {
-                "a": list(map(str, map(lambda x: Timestamp(x)._date_repr, a._values))),
+                "a": list(
+                    map(str, map(lambda x: Timestamp(x)._date_repr, a._values))
+                ),
                 "b": list(map(str, map(Timestamp, b._values))),
                 "c": list(
                     map(
                         str,
-                        map(lambda x: Timedelta(x)._repr_base(format="all"), c._values),
+                        map(
+                            lambda x: Timedelta(x)._repr_base(format="all"),
+                            c._values,
+                        ),
                     )
                 ),
                 "d": list(map(str, d._values)),
@@ -629,7 +659,9 @@ class TestDataFrameDataTypes(TestData):
 
         # < 1.14 truncates
         # >= 1.14 preserves the full repr
-        val = "1.12345678901" if _np_version_under1p14 else "1.1234567890123457"
+        val = (
+            "1.12345678901" if _np_version_under1p14 else "1.1234567890123457"
+        )
         expected = DataFrame([val])
         assert_frame_equal(result, expected)
 
@@ -680,7 +712,8 @@ class TestDataFrameDataTypes(TestData):
         dt4 = dtype_class({"b": str, 2: str})
         dt5 = dtype_class({"e": str})
         msg = (
-            "Only a column name can be used for the key in a dtype mappings" " argument"
+            "Only a column name can be used for the key in a dtype mappings"
+            " argument"
         )
         with pytest.raises(KeyError, match=msg):
             df.astype(dt4)
@@ -711,7 +744,9 @@ class TestDataFrameDataTypes(TestData):
 
         result = df.astype(str)
         a1_str = Series(["1", "2", "3", "4", "5"], dtype="str", name="a")
-        b_str = Series(["0.1", "0.2", "0.4", "0.6", "0.8"], dtype=str, name="b")
+        b_str = Series(
+            ["0.1", "0.2", "0.4", "0.6", "0.8"], dtype=str, name="b"
+        )
         a2_str = Series(["0", "1", "2", "3", "4"], dtype="str", name="a")
         expected = concat([a1_str, b_str, a2_str], axis=1)
         assert_frame_equal(result, expected)
@@ -761,7 +796,9 @@ class TestDataFrameDataTypes(TestData):
     @pytest.mark.parametrize("dtype", ["Int64", "Int32", "Int16"])
     def test_astype_extension_dtypes(self, dtype):
         # GH 22578
-        df = pd.DataFrame([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]], columns=["a", "b"])
+        df = pd.DataFrame(
+            [[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]], columns=["a", "b"]
+        )
 
         expected1 = pd.DataFrame(
             {
@@ -773,7 +810,9 @@ class TestDataFrameDataTypes(TestData):
         tm.assert_frame_equal(df.astype("int64").astype(dtype), expected1)
         tm.assert_frame_equal(df.astype(dtype).astype("float64"), df)
 
-        df = pd.DataFrame([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]], columns=["a", "b"])
+        df = pd.DataFrame(
+            [[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]], columns=["a", "b"]
+        )
         df["b"] = df["b"].astype(dtype)
         expected2 = pd.DataFrame(
             {"a": [1.0, 3.0, 5.0], "b": integer_array([2, 4, 6], dtype=dtype)}
@@ -918,11 +957,15 @@ class TestDataFrameDataTypes(TestData):
             )
         )
         result = df.get_dtype_counts().sort_index()
-        expected = Series({"datetime64[ns]": 1, "timedelta64[ns]": 1}).sort_index()
+        expected = Series(
+            {"datetime64[ns]": 1, "timedelta64[ns]": 1}
+        ).sort_index()
         assert_series_equal(result, expected)
 
         df["C"] = df["A"] + df["B"]
-        expected = Series({"datetime64[ns]": 2, "timedelta64[ns]": 1}).sort_values()
+        expected = Series(
+            {"datetime64[ns]": 2, "timedelta64[ns]": 1}
+        ).sort_values()
         result = df.get_dtype_counts().sort_values()
         assert_series_equal(result, expected)
 
@@ -970,7 +1013,13 @@ class TestDataFrameDataTypes(TestData):
             ([1, 2]),
             (["1", "2"]),
             (list(pd.date_range("1/1/2011", periods=2, freq="H"))),
-            (list(pd.date_range("1/1/2011", periods=2, freq="H", tz="US/Eastern"))),
+            (
+                list(
+                    pd.date_range(
+                        "1/1/2011", periods=2, freq="H", tz="US/Eastern"
+                    )
+                )
+            ),
             ([pd.Interval(left=0, right=5)]),
         ],
     )
@@ -1009,7 +1058,10 @@ class TestDataFrameDataTypes(TestData):
             # multi-extension
             (
                 DataFrame(
-                    {"A": pd.Categorical(["a", "b"]), "B": pd.Categorical(["a", "b"])}
+                    {
+                        "A": pd.Categorical(["a", "b"]),
+                        "B": pd.Categorical(["a", "b"]),
+                    }
                 ),
                 True,
             ),
@@ -1028,7 +1080,10 @@ class TestDataFrameDataTypes(TestData):
             # multi-extension differ
             (
                 DataFrame(
-                    {"A": pd.Categorical(["a", "b"]), "B": pd.Categorical(["b", "c"])}
+                    {
+                        "A": pd.Categorical(["a", "b"]),
+                        "B": pd.Categorical(["b", "c"]),
+                    }
                 ),
                 False,
             ),
@@ -1038,7 +1093,9 @@ class TestDataFrameDataTypes(TestData):
         assert data._is_homogeneous_type is expected
 
     def test_asarray_homogenous(self):
-        df = pd.DataFrame({"A": pd.Categorical([1, 2]), "B": pd.Categorical([1, 2])})
+        df = pd.DataFrame(
+            {"A": pd.Categorical([1, 2]), "B": pd.Categorical([1, 2])}
+        )
         result = np.asarray(df)
         # may change from object in the future
         expected = np.array([[1, 1], [2, 2]], dtype="object")
@@ -1172,11 +1229,14 @@ class TestDataFrameDatetimeWithTZ(TestData):
         with option_context("display.max_columns", 20):
             result = str(self.tzframe)
             assert (
-                "0 2013-01-01 2013-01-01 00:00:00-05:00 " "2013-01-01 00:00:00+01:00"
+                "0 2013-01-01 2013-01-01 00:00:00-05:00 "
+                "2013-01-01 00:00:00+01:00"
             ) in result
             assert (
-                "1 2013-01-02                       " "NaT                       NaT"
+                "1 2013-01-02                       "
+                "NaT                       NaT"
             ) in result
             assert (
-                "2 2013-01-03 2013-01-03 00:00:00-05:00 " "2013-01-03 00:00:00+01:00"
+                "2 2013-01-03 2013-01-03 00:00:00-05:00 "
+                "2013-01-03 00:00:00+01:00"
             ) in result

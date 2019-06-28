@@ -66,7 +66,9 @@ class SharedWithSparse:
     def test_get_value(self, float_frame):
         for idx in float_frame.index:
             for col in float_frame.columns:
-                with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
+                with tm.assert_produces_warning(
+                    FutureWarning, check_stacklevel=False
+                ):
                     result = float_frame.get_value(idx, col)
                 expected = float_frame[col][idx]
                 tm.assert_almost_equal(result, expected)
@@ -148,7 +150,10 @@ class SharedWithSparse:
         empty_frame = DataFrame()
 
         df = self.klass([1])
-        msg = "'(Sparse)?DataFrame' objects are mutable, thus they cannot be" " hashed"
+        msg = (
+            "'(Sparse)?DataFrame' objects are mutable, thus they cannot be"
+            " hashed"
+        )
         with pytest.raises(TypeError, match=msg):
             hash(df)
         with pytest.raises(TypeError, match=msg):
@@ -188,7 +193,9 @@ class SharedWithSparse:
         assert not float_string_frame.empty
 
         # corner case
-        df = DataFrame({"A": [1.0, 2.0, 3.0], "B": ["a", "b", "c"]}, index=np.arange(3))
+        df = DataFrame(
+            {"A": [1.0, 2.0, 3.0], "B": ["a", "b", "c"]}, index=np.arange(3)
+        )
         del df["A"]
         assert not df.empty
 
@@ -263,7 +270,8 @@ class SharedWithSparse:
             self._assert_series_equal(s, expected)
 
         df = self.klass(
-            {"floats": np.random.randn(5), "ints": range(5)}, columns=["floats", "ints"]
+            {"floats": np.random.randn(5), "ints": range(5)},
+            columns=["floats", "ints"],
         )
 
         for tup in df.itertuples(index=False):
@@ -302,7 +310,10 @@ class SharedWithSparse:
         # GH 7839
         # make sure can iterate
         df = DataFrame(
-            {"id": [1, 2, 3, 4, 5, 6], "raw_grade": ["a", "b", "b", "a", "a", "e"]}
+            {
+                "id": [1, 2, 3, 4, 5, 6],
+                "raw_grade": ["a", "b", "b", "a", "a", "e"],
+            }
         )
         df["grade"] = Categorical(df["raw_grade"])
 
@@ -423,7 +434,8 @@ class SharedWithSparse:
 
     def test_repr_with_mi_nat(self, float_string_frame):
         df = self.klass(
-            {"X": [1, 2]}, index=[[pd.NaT, pd.Timestamp("20130101")], ["a", "b"]]
+            {"X": [1, 2]},
+            index=[[pd.NaT, pd.Timestamp("20130101")], ["a", "b"]],
         )
         result = repr(df)
         expected = "              X\nNaT        a  1\n2013-01-01 b  2"
@@ -510,7 +522,11 @@ class TestDataFrameMisc(SharedWithSparse):
         # GH 1893
 
         data = DataFrame(
-            {"a": ["foo", "bar", "baz", "qux"], "b": [0, 0, 1, 1], "c": [1, 2, 3, 4]}
+            {
+                "a": ["foo", "bar", "baz", "qux"],
+                "b": [0, 0, 1, 1],
+                "c": [1, 2, 3, 4],
+            }
         )
 
         def _check_f(base, f):

@@ -215,7 +215,13 @@ def radviz(frame, class_column, ax=None, color=None, colormap=None, **kwds):
 
 @deprecate_kwarg(old_arg_name="data", new_arg_name="frame")
 def andrews_curves(
-    frame, class_column, ax=None, samples=200, color=None, colormap=None, **kwds
+    frame,
+    class_column,
+    ax=None,
+    samples=200,
+    color=None,
+    colormap=None,
+    **kwds
 ):
     """
     Generate a matplotlib plot of Andrews curves, for visualising clusters of
@@ -487,7 +493,9 @@ class _Options(dict):
     def __delitem__(self, key):
         key = self._get_canonical_key(key)
         if key in self._DEFAULT_KEYS:
-            raise ValueError("Cannot remove default parameter {key}".format(key=key))
+            raise ValueError(
+                "Cannot remove default parameter {key}".format(key=key)
+            )
         return super().__delitem__(key)
 
     def __contains__(self, key):

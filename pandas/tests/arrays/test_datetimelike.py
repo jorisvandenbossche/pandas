@@ -18,7 +18,9 @@ def period_index(request):
     """
     freqstr = request.param
     # TODO: non-monotone indexes; NaTs, different start dates
-    pi = pd.period_range(start=pd.Timestamp("2000-01-01"), periods=100, freq=freqstr)
+    pi = pd.period_range(
+        start=pd.Timestamp("2000-01-01"), periods=100, freq=freqstr
+    )
     return pi
 
 
@@ -33,7 +35,9 @@ def datetime_index(request):
     """
     freqstr = request.param
     # TODO: non-monotone indexes; NaTs, different start dates, timezones
-    pi = pd.date_range(start=pd.Timestamp("2000-01-01"), periods=100, freq=freqstr)
+    pi = pd.date_range(
+        start=pd.Timestamp("2000-01-01"), periods=100, freq=freqstr
+    )
     return pi
 
 
@@ -108,7 +112,9 @@ class SharedTests:
             arr.take([0, 1], allow_fill=True, fill_value=2.0)
 
         with pytest.raises(ValueError):
-            arr.take([0, 1], allow_fill=True, fill_value=pd.Timestamp.now().time)
+            arr.take(
+                [0, 1], allow_fill=True, fill_value=pd.Timestamp.now().time
+            )
 
     def test_concat_same_type(self):
         data = np.arange(10, dtype="i8") * 24 * 3600 * 10 ** 9
@@ -446,8 +452,12 @@ class TestDatetimeArray(SharedTests):
 
     def test_concat_same_type_different_freq(self):
         # we *can* concatenate DTI with different freqs.
-        a = DatetimeArray(pd.date_range("2000", periods=2, freq="D", tz="US/Central"))
-        b = DatetimeArray(pd.date_range("2000", periods=2, freq="H", tz="US/Central"))
+        a = DatetimeArray(
+            pd.date_range("2000", periods=2, freq="D", tz="US/Central")
+        )
+        b = DatetimeArray(
+            pd.date_range("2000", periods=2, freq="H", tz="US/Central")
+        )
         result = DatetimeArray._concat_same_type([a, b])
         expected = DatetimeArray(
             pd.to_datetime(

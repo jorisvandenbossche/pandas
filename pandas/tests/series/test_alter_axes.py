@@ -49,7 +49,9 @@ class TestSeriesAlterAxes:
 
         # index with name
         renamer = Series(
-            np.arange(4), index=Index(["a", "b", "c", "d"], name="name"), dtype="int64"
+            np.arange(4),
+            index=Index(["a", "b", "c", "d"], name="name"),
+            dtype="int64",
         )
         renamed = renamer.rename({})
         assert renamed.index.name == renamer.index.name
@@ -168,7 +170,9 @@ class TestSeriesAlterAxes:
             result = s.reset_index(level=levels)
             tm.assert_frame_equal(result, df)
 
-            result = df.set_index(["A", "B"]).reset_index(level=levels, drop=True)
+            result = df.set_index(["A", "B"]).reset_index(
+                level=levels, drop=True
+            )
             tm.assert_frame_equal(result, df[["C"]])
 
             with pytest.raises(KeyError, match="Level E "):
@@ -232,7 +236,9 @@ class TestSeriesAlterAxes:
 
     def test_rename_axis_mapper(self):
         # GH 19978
-        mi = MultiIndex.from_product([["a", "b", "c"], [1, 2]], names=["ll", "nn"])
+        mi = MultiIndex.from_product(
+            [["a", "b", "c"], [1, 2]], names=["ll", "nn"]
+        )
         s = Series([i for i in range(len(mi))], index=mi)
 
         result = s.rename_axis(index={"ll": "foo"})
