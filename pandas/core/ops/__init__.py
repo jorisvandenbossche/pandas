@@ -485,7 +485,9 @@ def dispatch_to_series(left, right, func, str_rep=None, axis=None):
     if lib.is_scalar(right) or np.ndim(right) == 0:
 
         def column_op(a, b):
-            return {i: func(a.iloc[:, i], b) for i in range(len(a.columns))}
+            # return {i: func(a.iloc[:, i], b) for i in range(len(a.columns))}
+            res = [func(col, b) for col in a._get_arrays()]
+            return left._from_arrays(res, left.columns, left.index, fastpath=True)
 
     elif isinstance(right, ABCDataFrame):
         assert right._indexed_same(left)

@@ -1911,8 +1911,10 @@ class DataFrame(NDFrame):
             raise ValueError("'orient' must be either 'columns' or 'index'")
 
     @classmethod
-    def _from_arrays(cls, arrays, columns, index, dtype=None):
-        mgr = arrays_to_mgr(arrays, columns, index, columns, dtype=dtype)
+    def _from_arrays(cls, arrays, columns, index, dtype=None, fastpath=False):
+        mgr = arrays_to_mgr(
+            arrays, columns, index, columns, dtype=dtype, fastpath=fastpath
+        )
         return cls(mgr)
 
     def to_sparse(self, fill_value=None, kind="block"):
@@ -5293,6 +5295,13 @@ class DataFrame(NDFrame):
 
     # ----------------------------------------------------------------------
     # Arithmetic / combination related
+
+    def _get_arrays(self):
+        res = []
+        for i in range(len(self.columns)):
+            values = self._data.iget_values(i)
+            res.append(values)
+        return res
 
     def _combine_frame(self, other, func, fill_value=None, level=None):
         this, other = self.align(other, join="outer", level=level, copy=False)

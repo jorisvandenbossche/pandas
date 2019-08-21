@@ -987,6 +987,11 @@ class BlockManager(PandasObject):
             self.axes[1],
         )
 
+    def iget_values(self, i):
+        block = self.blocks[self._blknos[i]]
+        values = block.iget(self._blklocs[i])
+        return values
+
     def delete(self, item):
         """
         Delete selected item (items if non-unique) in-place.

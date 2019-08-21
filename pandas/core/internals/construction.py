@@ -55,7 +55,7 @@ from pandas.core.internals import (
 # BlockManager Interface
 
 
-def arrays_to_mgr(arrays, arr_names, index, columns, dtype=None):
+def arrays_to_mgr(arrays, arr_names, index, columns, dtype=None, fastpath=False):
     """
     Segregate Series based on type and coerce into matrices.
 
@@ -68,7 +68,8 @@ def arrays_to_mgr(arrays, arr_names, index, columns, dtype=None):
         index = ensure_index(index)
 
     # don't force copy because getting jammed in an ndarray anyway
-    arrays = _homogenize(arrays, index, dtype)
+    if not fastpath:
+        arrays = _homogenize(arrays, index, dtype)
 
     # from BlockManager perspective
     axes = [ensure_index(columns), index]
