@@ -2398,6 +2398,7 @@ Let's look at a few examples.
 Read a URL with no options:
 
 .. ipython:: python
+   :okexcept:
 
    url = 'https://www.fdic.gov/bank/individual/failed/banklist.html'
    dfs = pd.read_html(url)

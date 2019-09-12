@@ -102,6 +102,7 @@ a Python dictionary, where the keys are the column names
 and the values are the data.
 
 .. ipython:: python
+   :okexcept:
 
    df = pd.DataFrame({'x': [1, 3, 5], 'y': [2, 4, 6]})
    df
@@ -126,6 +127,7 @@ The pandas method is :func:`read_csv`, which works similarly. Additionally, it w
 the data set if presented with a url.
 
 .. ipython:: python
+   :okexcept:
 
    url = ('https://raw.github.com/pandas-dev'
           '/pandas/master/pandas/tests/data/tips.csv')
@@ -199,6 +201,7 @@ New columns can be assigned in the same way. The :meth:`DataFrame.drop` method
 drops a column from the ``DataFrame``.
 
 .. ipython:: python
+   :okexcept:
 
    tips['total_bill'] = tips['total_bill'] - 2
    tips['new_bill'] = tips['total_bill'] / 2
@@ -219,6 +222,7 @@ DataFrames can be filtered in multiple ways; the most intuitive of which is usin
 :ref:`boolean indexing <indexing.boolean>`.
 
 .. ipython:: python
+   :okexcept:
 
    tips[tips['total_bill'] > 10].head()
 
@@ -236,11 +240,13 @@ The same operation in pandas can be accomplished using
 the ``where`` method from ``numpy``.
 
 .. ipython:: python
+   :okexcept:
 
    tips['bucket'] = np.where(tips['total_bill'] < 10, 'low', 'high')
    tips.head()
 
 .. ipython:: python
+   :okexcept:
    :suppress:
 
    tips = tips.drop('bucket', axis=1)
@@ -272,6 +278,7 @@ not available in Stata (such as time zone handling and custom offsets) --
 see the :ref:`timeseries documentation<timeseries>` for more details.
 
 .. ipython:: python
+   :okexcept:
 
    tips['date1'] = pd.Timestamp('2013-01-15')
    tips['date2'] = pd.Timestamp('2015-02-15')
@@ -285,6 +292,7 @@ see the :ref:`timeseries documentation<timeseries>` for more details.
          'months_between']].head()
 
 .. ipython:: python
+   :okexcept:
    :suppress:
 
    tips = tips.drop(['date1', 'date2', 'date1_year', 'date2_month',
@@ -308,6 +316,7 @@ operations do not happen in place. To make these changes persist, assign the ope
 to a variable.
 
 .. ipython:: python
+   :okexcept:
 
    # keep
    tips[['sex', 'total_bill', 'tip']].head()
@@ -332,6 +341,7 @@ pandas objects have a :meth:`DataFrame.sort_values` method, which
 takes a list of columns to sort by.
 
 .. ipython:: python
+   :okexcept:
 
    tips = tips.sort_values(['sex', 'total_bill'])
    tips.head()
@@ -356,6 +366,7 @@ In Python 3, all strings are Unicode strings. ``len`` includes trailing blanks.
 Use ``len`` and ``rstrip`` to exclude trailing blanks.
 
 .. ipython:: python
+   :okexcept:
 
    tips['time'].str.len().head()
    tips['time'].str.rstrip().str.len().head()
@@ -379,6 +390,7 @@ position.  Keep in mind that Python indexes are zero-based and
 the function will return -1 if it fails to find the substring.
 
 .. ipython:: python
+   :okexcept:
 
    tips['sex'].str.find("ale").head()
 
@@ -397,6 +409,7 @@ from a string by position locations.  Keep in mind that Python
 indexes are zero-based.
 
 .. ipython:: python
+   :okexcept:
 
    tips['sex'].str[0:1].head()
 
@@ -424,6 +437,7 @@ by using regular expressions. There are much more powerful
 approaches, but this just shows a simple approach.
 
 .. ipython:: python
+   :okexcept:
 
    firstlast = pd.DataFrame({'string': ['John Smith', 'Jane Cook']})
    firstlast['First_Name'] = firstlast['string'].str.split(" ", expand=True)[0]
@@ -454,6 +468,7 @@ change the case of ASCII and Unicode strings, respectively.
 The equivalent Python functions are ``upper``, ``lower``, and ``title``.
 
 .. ipython:: python
+   :okexcept:
 
    firstlast = pd.DataFrame({'string': ['John Smith', 'Jane Cook']})
    firstlast['upper'] = firstlast['string'].str.upper()
@@ -467,6 +482,7 @@ Merging
 The following tables will be used in the merge examples
 
 .. ipython:: python
+   :okexcept:
 
    df1 = pd.DataFrame({'key': ['A', 'B', 'C', 'D'],
                        'value': np.random.randn(4)})
@@ -533,6 +549,7 @@ similar functionality. Note that different join
 types are accomplished via the ``how`` keyword.
 
 .. ipython:: python
+   :okexcept:
 
    inner_join = df1.merge(df2, on=['key'], how='inner')
    inner_join
@@ -556,6 +573,7 @@ are the same; for example missing data propagates through numeric
 operations, and is ignored by default for aggregations.
 
 .. ipython:: python
+   :okexcept:
 
    outer_join
    outer_join['value_x'] + outer_join['value_y']
@@ -575,6 +593,7 @@ This doesn't work in pandas.  Instead, the :func:`pd.isna` or :func:`pd.notna` f
 should be used for comparisons.
 
 .. ipython:: python
+   :okexcept:
 
    outer_join[pd.isna(outer_join['value_x'])]
    outer_join[pd.notna(outer_join['value_x'])]
@@ -586,6 +605,7 @@ value, like the mean, or forward filling from previous rows. See the
 :ref:`missing data documentation<missing_data>` for more.
 
 .. ipython:: python
+   :okexcept:
 
    # Drop rows with any missing value
    outer_join.dropna()
@@ -616,6 +636,7 @@ allows similar aggregations.  See the :ref:`groupby documentation<groupby>`
 for more details and examples.
 
 .. ipython:: python
+   :okexcept:
 
    tips_summed = tips.groupby(['sex', 'smoker'])['total_bill', 'tip'].sum()
    tips_summed.head()
@@ -639,6 +660,7 @@ these type of operations to be succinctly expressed in one
 operation.
 
 .. ipython:: python
+   :okexcept:
 
    gb = tips.groupby('smoker')['total_bill']
    tips['adj_total_bill'] = tips['total_bill'] - gb.transform('mean')
@@ -660,6 +682,7 @@ sort order by sex/smoker group.
 In pandas this would be written as:
 
 .. ipython:: python
+   :okexcept:
 
    tips.groupby(['sex', 'smoker']).first()
 

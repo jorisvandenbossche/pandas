@@ -23,6 +23,7 @@ the data into a DataFrame called `tips` and assume we have a database table of t
 structure.
 
 .. ipython:: python
+    :okexcept:
 
     url = ('https://raw.github.com/pandas-dev'
            '/pandas/master/pandas/tests/data/tips.csv')
@@ -43,6 +44,7 @@ to select all columns):
 With pandas, column selection is done by passing a list of column names to your DataFrame:
 
 .. ipython:: python
+    :okexcept:
 
     tips[['total_bill', 'tip', 'smoker', 'time']].head(5)
 
@@ -60,6 +62,7 @@ In SQL, you can add a calculated column:
 With pandas, you can use the :meth:`DataFrame.assign` method of a DataFrame to append a new column:
 
 .. ipython:: python
+    :okexcept:
 
     tips.assign(tip_rate=tips['tip'] / tips['total_bill']).head(5)
 
@@ -78,6 +81,7 @@ DataFrames can be filtered in multiple ways; the most intuitive of which is usin
 `boolean indexing <https://pandas.pydata.org/pandas-docs/stable/indexing.html#boolean-indexing>`_.
 
 .. ipython:: python
+    :okexcept:
 
     tips[tips['time'] == 'Dinner'].head(5)
 
@@ -85,6 +89,7 @@ The above statement is simply passing a ``Series`` of True/False objects to the 
 returning all rows with True.
 
 .. ipython:: python
+    :okexcept:
 
     is_dinner = tips['time'] == 'Dinner'
     is_dinner.value_counts()
@@ -101,6 +106,7 @@ Just like SQL's OR and AND, multiple conditions can be passed to a DataFrame usi
     WHERE time = 'Dinner' AND tip > 5.00;
 
 .. ipython:: python
+    :okexcept:
 
     # tips of more than $5.00 at Dinner meals
     tips[(tips['time'] == 'Dinner') & (tips['tip'] > 5.00)]
@@ -113,6 +119,7 @@ Just like SQL's OR and AND, multiple conditions can be passed to a DataFrame usi
     WHERE size >= 5 OR total_bill > 45;
 
 .. ipython:: python
+    :okexcept:
 
     # tips by parties of at least 5 diners OR bill total was more than $45
     tips[(tips['size'] >= 5) | (tips['total_bill'] > 45)]
@@ -121,6 +128,7 @@ NULL checking is done using the :meth:`~pandas.Series.notna` and :meth:`~pandas.
 methods.
 
 .. ipython:: python
+    :okexcept:
 
     frame = pd.DataFrame({'col1': ['A', 'B', np.NaN, 'C', 'D'],
                           'col2': ['F', np.NaN, 'G', 'H', 'I']})
@@ -136,6 +144,7 @@ where ``col2`` IS NULL with the following query:
     WHERE col2 IS NULL;
 
 .. ipython:: python
+    :okexcept:
 
     frame[frame['col2'].isna()]
 
@@ -148,6 +157,7 @@ Getting items where ``col1`` IS NOT NULL can be done with :meth:`~pandas.Series.
     WHERE col1 IS NOT NULL;
 
 .. ipython:: python
+    :okexcept:
 
     frame[frame['col1'].notna()]
 
@@ -176,6 +186,7 @@ For instance, a query getting us the number of tips left by sex:
 The pandas equivalent would be:
 
 .. ipython:: python
+    :okexcept:
 
     tips.groupby('sex').size()
 
@@ -185,6 +196,7 @@ Notice that in the pandas code we used :meth:`~pandas.core.groupby.DataFrameGrou
 the number of ``not null`` records within each.
 
 .. ipython:: python
+    :okexcept:
 
     tips.groupby('sex').count()
 
@@ -192,6 +204,7 @@ Alternatively, we could have applied the :meth:`~pandas.core.groupby.DataFrameGr
 to an individual column:
 
 .. ipython:: python
+    :okexcept:
 
     tips.groupby('sex')['total_bill'].count()
 
@@ -212,6 +225,7 @@ to your grouped DataFrame, indicating which functions to apply to specific colum
     */
 
 .. ipython:: python
+    :okexcept:
 
     tips.groupby('day').agg({'tip': np.mean, 'day': np.size})
 
@@ -236,6 +250,7 @@ Grouping by more than one column is done by passing a list of columns to the
     */
 
 .. ipython:: python
+    :okexcept:
 
     tips.groupby(['smoker', 'day']).agg({'tip': [np.size, np.mean]})
 
@@ -249,6 +264,7 @@ parameters allowing you to specify the type of join to perform (LEFT, RIGHT, INN
 columns to join on (column names or indices).
 
 .. ipython:: python
+    :okexcept:
 
     df1 = pd.DataFrame({'key': ['A', 'B', 'C', 'D'],
                         'value': np.random.randn(4)})
@@ -269,6 +285,7 @@ INNER JOIN
       ON df1.key = df2.key;
 
 .. ipython:: python
+    :okexcept:
 
     # merge performs an INNER JOIN by default
     pd.merge(df1, df2, on='key')
@@ -277,6 +294,7 @@ INNER JOIN
 column with another DataFrame's index.
 
 .. ipython:: python
+    :okexcept:
 
     indexed_df2 = df2.set_index('key')
     pd.merge(df1, indexed_df2, left_on='key', right_index=True)
@@ -292,6 +310,7 @@ LEFT OUTER JOIN
       ON df1.key = df2.key;
 
 .. ipython:: python
+    :okexcept:
 
     # show all records from df1
     pd.merge(df1, df2, on='key', how='left')
@@ -307,6 +326,7 @@ RIGHT JOIN
       ON df1.key = df2.key;
 
 .. ipython:: python
+    :okexcept:
 
     # show all records from df2
     pd.merge(df1, df2, on='key', how='right')
@@ -325,6 +345,7 @@ joined columns find a match. As of writing, FULL JOINs are not supported in all 
       ON df1.key = df2.key;
 
 .. ipython:: python
+    :okexcept:
 
     # show all records from both frames
     pd.merge(df1, df2, on='key', how='outer')
@@ -335,6 +356,7 @@ UNION
 UNION ALL can be performed using :meth:`~pandas.concat`.
 
 .. ipython:: python
+    :okexcept:
 
     df1 = pd.DataFrame({'city': ['Chicago', 'San Francisco', 'New York City'],
                         'rank': range(1, 4)})
@@ -359,6 +381,7 @@ UNION ALL can be performed using :meth:`~pandas.concat`.
     */
 
 .. ipython:: python
+    :okexcept:
 
     pd.concat([df1, df2])
 
@@ -385,6 +408,7 @@ In pandas, you can use :meth:`~pandas.concat` in conjunction with
 :meth:`~pandas.DataFrame.drop_duplicates`.
 
 .. ipython:: python
+    :okexcept:
 
     pd.concat([df1, df2]).drop_duplicates()
 
@@ -402,6 +426,7 @@ Top N rows with offset
     LIMIT 10 OFFSET 5;
 
 .. ipython:: python
+    :okexcept:
 
     tips.nlargest(10 + 5, columns='tip').tail(10)
 
@@ -422,6 +447,7 @@ Top N rows per group
 
 
 .. ipython:: python
+    :okexcept:
 
     (tips.assign(rn=tips.sort_values(['total_bill'], ascending=False)
                         .groupby(['day'])
@@ -432,6 +458,7 @@ Top N rows per group
 the same using `rank(method='first')` function
 
 .. ipython:: python
+    :okexcept:
 
     (tips.assign(rnk=tips.groupby(['day'])['total_bill']
                          .rank(method='first', ascending=False))
@@ -457,6 +484,7 @@ Notice that when using ``rank(method='min')`` function
 (as Oracle's RANK() function)
 
 .. ipython:: python
+    :okexcept:
 
     (tips[tips['tip'] < 2]
         .assign(rnk_min=tips.groupby(['sex'])['tip']
@@ -475,6 +503,7 @@ UPDATE
     WHERE tip < 2;
 
 .. ipython:: python
+    :okexcept:
 
     tips.loc[tips['tip'] < 2, 'tip'] *= 2
 
@@ -489,5 +518,6 @@ DELETE
 In pandas we select the rows that should remain, instead of deleting them
 
 .. ipython:: python
+    :okexcept:
 
     tips = tips.loc[tips['tip'] <= 9]
