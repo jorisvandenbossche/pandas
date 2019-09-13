@@ -30,7 +30,7 @@ from pandas.core.dtypes.dtypes import (
 
 import pandas as pd
 from pandas import Categorical, CategoricalIndex, IntervalIndex, Series, date_range
-from pandas.core.sparse.api import SparseDtype
+from pandas.core.arrays.sparse import SparseDtype
 import pandas.util.testing as tm
 
 
@@ -953,17 +953,12 @@ def test_registry_find(dtype, expected):
         (pd.Series([True, False]), True),
         (pd.SparseArray([True, False]), True),
         (SparseDtype(bool), True),
+        (pd.Series(pd.SparseArray([True, False])), True),
     ],
 )
 def test_is_bool_dtype(dtype, expected):
     result = is_bool_dtype(dtype)
     assert result is expected
-
-
-@pytest.mark.filterwarnings("ignore:Sparse:FutureWarning")
-def test_is_bool_dtype_sparse():
-    result = is_bool_dtype(pd.SparseSeries([True, False]))
-    assert result is True
 
 
 @pytest.mark.parametrize(

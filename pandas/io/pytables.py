@@ -40,8 +40,7 @@ from pandas import (
     MultiIndex,
     PeriodIndex,
     Series,
-    SparseDataFrame,
-    SparseSeries,
+    SparseArray,
     TimedeltaIndex,
     concat,
     isna,
@@ -173,12 +172,7 @@ use the format='fixed(f)|table(t)' keyword instead
 """
 
 # map object types
-_TYPE_MAP = {
-    Series: "series",
-    SparseSeries: "sparse_series",
-    DataFrame: "frame",
-    SparseDataFrame: "sparse_frame",
-}
+_TYPE_MAP = {Series: "series", DataFrame: "frame"}
 
 # storer class map
 _STORER_MAP = {
@@ -186,9 +180,7 @@ _STORER_MAP = {
     "DataFrame": "LegacyFrameFixed",
     "DataMatrix": "LegacyFrameFixed",
     "series": "SeriesFixed",
-    "sparse_series": "SparseSeriesFixed",
     "frame": "FrameFixed",
-    "sparse_frame": "SparseFrameFixed",
 }
 
 # table class map
@@ -3100,12 +3092,14 @@ class SparseSeriesFixed(SparseFixed):
         index = self.read_index("index")
         sp_values = self.read_array("sp_values")
         sp_index = self.read_index("sp_index")
-        return SparseSeries(
-            sp_values,
+        return Series(
+            SparseArray(
+                sp_values,
+                sparse_index=sp_index,
+                kind=self.kind or "block",
+                fill_value=self.fill_value,
+            ),
             index=index,
-            sparse_index=sp_index,
-            kind=self.kind or "block",
-            fill_value=self.fill_value,
             name=self.name,
         )
 
@@ -3132,12 +3126,7 @@ class SparseFrameFixed(SparseFixed):
             s = SparseSeriesFixed(self.parent, getattr(self.group, key))
             s.infer_axes()
             sdict[c] = s.read()
-        return SparseDataFrame(
-            sdict,
-            columns=columns,
-            default_kind=self.default_kind,
-            default_fill_value=self.default_fill_value,
-        )
+        return DataFrame(sdict, columns=columns)
 
     def write(self, obj, **kwargs):
         """ write it as a collection of individual sparse series """
