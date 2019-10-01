@@ -471,6 +471,14 @@ class TestParquetPyArrow(Base):
         # GH #19134
         check_round_trip(df_compat, pa, path="s3://pandas-test/pyarrow.parquet")
 
+        # GH-28490 (directory with s3)
+        check_round_trip(
+            df_compat,
+            pa,
+            path="s3://pandas-test/partitioned/",
+            write_kwargs=dict(partition_cols=["B"]),
+        )
+
     def test_partition_cols_supported(self, pa, df_full):
         # GH #23283
         partition_cols = ["bool", "int"]

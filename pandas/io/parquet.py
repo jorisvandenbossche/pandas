@@ -92,7 +92,15 @@ class PyArrowImpl(BaseImpl):
         **kwargs
     ):
         self.validate_dataframe(df)
-        path, _, _, _ = get_filepath_or_buffer(path, mode="wb")
+        fs = kwargs.pop("filesystem", None)
+        if is_s3_url(path):
+            if fs is None:
+                import s3fs
+
+                fs = s3fs.S3FileSystem()
+        else:
+            path, _, _, _ = get_filepath_or_buffer(path, mode="wb")
+        kwargs["filesystem"] = fs
 
         if index is None:
             from_pandas_kwargs = {}
@@ -118,7 +126,16 @@ class PyArrowImpl(BaseImpl):
             )
 
     def read(self, path, columns=None, **kwargs):
-        path, _, _, should_close = get_filepath_or_buffer(path)
+        fs = kwargs.pop("filesystem", None)
+        if is_s3_url(path):
+            if fs is None:
+                import s3fs
+
+                fs = s3fs.S3FileSystem()
+            should_close = False
+        else:
+            path, _, _, should_close = get_filepath_or_buffer(path)
+        kwargs["filesystem"] = fs
 
         kwargs["use_pandas_metadata"] = True
         result = self.api.parquet.read_table(
