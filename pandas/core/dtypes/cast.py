@@ -330,7 +330,7 @@ def maybe_cast_to_extension_array(cls, obj, dtype=None):
     """
     assert isinstance(cls, type), f"must pass a type: {cls}"
     try:
-        result = cls._from_sequence(obj, dtype=dtype)
+        result = cls._from_scalars(obj, dtype=dtype)
     except Exception:
         # We can't predict what downstream EA constructors may raise
         result = obj

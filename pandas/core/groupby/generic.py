@@ -1086,7 +1086,7 @@ class DataFrameGroupBy(GroupBy):
                     assert result.ndim == 1 or result.shape[0] == 1
                     try:
                         # Cast back if feasible
-                        result = type(block.values)._from_sequence(
+                        result = type(block.values)._from_scalars(
                             result.ravel(), dtype=block.values.dtype
                         )
                     except (ValueError, TypeError):

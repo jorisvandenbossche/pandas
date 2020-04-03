@@ -295,6 +295,14 @@ class DatetimeArray(dtl.DatetimeLikeArrayMixin, dtl.TimelikeOps, dtl.DatelikeOps
         return result
 
     @classmethod
+    def _from_scalars(
+        cls, data, dtype,
+    ):
+        if not all(isinstance(v, Timestamp) or isna(v) for v in data):
+            raise TypeError("Requires timestamp scalars")
+        return cls._from_sequence(data, dtype)
+
+    @classmethod
     def _from_sequence(
         cls,
         data,

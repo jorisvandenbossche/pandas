@@ -168,6 +168,12 @@ class ExtensionArray:
     # ------------------------------------------------------------------------
 
     @classmethod
+    def _from_scalars(cls, data, dtype):
+        if not all(isinstance(v, dtype.type) or isna(v) for v in data):
+            raise TypeError("Requires dtype scalars")
+        return cls._from_sequence(data, dtype)
+
+    @classmethod
     def _from_sequence(cls, scalars, dtype=None, copy=False):
         """
         Construct a new ExtensionArray from a sequence of scalars.
@@ -550,7 +556,7 @@ class ExtensionArray:
             if method is not None:
                 func = pad_1d if method == "pad" else backfill_1d
                 new_values = func(self.astype(object), limit=limit, mask=mask)
-                new_values = self._from_sequence(new_values, dtype=self.dtype)
+                new_values = self._from_scalars(new_values, dtype=self.dtype)
             else:
                 # fill with value
                 new_values = self.copy()
@@ -612,7 +618,7 @@ class ExtensionArray:
         if isna(fill_value):
             fill_value = self.dtype.na_value
 
-        empty = self._from_sequence(
+        empty = self._from_scalars(
             [fill_value] * min(abs(periods), len(self)), dtype=self.dtype
         )
         if periods > 0:
@@ -632,7 +638,7 @@ class ExtensionArray:
         uniques : ExtensionArray
         """
         uniques = unique(self.astype(object))
-        return self._from_sequence(uniques, dtype=self.dtype)
+        return self._from_scalars(uniques, dtype=self.dtype)
 
     def searchsorted(self, value, side="left", sorter=None):
         """
@@ -889,7 +895,7 @@ class ExtensionArray:
 
                result = take(data, indices, fill_value=fill_value,
                              allow_fill=allow_fill)
-               return self._from_sequence(result, dtype=self.dtype)
+               return self._from_scalars(result, dtype=self.dtype)
         """
         # Implementer note: The `fill_value` parameter should be a user-facing
         # value, an instance of self.dtype.type. When passed `fill_value=None`,

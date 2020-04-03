@@ -930,7 +930,7 @@ class BlockManager(PandasObject):
                 result[rl] = blk.iget((i, loc))
 
         if isinstance(dtype, ExtensionDtype):
-            result = dtype.construct_array_type()._from_sequence(result, dtype=dtype)
+            result = dtype.construct_array_type()._from_scalars(result, dtype=dtype)
 
         return result
 
