@@ -843,6 +843,7 @@ b  2""",
     def _cython_agg_general(
         self, how: str, alt=None, numeric_only: bool = True, min_count: int = -1
     ):
+        breakpoint()
         output: Dict[base.OutputKey, Union[np.ndarray, DatetimeArray]] = {}
         # Ideally we would be able to enumerate self._iterate_slices and use
         # the index from enumeration as the key of output, but ohlc in particular

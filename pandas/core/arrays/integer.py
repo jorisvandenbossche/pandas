@@ -356,7 +356,15 @@ class IntegerArray(BaseMaskedArray):
         super().__init__(values, mask, copy=copy)
 
     @classmethod
+    def _from_scalars(cls, data, dtype):
+        breakpoint()
+        if not all(isinstance(v, (int, dtype.type)) or isna(v) for v in data):
+            raise TypeError("Requires dtype scalars")
+        return cls._from_sequence(data, dtype)
+
+    @classmethod
     def _from_sequence(cls, scalars, dtype=None, copy: bool = False) -> "IntegerArray":
+        breakpoint()
         return integer_array(scalars, dtype=dtype, copy=copy)
 
     @classmethod

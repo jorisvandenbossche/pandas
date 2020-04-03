@@ -780,7 +780,7 @@ class IntervalArray(IntervalMixin, ExtensionArray):
             fill_value = self.left._na_value
             empty = IntervalArray.from_breaks([fill_value] * (empty_len + 1))
         else:
-            empty = self._from_scalars([fill_value] * empty_len)
+            empty = self._from_scalars([fill_value] * empty_len, self.dtype)
 
         if periods > 0:
             a = empty

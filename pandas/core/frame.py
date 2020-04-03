@@ -2508,7 +2508,7 @@ class DataFrame(NDFrame):
             arr_type = dtype.construct_array_type()
             values = self.values
 
-            new_values = [arr_type._from_sequence(row, dtype=dtype) for row in values]
+            new_values = [arr_type._from_scalars(row, dtype=dtype) for row in values]
             result = self._constructor(
                 dict(zip(self.index, new_values)), index=self.columns
             )
