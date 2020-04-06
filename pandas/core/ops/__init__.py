@@ -405,9 +405,12 @@ def dispatch_to_series(left, right, func, str_rep=None, axis=None):
     elif isinstance(right, ABCDataFrame):
         assert right._indexed_same(left)
 
+        array_op = get_array_op(func, str_rep=str_rep)
+
         arrays = []
         for l, r in zip(left._iter_column_arrays(), right._iter_column_arrays()):
-            arrays.append(func(l, r))
+            # breakpoint()
+            arrays.append(array_op(l, r))
         return type(left)._from_arrays(
             arrays, left.columns, left.index, verify_integrity=False
         )

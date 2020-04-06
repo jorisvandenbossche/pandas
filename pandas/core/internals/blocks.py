@@ -318,7 +318,11 @@ class Block(PandasObject):
         return self.make_block_same_class(values, placement=placement)
 
     def iget(self, i):
-        return self.values[i]
+        # breakpoint()
+        values = self.internal_values()
+        if self.ndim == 1:
+            return values
+        return values[i]
 
     def set(self, locs, values):
         """
@@ -1585,7 +1589,6 @@ class ExtensionBlock(Block):
         return (len(self.mgr_locs), len(self.values))
 
     def iget(self, col):
-
         if self.ndim == 2 and isinstance(col, tuple):
             col, loc = col
             if not com.is_null_slice(col) and col != 0:
