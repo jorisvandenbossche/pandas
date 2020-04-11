@@ -411,7 +411,7 @@ def dispatch_to_series(left, right, func, str_rep=None, axis=None):
 
         array_op = get_array_op(func, str_rep=str_rep)
 
-        mode = os.environ["OPS_MODE"]
+        mode = os.environ.get("OPS_MODE", "columnwise")
 
         if mode == "columnwise":
             arrays = []
