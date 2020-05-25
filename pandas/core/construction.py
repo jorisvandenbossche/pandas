@@ -101,6 +101,7 @@ def array(
         :class:`datetime.datetime`     :class:`pandas.arrays.DatetimeArray`
         :class:`datetime.timedelta`    :class:`pandas.arrays.TimedeltaArray`
         :class:`int`                   :class:`pandas.arrays.IntegerArray`
+        :class:`float`                 :class:`pandas.arrays.FloatingArray`
         :class:`str`                   :class:`pandas.arrays.StringArray`
         :class:`bool`                  :class:`pandas.arrays.BooleanArray`
         ============================== =====================================
@@ -112,6 +113,11 @@ def array(
            Pandas infers nullable-integer dtype for integer data,
            string dtype for string data, and nullable-boolean dtype
            for boolean data.
+
+        .. versionchanged:: 1.1.0
+
+            Pandas now also infers nullable-floating dtype for float-like
+            input data
 
     copy : bool, default True
         Whether to copy the data, even if not necessary. Depending
@@ -204,6 +210,11 @@ def array(
     [1, 2, <NA>]
     Length: 3, dtype: Int64
 
+    >>> pd.array([1.1, 2.2])
+    <FloatingArray>
+    [1.1, 2.2]
+    Length: 2, dtype: Float64
+
     >>> pd.array(["a", None, "c"])
     <StringArray>
     ['a', <NA>, 'c']
@@ -230,10 +241,10 @@ def array(
     If pandas does not infer a dedicated extension type a
     :class:`arrays.PandasArray` is returned.
 
-    >>> pd.array([1.1, 2.2])
+    >>> pd.array([1 + 1j, 3 + 2j])
     <PandasArray>
-    [1.1, 2.2]
-    Length: 2, dtype: float64
+    [(1+1j), (3+2j)]
+    Length: 2, dtype: complex128
 
     As mentioned in the "Notes" section, new extension types may be added
     in the future (by pandas or 3rd party libraries), causing the return
@@ -257,6 +268,7 @@ def array(
     from pandas.core.arrays import (
         period_array,
         BooleanArray,
+        FloatingArray,
         IntegerArray,
         IntervalArray,
         PandasArray,
@@ -318,6 +330,9 @@ def array(
 
         elif inferred_dtype == "integer":
             return IntegerArray._from_sequence(data, copy=copy)
+
+        elif inferred_dtype == "floating":
+            return FloatingArray._from_sequence(data, copy=copy)
 
         elif inferred_dtype == "boolean":
             return BooleanArray._from_sequence(data, copy=copy)
