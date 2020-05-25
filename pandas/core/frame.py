@@ -8454,6 +8454,22 @@ NaN 12.3   33.0
                 raise NotImplementedError(msg)
             return data
 
+        def col_func(values):
+            if isinstance(values, ExtensionArray):
+                return values._reduce(name, skipna=skipna, **kwds)
+            else:
+                return op(values, skipna=skipna, **kwds)
+
+        # if axis == 0 and self._policy == "split":
+        if axis == 0 and self._mgr.any_extension_types:
+            # column-wise reduction
+            df = self
+            if numeric_only is True:
+                df = _get_data(axis_matters=True)
+
+            result = [col_func(val) for val in df._iter_column_arrays()]
+            return df._constructor_sliced(result, index=df.columns)
+
         if numeric_only is not None and axis in [0, 1]:
             df = self
             if numeric_only is True:
