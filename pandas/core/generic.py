@@ -172,7 +172,8 @@ class NDFrame(PandasObject, SelectionMixin, indexing.IndexingMixin):
     """
 
     _internal_names: List[str] = [
-        "_mgr",
+        "__mgr",
+        "_mgr_initialized",
         "_cacher",
         "_item_cache",
         "_cache",
@@ -191,7 +192,8 @@ class NDFrame(PandasObject, SelectionMixin, indexing.IndexingMixin):
     _deprecations: FrozenSet[str] = frozenset(["get_values"])
     _metadata: List[str] = []
     _is_copy = None
-    _mgr: BlockManager
+    __mgr: BlockManager
+    _mgr_initialized: bool = True
     _attrs: Dict[Optional[Hashable], Any]
     _typ: str
 
@@ -207,13 +209,20 @@ class NDFrame(PandasObject, SelectionMixin, indexing.IndexingMixin):
         # copy kwarg is retained for mypy compat, is not used
 
         object.__setattr__(self, "_is_copy", None)
-        object.__setattr__(self, "_mgr", data)
+        object.__setattr__(self, "__mgr", data)
         object.__setattr__(self, "_item_cache", {})
         if attrs is None:
             attrs = {}
         else:
             attrs = dict(attrs)
         object.__setattr__(self, "_attrs", attrs)
+
+    @classmethod
+    def _init_lazy(cls, data, axes):
+        self = NDFrame.__new__(cls)
+        object.__setattr__(self, "_mgr_initialized", False)
+        object.__setattr__(self, "_mgr_data", (data, *axes))
+        return self
 
     @classmethod
     def _init_mgr(cls, mgr, axes, dtype=None, copy: bool = False) -> BlockManager:
@@ -5215,6 +5224,17 @@ class NDFrame(PandasObject, SelectionMixin, indexing.IndexingMixin):
         """
         # Note: obj.x will always call obj.__getattribute__('x') prior to
         # calling obj.__getattr__('x').
+        if name == "_mgr":
+            if object.__getattribute__(self, "_mgr_initialized"):
+                return object.__getattribute__(self, "__mgr")
+            else:
+                print("Initializing !!!")
+                from pandas.core.internals.construction import init_ndarray
+
+                data = init_ndarray(*self._mgr_data, dtype=None, copy=False)
+                object.__setattr__(self, "__mgr", data)
+                object.__setattr__(self, "_mgr_initialized", True)
+                return data
         if (
             name in self._internal_names_set
             or name in self._metadata
