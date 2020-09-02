@@ -13,6 +13,8 @@ when we use Cython and Numba on a test function operating row-wise on the
 ``DataFrame``. Using :func:`pandas.eval` we will speed up a sum by an order of
 ~2.
 
+I add here a new sentence.
+
 .. note::
 
    In addition to following the steps in this tutorial, users interested in enhancing
