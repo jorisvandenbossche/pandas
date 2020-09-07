@@ -52,8 +52,17 @@ def concatenate_block_managers(
         if concat_axis == 1:
             # TODO for now only fastpath without indexers
             mgrs = [t[0] for t in mgrs_indexers]
+            
+            # def concat_arrays(objs):
+            #     # TODO or use concat_compat? to ensure to get the common dtype?
+            #     # or is this already guaranteed here?
+            #     if isinstance(objs[0], ExtensionArray):
+            #         return objs[0]._concat_same_type(objs)
+            #     else:
+            #         return np.concatenate(objs)
+
             arrays = [
-                np.concatenate([mgrs[i].arrays[j] for i in range(len(mgrs))])
+                concat_compat([mgrs[i].arrays[j] for i in range(len(mgrs))], axis=0)
                 for j in range(len(mgrs[0].arrays))
             ]
             return ArrayManager(arrays, [axes[1], axes[0]])

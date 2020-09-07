@@ -120,7 +120,7 @@ from pandas.core.aggregation import reconstruct_func, relabel_result
 from pandas.core.arrays import Categorical, ExtensionArray
 from pandas.core.arrays.datetimelike import DatetimeLikeArrayMixin as DatetimeLikeArray
 from pandas.core.arrays.sparse import SparseFrameAccessor
-from pandas.core.construction import extract_array
+from pandas.core.construction import extract_array, array
 from pandas.core.generic import NDFrame, _shared_docs
 from pandas.core.indexes import base as ibase
 from pandas.core.indexes.api import Index, ensure_index, ensure_index_from_sequences
