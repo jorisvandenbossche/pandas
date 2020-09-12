@@ -41,7 +41,7 @@ import pandas.core.algorithms as algos
 from pandas.core.arrays import ExtensionArray, PandasDtype
 from pandas.core.arrays.sparse import SparseDtype
 from pandas.core.base import PandasObject
-from pandas.core.construction import extract_array, array
+from pandas.core.construction import array, extract_array
 from pandas.core.indexers import maybe_convert_indices
 from pandas.core.indexes.api import Index, ensure_index
 from pandas.core.internals.blocks import (
@@ -881,9 +881,41 @@ class ArrayManager(DataManager):
 
         return result_arrays
 
+    def unstack(self, unstacker, fill_value) -> "ArrayManager":
+        """
+        Return a BlockManager with all blocks unstacked..
+
+        Parameters
+        ----------
+        unstacker : reshape._Unstacker
+        fill_value : Any
+            fill_value for newly introduced missing values.
+
+        Returns
+        -------
+        unstacked : BlockManager
+        """
+        indexer, _ = unstacker._indexer_and_to_sort
+        new_indexer = np.full(unstacker.mask.shape, -1)
+        new_indexer[unstacker.mask] = indexer
+        new_indexer2D = new_indexer.reshape(*unstacker.full_shape)
+
+        new_arrays = []
+        for arr in self.arrays:
+            for i in range(unstacker.full_shape[1]):
+                new_arr = algos.take(
+                    arr, new_indexer2D[:, i], allow_fill=True, fill_value=fill_value
+                )
+                new_arrays.append(new_arr)
+
+        new_index = unstacker.new_index
+        new_columns = unstacker.get_new_columns(self._axes[1])
+        new_axes = [new_index, new_columns]
+
+        return type(self)(new_arrays, new_axes, do_integrity_check=False)
+
     # TODO
     # equals
-    # unstack
     # to_dict
     # quantile
 
