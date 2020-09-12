@@ -8,6 +8,7 @@ import operator
 from textwrap import dedent
 from typing import TYPE_CHECKING, Dict, Optional, Tuple, Union, cast
 from warnings import catch_warnings, simplefilter, warn
+import functools
 
 import numpy as np
 
@@ -64,6 +65,8 @@ if TYPE_CHECKING:
 
 _shared_docs: Dict[str, str] = {}
 
+
+maybe_promote_cached = functools.lru_cache(maxsize=128)(maybe_promote)
 
 # --------------- #
 # dtype access    #
@@ -1520,6 +1523,22 @@ def _get_take_nd_function(
     return func2
 
 
+@functools.lru_cache(maxsize=128)
+def _get_take_1d_function(arr_dtype, out_dtype):
+    tup = (arr_dtype.name, out_dtype.name)
+    func = _take_1d_dict.get(tup, None)
+    if func is not None:
+        return func
+
+    tup = (out_dtype.name, out_dtype.name)
+    func = _take_1d_dict.get(tup, None)
+    if func is not None:
+        func = _convert_wrapper(func, out_dtype)
+        return func
+
+    return None
+
+
 def take(arr, indices, axis: int = 0, allow_fill: bool = False, fill_value=None):
     """
     Take elements from an array.
@@ -1718,6 +1737,85 @@ def take_nd(
 
 
 take_1d = take_nd
+
+
+def take_1d_arr(
+    arr, indexer, fill_value=np.nan, allow_fill: bool = True
+):
+    """
+    Specialized Cython take which sets NaN values in one pass
+
+    This dispatches to ``take`` defined on ExtensionArrays. It does not
+    currently dispatch to ``SparseArray.take`` for sparse ``arr``.
+
+    Parameters
+    ----------
+    arr : array-like
+        Input array.
+    indexer : ndarray
+        1-D array of indices to take, subarrays corresponding to -1 value
+        indices are filed with fill_value
+    axis : int, default 0
+        Axis to take from
+    out : ndarray or None, default None
+        Optional output array, must be appropriate type to hold input and
+        fill_value together, if indexer has any -1 value entries; call
+        maybe_promote to determine this type for any fill_value
+    fill_value : any, default np.nan
+        Fill value to replace -1 values with
+    allow_fill : boolean, default True
+        If False, indexer is assumed to contain no -1 values so no filling
+        will be done.  This short-circuits computation of a mask.  Result is
+        undefined if allow_fill == False and -1 is present in indexer.
+
+    Returns
+    -------
+    subarray : array-like
+        May be the same type as the input, or cast to an ndarray.
+    """
+    mask_info = None
+
+    # if is_extension_array_dtype(arr):
+    #     return arr.take(indexer, fill_value=fill_value, allow_fill=allow_fill)
+
+    # arr = extract_array(arr)
+    arr = np.asarray(arr)
+
+    indexer = ensure_int64(indexer, copy=False)
+    if not allow_fill:
+        dtype, fill_value = arr.dtype, arr.dtype.type()
+        mask_info = None, False
+    else:
+        # check for promotion based on types only (do this first because
+        # it's faster than computing a mask)
+        dtype, fill_value = maybe_promote_cached(arr.dtype, fill_value)
+        if dtype != arr.dtype:
+            # check if promotion is actually required based on indexer
+            mask = indexer == -1
+            needs_masking = mask.any()
+            mask_info = mask, needs_masking
+            if not needs_masking:
+                # if not, then depromote, set fill_value to dummy
+                # (it won't be used but we don't want the cython code
+                # to crash when trying to cast it to dtype)
+                dtype, fill_value = arr.dtype, arr.dtype.type()
+
+    # at this point, it's guaranteed that dtype can hold both the arr values
+    # and the fill_value
+    out = np.empty(indexer.shape, dtype=dtype)
+
+    # breakpoint()
+
+    func = _get_take_1d_function(arr.dtype, out.dtype)
+    if func is None:
+        def func(arr, indexer, out, fill_value=np.nan):
+            indexer = ensure_int64(indexer)
+            _take_nd_object(
+                arr, indexer, out, axis=0, fill_value=fill_value, mask_info=mask_info
+            )
+    func(arr, indexer, out, fill_value)
+
+    return out
 
 
 def take_2d_multi(arr, indexer, fill_value=np.nan):

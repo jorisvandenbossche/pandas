@@ -664,6 +664,7 @@ class DataFrame(NDFrame):
         """
         Can we transpose this DataFrame without creating any new array objects.
         """
+        return False
         if isinstance(self._data, ArrayManager):
             return False
         if self._data.any_extension_types:
