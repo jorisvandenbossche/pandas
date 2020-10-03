@@ -3817,6 +3817,7 @@ class NDFrame(PandasObject, SelectionMixin, indexing.IndexingMixin):
         df.iloc[0:5]['group'] = 'a'
 
         """
+        # breakpoint()
         # return early if the check is not needed
         if not (force or self._is_copy):
             return

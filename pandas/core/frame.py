@@ -3038,6 +3038,9 @@ class DataFrame(NDFrame):
         return self._get_value(index, col, takeable=True)
 
     def __setitem__(self, key, value):
+        import sys
+
+        print(sys.getrefcount(self))
         key = com.apply_if_callable(key, self)
 
         # see if we can slice the rows
