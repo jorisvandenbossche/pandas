@@ -1210,6 +1210,7 @@ def convert_dtypes(
     convert_string: bool = True,
     convert_integer: bool = True,
     convert_boolean: bool = True,
+    convert_floating: bool = True,
 ) -> Dtype:
     """
     Convert objects to best possible type, and optionally,
@@ -1224,6 +1225,7 @@ def convert_dtypes(
         Whether, if possible, conversion can be done to integer extension types.
     convert_boolean : bool, defaults True
         Whether object dtypes should be converted to ``BooleanDtypes()``.
+    convert_floating : bool, defaults True
 
     Returns
     -------
@@ -1258,6 +1260,16 @@ def convert_dtypes(
         else:
             if is_integer_dtype(inferred_dtype):
                 inferred_dtype = input_array.dtype
+
+        if convert_floating:
+            if not is_integer_dtype(input_array.dtype) and is_numeric_dtype(
+                input_array.dtype
+            ):
+                arr = input_array[notna(input_array)]
+                if (arr.astype(int) == arr).all():
+                    inferred_dtype = "Int64"
+                else:
+                    inferred_dtype = "Float64"
 
         if convert_boolean:
             if is_bool_dtype(input_array.dtype):
