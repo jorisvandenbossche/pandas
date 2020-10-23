@@ -6021,6 +6021,7 @@ class NDFrame(PandasObject, SelectionMixin, indexing.IndexingMixin):
         convert_string: bool_t = True,
         convert_integer: bool_t = True,
         convert_boolean: bool_t = True,
+        convert_floating: bool_t = True,
     ) -> FrameOrSeries:
         """
         Convert columns to best possible dtypes using dtypes supporting ``pd.NA``.
@@ -6138,12 +6139,20 @@ class NDFrame(PandasObject, SelectionMixin, indexing.IndexingMixin):
         """
         if self.ndim == 1:
             return self._convert_dtypes(
-                infer_objects, convert_string, convert_integer, convert_boolean
+                infer_objects,
+                convert_string,
+                convert_integer,
+                convert_boolean,
+                convert_floating,
             )
         else:
             results = [
                 col._convert_dtypes(
-                    infer_objects, convert_string, convert_integer, convert_boolean
+                    infer_objects,
+                    convert_string,
+                    convert_integer,
+                    convert_boolean,
+                    convert_floating,
                 )
                 for col_name, col in self.items()
             ]
