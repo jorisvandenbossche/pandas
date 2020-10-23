@@ -1,12 +1,12 @@
 from collections import abc
-from typing import Any, Optional, Sequence, Tuple, Type, Union
+from typing import Any, Optional, Pattern, Sequence, Tuple, Type, Union
 
 import numpy as np
 import pyarrow as pa
 import pyarrow.compute as pc
 
 from pandas._libs import missing as libmissing
-from pandas._typing import ArrayLike
+from pandas._typing import ArrayLike, Scalar
 
 from pandas.core.dtypes.base import ExtensionDtype
 from pandas.core.dtypes.dtypes import register_extension_dtype
@@ -21,6 +21,7 @@ from pandas.api.types import (
 )
 from pandas.core.arrays.base import ExtensionArray
 from pandas.core.indexers import check_array_indexer
+from pandas.core.strings import BaseStringArrayMethods
 
 
 def _as_pandas_scalar(arrow_scalar: pa.Scalar) -> Optional[str]:
@@ -115,7 +116,7 @@ class ArrowStringDtype(ExtensionDtype):
             return False
 
 
-class ArrowStringArray(ExtensionArray):
+class ArrowStringArray(ExtensionArray, BaseStringArrayMethods):
     """
     Extension array for string data in a ``pyarrow.ChunkedArray``.
 
@@ -330,7 +331,8 @@ class ArrowStringArray(ExtensionArray):
             raise NotImplementedError("Neither scalar nor ArrowStringArray")
 
         # TODO(ARROW-9429): Add a .to_numpy() to ChunkedArray
-        return pd.array(result.to_pandas().values)
+        return result.to_numpy()
+        # return pd.array(result.to_pandas().values)
 
     def __setitem__(self, key: Union[int, np.ndarray], value: Any) -> None:
         """Set one or more values inplace.
@@ -481,3 +483,161 @@ class ArrowStringArray(ExtensionArray):
                 indices_array = np.copy(indices_array)
                 indices_array[indices_array < 0] += len(self.data)
             return type(self)(self.data.take(indices_array))
+
+    def _str_count(self, pat, flags=0):
+        raise NotImplementedError
+
+    def _str_pad(self, width, side="left", fillchar=" "):
+        raise NotImplementedError
+
+    def _str_contains(self, pat, case=True, flags=0, na=None, regex=True):
+        if not regex:
+            match = pc.match_substring(self.data, pat)
+        else:
+            raise NotImplementedError
+        return match.to_numpy()
+
+    def _str_startswith(self, pat, na=None):
+        raise NotImplementedError
+
+    def _str_endswith(self, pat, na=None):
+        raise NotImplementedError
+
+    def _str_replace(self, pat, repl, n=-1, case=None, flags=0, regex=True):
+        raise NotImplementedError
+
+    def _str_repeat(self, repeats):
+        raise NotImplementedError
+
+    def _str_match(
+        self,
+        pat: Union[str, Pattern],
+        case: bool = True,
+        flags: int = 0,
+        na: Scalar = np.nan,
+    ):
+        raise NotImplementedError
+
+    def _str_fullmatch(
+        self,
+        pat: Union[str, Pattern],
+        case: bool = True,
+        flags: int = 0,
+        na: Scalar = np.nan,
+    ):
+        raise NotImplementedError
+
+    def _str_encode(self, encoding, errors="strict"):
+        raise NotImplementedError
+
+    def _str_find(self, sub, start=0, end=None):
+        raise NotImplementedError
+
+    def _str_rfind(self, sub, start=0, end=None):
+        raise NotImplementedError
+
+    def _str_findall(self, pat, flags=0):
+        raise NotImplementedError
+
+    def _str_get(self, i):
+        raise NotImplementedError
+
+    def _str_index(self, sub, start=0, end=None):
+        raise NotImplementedError
+
+    def _str_rindex(self, sub, start=0, end=None):
+        raise NotImplementedError
+
+    def _str_join(self, sep):
+        raise NotImplementedError
+
+    def _str_partition(self, sep, expand):
+        raise NotImplementedError
+
+    def _str_rpartition(self, sep, expand):
+        raise NotImplementedError
+
+    def _str_len(self):
+        raise NotImplementedError
+
+    def _str_slice(self, start=None, stop=None, step=None):
+        raise NotImplementedError
+
+    def _str_slice_replace(self, start=None, stop=None, repl=None):
+        raise NotImplementedError
+
+    def _str_translate(self, table):
+        raise NotImplementedError
+
+    def _str_wrap(self, width, **kwargs):
+        raise NotImplementedError
+
+    def _str_get_dummies(self, sep="|"):
+        raise NotImplementedError
+
+    def _str_isalnum(self):
+        raise NotImplementedError
+
+    def _str_isalpha(self):
+        raise NotImplementedError
+
+    def _str_isdecimal(self):
+        raise NotImplementedError
+
+    def _str_isdigit(self):
+        raise NotImplementedError
+
+    def _str_islower(self):
+        raise NotImplementedError
+
+    def _str_isnumeric(self):
+        raise NotImplementedError
+
+    def _str_isspace(self):
+        raise NotImplementedError
+
+    def _str_istitle(self):
+        raise NotImplementedError
+
+    def _str_isupper(self):
+        raise NotImplementedError
+
+    def _str_capitalize(self):
+        raise NotImplementedError
+
+    def _str_casefold(self):
+        raise NotImplementedError
+
+    def _str_title(self):
+        raise NotImplementedError
+
+    def _str_swapcase(self):
+        raise NotImplementedError
+
+    def _str_lower(self, is_ascii=False):
+        if is_ascii:
+            new_data = pc.ascii_lower(self.data)
+        else:
+            new_data = pc.utf8_lower(self.data)
+        return type(self)(new_data)
+
+    def _str_upper(self):
+        raise NotImplementedError
+
+    def _str_normalize(self, form):
+        raise NotImplementedError
+
+    def _str_strip(self, to_strip=None):
+        raise NotImplementedError
+
+    def _str_lstrip(self, to_strip=None):
+        raise NotImplementedError
+
+    def _str_rstrip(self, to_strip=None):
+        raise NotImplementedError
+
+    def _str_split(self, pat=None, n=-1, expand=False):
+        raise NotImplementedError
+
+    def _str_rsplit(self, pat=None, n=-1):
+        raise NotImplementedError

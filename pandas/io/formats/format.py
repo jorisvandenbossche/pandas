@@ -633,8 +633,8 @@ class DataFrameFormatter:
 
     def _calc_max_rows_fitted(self) -> Optional[int]:
         """Number of rows with data fitting the screen."""
-        if not self._is_in_terminal():
-            return self.max_rows
+        # if not self._is_in_terminal():
+        #     return self.max_rows
 
         _, height = get_terminal_size()
         if self.max_rows == 0:
