@@ -5,6 +5,7 @@ import numpy as np
 import pytest
 
 from pandas._libs import iNaT
+import pandas.util._test_decorators as td
 
 from pandas.core.dtypes.common import is_integer
 
@@ -475,6 +476,8 @@ class TestDataFrameIndexing:
         assert smaller["col10"].dtype == np.object_
         assert (smaller["col10"] == ["1", "2"]).all()
 
+    @td.skip_array_manager_invalid_test  # valid version below with nullable dtypes
+    def test_setitem_dtype_change(self):
         # dtype changing GH4204
         df = DataFrame([[0, 0]])
         df.iloc[0] = np.nan
@@ -482,6 +485,18 @@ class TestDataFrameIndexing:
         tm.assert_frame_equal(df, expected)
 
         df = DataFrame([[0, 0]])
+        df.loc[0] = np.nan
+        tm.assert_frame_equal(df, expected)
+
+    def test_setitem_nullable_nan(self):
+        # version of the test above using nullable dtypes (so that setting
+        # NaN can preserve the dtype)
+        df = DataFrame([[0, 0]], dtype="Int64")
+        df.iloc[0] = np.nan
+        expected = DataFrame([[np.nan, np.nan]], dtype="Int64")
+        tm.assert_frame_equal(df, expected)
+
+        df = DataFrame([[0, 0]], dtype="Int64")
         df.loc[0] = np.nan
         tm.assert_frame_equal(df, expected)
 
@@ -579,6 +594,8 @@ class TestDataFrameIndexing:
         float_frame["something"] = 2.5
         assert float_frame["something"].dtype == np.float64
 
+    @td.skip_array_manager_invalid_test
+    def test_setitem_cast_object(self):
         # GH 7704
         # dtype conversion on setting
         df = DataFrame(np.random.rand(30, 3), columns=tuple("ABC"))
@@ -591,6 +608,7 @@ class TestDataFrameIndexing:
         )
         tm.assert_series_equal(result, expected)
 
+    def test_setitem_preserve_int8_dtype(self):
         # Test that data type is preserved . #5782
         df = DataFrame({"one": np.arange(6, dtype=np.int8)})
         df.loc[1, "one"] = 6
@@ -603,7 +621,10 @@ class TestDataFrameIndexing:
         mask = float_frame["A"] > 0
 
         float_frame.loc[mask, "B"] = 0
-        expected.values[mask.values, 1] = 0
+
+        vals = float_frame.to_numpy()
+        vals[mask.values, 1] = 0
+        expected = DataFrame(vals, index=expected.index, columns=expected.columns)
 
         tm.assert_frame_equal(float_frame, expected)
 
@@ -1056,7 +1077,7 @@ class TestDataFrameIndexing:
         expected = np.array([np.nan, "qux", np.nan, "qux", np.nan], dtype=object)
         tm.assert_almost_equal(df["str"].values, expected)
 
-    def test_setitem_single_column_mixed_datetime(self):
+    def test_setitem_single_column_mixed_datetime(self, using_array_manager):
         df = DataFrame(
             np.random.randn(5, 3),
             index=["a", "b", "c", "d", "e"],
@@ -1074,10 +1095,12 @@ class TestDataFrameIndexing:
         tm.assert_series_equal(result, expected)
 
         # GH#16674 iNaT is treated as an integer when given by the user
-        df.loc["b", "timestamp"] = iNaT
-        assert not isna(df.loc["b", "timestamp"])
-        assert df["timestamp"].dtype == np.object_
-        assert df.loc["b", "timestamp"] == iNaT
+        if not using_array_manager:
+            # TODO(ArrayManager) setting iNaT in DatetimeArray actually sets NaT
+            df.loc["b", "timestamp"] = iNaT
+            assert not isna(df.loc["b", "timestamp"])
+            assert df["timestamp"].dtype == np.object_
+            assert df.loc["b", "timestamp"] == iNaT
 
         # allow this syntax
         df.loc["c", "timestamp"] = np.nan
@@ -1093,6 +1116,7 @@ class TestDataFrameIndexing:
         # pytest.raises(
         #    Exception, df.loc.__setitem__, ('d', 'timestamp'), [np.nan])
 
+    # @td.skip_array_manager_invalid_test
     def test_setitem_mixed_datetime(self):
         # GH 9336
         expected = DataFrame(
@@ -1623,6 +1647,7 @@ class TestDataFrameIndexing:
         with pytest.raises(TypeError, match=msg):
             df[df > 0.3] = 1
 
+    @td.skip_array_manager_not_yet_implemented  # TODO(ArrayManager) groupby
     def test_type_error_multiindex(self):
         # See gh-12218
         df = DataFrame(
@@ -1760,7 +1785,7 @@ def test_reindex_empty(src_idx, cat_idx):
     tm.assert_frame_equal(result, expected)
 
 
-def test_object_casting_indexing_wraps_datetimelike():
+def test_object_casting_indexing_wraps_datetimelike(using_array_manager):
     # GH#31649, check the indexing methods all the way down the stack
     df = DataFrame(
         {
@@ -1781,6 +1806,10 @@ def test_object_casting_indexing_wraps_datetimelike():
     ser = df.xs(0, axis=0)
     assert isinstance(ser.values[1], Timestamp)
     assert isinstance(ser.values[2], pd.Timedelta)
+
+    if using_array_manager:
+        # remainder of the test checking BlockManager internals
+        return
 
     mgr = df._mgr
     mgr._rebuild_blknos_and_blklocs()
