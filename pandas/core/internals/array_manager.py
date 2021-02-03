@@ -743,6 +743,7 @@ class ArrayManager(DataManager):
         consolidate: bool = True,
         only_slice: bool = False,
     ) -> T:
+        # breakpoint()
         axis = self._normalize_axis(axis)
         return self._reindex_indexer(
             new_axis, indexer, axis, fill_value, allow_dups, copy

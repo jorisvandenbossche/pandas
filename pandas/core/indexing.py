@@ -690,7 +690,7 @@ class _LocationIndexer(NDFrameIndexerBase):
             key = com.apply_if_callable(key, self.obj)
         indexer = self._get_setitem_indexer(key)
         self._has_valid_setitem_indexer(key)
-
+        # breakpoint()
         iloc = self if self.name == "iloc" else self.obj.iloc
         iloc._setitem_with_indexer(indexer, value, self.name)
 
@@ -1686,7 +1686,9 @@ class _iLocIndexer(_LocationIndexer):
 
             elif len(ilocs) == 1 and lplane_indexer == len(value) and not is_scalar(pi):
                 # We are setting multiple rows in a single column.
-                self._setitem_single_column(ilocs[0], value, pi, overwrite=False)
+                self._setitem_single_column(
+                    ilocs[0], value, pi, overwrite=name == "setitem"
+                )
 
             elif len(ilocs) == 1 and 0 != lplane_indexer != len(value):
                 # We are trying to set N values into M entries of a single
@@ -1710,7 +1712,7 @@ class _iLocIndexer(_LocationIndexer):
             elif len(ilocs) == len(value):
                 # We are setting multiple columns in a single row.
                 for loc, v in zip(ilocs, value):
-                    self._setitem_single_column(loc, v, pi, overwrite=False)
+                    self._setitem_single_column(loc, v, pi, overwrite=name == "setitem")
 
             elif len(ilocs) == 1 and com.is_null_slice(pi) and len(self.obj) == 0:
                 # This is a setitem-with-expansion, see
@@ -1732,7 +1734,8 @@ class _iLocIndexer(_LocationIndexer):
             for loc in ilocs:
                 # TODO should indicate this comes from a .loc and thus should
                 # never overwrite an existing column
-                self._setitem_single_column(loc, value, pi, overwrite=False)
+                # breakpoint()
+                self._setitem_single_column(loc, value, pi, overwrite=name == "setitem")
 
     def _setitem_with_indexer_2d_value(self, indexer, value):
         # We get here with np.ndim(value) == 2, excluding DataFrame,
