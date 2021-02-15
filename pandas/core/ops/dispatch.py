@@ -7,6 +7,8 @@ from pandas._typing import ArrayLike
 
 from pandas.core.dtypes.generic import ABCExtensionArray
 
+import numpy as np
+
 
 def should_extension_dispatch(left: ArrayLike, right: Any) -> bool:
     """
@@ -21,4 +23,4 @@ def should_extension_dispatch(left: ArrayLike, right: Any) -> bool:
     -------
     bool
     """
-    return isinstance(left, ABCExtensionArray) or isinstance(right, ABCExtensionArray)
+    return not isinstance(left, np.ndarray) or not isinstance(right, np.ndarray)

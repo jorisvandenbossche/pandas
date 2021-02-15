@@ -65,13 +65,16 @@ def set_numexpr_threads(n=None):
         ne.set_num_threads(n)
 
 
-def _evaluate_standard(op, op_str, a, b):
+def _evaluate_standard(op, op_str, a, b, use_errstate=True):
     """
     Standard evaluation.
     """
     if _TEST_MODE:
         _store_test_result(False)
-    with np.errstate(all="ignore"):
+    if use_errstate:
+        with np.errstate(all="ignore"):
+            return op(a, b)
+    else:
         return op(a, b)
 
 
@@ -101,7 +104,7 @@ def _can_use_numexpr(op, op_str, a, b, dtype_check):
     return False
 
 
-def _evaluate_numexpr(op, op_str, a, b):
+def _evaluate_numexpr(op, op_str, a, b, use_errstate=True):
     result = None
 
     if _can_use_numexpr(op, op_str, a, b, "evaluate"):
@@ -123,7 +126,7 @@ def _evaluate_numexpr(op, op_str, a, b):
         _store_test_result(result is not None)
 
     if result is None:
-        result = _evaluate_standard(op, op_str, a, b)
+        result = _evaluate_standard(op, op_str, a, b, use_errstate=use_errstate)
 
     return result
 
@@ -221,7 +224,7 @@ def _bool_arith_check(
     return True
 
 
-def evaluate(op, a, b, use_numexpr: bool = True):
+def evaluate(op, a, b, use_numexpr: bool = True, use_errstate=False):
     """
     Evaluate and return the expression of the op on a and b.
 
@@ -235,11 +238,11 @@ def evaluate(op, a, b, use_numexpr: bool = True):
     """
     op_str = _op_str_mapping[op]
     if op_str is not None:
-        use_numexpr = use_numexpr and _bool_arith_check(op_str, a, b)
+        # use_numexpr = use_numexpr and _bool_arith_check(op_str, a, b)
         if use_numexpr:
             # error: "None" not callable
-            return _evaluate(op, op_str, a, b)  # type: ignore[misc]
-    return _evaluate_standard(op, op_str, a, b)
+            return _evaluate(op, op_str, a, b, use_errstate=use_errstate)  # type: ignore[misc]
+    return _evaluate_standard(op, op_str, a, b, use_errstate=use_errstate)
 
 
 def where(cond, a, b, use_numexpr=True):

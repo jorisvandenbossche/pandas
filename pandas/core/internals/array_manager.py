@@ -54,6 +54,7 @@ from pandas.core.dtypes.missing import (
     isna,
 )
 
+from pandas.core import ops
 import pandas.core.algorithms as algos
 from pandas.core.array_algos.quantile import quantile_compat
 from pandas.core.array_algos.take import take_1d
@@ -322,16 +323,41 @@ class ArrayManager(DataManager):
         # expected "List[Union[ndarray, ExtensionArray]]"
         return type(self)(result_arrays, [index, columns])  # type: ignore[arg-type]
 
-    def operate_blockwise(self, other: ArrayManager, array_op) -> ArrayManager:
+    def operate_scalar(self, other, op) -> ArrayManager:
         """
-        Apply array_op blockwise with another (aligned) BlockManager.
+        TODO fill in
         """
-        # TODO what if `other` is BlockManager ?
+        # Get the appropriate array-op to apply to each column/block's values.
+        array_op = ops.get_array_op(op)
+        return self.apply(array_op, right=other)
+
+    def operate_array(self, other: ArrayLike, op, axis: int) -> ArrayManager:
+        """
+        TODO fill in
+        """
+        array_op = ops.get_array_op(op)
+        if axis == 1:
+            result_arrays = [
+                array_op(left, right_scalar) for left, right_scalar in zip(self.arrays, other)
+            ]
+        else:
+            result_arrays = [
+                array_op(left, other) for left in self.arrays
+            ]
+
+        return type(self)(result_arrays, self._axes)
+
+    def operate_manager(self, other: ArrayManager, op) -> ArrayManager:
+        """
+        TODO fill in
+        """
+        array_op = ops.get_array_op(op, use_errstate=False)
         left_arrays = self.arrays
         right_arrays = other.arrays
-        result_arrays = [
-            array_op(left, right) for left, right in zip(left_arrays, right_arrays)
-        ]
+        with np.errstate(all="ignore"): 
+            result_arrays = [
+                array_op(left, right) for left, right in zip(left_arrays, right_arrays)
+            ]
         return type(self)(result_arrays, self._axes)
 
     def apply(

@@ -51,6 +51,8 @@ from pandas.core.ops.dispatch import should_extension_dispatch
 from pandas.core.ops.invalid import invalid_comparison
 from pandas.core.ops.roperator import rpow
 
+import pandas.core.computation.expressions as expressions
+
 
 def comp_method_OBJECT_ARRAY(op, x, y):
     if isinstance(y, list):
@@ -134,7 +136,7 @@ def _masked_arith_op(x: np.ndarray, y, op):
     return result
 
 
-def _na_arithmetic_op(left, right, op, is_cmp: bool = False):
+def _na_arithmetic_op(left, right, op, is_cmp: bool = False, use_errstate=True):
     """
     Return the result of evaluating op on the passed in values.
 
@@ -155,10 +157,10 @@ def _na_arithmetic_op(left, right, op, is_cmp: bool = False):
     ------
     TypeError : invalid operation
     """
-    import pandas.core.computation.expressions as expressions
+    # import pandas.core.computation.expressions as expressions
 
     try:
-        result = expressions.evaluate(op, left, right)
+        result = expressions.evaluate(op, left, right, use_errstate=use_errstate)
     except TypeError:
         if is_cmp:
             # numexpr failed on comparison op, e.g. ndarray[float] > datetime
@@ -175,7 +177,7 @@ def _na_arithmetic_op(left, right, op, is_cmp: bool = False):
     return missing.dispatch_fill_zeros(op, left, right, result)
 
 
-def arithmetic_op(left: ArrayLike, right: Any, op):
+def arithmetic_op(left: ArrayLike, right: Any, op, use_errstate=True):
     """
     Evaluate an arithmetic operation `+`, `-`, `*`, `/`, `//`, `%`, `**`, ...
 
@@ -195,17 +197,22 @@ def arithmetic_op(left: ArrayLike, right: Any, op):
 
     # NB: We assume that extract_array has already been called
     #  on `left` and `right`.
-    lvalues = ensure_wrapped_if_datetimelike(left)
-    rvalues = ensure_wrapped_if_datetimelike(right)
-    rvalues = _maybe_upcast_for_op(rvalues, lvalues.shape)
+    # lvalues = ensure_wrapped_if_datetimelike(left)
+    # rvalues = ensure_wrapped_if_datetimelike(right)
+    # rvalues = _maybe_upcast_for_op(rvalues, lvalues.shape)
+    lvalues = left
+    rvalues=right
 
     if should_extension_dispatch(lvalues, rvalues) or isinstance(rvalues, Timedelta):
         # Timedelta is included because numexpr will fail on it, see GH#31457
         res_values = op(lvalues, rvalues)
 
     else:
-        with np.errstate(all="ignore"):
-            res_values = _na_arithmetic_op(lvalues, rvalues, op)
+        if use_errstate:
+            with np.errstate(all="ignore"):
+                res_values = _na_arithmetic_op(lvalues, rvalues, op)
+        else:
+            res_values = _na_arithmetic_op(lvalues, rvalues, op, use_errstate=use_errstate)
 
     return res_values
 
@@ -378,7 +385,7 @@ def logical_op(left: ArrayLike, right: Any, op) -> ArrayLike:
     return res_values
 
 
-def get_array_op(op):
+def get_array_op(op, use_errstate=True):
     """
     Return a binary array operation corresponding to the given operator op.
 
@@ -415,7 +422,7 @@ def get_array_op(op):
         "divmod",
         "pow",
     }:
-        return partial(arithmetic_op, op=op)
+        return partial(arithmetic_op, op=op, use_errstate=use_errstate)
     else:
         raise NotImplementedError(op_name)
 
