@@ -33,7 +33,7 @@ import warnings
 import numpy as np
 
 from pandas._libs import lib, reduction as libreduction
-from pandas._typing import ArrayLike, FrameOrSeries, FrameOrSeriesUnion
+from pandas._typing import ArrayLike, FrameOrSeries, FrameOrSeriesUnion, Manager
 from pandas.util._decorators import Appender, Substitution, doc
 
 from pandas.core.dtypes.cast import (
@@ -79,7 +79,7 @@ from pandas.core.groupby.groupby import (
 )
 from pandas.core.indexes.api import Index, MultiIndex, all_indexes_same
 import pandas.core.indexes.base as ibase
-from pandas.core.internals import BlockManager
+from pandas.core.internals import BlockManager, ArrayManager
 from pandas.core.series import Series
 from pandas.core.util.numba_ import maybe_use_numba
 
@@ -1041,10 +1041,21 @@ class DataFrameGroupBy(GroupBy[DataFrame]):
     def _cython_agg_general(
         self, how: str, alt=None, numeric_only: bool = True, min_count: int = -1
     ) -> DataFrame:
-        agg_mgr = self._cython_agg_blocks(
-            how, alt=alt, numeric_only=numeric_only, min_count=min_count
-        )
-        return self._wrap_agged_blocks(agg_mgr.blocks, items=agg_mgr.items)
+        
+        data: Manager = self._get_data_to_aggregate()
+        
+        if isinstance(data, BlockManager):
+            agg_mgr = self._cython_agg_blocks(
+                how, alt=alt, numeric_only=numeric_only, min_count=min_count
+            )
+            return self._wrap_agged_blocks(agg_mgr.blocks, items=agg_mgr.items)
+        elif isinstance(data, ArrayManager):
+            agg_arrays, columns = self._cython_agg_arrays(
+                how, alt=alt, numeric_only=numeric_only, min_count=min_count
+            )
+            return self._wrap_agged_arrays(agg_arrays, columns)
+        else:
+            raise Exception
 
     def _cython_agg_blocks(
         self, how: str, alt=None, numeric_only: bool = True, min_count: int = -1
@@ -1054,6 +1065,8 @@ class DataFrameGroupBy(GroupBy[DataFrame]):
 
         if numeric_only:
             data = data.get_numeric_data(copy=False)
+
+        # breakpoint()
 
         def cast_agg_result(result, values: ArrayLike, how: str) -> ArrayLike:
             # see if we can cast the values to the desired dtype
@@ -1150,6 +1163,135 @@ class DataFrameGroupBy(GroupBy[DataFrame]):
             raise DataError("No numeric types to aggregate")
 
         return new_mgr
+
+    def _cython_agg_arrays(
+        self, how: str, alt=None, numeric_only: bool = True, min_count: int = -1
+    ) -> BlockManager:
+
+        data: ArrayManager = self._get_data_to_aggregate()
+
+        if numeric_only:
+            data = data.get_numeric_data(copy=False)
+
+        # breakpoint()
+
+        def cast_agg_result(result, values: ArrayLike, how: str) -> ArrayLike:
+            # see if we can cast the values to the desired dtype
+            # this may not be the original dtype
+            assert not isinstance(result, DataFrame)
+
+            dtype = maybe_cast_result_dtype(values.dtype, how)
+            result = maybe_downcast_numeric(result, dtype)
+
+            if isinstance(values, Categorical) and isinstance(result, np.ndarray):
+                # If the Categorical op didn't raise, it is dtype-preserving
+                result = type(values)._from_sequence(result.ravel(), dtype=values.dtype)
+                # Note this will have result.dtype == dtype from above
+
+            # elif isinstance(result, np.ndarray) and result.ndim == 1:
+            #     # We went through a SeriesGroupByPath and need to reshape
+            #     # GH#32223 includes case with IntegerArray values
+            #     result = result.reshape(1, -1)
+            #     # test_groupby_duplicate_columns gets here with
+            #     #  result.dtype == int64, values.dtype=object, how="min"
+
+            return result
+
+        def py_fallback(bvalues: ArrayLike) -> ArrayLike:
+            # if self.grouper.aggregate fails, we fall back to a pure-python
+            #  solution
+
+            # We get here with a) EADtypes and b) object dtype
+            obj: FrameOrSeriesUnion
+
+            # call our grouper again with only this block
+            if isinstance(bvalues, ExtensionArray):
+                # TODO(EA2D): special case not needed with 2D EAs
+                obj = Series(bvalues)
+            else:
+                obj = DataFrame(bvalues.T)
+                if obj.shape[1] == 1:
+                    # Avoid call to self.values that can occur in DataFrame
+                    #  reductions; see GH#28949
+                    obj = obj.iloc[:, 0]
+
+            # Create SeriesGroupBy with observed=True so that it does
+            # not try to add missing categories if grouping over multiple
+            # Categoricals. This will done by later self._reindex_output()
+            # Doing it here creates an error. See GH#34951
+            sgb = get_groupby(obj, self.grouper, observed=True)
+            result = sgb.aggregate(lambda x: alt(x, axis=self.axis))
+
+            assert isinstance(result, (Series, DataFrame))  # for mypy
+            # In the case of object dtype block, it may have been split
+            #  in the operation.  We un-split here.
+            result = result._consolidate()
+            assert isinstance(result, (Series, DataFrame))  # for mypy
+            mgr = result._mgr
+            assert isinstance(mgr, BlockManager)
+
+            # unwrap DataFrame to get array
+            if len(mgr.blocks) != 1:
+                # We've split an object block! Everything we've assumed
+                # about a single block input returning a single block output
+                # is a lie. See eg GH-39329
+                return mgr.as_array()
+            else:
+                result = mgr.blocks[0].values
+                return result
+
+        def array_func(values: ArrayLike) -> ArrayLike:
+            
+            # values = np.atleast_2d(values)
+            use_1d = False
+            if how == "mean":
+                use_1d = True
+            try:
+                result = self.grouper._cython_operation(
+                    "aggregate", values, how, axis=1, min_count=min_count, use_1d=use_1d
+                )
+            except NotImplementedError:
+                # generally if we have numeric_only=False
+                # and non-applicable functions
+                # try to python agg
+
+                if alt is None:
+                    # we cannot perform the operation
+                    # in an alternate way, exclude the block
+                    assert how == "ohlc"
+                    raise
+
+                result = py_fallback(bvalues)
+
+            return cast_agg_result(result, values, how)
+
+        # TypeError -> we may have an exception in trying to aggregate
+        #  continue and exclude the block
+        # NotImplementedError -> "ohlc" with wrong dtype
+        # new_mgr = data.apply(blk_func, ignore_failures=True)
+        
+        result_arrays = [array_func(arr) for arr in data.arrays]
+
+        if not len(result_arrays):
+            raise DataError("No numeric types to aggregate")
+
+        return result_arrays, data.axes[0]
+
+    def _wrap_agged_arrays(self, arrays: Sequence[ArrayLike], columns: Index) -> DataFrame:
+        if not self.as_index:
+            index = np.arange(arrays[0].shape[0])
+            mgr = ArrayManager(arrays, axes=[index, columns])
+            result = self.obj._constructor(mgr)
+            self._insert_inaxis_grouper_inplace(result)
+        else:
+            index = self.grouper.result_index
+            mgr = ArrayManager(arrays, axes=[index, columns])
+            result = self.obj._constructor(mgr)
+
+        if self.axis == 1:
+            result = result.T
+
+        return self._reindex_output(result)._convert(datetime=True)
 
     def _aggregate_frame(self, func, *args, **kwargs) -> DataFrame:
         if self.grouper.nkeys != 1:
@@ -1633,7 +1775,7 @@ class DataFrameGroupBy(GroupBy[DataFrame]):
         else:
             return self.obj._constructor(result, index=obj.index, columns=result_index)
 
-    def _get_data_to_aggregate(self) -> BlockManager:
+    def _get_data_to_aggregate(self) -> Manager:
         obj = self._obj_with_exclusions
         if self.axis == 1:
             return obj.T._mgr

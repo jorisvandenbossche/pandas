@@ -396,7 +396,6 @@ class BaseGrouper:
     def _get_cython_function(
         self, kind: str, how: str, values: np.ndarray, is_numeric: bool
     ):
-
         dtype_str = values.dtype.name
         ftype = self._cython_functions[kind][how]
 
@@ -405,6 +404,14 @@ class BaseGrouper:
         f = getattr(libgroupby, ftype, None)
         if f is not None and is_numeric:
             return f
+
+        ndim = values.ndim
+
+        if ndim == 1 and how == "mean":
+            for dt in [dtype_str, "object"]:
+                f2 = getattr(libgroupby, f"{ftype}_1d_{dt}", None)
+                if f2 is not None:
+                    return f2
 
         # otherwise find dtype-specific version, falling back to object
         for dt in [dtype_str, "object"]:
@@ -547,7 +554,7 @@ class BaseGrouper:
 
     @final
     def _cython_operation(
-        self, kind: str, values, how: str, axis: int, min_count: int = -1, **kwargs
+        self, kind: str, values, how: str, axis: int, min_count: int = -1, use_1d=False, **kwargs
     ) -> np.ndarray:
         """
         Returns the values of a cython operation.
@@ -596,8 +603,11 @@ class BaseGrouper:
         vdim = values.ndim
         swapped = False
         if vdim == 1:
-            values = values[:, None]
-            out_shape = (self.ngroups, arity)
+            if use_1d:
+                out_shape = (self.ngroups,)
+            else:
+                values = values[:, None]
+                out_shape = (self.ngroups, arity)
         else:
             if axis > 0:
                 swapped = True
@@ -624,6 +634,7 @@ class BaseGrouper:
         if kind == "aggregate":
             result = maybe_fill(np.empty(out_shape, dtype=out_dtype), fill_value=np.nan)
             counts = np.zeros(self.ngroups, dtype=np.int64)
+            breakpoint()
             result = self._aggregate(result, counts, values, codes, func, min_count)
         elif kind == "transform":
             result = maybe_fill(
@@ -646,7 +657,8 @@ class BaseGrouper:
             result = result[counts > 0]
 
         if vdim == 1 and arity == 1:
-            result = result[:, 0]
+            if not use_1d:
+                result = result[:, 0]
 
         if swapped:
             result = result.swapaxes(0, axis)
