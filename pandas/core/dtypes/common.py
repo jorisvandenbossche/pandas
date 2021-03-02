@@ -1408,6 +1408,9 @@ def is_bool_dtype(arr_or_dtype) -> bool:
     """
     if arr_or_dtype is None:
         return False
+    # if isinstance(arr_or_dtype, np.dtype):
+    #     return arr_or_dtype.dtype == "b"
+
     try:
         dtype = get_dtype(arr_or_dtype)
     except (TypeError, ValueError):

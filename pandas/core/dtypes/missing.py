@@ -533,12 +533,12 @@ def infer_fill_value(val):
     return np.nan
 
 
-def maybe_fill(arr, fill_value=np.nan):
+def maybe_fill(arr: np.ndarray):
     """
     if we have a compatible fill_value and arr dtype, then fill
     """
-    if isna_compat(arr, fill_value):
-        arr.fill(fill_value)
+    if arr.dtype.kind == "f" or isna_compat(arr, np.nan):
+        arr.fill(np.nan)
     return arr
 
 
