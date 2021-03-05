@@ -489,18 +489,9 @@ class ArrayManager(DataManager):
         transposed: bool = False,
         interpolation="linear",
     ) -> ArrayManager:
-
-        arrs = [
-            x if not isinstance(x, np.ndarray) else np.atleast_2d(x)
-            for x in self.arrays
-        ]
+        # only ever called this way
         assert axis == 1
-        new_arrs = [quantile_compat(x, qs, interpolation, axis=axis) for x in arrs]
-        for i, arr in enumerate(new_arrs):
-            if arr.ndim == 2:
-                assert arr.shape[0] == 1, arr.shape
-                new_arrs[i] = arr[0]
-
+        new_arrs = [quantile_compat(x, qs, interpolation, axis=0) for x in self.arrays]
         axes = [qs, self._axes[1]]
         return type(self)(new_arrs, axes)
 

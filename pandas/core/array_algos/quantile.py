@@ -91,8 +91,9 @@ def quantile_with_mask(
     if is_empty:
         # create the array of na_values
         # 2d len(values) * len(qs)
-        flat = np.array([fill_value] * len(qs))
-        result = np.repeat(flat, len(values)).reshape(len(values), len(qs))
+        result = np.array([fill_value] * len(qs))
+        if values.ndim == 2:
+            result = np.repeat(result, len(values)).reshape(len(values), len(qs))
     else:
         # asarray needed for Sparse, see GH#24600
         result = nanpercentile(
@@ -141,10 +142,10 @@ def quantile_ea_compat(
 
     # asarray needed for Sparse, see GH#24600
     mask = np.asarray(values.isna())
-    mask = np.atleast_2d(mask)
+    # mask = np.atleast_2d(mask)
 
     values, fill_value = values._values_for_factorize()
-    values = np.atleast_2d(values)
+    # values = np.atleast_2d(values)
 
     result = quantile_with_mask(values, mask, fill_value, qs, interpolation, axis)
 
@@ -153,7 +154,10 @@ def quantile_ea_compat(
 
         if result.ndim == 1:
             # i.e. qs was originally a scalar
-            assert result.shape == (1,), result.shape
+            if values.ndim == 2:
+                assert result.shape == (1,), result.shape
+            else:
+                assert result.shape == (len(qs),), result.shape
             result = type(orig)._from_factorized(result, orig)
 
         else:
