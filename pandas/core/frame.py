@@ -6593,7 +6593,8 @@ class DataFrame(NDFrame, OpsMixin):
         right = lib.item_from_zerodim(right)
         if not is_list_like(right):
             # i.e. scalar, faster than checking np.ndim(right) == 0
-            bm = self._mgr.operate_scalar(right, func)
+            with np.errstate(all="ignore"):
+                bm = self._mgr.operate_scalar(right, func)
 
         elif isinstance(right, DataFrame):
             assert self.index.equals(right.index)
@@ -6603,21 +6604,23 @@ class DataFrame(NDFrame, OpsMixin):
             #  _frame_arith_method_with_reindex
 
             # TODO operate_manager expects a manager of the same type
-            bm = self._mgr.operate_manager(
-                # error: Argument 1 to "operate_manager" of "ArrayManager" has
-                # incompatible type "Union[ArrayManager, BlockManager]"; expected
-                # "ArrayManager"
-                # error: Argument 1 to "operate_manager" of "BlockManager" has
-                # incompatible type "Union[ArrayManager, BlockManager]"; expected
-                # "BlockManager"
-                right._mgr,  # type: ignore[arg-type]
-                func,
-            )
+            with np.errstate(all="ignore"):
+                bm = self._mgr.operate_manager(
+                    # error: Argument 1 to "operate_manager" of "ArrayManager" has
+                    # incompatible type "Union[ArrayManager, BlockManager]"; expected
+                    # "ArrayManager"
+                    # error: Argument 1 to "operate_manager" of "BlockManager" has
+                    # incompatible type "Union[ArrayManager, BlockManager]"; expected
+                    # "BlockManager"
+                    right._mgr,  # type: ignore[arg-type]
+                    func,
+                )
 
         elif isinstance(right, Series):
             assert right.index.equals(self._get_axis(axis))
             right = right._values
-            bm = self._mgr.operate_array(right, func, axis)
+            with np.errstate(all="ignore"):
+                bm = self._mgr.operate_array(right, func, axis)
 
         else:
             # Remaining cases have less-obvious dispatch rules
