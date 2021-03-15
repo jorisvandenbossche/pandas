@@ -344,7 +344,7 @@ class ArrayManager(DataManager):
             array_op(left, other) if isinstance(left, np.ndarray) else op(left, other)
             for left in self.arrays
         ]
-        return type(self)(result_arrays, self._axes)
+        return type(self)(result_arrays, self._axes, verify_integrity=False)
 
     def operate_array(self, other: ArrayLike, op, axis: int) -> ArrayManager:
         """
@@ -384,7 +384,7 @@ class ArrayManager(DataManager):
                 else op(left, other)
                 for left in self.arrays
             ]
-        return type(self)(result_arrays, self._axes)
+        return type(self)(result_arrays, self._axes, verify_integrity=False)
 
     def operate_manager(self, other: ArrayManager, op) -> ArrayManager:
         """
@@ -411,7 +411,7 @@ class ArrayManager(DataManager):
             else op(left, right)
             for left, right in zip(left_arrays, right_arrays)
         ]
-        return type(self)(result_arrays, self._axes)
+        return type(self)(result_arrays, self._axes, verify_integrity=False)
 
     def apply(
         self: T,
