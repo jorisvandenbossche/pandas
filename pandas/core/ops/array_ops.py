@@ -406,6 +406,8 @@ def get_array_op(op, do_checks=True):
         return op
 
     if op_name in {"eq", "ne", "lt", "le", "gt", "ge"}:
+        if not do_checks:
+            return partial(_na_arithmetic_op, is_cmp=True, op=op, needs_filling=False)
         return partial(comparison_op, op=op)
     elif op_name in {"and", "or", "xor", "rand", "ror", "rxor"}:
         return partial(logical_op, op=op)
