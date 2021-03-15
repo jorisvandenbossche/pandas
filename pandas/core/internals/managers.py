@@ -479,6 +479,28 @@ class BlockManager(DataManager):
         array_op = ops.get_array_op(op)
         return self.apply(array_op, right=other)
 
+    def _maybe_broadcast_to_manager(self, other: ArrayLike, axis: int):
+        """
+        If the Series operand is not EA-dtype, we can broadcast to 2D and operate
+        blockwise.
+        """
+        if not isinstance(other, np.ndarray):
+            # TODO(EA2D): no need to special-case with 2D EAs
+            if other.dtype == "datetime64[ns]" or other.dtype == "timedelta64[ns]":
+                # We can losslessly+cheaply cast to ndarray
+                other = np.asarray(other)
+            else:
+                return other
+
+        if axis == 0:
+            other = other.reshape(-1, 1)
+        else:
+            other = other.reshape(1, -1)
+
+        values = np.broadcast_to(other, (len(self.axes[1]), len(self.items))).T
+        blocks = [new_block(values, slice(0, len(self.items)), ndim=2)]
+        return type(self).from_blocks(blocks, self.axes).convert(copy=False)
+
     def operate_array(self, other: ArrayLike, op, axis: int) -> BlockManager:
         """
         Element-wise (arithmetic/comparison/logical) operation with other array.
@@ -499,6 +521,11 @@ class BlockManager(DataManager):
         BlockManager
         """
         array_op = ops.get_array_op(op)
+
+        other = self._maybe_broadcast_to_manager(other, axis)
+        if other.ndim == 2:
+            return self.operate_manager(other, op)
+
         if axis == 1:
             # match on the columns -> operate on each column array with single
             # element from other array

@@ -306,7 +306,6 @@ def align_method_FRAME(
         left, right = left.align(
             right, join="outer", axis=axis, level=level, copy=False
         )
-        right = _maybe_align_series_as_frame(left, right, axis)
 
     return left, right
 
@@ -382,29 +381,6 @@ def frame_arith_method_with_reindex(left: DataFrame, right: DataFrame, op) -> Da
         result = result.reindex(join_columns, axis=1)
 
     return result
-
-
-def _maybe_align_series_as_frame(frame: DataFrame, series: Series, axis: int):
-    """
-    If the Series operand is not EA-dtype, we can broadcast to 2D and operate
-    blockwise.
-    """
-    rvalues = series._values
-    if not isinstance(rvalues, np.ndarray):
-        # TODO(EA2D): no need to special-case with 2D EAs
-        if rvalues.dtype == "datetime64[ns]" or rvalues.dtype == "timedelta64[ns]":
-            # We can losslessly+cheaply cast to ndarray
-            rvalues = np.asarray(rvalues)
-        else:
-            return series
-
-    if axis == 0:
-        rvalues = rvalues.reshape(-1, 1)
-    else:
-        rvalues = rvalues.reshape(1, -1)
-
-    rvalues = np.broadcast_to(rvalues, frame.shape)
-    return type(frame)(rvalues, index=frame.index, columns=frame.columns)
 
 
 def flex_arith_method_FRAME(op):
