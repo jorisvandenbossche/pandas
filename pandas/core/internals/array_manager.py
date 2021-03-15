@@ -339,8 +339,11 @@ class ArrayManager(DataManager):
         ArrayManager
         """
         # Get the appropriate array-op to apply to each column/block's values.
-        array_op = ops.get_array_op(op)
-        result_arrays = [array_op(left, other) for left in self.arrays]
+        array_op = ops.get_array_op(op, do_checks=False)
+        result_arrays = [
+            array_op(left, other) if isinstance(left, np.ndarray) else op(left, other)
+            for left in self.arrays
+        ]
         return type(self)(result_arrays, self._axes)
 
     def operate_array(self, other: ArrayLike, op, axis: int) -> ArrayManager:
@@ -362,17 +365,25 @@ class ArrayManager(DataManager):
         -------
         ArrayManager
         """
-        array_op = ops.get_array_op(op)
+        array_op = ops.get_array_op(op, do_checks=False)
         if axis == 1:
             # match on the columns -> operate on each column array with single
             # element from other array
             result_arrays = [
                 array_op(left, right_scalar)
+                if isinstance(left, np.ndarray)
+                else op(left, right_scalar)
                 for left, right_scalar in zip(self.arrays, other)
             ]
         else:
             # match on the rows -> operate for each column array with full other array
-            result_arrays = [array_op(left, other) for left in self.arrays]
+            other_is_ndarray = isinstance(other, np.ndarray)
+            result_arrays = [
+                array_op(left, other)
+                if (isinstance(left, np.ndarray) and other_is_ndarray)
+                else op(left, other)
+                for left in self.arrays
+            ]
         return type(self)(result_arrays, self._axes)
 
     def operate_manager(self, other: ArrayManager, op) -> ArrayManager:
@@ -391,11 +402,14 @@ class ArrayManager(DataManager):
         ArrayManager
         """
         # TODO what if `other` is BlockManager ?
-        array_op = ops.get_array_op(op)
+        array_op = ops.get_array_op(op, do_checks=False)
         left_arrays = self.arrays
         right_arrays = other.arrays
         result_arrays = [
-            array_op(left, right) for left, right in zip(left_arrays, right_arrays)
+            array_op(left, right)
+            if (isinstance(left, np.ndarray) and isinstance(right, np.ndarray))
+            else op(left, right)
+            for left, right in zip(left_arrays, right_arrays)
         ]
         return type(self)(result_arrays, self._axes)
 

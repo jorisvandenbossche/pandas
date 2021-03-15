@@ -379,7 +379,7 @@ def logical_op(left: ArrayLike, right: Any, op) -> ArrayLike:
     return res_values
 
 
-def get_array_op(op):
+def get_array_op(op, do_checks=True):
     """
     Return a binary array operation corresponding to the given operator op.
 
@@ -416,6 +416,8 @@ def get_array_op(op):
         "divmod",
         "pow",
     }:
+        if not do_checks:
+            return partial(_na_arithmetic_op, op=op)
         return partial(arithmetic_op, op=op)
     else:
         raise NotImplementedError(op_name)
