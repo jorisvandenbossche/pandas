@@ -135,7 +135,7 @@ def _masked_arith_op(x: np.ndarray, y, op):
     return result
 
 
-def _na_arithmetic_op(left, right, op, is_cmp: bool = False):
+def _na_arithmetic_op(left, right, op, is_cmp: bool = False, needs_filling=True):
     """
     Return the result of evaluating op on the passed in values.
 
@@ -171,7 +171,9 @@ def _na_arithmetic_op(left, right, op, is_cmp: bool = False):
         # e.g. numeric array vs str
         return invalid_comparison(left, right, op)
 
-    return missing.dispatch_fill_zeros(op, left, right, result)
+    if needs_filling:
+        result = missing.dispatch_fill_zeros(op, left, right, result)
+    return result
 
 
 def arithmetic_op(left: ArrayLike, right: Any, op):
@@ -418,7 +420,15 @@ def get_array_op(op, do_checks=True):
         "pow",
     }:
         if not do_checks:
-            return partial(_na_arithmetic_op, op=op)
+            needs_filling = op in {
+                divmod,
+                roperator.rdivmod,
+                operator.floordiv,
+                roperator.rfloordiv,
+                operator.mod,
+                roperator.rmod,
+            }
+            return partial(_na_arithmetic_op, op=op, needs_filling=needs_filling)
         return partial(arithmetic_op, op=op)
     else:
         raise NotImplementedError(op_name)
