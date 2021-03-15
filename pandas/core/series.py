@@ -5108,6 +5108,7 @@ Keep all original rows and also all original values
 
         lvalues = self._values
         rvalues = extract_array(other, extract_numpy=True)
+        other = ops.maybe_prepare_scalar_for_op(other, (len(self),))
         with np.errstate(all="ignore"):
             result = ops.arithmetic_op(lvalues, rvalues, op)
 

@@ -36,6 +36,7 @@ from pandas.core.ops.array_ops import (  # noqa:F401
     comparison_op,
     get_array_op,
     logical_op,
+    maybe_prepare_scalar_for_op,
 )
 from pandas.core.ops.common import (  # noqa:F401
     get_op_result_name,

@@ -6591,10 +6591,16 @@ class DataFrame(NDFrame, OpsMixin):
         DataFrame
         """
         right = lib.item_from_zerodim(right)
+
         if not is_list_like(right):
             # i.e. scalar, faster than checking np.ndim(right) == 0
-            with np.errstate(all="ignore"):
-                bm = self._mgr.operate_scalar(right, func)
+            right = ops.maybe_prepare_scalar_for_op(right, (self.shape[1],))
+            if isinstance(right, ExtensionArray):
+                with np.errstate(all="ignore"):
+                    bm = self._mgr.operate_array(right, func, 1)
+            else:
+                with np.errstate(all="ignore"):
+                    bm = self._mgr.operate_scalar(right, func)
 
         elif isinstance(right, DataFrame):
             assert self.index.equals(right.index)

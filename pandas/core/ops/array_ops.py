@@ -198,7 +198,6 @@ def arithmetic_op(left: ArrayLike, right: Any, op):
     #  on `left` and `right`.
     lvalues = ensure_wrapped_if_datetimelike(left)
     rvalues = ensure_wrapped_if_datetimelike(right)
-    rvalues = _maybe_upcast_for_op(rvalues, lvalues.shape)
 
     if should_extension_dispatch(lvalues, rvalues) or isinstance(rvalues, Timedelta):
         # Timedelta is included because numexpr will fail on it, see GH#31457
@@ -422,7 +421,7 @@ def get_array_op(op):
         raise NotImplementedError(op_name)
 
 
-def _maybe_upcast_for_op(obj, shape: Shape):
+def maybe_prepare_scalar_for_op(obj, shape: Shape):
     """
     Cast non-pandas objects to pandas types to unify behavior of arithmetic
     and comparison operations.

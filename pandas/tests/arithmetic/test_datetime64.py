@@ -676,10 +676,11 @@ class TestDatetimeIndexComparisons:
             result = op(other, dtarr)
             tm.assert_equal(result, expected)
         else:
-            msg = (
-                r"Invalid comparison between dtype=datetime64\[ns, .*\] "
-                f"and {type(other).__name__}"
-            )
+            msg = None
+            # msg = (
+            #     r"Invalid comparison between dtype=datetime64\[ns, .*\] "
+            #     f"and {type(other).__name__}"
+            # )
             with pytest.raises(TypeError, match=msg):
                 op(dtarr, other)
             with pytest.raises(TypeError, match=msg):
