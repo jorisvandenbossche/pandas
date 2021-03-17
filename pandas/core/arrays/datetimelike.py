@@ -1176,10 +1176,10 @@ class DatetimeLikeArrayMixin(OpsMixin, NDArrayBackedExtensionArray):
         """
         Add pd.NaT to self
         """
-        if is_period_dtype(self.dtype):
-            raise TypeError(
-                f"Cannot add {type(self).__name__} and {type(NaT).__name__}"
-            )
+        # if is_period_dtype(self.dtype):
+        #     raise TypeError(
+        #         f"Cannot add {type(self).__name__} and {type(NaT).__name__}"
+        #     )
 
         # GH#19124 pd.NaT is treated like a timedelta for both timedelta
         # and datetime dtypes
