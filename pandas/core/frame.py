@@ -6673,8 +6673,6 @@ class DataFrame(NDFrame, OpsMixin):
             assert right.index.equals(self.columns)
 
             right = right._values
-            # maybe_align_as_frame ensures we do not have an ndarray here
-            assert not isinstance(right, np.ndarray)
 
             with np.errstate(all="ignore"):
                 arrays = [
