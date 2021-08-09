@@ -776,7 +776,7 @@ class ArrayManager(BaseArrayManager):
         Return the data as a SingleArrayManager.
         """
         values = self.arrays[i]
-        return SingleArrayManager([values], [self._axes[0]])
+        return SingleArrayManager([values], [self._axes[0]], verify_integrity=False)
 
     def iget_values(self, i: int) -> ArrayLike:
         """
