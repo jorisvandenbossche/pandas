@@ -727,7 +727,8 @@ class Series(base.IndexOpsMixin, generic.NDFrame):
         --------
         numpy.ndarray.ravel : Return a flattened array.
         """
-        return self._values.ravel(order=order)
+        raise NotImplementedError("Series.ravel")
+        # return self._values.ravel(order=order)
 
     def __len__(self) -> int:
         """
