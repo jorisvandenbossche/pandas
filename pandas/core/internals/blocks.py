@@ -1370,6 +1370,16 @@ class EABackedBlock(Block):
             new_values = values.fillna(value=fill_value, method=method, limit=limit)
         return self.make_block_same_class(new_values)
 
+    def fillna(
+        self, value, limit=None, inplace: bool = False, downcast=None
+    ) -> list[Block]:
+
+        new_values = missing.fillna_ea_array(self.values, value, limit=limit, inplace=inplace, downcast=downcast)
+
+        if new_values.dtype == object:
+            return [self.make_block(values=new_values)]
+        return [self.make_block_same_class(values=new_values)]
+
 
 class ExtensionBlock(libinternals.Block, EABackedBlock):
     """
@@ -1556,12 +1566,6 @@ class ExtensionBlock(libinternals.Block, EABackedBlock):
                 )
 
         return self.values[slicer]
-
-    def fillna(
-        self, value, limit=None, inplace: bool = False, downcast=None
-    ) -> list[Block]:
-        values = self.values.fillna(value=value, limit=limit)
-        return [self.make_block_same_class(values=values)]
 
     def diff(self, n: int, axis: int = 1) -> list[Block]:
         if axis == 0 and n != 0:
@@ -1750,20 +1754,21 @@ class NDArrayBackedExtensionBlock(libinternals.NDArrayBackedBlock, EABackedBlock
         new_values = values.shift(periods, fill_value=fill_value, axis=axis)
         return [self.make_block_same_class(new_values)]
 
-    def fillna(
-        self, value, limit=None, inplace: bool = False, downcast=None
-    ) -> list[Block]:
+    # def fillna(
+    #     self, value, limit=None, inplace: bool = False, downcast=None
+    # ) -> list[Block]:
 
-        if not self._can_hold_element(value) and self.dtype.kind != "m":
-            # We support filling a DatetimeTZ with a `value` whose timezone
-            #  is different by coercing to object.
-            # TODO: don't special-case td64
-            return self.astype(object).fillna(value, limit, inplace, downcast)
+    #     if not self._can_hold_element(value) and self.dtype.kind != "m":
+    #         # We support filling a DatetimeTZ with a `value` whose timezone
+    #         #  is different by coercing to object.
+    #         # TODO: don't special-case td64
+    #         breakpoint()
+    #         return self.astype(object).fillna(value, limit, inplace, downcast)
 
-        values = self.values
-        values = values if inplace else values.copy()
-        new_values = values.fillna(value=value, limit=limit)
-        return [self.make_block_same_class(values=new_values)]
+    #     values = self.values
+    #     values = values if inplace else values.copy()
+    #     new_values = values.fillna(value=value, limit=limit)
+    #     return [self.make_block_same_class(values=new_values)]
 
 
 class DatetimeLikeBlock(NDArrayBackedExtensionBlock):
