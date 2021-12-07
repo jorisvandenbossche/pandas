@@ -45,24 +45,20 @@ _sizes = [0, 1, 100, 10 ** 4, 10 ** 6]
 
 
 class TimeIntsToPydatetime:
-    params = (
-        ["time", "date", "datetime", "timestamp"],
-        _sizes,
-        _tzs,
-    )
-    param_names = ["box", "size", "tz"]
-    # TODO: fold? freq?
+    params = [
+        [(box, None) for box in ["time", "date", "datetime", "timestamp"]]
+        + [("timestamp", tz) for tz in _tzs]
+    ]
+    param_names = ["box_tz"]
 
-    def setup(self, box, size, tz):
-        if box == "date" and tz is not None:
-            # tz is ignored, so avoid running redundant benchmarks
-            raise NotImplementedError  # skip benchmark
-        if size == 10 ** 6 and tz is _tzs[-1]:
-            # This is cumbersomely-slow, so skip to trim runtime
-            raise NotImplementedError  # skip benchmark
-
+    def setup(self, box_tz):
+        size = 10 ** 5
+        if box_tz[1] is tzlocal_obj:
+            # tzlocal is very slow, so reduce the size
+            size = 10 ** 3
         arr = np.random.randint(0, 10, size=size, dtype="i8")
         self.i8data = arr
 
-    def time_ints_to_pydatetime(self, box, size, tz):
+    def time_ints_to_pydatetime(self, box_tz):
+        box, tz = box_tz
         ints_to_pydatetime(self.i8data, tz, box=box)

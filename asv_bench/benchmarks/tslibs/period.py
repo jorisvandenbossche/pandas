@@ -123,19 +123,18 @@ class TimePeriodArrToDT64Arr:
 
 class TimeDT64ArrToPeriodArr:
     params = [
-        _sizes,
-        _freq_ints,
-        _tzs,
+        [(freq, _tzs[0]) for freq in _freq_ints] + [(_freq_ints[0], tz) for tz in _tzs]
     ]
-    param_names = ["size", "freq", "tz"]
+    param_names = ["freq_tz"]
 
-    def setup(self, size, freq, tz):
-        if size == 10 ** 6 and tz is tzlocal_obj:
-            # tzlocal is cumbersomely slow, so skip to keep runtime in check
-            raise NotImplementedError
-
+    def setup(self, freq_tz):
+        size = 10 ** 5
+        if freq_tz[1] is tzlocal_obj:
+            # tzlocal is very slow, so reduce the size
+            size = 10 ** 3
         arr = np.arange(10, dtype="i8").repeat(size // 10)
         self.i8values = arr
 
-    def time_dt64arr_to_periodarr(self, size, freq, tz):
+    def time_dt64arr_to_periodarr(self, freq_tz):
+        freq, tz = freq_tz
         dt64arr_to_periodarr(self.i8values, freq, tz)
