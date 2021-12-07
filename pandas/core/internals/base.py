@@ -135,7 +135,6 @@ class DataManager(PandasObject):
     ) -> T:
         raise AbstractMethodError(self)
 
-    @final
     def isna(self: T, func) -> T:
         return self.apply("apply", func=func)
 

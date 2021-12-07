@@ -48,6 +48,7 @@ from pandas.core.dtypes.generic import (
 )
 from pandas.core.dtypes.inference import is_inferred_bool_dtype
 from pandas.core.dtypes.missing import (
+    _isna_array,
     array_equals,
     isna,
     na_value_for_dtype,
@@ -192,6 +193,7 @@ class BaseArrayManager(DataManager):
         f,
         align_keys: list[str] | None = None,
         ignore_failures: bool = False,
+        verify_integrity=True,
         **kwargs,
     ) -> T:
         """
@@ -262,7 +264,7 @@ class BaseArrayManager(DataManager):
 
         # error: Argument 1 to "ArrayManager" has incompatible type "List[ndarray]";
         # expected "List[Union[ndarray, ExtensionArray]]"
-        return type(self)(result_arrays, new_axes)  # type: ignore[arg-type]
+        return type(self)(result_arrays, new_axes, verify_integrity=verify_integrity)  # type: ignore[arg-type]
 
     def apply_with_block(self: T, f, align_keys=None, swap_axis=True, **kwargs) -> T:
         # switch axis to follow BlockManager logic
@@ -439,6 +441,9 @@ class BaseArrayManager(DataManager):
 
     def to_native_types(self, **kwargs):
         return self.apply(to_native_types, **kwargs)
+
+    def isna(self: T, func=None) -> T:
+        return self.apply(_isna_array, verify_integrity=False)
 
     @property
     def is_mixed_type(self) -> bool:

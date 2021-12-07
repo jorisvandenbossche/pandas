@@ -12,6 +12,7 @@ from pandas._libs import lib
 import pandas._libs.missing as libmissing
 from pandas._libs.tslibs import (
     NaT,
+    Period,
     iNaT,
 )
 from pandas._typing import (
@@ -210,6 +211,7 @@ def _use_inf_as_na(key):
     """
     inf_as_na = get_option(key)
     globals()["_isna"] = partial(_isna, inf_as_na=inf_as_na)
+    globals()["_isna_array"] = partial(_isna_array, inf_as_na=inf_as_na)
     if inf_as_na:
         globals()["nan_checker"] = lambda x: ~np.isfinite(x)
         globals()["INF_AS_NA"] = True
@@ -244,7 +246,8 @@ def _isna_array(values: ArrayLike, inf_as_na: bool = False):
             result = values.isna()
     elif is_string_or_object_np_dtype(values.dtype):
         result = _isna_string_dtype(values, inf_as_na=inf_as_na)
-    elif needs_i8_conversion(dtype):
+    # elif needs_i8_conversion(dtype):
+    elif dtype.kind in "mM" or (dtype.kind == "O" and dtype.type is Period):
         # this is the NaT pattern
         result = values.view("i8") == iNaT
     else:
