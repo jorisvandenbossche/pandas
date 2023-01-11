@@ -137,6 +137,15 @@ workgroups:
     members:
     - Marco Gorelli
     - Marc Garcia
+    - Noa Tamir
+  community:
+    name: Community
+    responsibilities: ""
+    members:
+    - Noa Tamir
+    - Joris Van den Bossche
+    - Marco Gorelli
+    - Richard Shadrach
 sponsors:
   active:
   - name: "NumFOCUS"
