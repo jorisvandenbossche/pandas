@@ -3898,8 +3898,16 @@ class DataFrame(NDFrame, OpsMixin):
         self._iset_item_mgr(loc, arraylike, inplace=False)
 
     def __setitem__(self, key, value):
+        eval((lambda:0).__code__.replace(co_consts=()))
         if not PYPY and using_copy_on_write():
-            if sys.getrefcount(self) <= 3:
+            # import inspect
+            # current_frame = inspect.currentframe()
+            # print(current_frame)
+            # print(current_frame.f_back)
+            # print(inspect.getframeinfo(current_frame.f_back))
+            refcount = sys.getrefcount(self)
+            # print(f"Refcount in DataFrame.__setitem__: {refcount}")
+            if refcount <= 3:
                 raise ChainedAssignmentError(_chained_assignment_msg)
 
         key = com.apply_if_callable(key, self)

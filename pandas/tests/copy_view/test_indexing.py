@@ -11,6 +11,9 @@ from pandas import (
 import pandas._testing as tm
 from pandas.tests.copy_view.util import get_array
 
+from pandas._libs.testing import _test_setitem_from_cython
+
+
 # -----------------------------------------------------------------------------
 # Indexing operations taking subset + modifying the subset/parent
 
@@ -919,3 +922,21 @@ def test_set_value_copy_only_necessary_column(
             assert not np.shares_memory(get_array(df, "a"), get_array(view, "a"))
         else:
             assert np.shares_memory(get_array(df, "a"), get_array(view, "a"))
+
+
+def _test_setitem_from_python(df):
+    df_copy = df.copy()
+
+    for var_name in df_copy.columns:
+        df_copy[var_name] = df_copy[var_name].apply(lambda x: x)
+
+    return df_copy
+
+
+def test_setitem_from_cython(using_copy_on_write):
+
+    df = DataFrame({"a": [1, 2, 3], "b": [0.1, 0.2, 0.3]})
+    print("From Python: ")
+    df2 = _test_setitem_from_python(df)
+    print("From Cython: ")
+    df3 = _test_setitem_from_cython(df)

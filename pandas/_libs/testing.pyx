@@ -217,3 +217,12 @@ cpdef assert_almost_equal(a, b,
         return True
 
     raise AssertionError(f"{a} != {b}")
+
+
+def _test_setitem_from_cython(df):
+    df_copy = df.copy()
+
+    for var_name in df_copy.columns:
+        df_copy[var_name] = df_copy[var_name].apply(lambda x: x)
+
+    return df_copy
