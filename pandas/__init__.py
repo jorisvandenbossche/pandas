@@ -107,6 +107,7 @@ from pandas.core.api import (
     Series,
     DataFrame,
 )
+from pandas.core.frame import col
 
 from pandas.core.dtypes.dtypes import SparseDtype
 

@@ -5688,6 +5688,9 @@ class NDFrame(PandasObject, indexing.IndexingMixin):
                  one  two  three
         rabbit    4    5      6
         """
+        from pandas.core.frame import Expr
+        if isinstance(items, Expr):
+            return self[items.evaluate(self)]
         nkw = common.count_not_none(items, like, regex)
         if nkw > 1:
             raise TypeError(

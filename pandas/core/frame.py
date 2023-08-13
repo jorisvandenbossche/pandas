@@ -257,6 +257,108 @@ if TYPE_CHECKING:
 
     from pandas.io.formats.style import Styler
 
+
+series_dunders = ['__abs__',
+ '__add__',
+ '__and__',
+ '__array__',
+ '__array_priority__',
+ '__array_ufunc__',
+ #'__bool__',
+ '__contains__',
+ '__divmod__',
+ '__eq__',
+ '__floordiv__',
+ '__ge__',
+ '__gt__',
+ '__invert__',
+ '__le__',
+ '__len__',
+ '__lt__',
+ '__matmul__',
+ '__mod__',
+ '__mul__',
+ '__ne__',
+ '__neg__',
+ '__or__',
+ '__pos__',
+ '__pow__',
+ '__radd__',
+ '__rand__',
+ '__rdivmod__',
+ '__rfloordiv__',
+ '__rmatmul__',
+ '__rmod__',
+ '__rmul__',
+ '__ror__',
+ '__round__',
+ '__rpow__',
+ '__rsub__',
+ '__rtruediv__',
+ '__rxor__',
+ '__sub__',
+ '__truediv__',
+ '__xor__']
+
+
+
+def add_dunders(cls):
+    def add_dunder(name):
+
+        def dunder(self, *args, **kwargs):
+            self._calls.append((name, args, kwargs))
+            return self
+
+        setattr(cls, name, dunder)
+
+    for dunder_name in series_dunders:
+        add_dunder(dunder_name)
+
+    return cls
+
+
+@add_dunders
+class Expr:
+    _calls = []
+    
+    def __init__(self, col_name):
+        self._calls = [col_name]
+
+    def __call__(self, *args, **kwargs):
+        assert len(self._calls[-1]) == 1
+        self._calls[-1] = (self._calls[-1][0], args, kwargs)
+        return self
+
+    def __getattr__(self, name):
+        if name == "_ipython_canary_method_should_not_exist_":
+            raise AttributeError
+        self._calls.append((name, ))
+        return self
+    
+    def __repr__(self):
+        return "<Expr>\n" + str(self._calls)
+    
+    def _ipython_display_(self):
+        return str(self)
+    
+    def evaluate(self, df):
+        result = df[self._calls[0]]
+        for step in self._calls[1:]:
+            if len(step) == 1:
+                # attribute
+                result = getattr(result, step[0])
+            else:
+                # method
+                name, args, kwargs = step
+                # is this always the same df?
+                args = [arg.evaluate(df) if isinstance(arg, Expr) else arg for arg in args]
+                result = getattr(result, name)(*args, **kwargs)
+        return result
+            
+
+col = Expr
+
+
 # ---------------------------------------------------------------------
 # Docstring templates
 
@@ -5015,7 +5117,10 @@ class DataFrame(NDFrame, OpsMixin):
         data = self.copy(deep=None)
 
         for k, v in kwargs.items():
-            data[k] = com.apply_if_callable(v, data)
+            if isinstance(v, Expr):
+                data[k] = v.evaluate(data)
+            else:
+                data[k] = com.apply_if_callable(v, data)
         return data
 
     def _sanitize_column(self, value) -> tuple[ArrayLike, BlockValuesRefs | None]:
