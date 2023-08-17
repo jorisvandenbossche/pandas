@@ -8,7 +8,7 @@
 image:
   file: Dockerfile
 tasks:
-  - name: Prepare development environment
+  - name: Prepare development environmenttt
     init: |
       mkdir -p .vscode
       cp gitpod/settings.json .vscode/settings.json
