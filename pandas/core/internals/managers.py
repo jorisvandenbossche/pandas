@@ -1310,9 +1310,6 @@ class BlockManager(libinternals.BlockManager, BaseBlockManager):
 
         if inplace and blk.should_store(value):
             copy = False
-            if using_copy_on_write() and not self._has_no_reference_block(blkno):
-                # perform Copy-on-Write and clear the reference
-                copy = True
             iloc = self.blklocs[loc]
             blk.set_inplace(slice(iloc, iloc + 1), value, copy=copy)
             return
