@@ -4304,7 +4304,7 @@ def _background_gradient(
 
         Parameters
         ----------
-        rgba : rgb or rgba tuple
+        color : rgb or rgba tuple
 
         Returns
         -------

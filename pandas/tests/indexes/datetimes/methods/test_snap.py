@@ -9,6 +9,8 @@ from pandas import (
 import pandas._testing as tm
 
 
+@pytest.mark.filterwarnings(r"ignore:PeriodDtype\[B\] is deprecated:FutureWarning")
+@pytest.mark.filterwarnings("ignore:Period with BDay freq:FutureWarning")
 @pytest.mark.parametrize("tz", [None, "Asia/Shanghai", "Europe/Berlin"])
 @pytest.mark.parametrize("name", [None, "my_dti"])
 def test_dti_snap(name, tz, unit):

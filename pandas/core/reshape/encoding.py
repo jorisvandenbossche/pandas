@@ -12,6 +12,7 @@ import numpy as np
 
 from pandas._libs import missing as libmissing
 from pandas._libs.sparse import IntIndex
+from pandas.compat import pa_version_under16p0
 from pandas.util._decorators import set_module
 
 from pandas.core.dtypes.common import (
@@ -175,7 +176,8 @@ def get_dummies(
                 pa.types.is_string(pa_type)
                 or pa.types.is_large_string(pa_type)
                 or pa.types.is_dictionary(pa_type)
-                or pa.types.is_string_view(pa_type)
+                # is_string_view is only available in pyarrow>=16
+                or (not pa_version_under16p0 and pa.types.is_string_view(pa_type))
             ):
                 return True
             # Arrow types whose numpy fallback is object (e.g. binary,
@@ -406,8 +408,8 @@ def _get_dummies_1d(
 @set_module("pandas")
 def from_dummies(
     data: DataFrame,
-    sep: str | None = None,
-    default_category: Hashable | dict[str, Hashable] | None = None,
+    sep: None | str = None,
+    default_category: None | Hashable | dict[str, Hashable] = None,
 ) -> DataFrame:
     """
     Create a categorical ``DataFrame`` from a ``DataFrame`` of dummy variables.

@@ -31,7 +31,8 @@ jobs:
         environment: [py311, py312, py313, py314]
         # Prevent the include jobs from overriding other jobs
         pytest_marker_expression: [""]
-        pandas_future: ["default"]
+        pandas_future_infer_string: ["1"]
+        pandas_future_python_scalars: ["0"]
         include:
           - name: "Downstream Compat"
             environment: downstream
@@ -72,13 +73,13 @@ jobs:
             # It will be temporarily activated during tests with locale.setlocale
             extra_loc: "zh_CN"
             platform: ubuntu-24.04
-          - name: "Future configs legacy values"
+          - name: "PANDAS_FUTURE_INFER_STRING=0"
             environment: py313
-            pandas_future: "legacy"
+            pandas_future_infer_string: "0"
             platform: ubuntu-24.04
-          - name: "Future configs upcoming values"
+          - name: "PANDAS_FUTURE_PYTHON_SCALARS=1"
             environment: py313
-            pandas_future: "upcoming"
+            pandas_future_python_scalars: "1"
             platform: ubuntu-24.04
           - name: "Numpy Nightly"
             environment: numpy-nightly
@@ -95,7 +96,7 @@ jobs:
       LC_ALL: ${{ matrix.lc_all || '' }}
     concurrency:
       # https://github.community/t/concurrecy-not-work-for-push/183068/7
-      group: ${{ github.event_name == 'push' && github.run_number || github.ref }}-${{ matrix.environment }}-${{ matrix.pytest_marker_expression }}-${{ matrix.extra_apt || '' }}-${{ matrix.pandas_future }}-${{ matrix.platform }}
+      group: ${{ github.event_name == 'push' && github.run_number || github.ref }}-${{ matrix.environment }}-${{ matrix.pytest_marker_expression }}-${{ matrix.extra_apt || '' }}-${{ matrix.pandas_future_infer_string }}-${{ matrix.platform }}
       cancel-in-progress: true
 
     services:
@@ -181,7 +182,8 @@ jobs:
         numprocesses: 'auto'
         pytest_marker_expression: ${{ matrix.pytest_marker_expression == '' && 'not single_cpu' || matrix.pytest_marker_expression }}
         pytest_target: ${{ matrix.pytest_target || 'pandas' }}
-        pandas_future: ${{ matrix.pandas_future || 'default' }}
+        pandas_future_infer_string: ${{ matrix.pandas_future_infer_string || '1' }}
+        pandas_future_python_scalars: ${{ matrix.pandas_future_python_scalars || '0' }}
 
     - name: Test (single_cpu)
       id: test-single-cpu
@@ -194,7 +196,8 @@ jobs:
         numprocesses: 0
         pytest_marker_expression: 'single_cpu'
         pytest_target: ${{ matrix.pytest_target || 'pandas' }}
-        pandas_future: ${{ matrix.pandas_future || 'default' }}
+        pandas_future_infer_string: ${{ matrix.pandas_future_infer_string || '1' }}
+        pandas_future_python_scalars: ${{ matrix.pandas_future_python_scalars || '0' }}
       if: ${{ matrix.pytest_marker_expression == '' && (always() && steps.build.outcome == 'success')}}
 
     - name: Upload test coverage to Codecov

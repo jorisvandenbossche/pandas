@@ -636,6 +636,11 @@ class StylerRenderer:
         Also add elements to the cellstyle_map for more efficient grouped elements in
         <style></style> block
 
+        Parameters
+        ----------
+        sparsify_index : bool
+            Whether index_headers section will add rowspan attributes (>1) to elements.
+
         Returns
         -------
         body : list
@@ -2261,8 +2266,10 @@ class Tooltips:
 
         Parameters
         ----------
-        styler : StylerRenderer
-            The renderer whose ``data`` the tooltips are reindexed against.
+        styler_data : DataFrame
+            Underlying ``Styler`` DataFrame used for reindexing.
+        uuid : str
+            The underlying ``Styler`` uuid for CSS id.
         d : dict
             The dictionary prior to final render
 

@@ -1091,6 +1091,7 @@ def test_columns_multiindex_modified(temp_h5_path):
     assert cols2load_original == cols2load
 
 
+@pytest.mark.filterwarnings(r"ignore:PeriodDtype\[B\] is deprecated:FutureWarning")
 @pytest.mark.parametrize(
     "columns",
     [

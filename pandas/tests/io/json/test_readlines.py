@@ -20,6 +20,10 @@ import pandas._testing as tm
 
 from pandas.io.json._json import JsonReader
 
+pytestmark = pytest.mark.filterwarnings(
+    "ignore:Passing a BlockManager to DataFrame:DeprecationWarning"
+)
+
 
 @pytest.fixture
 def lines_json_df():

@@ -2649,7 +2649,7 @@ class TimeGrouper(Grouper):
         # GH#43486: filter NaTs up front, mirroring _get_period_bins
         nat_count = 0
         if ax.hasnans:
-            nat_count = ax.isna().sum()  # type: ignore[assignment]
+            nat_count = ax.isna().sum()
             ax = ax[~ax.isna()]
 
         if len(ax) == 0:

@@ -194,14 +194,7 @@ class Preprocessors:
                 break
 
             resp.raise_for_status()
-            # only keep the fields used in the templates; the full response also
-            # includes other fields that change independently (e.g. follower
-            # count), causing a diff on every rebuild
-            user_json = resp.json()
-            maintainers_info[user] = {
-                key: user_json[key]
-                for key in ("name", "login", "avatar_url", "html_url", "blog")
-            }
+            maintainers_info[user] = resp.json()
 
         context["maintainers"]["github_info"] = maintainers_info
 
@@ -237,23 +230,6 @@ class Preprocessors:
             resp.raise_for_status()
             releases = resp.json()
 
-            # only keep the fields actually used when rendering the site; the full
-            # response also includes fields like download_count, causing the file
-            # to change on every rebuild
-            releases = [
-                {
-                    "tag_name": release["tag_name"],
-                    "published_at": release["published_at"],
-                    "prerelease": release["prerelease"],
-                    "browser_download_url": (
-                        release["assets"][0]["browser_download_url"]
-                        if release["assets"]
-                        else ""
-                    ),
-                }
-                for release in releases
-            ]
-
         with open(
             pathlib.Path(context["target_path"]) / "releases.json",
             "w",
@@ -264,19 +240,20 @@ class Preprocessors:
         for release in releases:
             if release["prerelease"]:
                 continue
-            name = release["tag_name"].lstrip("v")
-            parsed_version = version.parse(name)
             published = datetime.datetime.strptime(
                 release["published_at"], "%Y-%m-%dT%H:%M:%SZ"
             )
             context["releases"].append(
                 {
-                    "name": name,
-                    "parsed_version": parsed_version,
-                    "short_name": f"{parsed_version.major}.{parsed_version.minor}",
+                    "name": release["tag_name"].lstrip("v"),
+                    "parsed_version": version.parse(release["tag_name"].lstrip("v")),
                     "tag": release["tag_name"],
                     "published": published,
-                    "url": release["browser_download_url"],
+                    "url": (
+                        release["assets"][0]["browser_download_url"]
+                        if release["assets"]
+                        else ""
+                    ),
                 }
             )
         # sorting out obsolete versions

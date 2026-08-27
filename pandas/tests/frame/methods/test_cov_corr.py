@@ -153,6 +153,7 @@ class TestDataFrameCorr:
         rs = df.corr(meth)
         assert isna(rs.values).all()
 
+    @pytest.mark.filterwarnings("ignore::RuntimeWarning")
     @pytest.mark.parametrize("meth", ["pearson", "kendall", "spearman"])
     def test_corr_int_and_boolean(self, meth):
         # when dtypes of pandas series are different

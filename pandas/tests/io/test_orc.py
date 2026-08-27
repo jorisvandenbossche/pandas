@@ -16,6 +16,10 @@ pytest.importorskip("pyarrow.orc")
 
 import pyarrow as pa
 
+pytestmark = pytest.mark.filterwarnings(
+    "ignore:Passing a BlockManager to DataFrame:DeprecationWarning"
+)
+
 
 @pytest.fixture
 def dirpath(datapath):

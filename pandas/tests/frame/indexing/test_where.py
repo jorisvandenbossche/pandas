@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from hypothesis import given
 import numpy as np
 import pytest
 
@@ -17,6 +18,7 @@ from pandas import (
     isna,
 )
 import pandas._testing as tm
+from pandas._testing._hypothesis import OPTIONAL_ONE_OF_ALL
 
 
 @pytest.fixture(params=["default", "float_string", "mixed_float", "mixed_int"])
@@ -153,6 +155,8 @@ class TestDataFrameIndexingWhere:
         check_dtypes = all(not issubclass(s.type, np.integer) for s in df.dtypes)
         _check_align(df, cond, np.nan, check_dtypes=check_dtypes)
 
+    # Ignore deprecation warning in Python 3.12 for inverting a bool
+    @pytest.mark.filterwarnings("ignore::DeprecationWarning")
     def test_where_invalid(self):
         # invalid conditions
         df = DataFrame(
@@ -972,24 +976,13 @@ def test_where_nullable_invalid_na(frame_or_series, any_numeric_ea_dtype):
             obj.mask(mask, null)
 
 
-@pytest.mark.parametrize(
-    "data",
-    [
-        [1, 2, None],
-        [1.5, None, 3.0],
-        [None, None, None],
-        ["a", None, "c"],
-        [],
-        [{"a": 1}, None, {"b": 2}],
-        [[1, 2], None, [3]],
-    ],
-)
+@pytest.mark.slow
+@given(data=OPTIONAL_ONE_OF_ALL)
 def test_where_inplace_casting(data):
     # GH 22051
     df = DataFrame({"a": data})
-    mask = pd.notnull(df)
-    df_copy = df.where(mask, None).copy()
-    df.where(mask, None, inplace=True)
+    df_copy = df.where(pd.notnull(df), None).copy()
+    df.where(pd.notnull(df), None, inplace=True)
     tm.assert_equal(df, df_copy)
 
 

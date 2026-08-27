@@ -14,7 +14,6 @@ from typing import (
 )
 import warnings
 
-from pandas.errors import Pandas4Warning
 from pandas.util._decorators import (
     set_module,
 )
@@ -231,18 +230,9 @@ class Accessor:
         return self._accessor(obj)
 
 
-def __getattr__(name: str):
-    if name == "CachedAccessor":
-        # Alias kept for downstream libraries
-        warnings.warn(
-            f"{name} is deprecated and will be removed in a future version. "
-            "Use pandas.core.accessor.Accessor instead.",
-            Pandas4Warning,
-            stacklevel=find_stack_level(),
-        )
-        return Accessor
-
-    raise AttributeError(f"module 'pandas.core.accessor' has no attribute '{name}'")
+# Alias kept for downstream libraries
+# TODO: Deprecate as name is now misleading
+CachedAccessor = Accessor
 
 
 def _register_accessor(

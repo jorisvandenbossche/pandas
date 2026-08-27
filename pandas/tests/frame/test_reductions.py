@@ -13,6 +13,7 @@ from pandas.compat import (
     IS64,
     is_platform_windows,
 )
+from pandas.compat.numpy import np_version_gt2
 from pandas.errors import Pandas4Warning
 import pandas.util._test_decorators as td
 
@@ -41,7 +42,7 @@ from pandas.core import (
 )
 from pandas.tests.extension.decimal import DecimalArray
 
-is_windows_np2_or_is32 = not IS64
+is_windows_np2_or_is32 = (is_platform_windows() and not np_version_gt2) or not IS64
 is_windows_or_is32 = is_platform_windows() or not IS64
 
 
@@ -1129,6 +1130,7 @@ class TestDataFrameAnalytics:
                 tm.assert_series_equal(result, expected)
 
     @pytest.mark.parametrize("axis", [0, 1])
+    @pytest.mark.filterwarnings(r"ignore:PeriodDtype\[B\] is deprecated:FutureWarning")
     def test_idxmin_empty(self, index, skipna, axis):
         # GH53265
         if axis == 0:
@@ -1177,6 +1179,7 @@ class TestDataFrameAnalytics:
             tm.assert_series_equal(result, expected)
 
     @pytest.mark.parametrize("axis", [0, 1])
+    @pytest.mark.filterwarnings(r"ignore:PeriodDtype\[B\] is deprecated:FutureWarning")
     def test_idxmax_empty(self, index, skipna, axis):
         # GH53265
         if axis == 0:

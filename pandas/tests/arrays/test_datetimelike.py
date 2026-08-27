@@ -11,6 +11,7 @@ from pandas._libs import (
     Timestamp,
 )
 from pandas._libs.tslibs import to_offset
+from pandas.compat.numpy import np_version_gt2
 from pandas.errors import Pandas4Warning
 
 from pandas.core.dtypes.dtypes import PeriodDtype
@@ -201,6 +202,9 @@ class SharedTests:
         result = arr.take([-1, 1], allow_fill=True, fill_value=NaT)
         assert result[0] is NaT
 
+    @pytest.mark.filterwarnings(
+        "ignore:Period with BDay freq is deprecated:FutureWarning"
+    )
     def test_take_fill_str(self, arr1d):
         # Cast str fill_value matching other fill_value-taking methods
         result = arr1d.take([-1, 1], allow_fill=True, fill_value=str(arr1d[-1]))
@@ -649,7 +653,7 @@ class TestDatetimeArray(SharedTests):
 
     def test_array_interface(self, datetime_index):
         arr = datetime_index._data
-        copy_false = None
+        copy_false = None if np_version_gt2 else False
 
         # default asarray gives the same underlying data (for tz naive)
         result = np.asarray(arr)
@@ -669,6 +673,9 @@ class TestDatetimeArray(SharedTests):
         assert result is expected
         tm.assert_numpy_array_equal(result, expected)
         result = np.array(arr, dtype="datetime64[ns]")
+        if not np_version_gt2:
+            # TODO: GH 57739
+            assert result is not expected
         tm.assert_numpy_array_equal(result, expected)
 
         # to object dtype
@@ -707,7 +714,7 @@ class TestDatetimeArray(SharedTests):
         # GH#23524
         arr = arr1d
         dti = self.index_cls(arr1d, copy=False)
-        copy_false = None
+        copy_false = None if np_version_gt2 else False
 
         expected = dti.asi8.view("M8[ns]")
         result = np.array(arr, dtype="M8[ns]")
@@ -727,7 +734,7 @@ class TestDatetimeArray(SharedTests):
     def test_array_i8_dtype(self, arr1d):
         arr = arr1d
         dti = self.index_cls(arr1d)
-        copy_false = None
+        copy_false = None if np_version_gt2 else False
 
         expected = dti.asi8
         result = np.array(arr, dtype="i8")
@@ -968,7 +975,7 @@ class TestTimedeltaArray(SharedTests):
 
     def test_array_interface(self, timedelta_index):
         arr = timedelta_index._data
-        copy_false = None
+        copy_false = None if np_version_gt2 else False
 
         # default asarray gives the same underlying data
         result = np.asarray(arr)
@@ -988,6 +995,9 @@ class TestTimedeltaArray(SharedTests):
         assert result is expected
         tm.assert_numpy_array_equal(result, expected)
         result = np.array(arr, dtype="timedelta64[us]")
+        if not np_version_gt2:
+            # TODO: GH 57739
+            assert result is not expected
         tm.assert_numpy_array_equal(result, expected)
 
         # to object dtype

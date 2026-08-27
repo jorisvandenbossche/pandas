@@ -110,7 +110,6 @@ class ODFReader(BaseExcelReader["OpenDocument"]):
         """
         Parse an ODF Table into a list of lists
         """
-        from odf.namespaces import OFFICENS
         from odf.table import (
             CoveredTableCell,
             TableCell,
@@ -133,14 +132,10 @@ class ODFReader(BaseExcelReader["OpenDocument"]):
 
             for sheet_cell in sheet_row.childNodes:
                 if hasattr(sheet_cell, "qname") and sheet_cell.qname in cell_names:
-                    value: Scalar | NaTType
-                    if (
-                        sheet_cell.qname == covered_cell_name
-                        and (OFFICENS, "value") not in sheet_cell.attributes
-                    ):
-                        value = self.empty_value
-                    else:
+                    if sheet_cell.qname == table_cell_name:
                         value = self._get_cell_value(sheet_cell)
+                    else:
+                        value = self.empty_value
 
                     column_repeat = self._get_column_repeat(sheet_cell)
 

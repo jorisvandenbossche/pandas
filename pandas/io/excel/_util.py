@@ -185,7 +185,7 @@ def maybe_convert_usecols(usecols: None) -> None: ...
 
 def maybe_convert_usecols(
     usecols: str | list[int] | list[str] | usecols_func | None,
-) -> list[int] | list[str] | usecols_func | None:
+) -> None | list[int] | list[str] | usecols_func:
     """
     Convert `usecols` into a compatible format for parsing in `parsers.py`.
 
@@ -280,7 +280,6 @@ def pop_header_name(
         The data row to parse for the header name.
     index_col : int, list
         The index columns for our data. Assumed to be non-null.
-        If a list is passed, the maximum ``index_col`` value is used.
 
     Returns
     -------

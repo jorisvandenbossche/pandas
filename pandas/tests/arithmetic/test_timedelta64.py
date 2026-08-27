@@ -1111,9 +1111,7 @@ class TestTimedeltaArraylikeAddSubOps:
         with pytest.raises(TypeError, match=msg):
             tdarr - ts
 
-    @pytest.mark.filterwarnings(
-        "ignore:.*'generic' unit for NumPy timedelta:DeprecationWarning"
-    )
+    @pytest.mark.filterwarnings("ignore:.*generic.*unit.*:DeprecationWarning")
     def test_td64arr_add_datetime64_nat(self, box_with_array):
         # GH#23215
         # The bare np.datetime64("NaT") is load-bearing here: the expected
@@ -2141,6 +2139,7 @@ class TestTimedeltaArraylikeMulDivOps:
             result = np.asarray(left) // right
         tm.assert_equal(result, expected)
 
+    @pytest.mark.filterwarnings("ignore:invalid value encountered:RuntimeWarning")
     def test_td64arr_floordiv_tdscalar(self, box_with_array, scalar_td):
         # GH#18831, GH#19125
         box = box_with_array

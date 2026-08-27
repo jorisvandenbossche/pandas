@@ -19,6 +19,9 @@ pytestmark = [
     pytest.mark.single_cpu,
     pytest.mark.network,
     pytest.mark.filterwarnings(
+        "ignore:Passing a BlockManager to DataFrame:DeprecationWarning"
+    ),
+    pytest.mark.filterwarnings(
         "ignore:The 'fastparquet' engine is deprecated:DeprecationWarning"
     ),
 ]

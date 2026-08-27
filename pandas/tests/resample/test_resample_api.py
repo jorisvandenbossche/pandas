@@ -148,19 +148,12 @@ def test_getitem(test_frame):
     r = test_frame.resample("h")["B"]
     assert r._selected_obj.name == test_frame.columns[1]
 
-    # tuple keys are deprecated but should preserve the current behavior
-    with tm.assert_produces_warning(
-        Pandas4Warning,
-        match="Passing a tuple to __getitem__ is deprecated",
-    ):
-        r = test_frame.resample("h")[("A", "B")]
+    # technically this is allowed
+    r = test_frame.resample("h")["A", "B"]
+    tm.assert_index_equal(r._selected_obj.columns, test_frame.columns[[0, 1]])
 
-    expected = test_frame[["A", "B"]]
-
-    tm.assert_index_equal(
-        r._selected_obj.columns,
-        expected.columns,
-    )
+    r = test_frame.resample("h")["A", "B"]
+    tm.assert_index_equal(r._selected_obj.columns, test_frame.columns[[0, 1]])
 
 
 @pytest.mark.parametrize("key", [["D"], ["A", "D"]])

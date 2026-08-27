@@ -472,6 +472,7 @@ class TestPairwise:
         # not exact: rolling corr rounds differently on 32-bit
         tm.assert_almost_equal(result, expected, check_dtype=False)
 
+    @pytest.mark.filterwarnings("ignore:RuntimeWarning")
     @pytest.mark.parametrize(
         "f",
         [

@@ -110,16 +110,16 @@ if TYPE_CHECKING:
 
 def interleaved_dtype(dtypes: list[DtypeObj]) -> DtypeObj | None:
     """
-    Find the common dtype for `dtypes`.
+    Find the common dtype for `blocks`.
 
     Parameters
     ----------
-    dtypes : List[DtypeObj]
+    blocks : List[DtypeObj]
 
     Returns
     -------
     dtype : np.dtype, ExtensionDtype, or None
-        None is returned when `dtypes` is empty.
+        None is returned when `blocks` is empty.
     """
     if not len(dtypes):
         return None
