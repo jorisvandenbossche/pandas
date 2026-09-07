@@ -380,17 +380,18 @@ cdef tuple _get_zoneinfo_trans_and_deltas(tzinfo tz):
         # handle these dates. See test_zoneinfo_negative_dst_distant_dates for
         # why. GH#65712, GH#65733
         valid = True
-        try:
-            for future_ts, future_delta in future_trans:
-                probe = datetime.fromtimestamp(future_ts + 1, timezone.utc)
-                probe_offset = probe.astimezone(tz).utcoffset().total_seconds()
-                if int(probe_offset) != future_delta:
-                    valid = False
-                    break
-        except (OSError, OverflowError, ValueError):
-            valid = False
+        # try:
+        #     for future_ts, future_delta in future_trans:
+        #         probe = datetime.fromtimestamp(future_ts + 1, timezone.utc)
+        #         probe_offset = probe.astimezone(tz).utcoffset().total_seconds()
+        #         if int(probe_offset) != future_delta:
+        #             valid = False
+        #             break
+        # except (OSError, OverflowError, ValueError):
+        #     valid = False
 
         if valid:
+            print(future_trans)
             for future_ts, future_delta in future_trans:
                 trans_utc.append(future_ts)
                 deltas_seconds.append(future_delta)
