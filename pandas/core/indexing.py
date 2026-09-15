@@ -2609,7 +2609,6 @@ class _iLocIndexer(_LocationIndexer):
         expanded.
         """
         info_axis = self.obj._info_axis_number
-        take_split_path = self._decide_split_path(indexer, value)
 
         if isinstance(indexer, tuple):
             nindexer = []
@@ -2667,6 +2666,21 @@ class _iLocIndexer(_LocationIndexer):
             # must come after setting of missing
             indexer, value = self._maybe_mask_setitem_value(indexer, value)
 
+        if (isinstance(value, ABCSeries) and name != "iloc") or isinstance(value, dict):
+            # GH#66106 align a Series/dict value using the final indexer before
+            # deciding the split path below, so that decision sees the value's
+            # actual (possibly upcast-inducing) dtype rather than a
+            # pre-alignment snapshot -- _maybe_mask_setitem_value above may
+            # already have aligned it, in which case this is a no-op.
+            # TODO(EA): ExtensionBlock.setitem this causes issues with
+            #  setting for extensionarrays that store dicts. Need to decide
+            #  if it's worth supporting that.
+            from pandas import Series
+
+            value = self._align_series(indexer, Series(value))
+
+        take_split_path = self._decide_split_path(indexer, value)
+
         # align and set the values
         if take_split_path:
             # We have to operate column-wise
@@ -2688,10 +2702,9 @@ class _iLocIndexer(_LocationIndexer):
         if isinstance(indexer[0], np.ndarray) and indexer[0].ndim > 2:
             raise ValueError(r"Cannot set values with ndim > 2")
 
-        if (isinstance(value, ABCSeries) and name != "iloc") or isinstance(value, dict):
-            from pandas import Series
-
-            value = self._align_series(indexer, Series(value))
+        # NB: a Series/dict value has already been aligned by
+        #  _setitem_with_indexer, before the split-path decision was made, so
+        #  it is never seen here as anything but an already-aligned array.
 
         # Ensure we have something we can iterate over
         info_axis = indexer[1]
@@ -2923,13 +2936,9 @@ class _iLocIndexer(_LocationIndexer):
         """
         _setitem_with_indexer for the case when we have a single Block.
         """
-        from pandas import Series
-
-        if (isinstance(value, ABCSeries) and name != "iloc") or isinstance(value, dict):
-            # TODO(EA): ExtensionBlock.setitem this causes issues with
-            # setting for extensionarrays that store dicts. Need to decide
-            # if it's worth supporting that.
-            value = self._align_series(indexer, Series(value))
+        # NB: a Series/dict value has already been aligned by
+        #  _setitem_with_indexer, before the split-path decision was made, so
+        #  it is never seen here as anything but an already-aligned array.
 
         info_axis = self.obj._info_axis_number
         item_labels = self.obj._get_axis(info_axis)
@@ -2948,20 +2957,6 @@ class _iLocIndexer(_LocationIndexer):
                     loc = item_labels.get_loc(col)
                     self._setitem_single_column(loc, value, indexer[0])
                     return
-
-            if (
-                self.ndim == 2
-                and len(indexer) == 2
-                and self.obj.shape[1] > 1
-                and not com.is_null_slice(indexer[1])
-                and not isinstance(value, ABCDataFrame)
-                and not can_hold_element(
-                    self.obj._mgr.blocks[0].values,
-                    extract_array(value, extract_numpy=True),
-                )
-            ):
-                self._setitem_with_indexer_split_path(indexer, value, name)
-                return
 
             indexer = maybe_convert_ix(*indexer)  # e.g. test_setitem_frame_align
 
