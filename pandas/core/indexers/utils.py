@@ -23,6 +23,7 @@ from pandas.core.dtypes.common import (
 )
 from pandas.core.dtypes.dtypes import ExtensionDtype
 from pandas.core.dtypes.generic import (
+    ABCExtensionArray,
     ABCIndex,
     ABCSeries,
 )
@@ -305,14 +306,24 @@ def length_of_indexer(indexer, target=None) -> int:
         # slices with start/stop left as None).
         start, stop, step = indexer.indices(target_len)
         return len(range(start, stop, step))
-    elif isinstance(indexer, (ABCSeries, ABCIndex, np.ndarray, list)):
-        if isinstance(indexer, list):
+    elif isinstance(
+        indexer, (ABCSeries, ABCIndex, ABCExtensionArray, np.ndarray, list, tuple)
+    ):
+        if isinstance(indexer, (list, tuple)):
             indexer = np.array(indexer)
 
-        if indexer.dtype == bool:
+        if is_bool_dtype(indexer.dtype):
             # GH#25774
-            # np.asarray because Index has no .sum; GH#68021
+            # np.asarray because Index/ExtensionArray may not have .sum; GH#68021
+            # A boolean mask's count of True values is well defined regardless
+            #  of its dimensionality (e.g. a 2-D mask covering a whole block).
             return int(np.asarray(indexer).sum())
+
+        if getattr(indexer, "ndim", 1) != 1:
+            # e.g. a 0-d or 2-D integer ndarray -- not something we can
+            #  meaningfully call a "length" for; let the caller's own
+            #  indexing handle it.
+            raise AssertionError("cannot find the length of the indexer")
         return len(indexer)
     elif isinstance(indexer, range):
         try:

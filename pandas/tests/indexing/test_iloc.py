@@ -2109,6 +2109,32 @@ def test_iloc_setitem_single_column_key_row_key_length_of_indexer_cannot_measure
     tm.assert_frame_equal(df, expected)
 
 
+@pytest.mark.parametrize(
+    "row_key",
+    [
+        pd.array([0, 1, 2], dtype="Int64"),
+        pd.array([True, True, True, False], dtype="boolean"),
+        pd.Categorical([0, 1, 2]),
+        (0, 1, 2),
+    ],
+)
+def test_iloc_setitem_single_column_key_length_of_indexer_cannot_measure_mixed_dtype(
+    row_key,
+):
+    # GH#68021 a mixed-dtype frame already takes the per-column path for any
+    #  row key, so this reaches length_of_indexer regardless of the
+    #  single-block behavior tested above, and already raised AssertionError
+    #  for these row keys (masked array, Categorical, tuple) -- a pre-existing
+    #  bug independent of GH#68021, fixed by extending length_of_indexer
+    df = pd.DataFrame({"a": np.zeros(4), "b": np.zeros(4), "c": list("wxyz")})
+
+    df.iloc[row_key, [1]] = [1.0, 2.0, 3.0]
+
+    expected = pd.DataFrame({"a": np.zeros(4), "b": np.zeros(4), "c": list("wxyz")})
+    expected["b"] = [1.0, 2.0, 3.0, 0.0]
+    tm.assert_frame_equal(df, expected)
+
+
 def test_iloc_setitem_boolean_column_key_selecting_one_column():
     # GH#68021 _ensure_iterable_column_indexer leaves a list of bools alone, so
     #  the per-column path would have taken True for a position
