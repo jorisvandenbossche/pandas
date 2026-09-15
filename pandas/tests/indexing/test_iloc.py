@@ -2027,12 +2027,14 @@ def test_iloc_setitem_single_column_key_tuples_matching_width_still_2d():
 
 def test_iloc_setitem_single_column_key_length_mismatch_still_raises():
     # GH#68021 the per-column path must not swallow a genuine length mismatch.
-    #  The message is numpy's rather than pandas' because a single-block frame
-    #  takes the non-split path; that divergence is deliberate, see GH#65241 and
-    #  test_loc_setitem_int_row_length_mismatch_message.
+    #  A single-column selection always takes the split path now (regardless of
+    #  block structure), so this gets pandas' message rather than numpy's; see
+    #  test_loc_setitem_int_row_length_mismatch_message for the (unrelated,
+    #  still-divergent) scalar-row/multi-column case.
     df = pd.DataFrame(np.zeros((4, 3)), columns=list("abc"))
 
-    with pytest.raises(ValueError, match="setting an array element with a sequence"):
+    msg = "Must have equal len keys and value when setting with an iterable"
+    with pytest.raises(ValueError, match=msg):
         df.iloc[[0, 1], [1]] = [1.0, 2.0, 3.0]
 
 
@@ -2097,9 +2099,9 @@ def test_iloc_setitem_scalar_row_single_column_unchanged():
 def test_iloc_setitem_single_column_key_row_key_length_of_indexer_cannot_measure(
     row_key,
 ):
-    # GH#68021 length_of_indexer does not know these row keys and raises
-    #  AssertionError for them, so they have to keep taking the whole-block
-    #  path instead of the per-column one
+    # GH#68021 length_of_indexer now measures these row keys (masked array,
+    #  Categorical, tuple) too, so the per-column path handles them the same
+    #  way regardless of block structure
     df = pd.DataFrame(np.zeros((4, 3)), columns=list("abc"))
 
     df.iloc[row_key, [1]] = [1.0, 2.0, 3.0]
@@ -2136,8 +2138,9 @@ def test_iloc_setitem_single_column_key_length_of_indexer_cannot_measure_mixed_d
 
 
 def test_iloc_setitem_boolean_column_key_selecting_one_column():
-    # GH#68021 _ensure_iterable_column_indexer leaves a list of bools alone, so
-    #  the per-column path would have taken True for a position
+    # GH#68021 _ensure_iterable_column_indexer now recognizes a plain list of
+    #  bools as a boolean mask (matching what np.ix_ already did), rather than
+    #  leaving it alone and later taking True for a position
     df = pd.DataFrame(np.zeros((5, 1)), columns=["a"])
 
     df.iloc[range(3), [True]] = [1.0, 2.0, 3.0]
@@ -2159,12 +2162,14 @@ def test_iloc_setitem_single_column_key_empty_selection_is_noop(row_key):
 
 
 @pytest.mark.parametrize("row_key", [np.array(0), np.array([[0], [1]])])
-def test_iloc_setitem_single_column_key_non_1d_row_key_keeps_clear_error(row_key):
-    # GH#68021 length_of_indexer cannot measure these, so they keep taking the
-    #  whole-block path and its clearer message
+def test_iloc_setitem_single_column_key_non_1d_row_key_raises(row_key):
+    # GH#68021 length_of_indexer cannot measure these (a 0-d or 2-D ndarray is
+    #  not a meaningful positional indexer), and now raises the same way
+    #  regardless of block structure instead of only on split (mixed-dtype)
+    #  frames.
     df = pd.DataFrame(np.zeros((4, 3)), columns=list("abc"))
 
-    with pytest.raises(ValueError, match="Cross index must be 1 dimensional"):
+    with pytest.raises(AssertionError, match="cannot find the length of the indexer"):
         df.iloc[row_key, [1]] = [1.0, 2.0]
 
 
@@ -2190,10 +2195,9 @@ def test_iloc_setitem_null_slice_column_key_single_column_frame():
 
 
 def test_iloc_setitem_boolean_index_row_key():
-    # GH#68021 on a single-block frame this raised the same
-    #  "setting an array element with a sequence" as every other row key; it
-    #  reaches length_of_indexer, and so the Index.sum() crash, only via the
-    #  new per-column route
+    # GH#68021 a single-block frame now takes the per-column route like a
+    #  split (mixed-dtype) frame already did, reaching length_of_indexer,
+    #  which now handles a boolean-dtype Index (it has no .sum())
     df = pd.DataFrame(np.zeros((4, 3)), columns=list("abc"))
 
     df.iloc[pd.Index([True, True, True, False]), [1]] = [1.0, 2.0, 3.0]

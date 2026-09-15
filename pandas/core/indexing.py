@@ -2511,6 +2511,28 @@ class _iLocIndexer(_LocationIndexer):
         ):
             take_split_path = True
 
+        # GH#68021 a selection that resolves to a single column gets no benefit
+        # from the whole-block np.ix_ fast path below -- there is only one
+        # column to set either way -- and that path's cross-product indexer
+        # cannot broadcast a 1-D value into it. Route it through the split
+        # path instead, which sets that one column directly via
+        # _setitem_single_column and so does not depend on block structure.
+        # An integer column key already drops the column axis (numpy
+        # broadcasts fine into the resulting 1-D selection) and a scalar row
+        # key is a single-cell assignment (handled specially, including
+        # nested values, by the whole-block path) -- both are excluded.
+        if (
+            not take_split_path
+            and self.ndim == 2
+            and isinstance(indexer, tuple)
+            and len(indexer) == 2
+            and not is_integer(indexer[1])
+            and not is_scalar(indexer[0])
+        ):
+            ilocs = self._ensure_iterable_column_indexer(indexer[1])
+            if len(ilocs) == 1:
+                take_split_path = True
+
         return take_split_path
 
     def _setitem_new_column(self, indexer, key, value, name: str) -> None:
@@ -2941,41 +2963,6 @@ class _iLocIndexer(_LocationIndexer):
                 self._setitem_with_indexer_split_path(indexer, value, name)
                 return
 
-            if (
-                self.ndim == 2
-                and len(indexer) == 2
-                # an integer column key drops the column axis, so the selection
-                #  stays 1-D and numpy broadcasts the value into it just fine
-                and not is_integer(indexer[1])
-                and not is_scalar(indexer[0])
-                and not isinstance(value, ABCDataFrame)
-                and is_list_like_indexer(value)
-                and getattr(value, "ndim", 1) == 1
-                # length_of_indexer below measures only these, and only in
-                #  one dimension; every other row key (masked/Categorical/tuple,
-                #  0-d or 2-D ndarray) has to keep taking the whole-block path,
-                #  which reports its own, clearer errors.  GH#68021
-                and isinstance(
-                    indexer[0], (slice, range, list, np.ndarray, ABCSeries, ABCIndex)
-                )
-                and getattr(indexer[0], "ndim", 1) == 1
-            ):
-                ilocs = self._ensure_iterable_column_indexer(indexer[1])
-                if len(ilocs) == 1 and not _is_2d_value_for_columns(value, 1):
-                    # _ensure_iterable_column_indexer leaves a non-ndarray
-                    #  boolean key alone, so ilocs[0] can be True rather than a
-                    #  position; that is not ours to set column-wise
-                    loc = ilocs[0]
-                    if is_integer(loc):
-                        nrows = length_of_indexer(indexer[0], self.obj.index)
-                        if nrows == len(value):
-                            # GH#68021 the cross-product selection is (N, 1) but
-                            #  the value is 1-D of length N, which numpy cannot
-                            #  broadcast into it.  Set the single column row-wise,
-                            #  as the split path does.
-                            self._setitem_single_column(int(loc), value, indexer[0])
-                            return
-
             indexer = maybe_convert_ix(*indexer)  # e.g. test_setitem_frame_align
 
         if isinstance(value, ABCDataFrame) and name != "iloc":
@@ -3106,10 +3093,14 @@ class _iLocIndexer(_LocationIndexer):
             ilocs = [column_indexer]
         elif isinstance(column_indexer, slice):
             ilocs = range(len(self.obj.columns))[column_indexer]
-        elif (
-            isinstance(column_indexer, np.ndarray) and column_indexer.dtype.kind == "b"
-        ):
-            ilocs = np.arange(len(column_indexer))[column_indexer]
+        elif com.is_bool_indexer(column_indexer):
+            # GH#68021 recognize a boolean mask regardless of container type
+            #  (plain list, Series, Index, ExtensionArray, ...), matching how
+            #  np.ix_ itself already interprets these as masks rather than
+            #  positions -- not just a boolean-dtype ndarray.
+            ilocs = np.arange(len(column_indexer))[
+                np.asarray(column_indexer, dtype=bool)
+            ]
         else:
             ilocs = column_indexer
         return ilocs
